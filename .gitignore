@@ -1,0 +1,13 @@
+/build
+/doc/build
+*.pyc
+/dist/
+.anjuta
+.idea/
+.settings/
+.project
+.pydevproject
+FGAme.anjuta
+fgame.nja
+MANIFEST
+.anjuta_sym_db.db
