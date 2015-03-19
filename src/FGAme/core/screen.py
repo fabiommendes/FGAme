@@ -182,7 +182,8 @@ class Canvas(Screen):
             self.paint_poly(poly.vertices, poly.color, poly.solid)
         else:
             raise NotImplementedError
-        
+ 
+#TODO: remover essa classe daqui!       
 class PyGameCanvas(Canvas):
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
 
