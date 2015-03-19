@@ -1,0 +1,64 @@
+#-*- coding: utf8 -*-
+
+__all__ = ['env']
+
+class Environment(object):
+    '''Classe que atua apenas como um namespace para as variáveis globais.'''
+
+    #===========================================================================
+    # Propriedades relativas ao backend
+    #===========================================================================
+    backend = None
+    backends = ['pygame', 'pygamegfx', 'pygamegl', 'sdl2']
+    backends_conf = dict(
+        pygame    = ('PyGameCanvas', 'PyGameInput', 'StepperMainLoop'),
+        pygamegfx = ('PyGameGFXCanvas', 'PyGameInput', 'StepperMainLoop'),
+        pygamegl  = ('PyGameGLCanvas', 'PyGameInput', 'StepperMainLoop'),
+        sdl2      = ('SDL2Canvas', 'SDL2Input', 'StepperMainLoop'),
+        pyglet    = ('PyGletCanvas', 'PyGletInput', 'PyGletMainLoop'),
+        kivy      = ('KivyCanvas', 'KivyInput', 'KivyMainloop'),
+    )
+    
+    #===========================================================================
+    # Leitura de entradas do usuário
+    #===========================================================================
+    input_class = None
+    input_object = None
+    
+    #===========================================================================
+    # Propriedades da tela
+    #===========================================================================
+    canvas_class = None
+    canvas_object = None
+    window_origin = (0, 0)
+    window_shape = None
+    
+    @property
+    def window_width(self): return self.window_shape[0]
+    
+    @property
+    def window_height(self): return self.window_shape[1]
+    
+    @window_width.setter
+    def window_width(self, value):
+        self.canvas_shape = (value, self.window_shape[1])
+    
+    @window_height.setter
+    def window_height(self, value):
+        self.canvas_shape = (self.window_height[0], value)
+    
+    #===========================================================================
+    # Propriedades do loop principal
+    #===========================================================================
+    mainloop_class = None
+    mainloop_object = None
+    
+    #===========================================================================
+    # Controle de inicialização e configuração
+    #===========================================================================
+    has_init = False
+    app_name = None
+    conf_path = None
+    
+
+env = Environment()
