@@ -543,9 +543,11 @@ class FilteredSignal(Signal):
         return trigger_method
 
 class DelegateSignal(Signal):
-    def __init__(self, name, delegate):
+    def __init__(self, name, delegate, num_filters=0, filter_names=None):
         super(DelegateSignal, self).__init__(name)
         self.delegate = delegate
+        self._num_filters = num_filters
+        self._filter_names = filter_names
     
     def _factory_listen_method(self):
         signal = self
@@ -728,7 +730,11 @@ def signal(name, *filters, **kwds):
     num_filters = len(filters)
     delegate = kwds.pop('delegate', None)
     if delegate:
-        return DelegateSignal(name, delegate=delegate)
+        if num_filters == 0:
+            return DelegateSignal(name, delegate=delegate)
+        else:
+            return DelegateSignal(name, delegate=delegate, 
+                                  num_filters=num_filters, filter_names=filters)
     elif num_filters == 0:
         return Signal(name, num_args=num_args)
     elif num_filters == 1:

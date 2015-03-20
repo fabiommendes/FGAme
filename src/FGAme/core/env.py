@@ -10,14 +10,7 @@ class Environment(object):
     #===========================================================================
     backend = None
     backends = ['pygame', 'pygamegfx', 'pygamegl', 'sdl2']
-    backends_conf = dict(
-        pygame    = ('PyGameCanvas', 'PyGameInput', 'StepperMainLoop'),
-        pygamegfx = ('PyGameGFXCanvas', 'PyGameInput', 'StepperMainLoop'),
-        pygamegl  = ('PyGameGLCanvas', 'PyGameInput', 'StepperMainLoop'),
-        sdl2      = ('SDL2Canvas', 'SDL2Input', 'StepperMainLoop'),
-        pyglet    = ('PyGletCanvas', 'PyGletInput', 'PyGletMainLoop'),
-        kivy      = ('KivyCanvas', 'KivyInput', 'KivyMainloop'),
-    )
+    backend_classes = None
     
     #===========================================================================
     # Leitura de entradas do usuário

@@ -1,6 +1,8 @@
 import os
 import importlib
 
+__all__ = ['get_screen_class', 'get_input_class', 'get_mainloop_class', 
+           'get_backend_classes', 'supports_backend']
 GLOBAL_INFO = None
 
 def get_info():
@@ -23,10 +25,11 @@ def get_info():
                     input=conf.input,
                     screen=conf.screen,
                     mainloop=conf.mainloop,
+                    imports=conf.imports,
                 )
         return out 
 
-def get_classes(backend):
+def get_backend_classes(backend):
     '''Retorna um dicionário mapeando 'input', 'screen' e 'mainloop' nas 
     respectivas classes para o backend selecionado.
     
@@ -34,7 +37,7 @@ def get_classes(backend):
     --------
     
     >>> from FGAme.backends import pygame as pygame_be
-    >>> D = get_classes('pygame')
+    >>> D = get_backend_classes('pygame')
     >>> D == {'input':    pygame_be.PyGameInput, 
     ...       'mainloop': pygame_be.PyGameMainLoop,
     ...       'screen':   pygame_be.PyGameCanvas}
@@ -42,7 +45,8 @@ def get_classes(backend):
     '''
     
     D = get_info()[backend]
-    return {k: _get_class_worker(k, backend) for k in D}
+    classes = ('input', 'mainloop', 'screen')
+    return {k: _get_class_worker(k, backend) for k in classes}
 
 def _get_class_worker(cls, backend):
     '''Implementa as funções get_screen, get_input, get_mainloop, etc'''
@@ -63,8 +67,20 @@ def get_input_class(backend):
 
 def get_mainloop_class(backend):
     '''Retorna a classe de mainloop para o backend selecionado'''
-    
+
     return _get_class_worker('mainloop', backend)
+
+def supports_backend(backend):
+    '''Retorna True caso o backend fornecido seja suportado'''
+    
+    imports = get_info()[backend]['imports']
+    try:
+        for module in imports:
+            importlib.import_module(module)
+        else:
+            return True
+    except ImportError:
+        return False
 
 if __name__ == '__main__':
     import doctest

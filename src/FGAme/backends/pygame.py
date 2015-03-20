@@ -1,7 +1,8 @@
+from math import trunc
+import string
 import pygame
-from FGAme.core.screen import Canvas
-from FGAme.core.input import Input
-from FGAme.core.mainloop import MainLoop
+from FGAme.core import env, Canvas, Input, MainLoop
+from FGAme.draw import Color
 
 class PyGameCanvas(Canvas):
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
@@ -78,6 +79,7 @@ class PyGameInput(Input):
         import pygame
         pygame.init()
         D = self._key_conversions
+        window_height = env.window_height
         
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -88,7 +90,7 @@ class PyGameInput(Input):
                 self.process_key_up(D.get(event.key))
             elif event.type == MOUSEMOTION:
                 x, y = event.pos
-                y = env.window_height - y
+                y = window_height - y
                 self.process_mouse_motion((x, y))
 
         self.process_long_press()

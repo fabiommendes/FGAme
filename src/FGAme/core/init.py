@@ -2,6 +2,7 @@
 import importlib
 from FGAme.core import log
 from FGAme.core import env
+from FGAme import backends
 
 class Control(object):
     '''Classe com funções de inicialização da FGAme'''
@@ -79,21 +80,17 @@ class Control(object):
         
         # Carrega backend pelo nome
         if isinstance(backend, str):
-            if not self.supports_backend(backend):
+            if not backends.supports_backend(backend):
                 raise ValueError('%s backend is not supported in your system' % backend)
             
-            canvas, input_, mainloop = self._backends_conf[backend]
-            core = importlib.import_module('FGAme.core')
-            self._canvas_class = getattr(core, canvas)
-            self._input_class = getattr(core, input_)
-            self._mainloop_class = getattr(core, mainloop)
             self._backend = backend
+            self._backend_classes = backends.get_backend_classes(backend)
             log.info('conf: Backend set to %s' % backend)
             
         # Carrega backend a partir de uma lista
         else:
             for be in backend:
-                if self.supports_backend(be):
+                if backends.supports_backend(be):
                     self.set_backend(be)
                     break
             else:
@@ -110,24 +107,6 @@ class Control(object):
     #===========================================================================
     # Query functions -- can be executed any time
     #===========================================================================
-    def supports_backend(self, backend):
-        '''Retorna True caso o sistema suporte o backend selecionado'''
-        
-        if backend in ['pygame', 'pygamegfx', 'pygamegl']:
-            try:
-                import pygame  # @UnusedImport
-                return True
-            except ImportError:
-                return False
-        elif backend == 'sdl2':
-            try:
-                import sdl2  # @UnusedImport
-                return True
-            except ImportError:
-                return False
-        else:
-            raise ValueError('invalid backend: %s' % backend)
-        
     def get_window_shape(self):
         '''Retorna uma tupla com a resolução da janela em pixels'''
         
@@ -173,38 +152,34 @@ class Control(object):
     def _init_canvas(self, *args, **kwds):
         '''Inicia a tela'''
         
-        # Encontra uma classe apropriada
-        #FIXME: refatorar a organização dos backends
         if self._canvas_class is None:
-            from FGAme.core.screen import PyGameCanvas
-            self._canvas_class = PyGameCanvas
+            self.set_backend()
+            self._canvas_class = self._backend_classes['screen']
             
         if not args:
-            obj = self._canvas_class(shape=self._window_shape or (800, 600), **kwds)
+            canvas = self._canvas_class(shape=self._window_shape or (800, 600), **kwds)
         elif len(args) == 2:
-            obj = self._canvas_class(shape=args, **kwds)
+            canvas = self._canvas_class(shape=args, **kwds)
         elif args == ('fullscreen',):
-            obj = self._canvas_class(shape=args, **kwds)
+            canvas = self._canvas_class(shape=args, **kwds)
         
-        obj.start()
-        self._canvas_object = obj
-        return obj
+        # Save environment variables
+        self._window_shape = canvas.shape
+        self._canvas_object = canvas
+        canvas.start()
+        return canvas
         
     def _init_input(self):
-        # Encontra uma classe apropriada
-        #FIXME: refatorar a organização dos backends
         if self._input_class is None:
-            from FGAme.core.input import PyGameInput
-            self._input_class = PyGameInput
+            self.set_backend()
+            self._input_class = self._backend_classes['input']
         
         return self._input_class()
     
     def _init_mainloop(self):
-        # Encontra uma classe apropriada
-        #FIXME: refatorar a organização dos backends
         if self._mainloop_class is None:
-            from FGAme.core.mainloop import MainLoop
-            self._mainloop_class = MainLoop
+            self.set_backend()
+            self._mainloop_class = self._backend_classes['mainloop']
         
         return self._mainloop_class()
         

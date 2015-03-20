@@ -1,5 +1,5 @@
 #-*-coding: utf8 -*-
-from FGAme import PyGameCanvas
+from FGAme import init_canvas
 from FGAme.draw import *
 from time import sleep
 
@@ -11,11 +11,11 @@ tree.add(RectangleAA((100, 100, 200, 200), color='blue'))
 tree.add(Poly([(400, 200), (800, 200), (600, 500)], color='black'))
 
 # Cria um objeto Canvas com a geometria da tela
-canvas = PyGameCanvas(800, 600)
+canvas = init_canvas(800, 600)
 
 # Loop principal
 for i in range(50):
-    canvas.clear_background()
+    canvas.clear_background('white')
     canvas.draw_tree(tree)
     canvas.flip()
     sleep(0.01)

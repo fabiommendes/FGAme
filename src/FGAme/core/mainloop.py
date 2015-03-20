@@ -50,5 +50,3 @@ class MainLoop(object):
     def stop(self):
         self._running = False
 
-class StepperMainLoop(MainLoop):
-    pass
