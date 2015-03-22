@@ -3,7 +3,7 @@
 Classes abstratas
 -----------------
 
-Todos os objetos físicos na FGAme herdam da classe Object ou de uma das 
+Todos os objetos físicos na FGAme herdam da classe Object ou de uma das
 subclasses derivadas aqui. Não é possível instanciar estas classes diretamente,
 mas elas são a base para todos os tipos de objetos utilizados na FGAme.
 
@@ -20,15 +20,12 @@ Classes derivadas
 Funções especiais para a criação de objetos
 --------------------------------------------
 
-#.. automodule :: FGAme.letters 
+#.. automodule :: FGAme.letters
 
 '''
 
-from .collision import *
-from .base import *
-from .aabb import *
-from .ball import *
-from .poly import *
 from .force import *
+from .collision import *
+from .objects import *
 from .simulation import *
 from .world import *

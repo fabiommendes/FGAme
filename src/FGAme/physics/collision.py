@@ -1,17 +1,21 @@
 #-*- coding: utf8 -*-
-from FGAme.mathutils import *
+from FGAme.mathutils import Vector, cross, dot, shadow_x, shadow_y
 from FGAme.util import multifunction
 
-#===============================================================================
+#=========================================================================
 # Classe Colisão -- representa uma colisão entre dois objetos.
 # Resolve a colisão sob demanda.
-#===============================================================================
+#=========================================================================
+
+
 class Collision(object):
-    '''Representa a colisão entre dois objetos. 
-    
+
+    '''Representa a colisão entre dois objetos.
+
     Subclasses de Collision devem implementar o método .resolve(dt) que resolve
     a colisão entre os objetos respeitando os vínculos de is_dynamic*.
     '''
+
     def __init__(self, A, B, pos, n, delta=None, world=None):
         self.objects = A, B
         self.world = world
@@ -20,7 +24,7 @@ class Collision(object):
         self.delta = delta
 
     def get_impulse(self, dt=0):
-        '''Calcula o impulso devido à colisão. Retorna o impulso gerado pelo 
+        '''Calcula o impulso devido à colisão. Retorna o impulso gerado pelo
         objeto A em cima do objeto B. (Ou seja: A recebe o negativo do impulso,
         enquanto B recebe o valor positivo).'''
 
@@ -170,20 +174,24 @@ class Collision(object):
     def object_B(self):
         return self.objects[1]
 
-#===============================================================================
+#=========================================================================
 # Funções de detecção e início de resolução de colisão
-#===============================================================================
+#=========================================================================
+
+
 class CollisionError(Exception):
-    '''Declara que não existem colisões disponíveis para os dois tipos de 
+
+    '''Declara que não existem colisões disponíveis para os dois tipos de
     objetos'''
     pass
 
+
 @multifunction(None, None)
 def get_collision(A, B):
-    '''Retorna um objeto de colisão caso ocorra uma colisão com o objeto 
-    other. Caso não haja colisão, retorna None. 
-    
-    Esta função é implementada por multidispatch. As classes derivadas de 
+    '''Retorna um objeto de colisão caso ocorra uma colisão com o objeto
+    other. Caso não haja colisão, retorna None.
+
+    Esta função é implementada por multidispatch. As classes derivadas de
     PhysicsObject devem registrar explicitamente a colisão entre todos os pares
     suportados (ex.: Circle com Circle, Circle com AABB, etc). Caso não tenha
     nenhuma implementação registrada, então utiliza-se a lógica de AABB's.'''
@@ -191,6 +199,7 @@ def get_collision(A, B):
     tA = type(A).__name__
     tB = type(B).__name__
     raise CollisionError('no collision defined for: (%s, %s)' % (tA, tB))
+
 
 def get_collision_aabb(A, B):
     '''Retorna uma colisão com o objeto other considerando apenas a caixas

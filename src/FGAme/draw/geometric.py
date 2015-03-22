@@ -3,20 +3,24 @@ from FGAme.draw import Drawable, Color
 from FGAme.mathutils import VectorM, sin, cos, pi
 import copy
 
+
 class Geometric(Drawable):
+
     '''Classe pai para todos os objetos geométricos'''
-    
-    # Especifica a geometria primitiva explicitamente --------------------------
+
+    # Especifica a geometria primitiva explicitamente ------------------------
     is_circle = False
     is_poly = False
     is_line = False
     is_rect = False
     is_drawable = True
 
-    # Constantes da classe -----------------------------------------------------
+    # Constantes da classe ---------------------------------------------------
     __slots__ = ['pos', 'theta', 'solid', 'lw', 'color']
 
-    def __init__(self, pos=(0, 0), theta=0.0, color='black', solid=True, lw=0.0):
+    def __init__(self,
+                 pos=(0, 0), theta=0.0,
+                 color='black', solid=True, lw=0.0):
         self.pos = VectorM(*pos)
         self.theta = float(theta)
         self.solid = bool(solid)
@@ -43,12 +47,14 @@ class Geometric(Drawable):
     def as_vertices(self, relative=False):
         raise NotImplementedError
 
+
 class Circle(Geometric):
+
     '''Objetos da classe Circle representam círculos.'''
-    
+
     __slots__ = ['radius']
     is_circle = True
-    
+
     def __init__(self, pos, radius, color='black', solid=True, lw=0.0):
         super(Circle, self).__init__(pos, 0, color, solid, lw)
         self.radius = float(radius)
@@ -63,30 +69,34 @@ class Circle(Geometric):
         R = self._radius * (self._scale if scaled else 1)
         cos, sin = cos, sin
 
-        if relative == False:
+        if not relative:
             delta = 2 * pi / N
             vertices = ((cos(delta * t), sin(delta * t)) for t in range(N))
             return list(vertices)
         X, Y = self._pos
-        return [ (x + X, y + Y) for (x, y) in vertices ]
+        return [(x + X, y + Y) for (x, y) in vertices]
 
     def paint(self, screen):
         screen.paint_circle(self.pos, self.radius, self.color)
 
+
 class RectangleAA(Geometric):
-    '''Objetos da classe RectangleAA representam retângulos alinhados aos eixos 
+
+    '''Objetos da classe RectangleAA representam retângulos alinhados aos eixos
     principais.
-    
-    É inicializado com uma tupla (x, y, dx, dy) onde (x,y) representam as 
+
+    É inicializado com uma tupla (x, y, dx, dy) onde (x,y) representam as
     coordenadas inferior-esquerda do retângulo e dx e dy as dimensões nos eixos
     X e Y respectivamente.
-    
+
     Existem construtores alternativos: centered(), ..., etc.
     '''
     __slots__ = ['shape']
     is_rect = True
-    
-    def __init__(self, rect=None, shape=None, pos=(0, 0), color='black', solid=True, lw=0.0):
+
+    def __init__(self,
+                 rect=None, shape=None, pos=(0, 0),
+                 color='black', solid=True, lw=0.0):
         if rect:
             super(RectangleAA, self).__init__(rect[:2], 0, color, solid, lw)
             self.shape = tuple(rect[2:])
@@ -95,11 +105,11 @@ class RectangleAA(Geometric):
         else:
             super(RectangleAA, self).__init__(pos, 0, color, solid, lw)
             self.shape = shape
-        
-    # Construtores alternativos ------------------------------------------------
+
+    # Construtores alternativos ----------------------------------------------
     @classmethod
     def centered(self, *args, **kwds):
-        '''Inicia o retângulo especificando as coordenadas do centro e as 
+        '''Inicia o retângulo especificando as coordenadas do centro e as
         dimensões em X e em Y.'''
         if len(args) == 1:
             x, y, dx, dy = args[0]
@@ -110,15 +120,15 @@ class RectangleAA(Geometric):
             x, y, dx, dy = args
         else:
             raise TypeError('must be initialized with 1, 2, or 4 arguments')
-        x -= dx/2
-        y -= dy/2
+        x -= dx / 2
+        y -= dy / 2
         return RectangleAA((x, y, dx, dy), **kwds)
-    
-    # Funções da API -----------------------------------------------------------
+
+    # Funções da API ---------------------------------------------------------
     @property
     def rect(self):
         return tuple(self.pos) + self.shape
-    
+
     def rotate(self, theta):
         raise ValueError('cannot rotate a Rect object')
 
@@ -130,13 +140,13 @@ class RectangleAA(Geometric):
 
     def as_vertices(self, mode=4, relative=False, scaled=True):
         '''Calcula apenas os vértices do polígono
-        
+
         Parameters
         ----------
-        
+
         mode : int
             Modo de conversão, caso a posição seja relativa: 0-começa no canto
-            inferior direito, em sentido anti-horário até 3. `mode=4` 
+            inferior direito, em sentido anti-horário até 3. `mode=4`
             corresponde ao centro.
         '''
         if scaled:
@@ -171,15 +181,17 @@ class RectangleAA(Geometric):
         if relative:
             return vertices
         else:
-            return [ (x + X, y + Y) for (x, y) in vertices ]
+            return [(x + X, y + Y) for (x, y) in vertices]
+
 
 class Poly(Geometric):
+
     '''Objetos da classe Poly representam polígonos especificados por uma lista
     de vértices.'''
-    
+
     is_poly = True
     __slots__ = ['vertices']
-    
+
     def __init__(self, vertices, color='black', solid=True, lw=0):
         super(Poly, self).__init__((0, 0), 0, color, solid, lw)
         self.vertices = vertices
@@ -191,24 +203,27 @@ class Poly(Geometric):
         vertices = self.vertices
         if scaled and self._scale != 0:
             scale = self._scale
-            vertices = [ v * scale for v in vertices ]
+            vertices = [v * scale for v in vertices]
         if relative:
             pos = self._pos
-            return [ v + pos for v in vertices ]
+            return [v + pos for v in vertices]
         return vertices
 
-#===============================================================================
+#=========================================================================
 # Delegate classes
-#===============================================================================
+#=========================================================================
+
+
 class GeometricEcho(object):
-    '''Classe base para objetos geométricos sem estado que assumem suas 
+
+    '''Classe base para objetos geométricos sem estado que assumem suas
     características do objeto físico correspondente'''
-    
+
     __slots__ = ['obj', 'color', 'lw', 'solid']
 
     def __init__(self, obj, color=None, lw=None, solid=None):
         self.obj = obj
-        
+
         if color is None:
             try:
                 self.color = obj.color or Color('black')
@@ -216,7 +231,7 @@ class GeometricEcho(object):
                 self.color = Color('black')
         else:
             self.color = Color(color)
-        
+
         if lw is None:
             try:
                 self.lw = obj.lw
@@ -224,7 +239,7 @@ class GeometricEcho(object):
                 self.lw = 0.0
         else:
             self.lw = float(lw)
-        
+
         if solid is None:
             try:
                 self.solid = obj.solid
@@ -232,27 +247,29 @@ class GeometricEcho(object):
                 self.solid = True
         else:
             self.solid = bool(solid)
-            
+
     @property
     def pos(self):
         return self.obj.pos
-    
+
     @property
     def theta(self):
         return self.obj.theta
-    
+
+
 class CircleEcho(GeometricEcho):
     base = Circle
     is_circle = True
-    
+
     @property
     def radius(self):
         return self.obj.radius
 
+
 class RectEcho(GeometricEcho):
     base = RectangleAA
     is_rect = True
-    
+
     @property
     def shape(self):
         return self.obj.shape
@@ -260,7 +277,8 @@ class RectEcho(GeometricEcho):
     @property
     def rect(self):
         return self.obj.rect
-    
+
+
 class PolyEcho(GeometricEcho):
     base = Poly
     is_poly = True

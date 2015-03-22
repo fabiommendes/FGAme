@@ -6,11 +6,14 @@ from FGAme.core import EventDispatcher, signal
 from FGAme.core import conf
 from FGAme.draw import RenderTree, color_property
 
-#===============================================================================
+#=========================================================================
 # Classe Mundo -- coordena todos os objetos com uma física definida e resolve a
 # interação entre eles
-#===============================================================================
+#=========================================================================
+
+
 class World(EventDispatcher):
+
     '''Documente-me!
     '''
 
@@ -18,16 +21,20 @@ class World(EventDispatcher):
                  gravity=None, damping=0, adamping=0,
                  rest_coeff=1, sfriction=0, dfriction=0, stop_velocity=1e-6,
                  simulation=None):
-        
+
         self.background = background
         self._render_tree = RenderTree()
-        
+
         if simulation:
             self.simulation = simulation
         else:
             self.simulation = Simulation(
-                gravity=gravity, damping=damping, adamping=adamping,
-                rest_coeff=rest_coeff, sfriction=sfriction, dfriction=dfriction,
+                gravity=gravity,
+                damping=damping,
+                adamping=adamping,
+                rest_coeff=rest_coeff,
+                sfriction=sfriction,
+                dfriction=dfriction,
                 stop_velocity=stop_velocity)
 
         # Controle de callbacks
@@ -36,11 +43,11 @@ class World(EventDispatcher):
 
     background = color_property('background', 'white')
 
-    #===========================================================================
+    #=========================================================================
     # Propriedades do objeto Simulation
-    #===========================================================================
+    #=========================================================================
     @property
-    def gravity(self): 
+    def gravity(self):
         return self.simulation.gravity
 
     @gravity.setter
@@ -62,20 +69,20 @@ class World(EventDispatcher):
     @adamping.setter
     def adamping(self, value):
         self.simulation.adamping = value
-        
+
     @property
     def time(self):
         return self.simulation.time
 
-    #===========================================================================
+    #=========================================================================
     # Gerenciamento de objetos
-    #===========================================================================
+    #=========================================================================
     def add(self, obj, layer=0):
         '''Adiciona um novo objeto ao mundo.
-        
+
         Exemplos
         --------
-        
+
         >>> obj = AABB((-10, 10, -10, 10))
         >>> world = World()
         >>> world.add(obj, layer=1)
@@ -91,7 +98,7 @@ class World(EventDispatcher):
         if getattr(obj, 'is_drawable', False):
             self._render_tree.add(obj, layer)
         else:
-            drawable = obj.get_drawable()
+            drawable = obj.visualization
             self._render_tree.add(drawable, layer)
             self.simulation.add(obj)
 
@@ -104,26 +111,27 @@ class World(EventDispatcher):
             self.simulation.remove(obj)
         else:
             self._render_tree.remove(obj)
-            
-    #===========================================================================
+
+    #=========================================================================
     # Controle de eventos
-    #===========================================================================
+    #=========================================================================
     # Delegações
     long_press = signal('long-press', 'key', delegate='simulation')
     key_up = signal('key-up', 'key', delegate='simulation')
     key_down = signal('key-down', 'key', delegate='simulation')
     mouse_motion = signal('mouse-motion', delegate='simulation')
     mouse_click = signal('mouse-click', 'button', delegate='simulation')
-    
+
     # Eventos privados
     frame_enter = signal('frame-enter')
     frame_skip = signal('frame-skip', num_args=1)
     collision = signal('collision', num_args=1)
-    #TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2', num_args=1)
+    # TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2',
+    # num_args=1)
 
-    #===========================================================================
+    #=========================================================================
     # Simulação de Física
-    #===========================================================================
+    #=========================================================================
     def pause(self):
         '''Pausa a simulação de física'''
 
@@ -148,42 +156,42 @@ class World(EventDispatcher):
         self.simulation.update(dt)
         return self.simulation.time
 
-    #===========================================================================
+    #=========================================================================
     # Laço principal
-    #===========================================================================
+    #=========================================================================
     def run(self, timeout=None, real_time=True):
         '''Roda a simulação de física durante o tempo 'timeout' especificado.
-        
+
         O parâmetro `real_time` especifica se o tempo considerado consiste no
         tempo real ou no tempo de simulação.'''
-        
+
         conf._mainloop_object.run(self, timeout=timeout)
 
     def stop(self):
         '''Finaliza o laço principal de simulação'''
-        
+
         conf._mainloop_object.stop()
 
     def set_next_state(self, value):
         '''Passa a simulação para o próximo estado'''
-        
+
         pass
-    
+
     def get_render_tree(self):
         return self._render_tree
-    
-    #===========================================================================
+
+    #=========================================================================
     # Criação de objetos especiais
-    #===========================================================================
+    #=========================================================================
     def set_bounds(self, *args, **kwds):
         '''Cria contorno'''
-        
+
         # Processa argumentos
         hard = kwds.get('hard', True)
         delta = kwds.get('delta', 10000)
         use_poly = kwds.get('use_poly', False)
         color = kwds.get('color', 'black')
-        
+
         if len(args) == 4:
             xmin, xmax, ymin, ymax = args
         elif len(args) == 1:
@@ -191,7 +199,7 @@ class World(EventDispatcher):
         elif not args:
             if 'width' not in kwds:
                 raise TypeError('not enougth parameters to set boundaries')
-            
+
             W, H = conf.get_window_shape()
             value = kwds.pop('width')
             try:
@@ -231,4 +239,3 @@ class World(EventDispatcher):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-

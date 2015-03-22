@@ -1,20 +1,23 @@
 #-*- coding: utf8 -*-
-from FGAme.mathutils import *
+from FGAme.mathutils import Vector, shadow_y
 from FGAme.physics import get_collision, get_collision_aabb, CollisionError
 from FGAme.core import EventDispatcher, signal, init
 from FGAme.core import env
 
-#===============================================================================
+#=========================================================================
 # Classe Mundo -- coordena todos os objetos com uma física definida e resolve a
 # interação entre eles
-#===============================================================================
+#=========================================================================
+
+
 class Simulation(EventDispatcher):
+
     '''Implementa a simulação de física.
-    
-    Os métodos principais são: add(obj) e remove(obj) para adicionar e remover 
-    objetos e update(dt) para atualizar o estado da simulação. Verifique a 
+
+    Os métodos principais são: add(obj) e remove(obj) para adicionar e remover
+    objetos e update(dt) para atualizar o estado da simulação. Verifique a
     documentação do método update() para uma descrição detalhada sobre como
-    a física é resolvida em cada etapa de simulação. 
+    a física é resolvida em cada etapa de simulação.
     '''
 
     def __init__(self, gravity=None, damping=0, adamping=0,
@@ -39,10 +42,10 @@ class Simulation(EventDispatcher):
         self.input = env.input_object
         super(Simulation, self).__init__()
 
-    #===========================================================================
+    #=========================================================================
     # Propriedades
-    #===========================================================================
-    
+    #=========================================================================
+
     #
     # Vetor com a aceleração da gravidade (em px/s^2)
     #
@@ -91,24 +94,24 @@ class Simulation(EventDispatcher):
             if not obj.owns_adamping:
                 obj._adamping = value
 
-    #===========================================================================
+    #=========================================================================
     # Gerenciamento de objetos
-    #===========================================================================
+    #=========================================================================
     def add(self, obj):
         '''Adiciona um novo objeto ao mundo.
-        
+
         Exemplos
         --------
-        
-        >>> obj = AABB((-10, 10, -10, 10))
+
+        >>> from FGAme import *
+        >>> obj = AABB(bbox=(-10, 10, -10, 10))
         >>> world = World()
         >>> world.add(obj, layer=1)
         '''
-        
+
         if obj not in self._objects:
             self._objects.append(obj)
             self._objects.sort()
-            obj.is_alive = True
             if not obj.owns_gravity:
                 obj._gravity = self.gravity
             if not obj.owns_damping:
@@ -124,24 +127,25 @@ class Simulation(EventDispatcher):
         except IndexError:
             pass
 
-    #===========================================================================
+    #=========================================================================
     # Controle de eventos
-    #===========================================================================
+    #=========================================================================
     # Delegações
     long_press = signal('long-press', 'key', delegate='input')
     key_up = signal('key-up', 'key', delegate='input')
     key_down = signal('key-down', 'key', delegate='input')
     mouse_motion = signal('mouse-motion', delegate='input')
     mouse_click = signal('mouse-click', 'button', delegate='input')
-    
+
     # Eventos privados
     frame_enter = signal('frame-enter')
     collision = signal('collision', num_args=1)
-    #TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2', num_args=1)
+    # TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2',
+    # num_args=1)
 
-    #===========================================================================
+    #=========================================================================
     # Simulação de Física
-    #===========================================================================
+    #=========================================================================
     def update(self, dt):
         '''Rotina principal da simulação de física.'''
 
@@ -156,10 +160,10 @@ class Simulation(EventDispatcher):
 
     def pre_update(self, dt):
         '''Executa a rotina de pré-atualização em todos os objetos.
-        
-        A fase de pré-atualização é executada no início de cada frame antes da 
-        atualização da física. Nesta fase objetos podem atualizar o estado 
-        interno ou realizar qualquer tipo de modificação antes do cálculo das 
+
+        A fase de pré-atualização é executada no início de cada frame antes da
+        atualização da física. Nesta fase objetos podem atualizar o estado
+        interno ou realizar qualquer tipo de modificação antes do cálculo das
         forças e colisões.
         '''
 
@@ -171,9 +175,9 @@ class Simulation(EventDispatcher):
             pass
 
     def post_update(self, dt):
-        '''Executa a rotina de pós-atualização em todos os objetos. 
-        
-        Este passo é executado em cada frame após resolver a dinâmica de 
+        '''Executa a rotina de pós-atualização em todos os objetos.
+
+        Este passo é executado em cada frame após resolver a dinâmica de
         forças e colisões.'''
 
         t = self.time
@@ -183,12 +187,11 @@ class Simulation(EventDispatcher):
 
     def detect_collisions(self, dt):
         '''Retorna uma lista com todas as colisões atuais.
-        
-        Uma colisão é caracterizada por um objeto da classe Collision() ou 
+
+        Uma colisão é caracterizada por um objeto da classe Collision() ou
         subclasse.'''
 
-        objects = self._objects
-        objects.sort()
+        objects = sorted(self._objects)
         collisions = []
         objects.sort()
 
@@ -196,16 +199,18 @@ class Simulation(EventDispatcher):
         # caso elas aconteçam, delega a tarefa de detecção fina de colisão para
         # a função get_collision
         for i, A in enumerate(objects):
-            xmax = A.xmax
+            xmax = A._xmax
+            A_static = bool(A._invinertia == A._invmass)
+
             for j in range(i + 1, len(objects)):
                 B = objects[j]
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
-                if B.xmin > xmax:
+                if B._xmin > xmax:
                     break
 
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
-                if A._invmass == A._invinertia == B._invmass == B._invinertia == 0:
+                if A_static and (B._invmass == B._invinertia == 0):
                     continue
 
                 # Somente testa as colisões positivas por AABB
@@ -218,8 +223,9 @@ class Simulation(EventDispatcher):
                 if col is not None:
                     col.world = self
                     collisions.append(col)
-                    A.trigger('collision', col)
-                    B.trigger('collision', col)
+                    print('colliding')
+                    # A.trigger('collision', col)
+                    # B.trigger('collision', col)
         return collisions
 
     def resolve_collisions(self, collisions, dt):
@@ -236,24 +242,24 @@ class Simulation(EventDispatcher):
         # Acumula as forças e acelerações
         for obj in self._objects:
             if obj._invmass:
-                F = obj._init_frame_force()
-                F += obj.external_force(t) or (0, 0)
-            elif obj.accel_static:
-                a = obj._init_frame_accell()
-                obj.apply_accel(a)
+                obj.init_accel()
+                #F += obj.external_force(t) or (0, 0)
+            elif obj.flag_accel_static:
+                obj.init_accel()
+                obj.apply_accel(obj._accel)
 
             if obj._invinertia:
                 tau = obj.global_torque()
                 tau += obj.external_torque(t) or 0
                 self._frame_tau = tau
-            elif obj.accel_static:
+            elif obj.flag_accel_static:
                 a = obj._init_frame_alpha()
                 obj.apply_alpha(a)
 
         # Applica as forças e acelerações
         for obj in self._objects:
             if obj._invmass:
-                obj.apply_force(obj._frame_force, dt)
+                obj.apply_accel(obj._accel, dt)
             elif obj._vel.x or obj._vel.y:
                 obj.move(obj._vel * dt)
 
@@ -295,15 +301,14 @@ class Simulation(EventDispatcher):
             get_collision[type(A), type(B)] = inverse
             return col
 
-    #===========================================================================
+    #=========================================================================
     # Cálculo de parâmetros físicos
-    #===========================================================================
+    #=========================================================================
     def kinetic_energy(self):
         '''Retorna a soma da energia cinética de todos os objetos do mundo'''
-        
+
         return sum(obj.kinetic() for obj in self.objects)
 
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-

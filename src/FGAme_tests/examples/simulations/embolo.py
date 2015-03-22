@@ -2,17 +2,23 @@
 '''
 Este exemplo mostra um gás de esferas rígidas em contato com um êmbulo sujeito a
 uma força viscosa. A energia é dissipada no movimento do êmbolo e aos poucos
-as partículas cessam o movimento. 
+as partículas cessam o movimento.
 '''
 
 from FGAme import *
-from random import uniform, choice, randint
+from random import uniform, randint
 
 # Inicializa o mundo
+
+
 class Gas(World):
-    def __init__(self, gravity=50, friction=0.0, num_balls=100, speed=200, radius=10, color='random'):
+
+    def __init__(self,
+                 gravity=50, friction=0.0,
+                 num_balls=100, speed=200, radius=10,
+                 color='random'):
         '''Cria uma simulação de um gás de partículas confinado por um êmbolo
-        com `num_balls` esferas de raio `radius` com velocidades no intervalo 
+        com `num_balls` esferas de raio `radius` com velocidades no intervalo
         de +/-`speed`.'''
 
         super(Gas, self).__init__(gravity=gravity, dfriction=friction)
@@ -29,8 +35,8 @@ class Gas(World):
             self.add(bola)
 
         # Inicia êmbolo
-        embolo = AABB(bbox=(11, 789, 420, 470), color=(150, 0, 0), mass=num_balls / 2)
-        embolo.external_force = lambda t:-100 * embolo.vel
+        embolo = AABB(bbox=(11, 789, 420, 470), color=(150, 0, 0),
+                      mass=num_balls / 2, damping=5)
         self.add(embolo)
 
     def get_color(self, color):
@@ -42,17 +48,17 @@ class Gas(World):
     @listen('long-press', 'up')
     def energy_up(self):
         '''Aumenta a energia de todas as partículas'''
- 
+
         for bola in self.bolas:
             bola.vel *= 1.01
- 
+
     @listen('long-press', 'down')
     def energy_down(self):
         '''Diminui a energia de todas as partículas'''
- 
+
         for bola in self.bolas:
             bola.vel *= 0.99
- 
+
     @listen('key-down', 'space')
     def toggle_pause(self):
         super(Gas, self).toggle_pause()
@@ -60,4 +66,3 @@ class Gas(World):
 # Inicia a simulação
 if __name__ == '__main__':
     Gas().run()
-

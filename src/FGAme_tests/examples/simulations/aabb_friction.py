@@ -1,6 +1,6 @@
 #-*- coding: utf8 -*-_
 '''
-Este exemplo demonstra a resposta a colisões com atrito utilizando duas caixas 
+Este exemplo demonstra a resposta a colisões com atrito utilizando duas caixas
 AABB.
 '''
 
@@ -12,7 +12,7 @@ world.set_bounds(width=10)
 
 # Cria objetos
 A = AABB(pos=(400, 100), shape=(50, 50), color='black')
-B = AABB(pos=(250, 500), shape=(50, 50), vel=(200, -400), color='red')
+B = AABB(pos=(150, 500), shape=(50, 50), vel=(200, -400), color='red')
 
 # Inicia a simulação
 world.add([A, B])
