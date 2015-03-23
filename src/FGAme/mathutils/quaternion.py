@@ -1,0 +1,2 @@
+class Quaternion(object):
+    pass

@@ -1,4 +1,5 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import Vector, shadow_y
 from FGAme.physics import get_collision, get_collision_aabb, CollisionError
 from FGAme.core import EventDispatcher, signal, init
@@ -223,7 +224,6 @@ class Simulation(EventDispatcher):
                 if col is not None:
                     col.world = self
                     collisions.append(col)
-                    print('colliding')
                     # A.trigger('collision', col)
                     # B.trigger('collision', col)
         return collisions
@@ -240,6 +240,7 @@ class Simulation(EventDispatcher):
         t = self.time
 
         # Acumula as forças e acelerações
+        # FIXME: consertar mecanismo de aceleração externa
         for obj in self._objects:
             if obj._invmass:
                 obj.init_accel()
@@ -249,9 +250,8 @@ class Simulation(EventDispatcher):
                 obj.apply_accel(obj._accel)
 
             if obj._invinertia:
-                tau = obj.global_torque()
-                tau += obj.external_torque(t) or 0
-                self._frame_tau = tau
+                obj.init_alpha()
+                #tau += obj.external_torque(t) or 0
             elif obj.flag_accel_static:
                 a = obj._init_frame_alpha()
                 obj.apply_alpha(a)
@@ -264,7 +264,7 @@ class Simulation(EventDispatcher):
                 obj.move(obj._vel * dt)
 
             if obj._invinertia:
-                obj.apply_torque(obj._frame_tau, dt)
+                obj.apply_alpha(obj._alpha, dt)
             elif obj._omega:
                 obj.rotate(obj._omega * dt)
 

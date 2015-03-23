@@ -1,43 +1,47 @@
 #-*- coding: utf8 -*-
-from math import sqrt, sin, cos, pi
+from math import sqrt, sin, cos
 
 SQRT_2 = sqrt(2)
 
-__all__ = ['Vector', 'VectorM', 'asvector', 'Matrix', 'MatrixM', 'MatrixR', 'dot', 'cross']
+__all__ = ['Vector', 'VectorM', 'asvector',
+           'Matrix', 'MatrixM', 'MatrixR',
+           'dot', 'cross']
 
-#===============================================================================
+#=========================================================================
 # Vetores
-#===============================================================================
+#=========================================================================
+
+
 class Vector(object):
     __slots__ = ['_x', '_y']
 
     def __init__(self, x, y):
         '''Representa um vetor bidimensional.
-        
+
         Exemplo
         -------
-        
+
         Criamos um vetor chamando a classe com as componentes como argumento.
-        
+
         >>> v = Vector(3, 4); print(v)
         Vector(3, 4)
 
         Os métodos de listas funcionam para objetos do tipo Vector:
-        
+
         >>> v[0], v[1], len(v)
         (3.0, 4.0, 2)
-        
+
         Objetos do tipo Vector também aceitam operações matemáticas
-        
+
         >>> v + 2 * v
         Vector(9, 12)
-        
-        Além de algumas funções de conveniência para calcular o módulo, 
+
+        Além de algumas funções de conveniência para calcular o módulo,
         vetor unitário, etc.
-        
+
         >>> v.norm()
         5.0
-        
+
         >>> v.normalized()
         Vector(0.6, 0.8)
         '''
@@ -71,11 +75,11 @@ class Vector(object):
     def rotated(self, theta, axis=(0, 0)):
         '''Retorna um vetor rotacionado por um ângulo theta'''
 
-        x, y = self -axis
+        x, y = self - axis
         cos_t, sin_t = cos(theta), sin(theta)
         return type(self)(x * cos_t - y * sin_t, x * sin_t + y * cos_t) + axis
 
-    # Métodos mágicos ----------------------------------------------------------
+    # Métodos mágicos --------------------------------------------------------
     def __len__(self):
         return 2
 
@@ -126,7 +130,7 @@ class Vector(object):
 
     def __radd__(self, other):
         '''x.__radd__(y) <==> y + x'''
-        return self +other
+        return self + other
 
     def __sub__(self, other):
         '''x.__sub__(y) <==> x - y'''
@@ -144,18 +148,22 @@ class Vector(object):
 
     def __nonzero__(self):
         return True
-    
+
     def __eq__(self, other):
         x, y = other
-        return self._x == x and self._y == y            
-        
-    @property
-    def x(self): return self._x
+        return self._x == x and self._y == y
 
     @property
-    def y(self): return self._y
+    def x(self):
+        return self._x
+
+    @property
+    def y(self):
+        return self._y
+
 
 class VectorM(Vector):
+
     '''Como Vector, mas com elementos mutáveis'''
 
     def __iadd__(self, other):
@@ -191,7 +199,7 @@ class VectorM(Vector):
     def rotate(self, theta, axis=(0, 0)):
         '''Realiza rotação *inplace*'''
 
-        x, y = self -axis
+        x, y = self - axis
         cos_t, sin_t = cos(theta), sin(theta)
         self._x = x * cos_t - y * sin_t + axis[0]
         self._y = x * sin_t + y * cos_t + axis[1]
@@ -215,10 +223,13 @@ class VectorM(Vector):
     y = property(Vector.y.fget)
 
     @x.setter
-    def x(self, value): self._x = float(value)
+    def x(self, value):
+        self._x = float(value)
 
     @y.setter
-    def y(self, value): self._y = float(value)
+    def y(self, value):
+        self._y = float(value)
+
 
 def asvector(v):
     '''Retorna o objeto como uma instância da classe Vetor'''
@@ -228,51 +239,54 @@ def asvector(v):
     else:
         return Vector(*v)
 
-#===============================================================================
+#=========================================================================
 # Matrizes
-#===============================================================================
+#=========================================================================
+
+
 class Matrix(object):
-    '''Implementa uma matriz bidimensional e operações básicas de álgebra 
+
+    '''Implementa uma matriz bidimensional e operações básicas de álgebra
     linear
-    
+
     Example
     -------
-    
+
     Criamos uma matriz a partir de uma lista de listas
-    
+
     >>> M = Matrix([[1, 2],
     ...             [3, 4]])
-    
+
     Podemos também utilizar os construtores especializados, como por exemplo
     o `Matrix.R`, que cria uma matriz de rotação
-    
-    >>> R = Matrix.R(pi); R 
+
+    >>> R = Matrix.R(pi); R
     |-1  -0|
     | 0  -1|
-    
-    Os objetos da classe Matrix implementam as operações básicas de álgebra 
+
+    Os objetos da classe Matrix implementam as operações básicas de álgebra
     linear
-    
+
     >>> M + 2 * R
     |-1  2|
     | 3  2|
-    
+
     As multiplicações são como definidas em ágebra linear
-    
+
     >>> M * M
     | 7  10|
     |15  22|
-    
+
     >>> M * Vector(2, 3)
     Vector(8, 18)
-    
-    Além disto, temos operações como cálculo da inversa, autovalores, 
+
+    Além disto, temos operações como cálculo da inversa, autovalores,
     determinante, etc
-    
+
     >>> M.inv() * M
     |1  0|
     |0  1|
-    
+
     >>> Matrix.I().eigval()  # Matrix.I() --> retorna uma matriz de identidade
     (1.0, 1.0)
     '''
@@ -280,10 +294,10 @@ class Matrix(object):
     def __init__(self, obj):
         self._data = tuple(Vector(*row) for row in obj)
 
-    # Construtores alternativos ------------------------------------------------
+    # Construtores alternativos ----------------------------------------------
     @classmethod
     def _from_lists_(cls, M):
-        '''Inicia a matriz a partir de uma lista de linhas. Corresponde ao 
+        '''Inicia a matriz a partir de uma lista de linhas. Corresponde ao
         método de inicialização padrão, mas pode ser invocado por subclasses
         caso a assinatura do construtor padrão seja diferente'''
 
@@ -308,14 +322,14 @@ class Matrix(object):
             cls._I = I = cls._from_lists_([[1, 0], [0, 1]])
             return I
 
-    # API básica ---------------------------------------------------------------
+    # API básica -------------------------------------------------------------
     def astuple(self):
         '''Retorna a matrix como uma tupla de tuplas'''
 
         return tuple(tuple(row) for row in self._data)
 
     def flat(self):
-        '''Itera sobre todos elementos da matriz, primeiro os elementos da 
+        '''Itera sobre todos elementos da matriz, primeiro os elementos da
         primeira linha e depois da segunda'''
 
         for L in self._data:
@@ -355,12 +369,12 @@ class Matrix(object):
         return self._from_lists_(M)
 
     def eig(self):
-        '''Retorna uma tupla com a lista de autovalores e a matriz dos 
+        '''Retorna uma tupla com a lista de autovalores e a matriz dos
         autovetores
-        
+
         Example
         -------
-        
+
         >>> M = Matrix([[1,2], [3,4]])
         >>> vals, vecs = M.eig()
         >>> v1, v2 = vecs.colvecs()
@@ -382,8 +396,8 @@ class Matrix(object):
 
     def eigvec(self, transpose=False):
         '''Retorna uma lista com os autovetores normalizados da matriz.
-        
-        A ordem dos autovetores corresponde àquela retornada pelo método 
+
+        A ordem dos autovetores corresponde àquela retornada pelo método
         `M.eigval()`'''
 
         a, b = self._data[0]
@@ -406,12 +420,12 @@ class Matrix(object):
         return [Vector(a, c), Vector(b, d)]
 
     def rowvecs(self):
-        '''Retorna uma lista com os vetores linha. Este método existe por 
+        '''Retorna uma lista com os vetores linha. Este método existe por
         simetria a `M.colvecs()`. Mesma coisa que list(M).'''
 
         return list(M)
 
-    # Métodos mágicos ----------------------------------------------------------
+    # Métodos mágicos --------------------------------------------------------
     def __len__(self):
         return 2
 
@@ -487,7 +501,7 @@ class Matrix(object):
 
     def __radd__(self, other):
         '''x.__radd__(y) <==> y + x'''
-        return self +other
+        return self + other
 
     def __sub__(self, other):
         '''x.__sub__(y) <==> x - y'''
@@ -506,13 +520,18 @@ class Matrix(object):
     def __nonzero__(self):
         return True
 
+
 class MatrixM(Matrix):
+
     '''Implementa matrizes mutáveis'''
     # TODO: implementar
-    
+
+
 class MatrixR(Matrix):
+
     '''Implementa matrizes de rotação'''
     # TODO: implementar
+
 
 def asmatrix(m):
     '''Retorna o objeto como uma instância da classe Vetor'''
@@ -522,16 +541,20 @@ def asmatrix(m):
     else:
         return Matrix(m)
 
-#===============================================================================
+#=========================================================================
 # Funções com vetores
-#===============================================================================
+#=========================================================================
+
+
 def dot(v1, v2):
     '''Calcula o produto escalar entre dois vetores'''
 
     return sum(x * y for (x, y) in zip(v1, v2))
 
+
 def cross(v1, v2):
-    '''Retorna a compontente z do produto vetorial de dois vetores bidimensionais'''
+    '''Retorna a compontente z do produto vetorial de dois vetores
+    bidimensionais'''
 
     x1, y1 = v1
     x2, y2 = v2

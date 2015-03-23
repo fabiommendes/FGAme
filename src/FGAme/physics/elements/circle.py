@@ -1,5 +1,6 @@
-#-*- coding: utf8 -*-
-from FGAme.mathutils import pi, sqrt
+# -*- coding: utf8 -*-
+
+from FGAme.mathutils import pi, sqrt, Circle
 from FGAme.physics.elements import LinearRB, RigidBody
 
 
@@ -24,6 +25,9 @@ class CommonCircle(object):
         '''Retorna o raio de giração do círculo'''
 
         return self._radius / sqrt(2)
+
+    def primitive(self):
+        return Circle(radius=self.radius, pos=self.pos)
 
     @property
     def radius(self):

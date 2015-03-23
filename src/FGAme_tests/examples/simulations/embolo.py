@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 Este exemplo mostra um gás de esferas rígidas em contato com um êmbulo sujeito a
 uma força viscosa. A energia é dissipada no movimento do êmbolo e aos poucos

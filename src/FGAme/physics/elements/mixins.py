@@ -7,7 +7,7 @@ Created on 22/03/2015
 from FGAme.mathutils import Vector
 from FGAme.physics.elements import PhysElement
 from FGAme.core import EventDispatcherMeta, signal
-from FGAme.draw import Color, RectEcho
+from FGAme.draw import Color, AABB, Shape
 from FGAme.util import lazy
 
 
@@ -144,44 +144,37 @@ class HasLocalForces(object):
 
 class HasVisualization(object):
     _is_mixin_ = True
-    _slots_ = ['_visualization', '_color']
+    _slots_ = ['_visualization']
 
-    def _init_has_visualization(self, color=None, visualization=None):
-        self._color = None
-        if color is not None:
-            self._color = Color(color)
-        self._visualization = RectEcho(self)
+    def _init_has_visualization(self,
+                                color='black',
+                                line_color='black', line_width=0.0):
 
+        c = color or 'black'
+        lc = line_color or 'black'
+        lw = line_width
+        self._visualization = Shape.from_primitive(self, c, lc, lw)
+
+    # Desenhando objeto #######################################################
     @property
     def visualization(self):
         return self._visualization
 
     @property
     def color(self):
-        return self._color
+        return self._visualization.color
 
     @color.setter
     def color(self, value):
-        self._color = Color(value)
+        self._visualization.color = Color(value)
 
-    #=========================================================================
-    # Desenhando objeto
-    #=========================================================================
-    def get_drawable(self, color='black', lw=0, solid=True):
-        '''Retorna um objeto que respeita a interface Drawable e pode ser
-        utilizado para a renderização do objeto físico.'''
+    @property
+    def line_color(self):
+        return self._visualization.line_color
 
-        return self.drawable
-
-    def get_primitive_drawable(self):
-
-        raise NotImplementedError
-
-    def get_aabb_drawable(self, color='black', lw=0, solid=True):
-        '''Retorna um objeto que pode ser utilizado para desenhar a AABB do
-        objeto físico considerado'''
-
-        return RectEcho(self, color=color, lw=lw, solid=solid)
+    @line_color.setter
+    def line_color(self, value):
+        self._visualization.line_color = Color(value)
 
 
 @EventDispatcherMeta.decorate

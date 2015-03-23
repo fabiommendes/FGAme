@@ -1,11 +1,12 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 
 import six
 from FGAme.mathutils import Vector
 
-#==============================================================================
-# Funções úteis
-#==============================================================================
+###############################################################################
+#                                 Funções úteis
+###############################################################################
+
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INF = float('inf')
 ORIGIN = Vector(0, 0)
@@ -20,9 +21,9 @@ def raises_method(ex=NOT_IMPLEMENTED):
         raise ex
     return method
 
-#==============================================================================
-# Flags de propriedades físicas
-#==============================================================================
+###############################################################################
+#                         Flags de propriedades físicas
+###############################################################################
 
 
 class PhysBits:
@@ -58,9 +59,10 @@ PHYS_HAS_VISUALIZATION = 1 << 16
 # for n, k in sorted(attrs):
 #     print('PHYS_%s = 1 << %i' % (k.upper(), n))
 
-#==============================================================================
-# Classes Base --- todos objetos físicos derivam delas
-#==============================================================================
+
+###############################################################################
+#          Classes Base --- todos objetos físicos derivam delas
+###############################################################################
 
 
 class PhysElementMeta(type):
@@ -306,9 +308,7 @@ class PhysElement(object):
         if not D:
             self._dict_ = None
 
-    #==========================================================================
-    # Valores padrão
-    #==========================================================================
+    # Valores padrão ##########################################################
     mass = float('inf')
     inertia = float('inf')
     pos = Vector(0, 0)
@@ -320,17 +320,15 @@ class PhysElement(object):
     ROG_sqr = 0
     ROG = 0
 
-    #==========================================================================
-    # Métodos com implementações inócuas
-    #==========================================================================
+    # Métodos com implementações inócuas ######################################
     move = do_nothing()
     boost = do_nothing()
     rotate = do_nothing()
     aboost = do_nothing()
 
-    #==========================================================================
-    # Controle de flags
-    #==========================================================================
+    ###########################################################################
+    #                           Controle de flags
+    ###########################################################################
 # Propriedades de controle de flags -- metacódigo
 #
 # Descomente e rode este código caso queira recalcular as propriedades
@@ -488,9 +486,9 @@ class PhysElement(object):
         else:
             self._phys_flags &= ~PHYS_HAS_VISUALIZATION
 
-    #==========================================================================
-    # is_dynamic*() queries
-    #==========================================================================
+    ###########################################################################
+    #               Manipulação/consulta do estado dinâmico
+    ###########################################################################
 
     def is_dynamic(self, what=None):
         '''Retorna True se o objeto for dinâmico ou nas variáveis lineares ou
@@ -578,10 +576,7 @@ class PhysElement(object):
 
         self._clearp('old_inertia', 'old_omega')
 
-    #==========================================================================
-    # Kinematic
-    #==========================================================================
-
+    # Kinematic ###############################################################
     def is_kinematic(self, what=None):
         '''Retorna True se o objeto for cinemático ou nas variáveis lineares ou
         nas angulares. Um objeto é considerado cinemático (em uma das
@@ -650,10 +645,7 @@ class PhysElement(object):
             self._setp('old_inertia', self.inertia)
             self.inertia = 'inf'
 
-    #==========================================================================
-    # Static
-    #==========================================================================
-
+    # Static ##################################################################
     def is_static(self, what=None):
         '''Retorna True se o objeto for estatático nas variáveis lineares e
         nas angulares. Um objeto é considerado estático (em uma das variáveis)

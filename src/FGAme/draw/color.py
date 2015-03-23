@@ -1,44 +1,45 @@
-#-*-coding: utf8 -*-
-#===============================================================================
-# Gerenciamento de cores
-#===============================================================================
+# -*-coding: utf8 -*-
+
+
 class Color(tuple):
-    '''Objeto básico que representa uma cor.
-    
+
+    '''
+    Objeto básico que representa uma cor.
+
     Examples
     --------
-    
+
     Podemos iniciar uma cor pelos valores RGBA ou por seu nome (no caso das
     mais comuns)
-    
+
     >>> w1 = Color(255, 255, 255)
     >>> w2 = Color('white')
-    
-    Os objetos do tipo Color são imutáveos e se comportam como uma tupla. 
-    
+
+    Os objetos do tipo Color são imutáveos e se comportam como uma tupla.
+
     >>> list(w1)
     [255, 255, 255, 255]
     >>> w1
     Color(255, 255, 255, 255)
-    
+
     Além disto, o construtor reaproveita objetos, de modo que cores iguais
     preservam a identidade
-    
+
     >>> w1 is w2
     True
-    
+
     Podemos acessar a cor em várias representações diferentes utilizando os
     atributos adequados.
-    
+
     >>> w1.rgb
     (255, 255, 255)
-    
+
     >>> w1.f_rgb
     (1.0, 1.0, 1.0)
-    
+
     >>> w1.u_rgb
     16777215
-    
+
     '''
 
     __slots__ = []
@@ -56,7 +57,7 @@ class Color(tuple):
             return color
         else:
             args = tuple(color)
-            
+
         try:
             return cls._CACHE[args]
         except KeyError:
@@ -65,13 +66,13 @@ class Color(tuple):
             else:
                 R, G, B = args
                 A = 255
-            
+
             if isinstance(R, float):
                 R = int(255 * R)
                 G = int(255 * G)
                 B = int(255 * B)
                 A = int(255 * A)
-            
+
             data = (R, G, B, A)
             try:
                 color = cls._CACHE[data]
@@ -105,43 +106,51 @@ class Color(tuple):
     def u_rgb(self):
         c = self
         return (c[0] << 16) + (c[1] << 8) + c[2]
-    
-    # Métodos mágicos ----------------------------------------------------------
+
+    # Métodos mágicos --------------------------------------------------------
     def __repr__(self):
         return 'Color%s' % tuple.__repr__(self)
-    
+
 Color._CACHE.update(dict(
     # Tons de cinza
     white=Color(255, 255, 255), black=Color(0, 0, 0),
- 
+
     # Cores básicas
     red=Color(255, 0, 0), green=Color(0, 255, 0), blue=Color(0, 0, 255)
 ))
 
+
+###############################################################################
+#                          Funções e objetos úteis
+###############################################################################
+
 class color_property(property):
-    '''Implementa uma propriedade que converte automaticamente os valores
+
+    '''
+    Implementa uma propriedade que converte automaticamente os valores
     fornecidos em cores válidas.
-    
-    Aceita None como um valor possível'''
-    
+
+    Aceita None como um valor possível
+    '''
+
     def __init__(self, name, default=None):
         self.name = name
         self.default = (None if default is None else Color(default))
         attr = '_' + name
-        
+
         def fget(self):
-            return getattr(self, attr, default) 
-            
+            return getattr(self, attr, default)
+
         def fset(self, value):
             if value is None:
                 fdel(self)
             else:
                 setattr(self, attr, Color(value))
-            
+
         def fdel(self):
             if hasattr(self, attr):
                 delattr(self, attr)
-            
+
         super(color_property, self).__init__(fget, fset, fdel)
 
 if __name__ == '__main__':

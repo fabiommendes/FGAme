@@ -53,7 +53,7 @@ class RigidBody(PhysPoint):
     >>> b = RigidBody()
     '''
 
-    __slots__ = ['_omega', '_theta', '_density', '_invinertia',
+    __slots__ = ['_omega', '_theta', '_alpha', '_density', '_invinertia',
                  '_xmin', '_xmax', '_ymin', '_ymax']
 
     def __init__(self,
@@ -105,16 +105,14 @@ class RigidBody(PhysPoint):
         self._theta = 0.0
         if theta is not None:
             self.rotate(theta)
+        self._alpha = 0.0
 
     def _init_inertias(self, density, mass, inertia):
         pass
 
-    #=========================================================================
-    # Propriedades e constantes físicas
-    #=========================================================================
-
-    #-------------------------------------------------------------------------
-    # Parâmetros físicos
+    ###########################################################################
+    #                 Propriedades e constantes físicas
+    ###########################################################################
 
     @property
     def mass(self):
@@ -172,8 +170,8 @@ class RigidBody(PhysPoint):
         if self._invinertia:
             self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
 
-    #-------------------------------------------------------------------------
-    # Variáveis de estado
+    # Variáveis de estado #####################################################
+
     @property
     def theta(self):
         return self._theta
@@ -190,8 +188,7 @@ class RigidBody(PhysPoint):
     def omega(self, value):
         self.aboost(value - self._omega)
 
-    #-------------------------------------------------------------------------
-    # Propriedades da caixa de contorno
+    # Propriedades da caixa de contorno #######################################
 
     @property
     def xmin(self):
@@ -209,33 +206,39 @@ class RigidBody(PhysPoint):
     def ymax(self):
         return self._ymax
 
+    @property
     def bbox(self):
         return (self._xmin, self._xmax, self._ymin, self._ymax)
 
+    @property
     def shape(self):
         return (self._xmax - self._xmin, self._ymax - self._ymin)
 
+    @property
     def rect(self):
         x, y = self._xmin, self._ymin
         return (x, y, self._xmax - x, self._ymax - y)
 
-    #-------------------------------------------------------------------------
-    # Parâmetros físicos derivados
-    @property
+    # Parâmetros físicos derivados ############################################
+
     def angularE(self):
+        '''Retorna a contribuição angular para a energia cinética'''
+
         return self._inertia * self.omega ** 2 / 2
 
-    @property
     def kineticE(self):
+        '''Retorna a energia cinética total'''
+
         return self.linearE + self.angularE
 
-    @property
     def momentumL(self):
+        '''Retorna o vetor momentum linear'''
+
         return self.inertia * self.omega
 
-    #==========================================================================
-    # Propriedades geométricas
-    #==========================================================================
+    ###########################################################################
+    #                         Propriedades geométricas
+    ###########################################################################
     def area(self):
         '''Retorna a área do objeto'''
 
@@ -251,9 +254,10 @@ class RigidBody(PhysPoint):
 
         return sqrt(self.ROG_sqr())
 
-    #=========================================================================
-    # Deslocamentos
-    #=========================================================================
+    ###########################################################################
+    #                             Deslocamentos
+    ###########################################################################
+
     def move(self, delta):
         x, y = delta
         self._pos += delta
@@ -283,9 +287,10 @@ class RigidBody(PhysPoint):
         x, y = pos - self._pos
         return self._vel + self._omega * Vector(-y, x)
 
-    #=========================================================================
-    # Resposta a forças, impulsos e atualização da física
-    #=========================================================================
+    ###########################################################################
+    #          Resposta a forças, impulsos e atualização da física
+    ###########################################################################
+
     def external_torque(self, t):
         '''Define uma torque externo análogo ao método .external_force()'''
 
@@ -315,9 +320,10 @@ class RigidBody(PhysPoint):
 
         self.aboost(itorque / self.inertia)
 
-    #=========================================================================
-    # Controle de estado dinâmico
-    #=========================================================================
+    ###########################################################################
+    #                       Controle de estado dinâmico
+    ###########################################################################
+
     def is_dynamic_angular(self):
         return bool(self._invinertia)
 

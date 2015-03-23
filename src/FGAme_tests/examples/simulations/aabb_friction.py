@@ -1,4 +1,5 @@
-#-*- coding: utf8 -*-_
+# -*- coding: utf8 -*-_
+
 '''
 Este exemplo demonstra a resposta a colisões com atrito utilizando duas caixas
 AABB.

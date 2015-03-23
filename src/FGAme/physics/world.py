@@ -98,15 +98,14 @@ class World(EventDispatcher):
         if getattr(obj, 'is_drawable', False):
             self._render_tree.add(obj, layer)
         else:
-            drawable = obj.visualization
-            self._render_tree.add(drawable, layer)
+            self._render_tree.add(obj.visualization, layer)
             self.simulation.add(obj)
 
     def remove(self, obj):
         '''Descarta um objeto do mundo'''
 
         if getattr(obj, 'is_drawable', False):
-            drawable = obj.get_drawable()
+            drawable = obj.visualization
             self._render_tree.remove(obj)
             self.simulation.remove(obj)
         else:
@@ -154,6 +153,8 @@ class World(EventDispatcher):
         if self.is_paused:
             return
         self.simulation.update(dt)
+        self._render_tree.update(dt)
+
         return self.simulation.time
 
     #=========================================================================

@@ -1,8 +1,7 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 
 from FGAme.physics.elements import LinearRB
-from FGAme.physics import get_collision, get_collision_aabb
-from FGAme.mathutils import Vector
+from FGAme.mathutils import aabb_bbox, AABB
 
 
 class PhysAABB(LinearRB):
@@ -56,27 +55,10 @@ class PhysAABB(LinearRB):
                  bbox=None, shape=None, rect=None):
 
         # Define as propriedades das caixas de contorno
-        if bbox is not None:
-            xmin, xmax, ymin, ymax = map(float, bbox)
-            if pos is not None:
-                raise TypeError('cannot set bbox and pos simultaneously')
-            x = (xmin + xmax) / 2.
-            y = (ymin + ymax) / 2.
-        elif shape is not None:
-            pos = pos or (0, 0)
-            dx, dy = map(float, shape)
-            x, y = pos
-            xmin, xmax = x - dx / 2., x + dx / 2.
-            ymin, ymax = y - dy / 2., y + dy / 2.
-        elif rect is not None:
-            xmin, ymin, dx, dy = map(float, rect)
-            xmax = xmin + dx
-            ymax = ymin + dy
-
-        elif None not in (xmin, xmax, ymin, ymax):
-            pass
-        else:
-            raise TypeError('either shape or bbox must be defined')
+        xmin, xmax, ymin, ymax = aabb_bbox(bbox=bbox, rect=rect,
+                                           shape=shape, pos=pos,
+                                           xmin=xmin, xmax=xmax,
+                                           ymin=ymin, ymax=ymax)
 
         pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
         super(PhysAABB, self).__init__(pos, vel, mass, density,
@@ -88,9 +70,7 @@ class PhysAABB(LinearRB):
         data = ', '.join('%.1f' % x for x in self.bbox())
         return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
 
-    #=========================================================================
-    # Torna as os limites da AABB modificáveis
-    #=========================================================================
+    # Torna as os limites da AABB modificáveis ################################
     @property
     def xmin(self):
         return self._xmin
@@ -127,9 +107,7 @@ class PhysAABB(LinearRB):
         self._ymax = float(value)
         self._pos.y = (self._ymax - self._ymin) / 2
 
-    #=========================================================================
-    # Propriedades geométricas
-    #=========================================================================
+    # Propriedades geométricas ################################################
     def area(self):
         return (self._xmax - self._xmin) * (self._ymax - self._ymin)
 
@@ -137,6 +115,9 @@ class PhysAABB(LinearRB):
         a = (self._xmax - self._xmin)
         b = (self._ymax - self._ymin)
         return (a ** 2 + b ** 2) / 12
+
+    def primitive(self):
+        return AABB(bbox=self.bbox)
 
 
 if __name__ == '__main__':

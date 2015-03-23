@@ -1,5 +1,5 @@
 # Importa as funções rápidas caso a variável de ambiente PYGAME_SLOWMATH não
-# seja definida 
+# seja definida
 import os as _os
 if not _os.environ.get('PYGAME_SLOWMATH', False):
     try:
@@ -8,6 +8,11 @@ if not _os.environ.get('PYGAME_SLOWMATH', False):
         from .linalg import *
 else:
     from .linalg import *
-    
+
+
 from .util import *
 from .vertices import *
+from .aabb import *
+from .circle import *
+from math import *
+from .abstract import *

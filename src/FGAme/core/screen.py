@@ -1,11 +1,11 @@
-#-*- coding: utf8 -*-
-from FGAme.mathutils import Vector
-from FGAme.draw import Color, color_property
-from math import trunc
+# -*- coding: utf8 -*-
 
-#=========================================================================
-# Classe Screen genérica
-#=========================================================================
+from FGAme.mathutils import Vector
+from FGAme.draw import color_property
+
+###############################################################################
+#                            Classe Screen genérica
+###############################################################################
 
 
 class Screen(object):
@@ -50,9 +50,10 @@ class Screen(object):
     def shape(self):
         return self.width, self.height
 
-#=========================================================================
-# Classe Canvas: backends baseados em renderização do tipo "pintura"
-#=========================================================================
+
+###############################################################################
+#     Classe Canvas: backends baseados em renderização do tipo "pintura"
+###############################################################################
 
 
 class Canvas(Screen):
@@ -78,9 +79,8 @@ class Canvas(Screen):
 
         raise NotImplementedError
 
-    #=========================================================================
-    # Context managers
-    #=========================================================================
+    # Context managers ########################################################
+
     def __enter__(self):
         if self.background is not None:
             self.clear_background(self.background)
@@ -88,9 +88,8 @@ class Canvas(Screen):
     def __exit__(self, *args):
         self.flip()
 
-    #=========================================================================
-    # Objetos primitivos
-    #=========================================================================
+    # Objetos primitivos ######################################################
+
     def paint_circle(self, pos, radius, color='black', solid=True):
         '''Pinta um círculo especificando a posição do centro, seu raio e
         opcionalmente a cor.
@@ -107,10 +106,9 @@ class Canvas(Screen):
         dx, dy = xmax - xmin, ymax - ymin
         self.draw_rect((xmin, ymin), (dx, dy), color=color, solid=solid)
 
-    def paint_rect(self, pos, shape, color='black', solid=True):
-        x, y = pos
-        w, h = shape
-        self.draw_poly(
+    def paint_rect(self, rect, color='black', solid=True):
+        x, y, w, h = rect
+        self.paint_poly(
             [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], color, solid)
 
     def paint_line(self, pt1, pt2, color='black', solid=True):
@@ -119,39 +117,21 @@ class Canvas(Screen):
     def clear_background(self, color=None):
         raise NotImplementedError
 
-    #=========================================================================
-    # Objetos derivados
-    #=========================================================================
+    # Objetos derivados #######################################################
+
     def draw_tree(self, tree):
         '''Renderiza uma DrawingTree chamando a função correspondente para
         desenhar cada objeto'''
 
-        funcs = self._drawing_funcs
         for obj in tree.walk():
             try:
-                draw_func = funcs[type(obj)]
-            except KeyError:
-                tt = type(obj)
-                for T in tt.mro():
-                    if T in funcs:
-                        draw_func = funcs[tt] = funcs[T]
-                        break
-                else:
-                    # Testa explicitamente
-                    if getattr(tt, 'is_circle', False):
-                        draw_func = funcs[tt] = self.draw_circle
-                    elif getattr(tt, 'is_rect', False):
-                        draw_func = funcs[tt] = self.draw_rect
-                    elif getattr(tt, 'is_poly', False):
-                        draw_func = funcs[tt] = self.draw_poly
-                    elif getattr(tt, 'is_tree', False):
-                        draw_func = funcs[tt] = self.draw_tree
-                    else:
-                        raise TypeError(
-                            'no method for drawing %s objects' %
-                            type(obj).__name__)
-
-            draw_func(obj)
+                method = 'draw_' + obj.canvas_primitive
+                func = getattr(self, method)
+            except AttributeError:
+                tt = type(obj).__name__
+                raise ValueError("don't know how to draw %s" % tt)
+            else:
+                func(obj)
 
     def draw_circle(self, circle):
         '''Desenha um círculo utilizando as informações de geometria, cor e
@@ -162,15 +142,12 @@ class Canvas(Screen):
         deslocamento da tela.'''
 
         if self._direct:
-            self.paint_circle(
-                circle.pos,
-                circle.radius,
-                circle.color,
-                circle.solid)
+            self.paint_circle(circle.pos, circle.radius,
+                              circle.color, True)
         else:
             raise NotImplementedError
 
-    def draw_rect(self, rect):
+    def draw_aabb(self, aabb):
         '''Desenha um círculo utilizando as informações de geometria, cor e
         localização do objeto `circle` associado.
 
@@ -179,7 +156,7 @@ class Canvas(Screen):
         deslocamento da tela.'''
 
         if self._direct:
-            self.paint_rect(rect.pos, rect.shape(), rect.color, rect.solid)
+            self.paint_rect(aabb.rect, aabb.color, True)
         else:
             raise NotImplementedError
 
@@ -192,6 +169,6 @@ class Canvas(Screen):
         deslocamento da tela.'''
 
         if self._direct:
-            self.paint_poly(poly.vertices, poly.color, poly.solid)
+            self.paint_poly(poly.vertices, poly.color)
         else:
             raise NotImplementedError
