@@ -1,7 +1,9 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import pi, sqrt, Circle
-from FGAme.physics.elements import LinearRB, RigidBody
+from FGAme.physics.obj_all import LinearRigidBody, RigidBody
+
+__all__ = ['Circle', 'Ball']
 
 
 class CommonCircle(object):
@@ -46,7 +48,7 @@ class CommonCircle(object):
 
     def scale(self, scale, update_physics=False):
         self._radius *= scale
-        LinearRB.scale(scale, update_physics)
+        LinearRigidBody.scale(scale, update_physics)
 
     def __repr__(self):
         tname = type(self).__name__
@@ -56,53 +58,54 @@ class CommonCircle(object):
             tname, pos, vel, self.radius)
 
 
-class PhysCircle(CommonCircle, LinearRB):
+class Circle(CommonCircle, LinearRigidBody):
 
     '''Define um círculo e implementa a detecção de colisão comparando a
     distância entre os centros com a soma dos raios.
 
-    Objetos da classe PhysCircle não realizam rotações. Caso deseje esta
-    propriedade, utilize PhysBall.'''
+    Objetos da classe Circle não realizam rotações. Caso deseje esta
+    propriedade, utilize Ball.
 
-    def __init__(self,
-                 pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None,
-                 radius=None):
 
-        if radius is None:
-            raise ValueError('radius must be defined')
+    Examples
+    --------
+
+    Os círculos devem ser inicializados fornecendo o raio e opcionalmente a
+    posição, velocidade e massa ou densidade.
+
+    >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
+    >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
+
+
+    '''
+
+    def __init__(self, radius, pos=(0, 0), vel=(0, 0),
+                 mass=None, density=None):
 
         self._radius = float(radius)
         xmin, xmax = pos[0] - radius, pos[0] + radius
         ymin, ymax = pos[1] - radius, pos[1] + radius
+        del radius
 
-        super(PhysCircle, self).__init__(pos, vel, mass, density,
-                                         xmin, xmax, ymin, ymax)
+        LinearRigidBody.__init__(**locals())
 
 
-class PhysBall(CommonCircle, RigidBody):
+class Ball(CommonCircle, RigidBody):
 
     '''Define um círculo e implementa a detecção de colisão comparando a
     distância entre os centros com a soma dos raios.
 
-    Objetos da classe PhysBall são capazes de realizar rotações.'''
+    Objetos da classe Ball são capazes de realizar rotações.'''
 
-    def __init__(self,
-                 pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None,
-                 theta=0.0, omega=0.0, inertia=None,
-                 radius=None):
-
-        if radius is None:
-            raise ValueError('radius must be defined')
+    def __init__(self, radius, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None):
 
         self._radius = float(radius)
         xmin, xmax = pos[0] - radius, pos[0] + radius
         ymin, ymax = pos[1] - radius, pos[1] + radius
+        del radius
 
-        super(PhysBall, self).__init__(pos, vel, mass, density,
-                                       theta, omega, inertia,
-                                       xmin, xmax, ymin, ymax)
+        RigidBody.__init__(**locals())
 
 
 if __name__ == '__main__':

@@ -1,21 +1,24 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics.elements import RigidBody
+from FGAme.physics.obj_all import RigidBody
 from FGAme.mathutils import aabb_bbox
 from FGAme.mathutils import Vector, VectorM, dot, cross
 from FGAme.mathutils import area, center_of_mass, ROG_sqr
 from FGAme.mathutils import sin, cos, pi
 
+__all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
-class PhysPoly(RigidBody):
+
+class Poly(RigidBody):
 
     '''Define um polígono arbitrário de N lados.'''
 
     __slots__ = ['vertices', 'num_sides', '_normals_idxs', 'num_normals']
 
-    def __init__(self, vertices, pos=None, **kwds):
-        if pos is not None:
-            raise TypeError('cannot define pos for polygonal shapes')
+    def __init__(self,
+                 vertices,
+                 pos=None, vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None):
 
         self.vertices = [VectorM(*pt) for pt in vertices]
         xmin = min(pt.x for pt in self.vertices)
@@ -23,10 +26,10 @@ class PhysPoly(RigidBody):
         ymin = min(pt.y for pt in self.vertices)
         ymax = max(pt.y for pt in self.vertices)
         pos_cm = center_of_mass(self.vertices)
-        super(PhysPoly, self).__init__(
-            pos=pos_cm,
-            xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax,
-            **kwds)
+
+        super(Poly, self).__init__(xmin, xmax, ymin, ymax,
+                                   pos_cm, vel, theta, omega,
+                                   mass=mass, density=density, inertia=inertia)
 
         self.num_sides = len(self.vertices)
         self._normals_idxs = self.get_li_indexes()
@@ -38,6 +41,10 @@ class PhysPoly(RigidBody):
         # cada frame
         if self.num_normals == self.num_sides:
             self._normals_idxs = None
+
+        # Movemos para a posição especificada caso pos seja fornecido
+        if pos is not None:
+            self.pos = pos
 
     def get_li_indexes(self):
         '''Retorna os índices referents às normais linearmente independentes
@@ -104,12 +111,12 @@ class PhysPoly(RigidBody):
     ###########################################################################
 
     def move(self, delta):
-        super(PhysPoly, self).move(delta)
+        super(Poly, self).move(delta)
         for v in self.vertices:
             v += delta
 
     def rotate(self, theta):
-        super(PhysPoly, self).rotate(theta)
+        super(Poly, self).rotate(theta)
 
         # Realiza a matriz de rotação manualmente para melhor performance
         cos_t, sin_t = cos(theta), sin(theta)
@@ -150,35 +157,59 @@ class PhysPoly(RigidBody):
 #                         Especialização de polígonos
 ###############################################################################
 
-class PhysRegular(PhysPoly):
+class RegularPoly(Poly):
 
-    def __init__(self, N, length, pos=(0, 0), **kwds):
+    __slots__ = ['length']
+
+    def __init__(self, N, length,
+                 pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None):
         '''Cria um polígono regoular com N lados de tamanho "length".'''
 
         self.length = length
+        vertices = self._vertices(N, length, pos)
+        del N, length, pos
 
+        Poly.__init__(**locals())
+
+    def _vertices(self, N, length, pos):
+        self.length = length
         alpha = pi / N
         theta = 2 * alpha
         b = length / (2 * sin(alpha))
         P0 = Vector(b, 0)
-        points = [(P0.rotated(n * theta)) for n in range(N)]
+        pos = Vector(*pos)
+        return [(P0.rotated(n * theta)) + pos for n in range(N)]
 
-        super(PhysRegular, self).__init__(vertices=points, pos=pos, **kwds)
 
+class Rectangle(Poly):
 
-class PhysRectangle(PhysPoly):
-
-    def __init__(self, bbox=None, rect=None, shape=None, pos=None,
-                 xmin=None, xmax=None, ymin=None, ymax=None, **kwds):
+    def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
+                 pos=None, vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None,
+                 bbox=None, rect=None, shape=None):
         '''Cria um retângulo especificando ou a caixa de contorno ou a posição
-        do centro de massa e a forma.'''
+        do centro de massa e a forma.
+
+        Pode ser inicializado como uma AABB, mas gera um polígono como
+        resultado.
+
+        >>> r = Rectangle(shape=(200, 100))
+        >>> r.rotate(pi/4)
+        >>> r.bbox                                         # doctest: +ELLIPSIS
+        (-106.066..., 106.066..., -106.066..., 106.066...)
+
+        '''
 
         bbox = aabb_bbox(bbox=bbox, rect=rect, shape=shape, pos=pos,
                          xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
-
         xmin, xmax, ymin, ymax = bbox
-        points = [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
-        super(PhysRectangle, self).__init__(vertices=points, **kwds)
+
+        super(Rectangle, self).__init__(
+            [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)],
+            None, vel, theta, omega,
+            mass=mass, density=density, inertia=inertia
+        )
 
 
 # TODO
@@ -196,8 +227,5 @@ def blob(cls, N, scale, pos=(0, 0), **kwds):
 
 
 if __name__ == '__main__':
-    R = PhysRectangle(shape=(100, 100))
-    print(R.vertices)
-    print([R.get_normal(i) for i in range(4)])
-    print([R.get_side(i) for i in range(4)])
-    print([R.get_normal(i) for i in range(4)])
+    import doctest
+    doctest.testmod()

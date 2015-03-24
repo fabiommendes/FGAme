@@ -1,12 +1,14 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import Vector, sqrt
-from FGAme.physics.elements import PhysPoint
+from FGAme.physics.obj_all import Dynamic
+
+__all__ = ['RigidBody', 'LinearRigidBody']
 
 INF = float('inf')
 
 
-class RigidBody(PhysPoint):
+class RigidBody(Dynamic):
 
     '''Classe pai para todos os objetos físicos da FGAme.
 
@@ -56,11 +58,9 @@ class RigidBody(PhysPoint):
     __slots__ = ['_omega', '_theta', '_alpha', '_density', '_invinertia',
                  '_xmin', '_xmax', '_ymin', '_ymax']
 
-    def __init__(self,
-                 pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None,
-                 theta=0.0, omega=0.0, inertia=None,
-                 xmin=None, xmax=None, ymin=None, ymax=None):
+    def __init__(self, xmin, xmax, ymin, ymax,
+                 pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None):
 
         # Define a caixa de contorno
         self._xmin = float(xmin)
@@ -340,19 +340,20 @@ class RigidBody(PhysPoint):
         return self._xmin < other._xmin
 
 
-class LinearRB(RigidBody):
+class LinearRigidBody(RigidBody):
 
     '''
     Classe que implementa corpos rígidos sem dinâmica angular.
     '''
 
-    def __init__(self,
+    def __init__(self, xmin, xmax, ymin, ymax,
                  pos=(0, 0), vel=(0, 0),
-                 mass=1.0, density=None,
-                 xmin=None, xmax=None, ymin=None, ymax=None):
+                 mass=None, density=None):
 
-        super(LinearRB, self).__init__(pos, vel, mass, density,
-                                       0, 0, None, xmin, xmax, ymin, ymax)
+        super(LinearRigidBody, self).__init__(
+            xmin, xmax, ymin, ymax, pos, vel,
+            mass=mass, density=density
+        )
         self._invinertia = 0.0
 
     @property

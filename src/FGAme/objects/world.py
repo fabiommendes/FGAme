@@ -1,20 +1,16 @@
-#-*- coding: utf8 -*-
 from __future__ import print_function
 
-from FGAme.physics import AABB, Poly, Simulation
+from FGAme.objects import AABB, Rectangle
+from FGAme.physics import Simulation
 from FGAme.core import EventDispatcher, signal
 from FGAme.core import conf
 from FGAme.draw import RenderTree, color_property
 
-#=========================================================================
-# Classe Mundo -- coordena todos os objetos com uma física definida e resolve a
-# interação entre eles
-#=========================================================================
-
 
 class World(EventDispatcher):
 
-    '''Documente-me!
+    '''Classe Mundo: coordena todos os objetos com uma física definida e
+    resolve a interação entre eles.
     '''
 
     def __init__(self, background=None,
@@ -43,9 +39,7 @@ class World(EventDispatcher):
 
     background = color_property('background', 'white')
 
-    #=========================================================================
-    # Propriedades do objeto Simulation
-    #=========================================================================
+    # Propriedades do objeto Simulation #######################################
     @property
     def gravity(self):
         return self.simulation.gravity
@@ -74,9 +68,7 @@ class World(EventDispatcher):
     def time(self):
         return self.simulation.time
 
-    #=========================================================================
-    # Gerenciamento de objetos
-    #=========================================================================
+    # Gerenciamento de objetos ################################################
     def add(self, obj, layer=0):
         '''Adiciona um novo objeto ao mundo.
 
@@ -111,9 +103,7 @@ class World(EventDispatcher):
         else:
             self._render_tree.remove(obj)
 
-    #=========================================================================
-    # Controle de eventos
-    #=========================================================================
+    # Controle de eventos #####################################################
     # Delegações
     long_press = signal('long-press', 'key', delegate='simulation')
     key_up = signal('key-up', 'key', delegate='simulation')
@@ -128,9 +118,7 @@ class World(EventDispatcher):
     # TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2',
     # num_args=1)
 
-    #=========================================================================
-    # Simulação de Física
-    #=========================================================================
+    # Simulação de Física #####################################################
     def pause(self):
         '''Pausa a simulação de física'''
 
@@ -157,9 +145,7 @@ class World(EventDispatcher):
 
         return self.simulation.time
 
-    #=========================================================================
-    # Laço principal
-    #=========================================================================
+    # Laço principal ##########################################################
     def run(self, timeout=None, real_time=True):
         '''Roda a simulação de física durante o tempo 'timeout' especificado.
 
@@ -181,9 +167,9 @@ class World(EventDispatcher):
     def get_render_tree(self):
         return self._render_tree
 
-    #=========================================================================
-    # Criação de objetos especiais
-    #=========================================================================
+    ###########################################################################
+    #                     Criação de objetos especiais
+    ###########################################################################
     def set_bounds(self, *args, **kwds):
         '''Cria contorno'''
 
@@ -223,7 +209,7 @@ class World(EventDispatcher):
             raise TypeError('invalid number of positional arguments')
 
         assert xmin < xmax and ymin < ymax, 'invalid bounds'
-        maker = Poly.rect if use_poly else AABB
+        maker = Rectangle if use_poly else AABB
         up = maker(bbox=(xmin - delta, xmax + delta, ymax, ymax + delta))
         down = maker(bbox=(xmin - delta, xmax + delta, ymin - delta, ymin))
         left = maker(bbox=(xmin - delta, xmin, ymin, ymax))

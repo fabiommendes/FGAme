@@ -2,6 +2,10 @@
 
 import six
 from FGAme.mathutils import Vector
+from FGAme.physics import flags
+
+__all__ = ['PhysElement']
+
 
 ###############################################################################
 #                                 Funções úteis
@@ -20,45 +24,6 @@ def raises_method(ex=NOT_IMPLEMENTED):
     def method(self, *args, **kwds):
         raise ex
     return method
-
-###############################################################################
-#                         Flags de propriedades físicas
-###############################################################################
-
-
-class PhysBits:
-    has_inertia = 2
-    has_linear = 3
-    has_angular = 4
-    has_bbox = 6
-
-    owns_gravity = 10
-    owns_damping = 11
-    owns_adamping = 12
-    accel_static = 13
-
-    has_world = 15
-    has_visualization = 16
-
-PHYS_HAS_MASS = 1 << 1
-PHYS_HAS_INERTIA = 1 << 2
-PHYS_HAS_SPEED = 1 << 3
-PHYS_HAS_ASPEED = 1 << 4
-PHYS_HAS_ROTATION = 1 << 5
-PHYS_HAS_BBOX = 1 << 6
-PHYS_OWNS_GRAVITY = 1 << 10
-PHYS_OWNS_DAMPING = 1 << 11
-PHYS_OWNS_ADAMPING = 1 << 12
-PHYS_ACCEL_STATIC = 1 << 13
-PHYS_HAS_WORLD = 1 << 15
-PHYS_HAS_VISUALIZATION = 1 << 16
-
-# Flags primárias -- metacódigo
-# attrs = [(n, k) for (k, n) in PhysBits.__dict__.items()
-#              if isinstance(n, int)]
-# for n, k in sorted(attrs):
-#     print('PHYS_%s = 1 << %i' % (k.upper(), n))
-
 
 ###############################################################################
 #          Classes Base --- todos objetos físicos derivam delas
@@ -191,11 +156,11 @@ class PhysElement(object):
 
     '''
 
-    __slots__ = ['_phys_flags', '_dict_']
+    __slots__ = ['_flags', '_dict_']
     _properties_ = set()
 
     def __init__(self, flags=0, dict_=None):
-        self._phys_flags = flags
+        self._flags = flags
         self._dict_ = dict_
 
     def __getattr__(self, attr):
@@ -306,7 +271,14 @@ class PhysElement(object):
                     del D[name]
 
         if not D:
-            self._dict_ = None
+            self._dict_ = None  # Interface Python
+
+    # Define igualdade <==> identidade ########################################
+    def __eq__(self, other):
+        return self is other
+
+    def __hash__(self):
+        return id(self)
 
     # Valores padrão ##########################################################
     mass = float('inf')
@@ -334,20 +306,21 @@ class PhysElement(object):
 # Descomente e rode este código caso queira recalcular as propriedades
 # associadas à cada flag de física.
 #
+#     from FGAme.physics.flags import _FlagBits
 #     template = '''
 #     @property
 #     def flag_flagname(self):
-#         return bool(self._phys_flags & PHYS_FLAGNAME)
+#         return bool(self._flags & flags.FLAGNAME)
 #
 #     @flag_flagname.setter
 #     def flag_flagname(self, value):
 #         if value:
-#             self._phys_flags |= PHYS_FLAGNAME
+#             self._flags |= flags.FLAGNAME
 #         else:
-#             self._phys_flags &= ~PHYS_FLAGNAME'''
+#             self._flags &= ~flags.FLAGNAME'''
 #
-#     attrs = [(n, k) for (k, n) in PhysBits.__dict__.items()
-#                  if isinstance(n, int)]
+#     attrs = [(n, k) for (k, n) in _FlagBits.__dict__.items()
+#              if isinstance(n, int)]
 #     for n, k in sorted(attrs):
 #         func_def = template.replace('flagname', k)
 #         func_def = func_def.replace('FLAGNAME', k.upper())
@@ -355,136 +328,114 @@ class PhysElement(object):
 
     # Definições geradas pelo código acima
     @property
-    def flag_has_mass(self):
-        return bool(self._phys_flags & PHYS_HAS_MASS)
-
-    @flag_has_mass.setter
-    def flag_has_mass(self, value):
-        if value:
-            self._phys_flags |= PHYS_HAS_MASS
-        else:
-            self._phys_flags &= ~PHYS_HAS_MASS
-
-    @property
     def flag_has_inertia(self):
-        return bool(self._phys_flags & PHYS_HAS_INERTIA)
+        return bool(self._flags & flags.HAS_INERTIA)
 
     @flag_has_inertia.setter
     def flag_has_inertia(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_INERTIA
+            self._flags |= flags.HAS_INERTIA
         else:
-            self._phys_flags &= ~PHYS_HAS_INERTIA
+            self._flags &= ~flags.HAS_INERTIA
 
     @property
-    def flag_has_speed(self):
-        return bool(self._phys_flags & PHYS_HAS_SPEED)
+    def flag_has_linear(self):
+        return bool(self._flags & flags.HAS_LINEAR)
 
-    @flag_has_speed.setter
-    def flag_has_speed(self, value):
+    @flag_has_linear.setter
+    def flag_has_linear(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_SPEED
+            self._flags |= flags.HAS_LINEAR
         else:
-            self._phys_flags &= ~PHYS_HAS_SPEED
+            self._flags &= ~flags.HAS_LINEAR
 
     @property
-    def flag_has_aspeed(self):
-        return bool(self._phys_flags & PHYS_HAS_ASPEED)
+    def flag_has_angular(self):
+        return bool(self._flags & flags.HAS_ANGULAR)
 
-    @flag_has_aspeed.setter
-    def flag_has_aspeed(self, value):
+    @flag_has_angular.setter
+    def flag_has_angular(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_ASPEED
+            self._flags |= flags.HAS_ANGULAR
         else:
-            self._phys_flags &= ~PHYS_HAS_ASPEED
-
-    @property
-    def flag_has_rotation(self):
-        return bool(self._phys_flags & PHYS_HAS_ROTATION)
-
-    @flag_has_rotation.setter
-    def flag_has_rotation(self, value):
-        if value:
-            self._phys_flags |= PHYS_HAS_ROTATION
-        else:
-            self._phys_flags &= ~PHYS_HAS_ROTATION
+            self._flags &= ~flags.HAS_ANGULAR
 
     @property
     def flag_has_bbox(self):
-        return bool(self._phys_flags & PHYS_HAS_BBOX)
+        return bool(self._flags & flags.HAS_BBOX)
 
     @flag_has_bbox.setter
     def flag_has_bbox(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_BBOX
+            self._flags |= flags.HAS_BBOX
         else:
-            self._phys_flags &= ~PHYS_HAS_BBOX
+            self._flags &= ~flags.HAS_BBOX
 
     @property
     def flag_owns_gravity(self):
-        return bool(self._phys_flags & PHYS_OWNS_GRAVITY)
+        return bool(self._flags & flags.OWNS_GRAVITY)
 
     @flag_owns_gravity.setter
     def flag_owns_gravity(self, value):
         if value:
-            self._phys_flags |= PHYS_OWNS_GRAVITY
+            self._flags |= flags.OWNS_GRAVITY
         else:
-            self._phys_flags &= ~PHYS_OWNS_GRAVITY
+            self._flags &= ~flags.OWNS_GRAVITY
 
     @property
     def flag_owns_damping(self):
-        return bool(self._phys_flags & PHYS_OWNS_DAMPING)
+        return bool(self._flags & flags.OWNS_DAMPING)
 
     @flag_owns_damping.setter
     def flag_owns_damping(self, value):
         if value:
-            self._phys_flags |= PHYS_OWNS_DAMPING
+            self._flags |= flags.OWNS_DAMPING
         else:
-            self._phys_flags &= ~PHYS_OWNS_DAMPING
+            self._flags &= ~flags.OWNS_DAMPING
 
     @property
     def flag_owns_adamping(self):
-        return bool(self._phys_flags & PHYS_OWNS_ADAMPING)
+        return bool(self._flags & flags.OWNS_ADAMPING)
 
     @flag_owns_adamping.setter
     def flag_owns_adamping(self, value):
         if value:
-            self._phys_flags |= PHYS_OWNS_ADAMPING
+            self._flags |= flags.OWNS_ADAMPING
         else:
-            self._phys_flags &= ~PHYS_OWNS_ADAMPING
+            self._flags &= ~flags.OWNS_ADAMPING
 
     @property
     def flag_accel_static(self):
-        return bool(self._phys_flags & PHYS_ACCEL_STATIC)
+        return bool(self._flags & flags.ACCEL_STATIC)
 
     @flag_accel_static.setter
     def flag_accel_static(self, value):
         if value:
-            self._phys_flags |= PHYS_ACCEL_STATIC
+            self._flags |= flags.ACCEL_STATIC
         else:
-            self._phys_flags &= ~PHYS_ACCEL_STATIC
+            self._flags &= ~flags.ACCEL_STATIC
 
     @property
     def flag_has_world(self):
-        return bool(self._phys_flags & PHYS_HAS_WORLD)
+        return bool(self._flags & flags.HAS_WORLD)
 
     @flag_has_world.setter
     def flag_has_world(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_WORLD
+            self._flags |= flags.HAS_WORLD
         else:
-            self._phys_flags &= ~PHYS_HAS_WORLD
+            self._flags &= ~flags.HAS_WORLD
 
     @property
     def flag_has_visualization(self):
-        return bool(self._phys_flags & PHYS_HAS_VISUALIZATION)
+        return bool(self._flags & flags.HAS_VISUALIZATION)
 
     @flag_has_visualization.setter
     def flag_has_visualization(self, value):
         if value:
-            self._phys_flags |= PHYS_HAS_VISUALIZATION
+            self._flags |= flags.HAS_VISUALIZATION
         else:
-            self._phys_flags &= ~PHYS_HAS_VISUALIZATION
+            self._flags &= ~flags.HAS_VISUALIZATION
 
     ###########################################################################
     #               Manipulação/consulta do estado dinâmico

@@ -5,10 +5,12 @@ from FGAme.physics import get_collision, get_collision_aabb, CollisionError
 from FGAme.core import EventDispatcher, signal, init
 from FGAme.core import env
 
-#=========================================================================
-# Classe Mundo -- coordena todos os objetos com uma física definida e resolve a
-# interação entre eles
-#=========================================================================
+###############################################################################
+#                                Simulação
+# ----------------------------------------------------------------------------
+# Coordena todos os objetos com uma física definida e resolve a interação
+# entre eles
+###############################################################################
 
 
 class Simulation(EventDispatcher):
@@ -43,9 +45,9 @@ class Simulation(EventDispatcher):
         self.input = env.input_object
         super(Simulation, self).__init__()
 
-    #=========================================================================
-    # Propriedades
-    #=========================================================================
+    ###########################################################################
+    #                             Propriedades
+    ###########################################################################
 
     #
     # Vetor com a aceleração da gravidade (em px/s^2)
@@ -95,9 +97,9 @@ class Simulation(EventDispatcher):
             if not obj.owns_adamping:
                 obj._adamping = value
 
-    #=========================================================================
-    # Gerenciamento de objetos
-    #=========================================================================
+    ###########################################################################
+    #                         Gerenciamento de objetos
+    ###########################################################################
     def add(self, obj):
         '''Adiciona um novo objeto ao mundo.
 
@@ -128,9 +130,9 @@ class Simulation(EventDispatcher):
         except IndexError:
             pass
 
-    #=========================================================================
-    # Controle de eventos
-    #=========================================================================
+    ###########################################################################
+    #                         Controle de eventos
+    ###########################################################################
     # Delegações
     long_press = signal('long-press', 'key', delegate='input')
     key_up = signal('key-up', 'key', delegate='input')
@@ -144,9 +146,9 @@ class Simulation(EventDispatcher):
     # TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2',
     # num_args=1)
 
-    #=========================================================================
-    # Simulação de Física
-    #=========================================================================
+    ###########################################################################
+    #                     Simulação de Física
+    ###########################################################################
     def update(self, dt):
         '''Rotina principal da simulação de física.'''
 
@@ -301,9 +303,7 @@ class Simulation(EventDispatcher):
             get_collision[type(A), type(B)] = inverse
             return col
 
-    #=========================================================================
-    # Cálculo de parâmetros físicos
-    #=========================================================================
+    # Cálculo de parâmetros físicos ###########################################
     def kinetic_energy(self):
         '''Retorna a soma da energia cinética de todos os objetos do mundo'''
 

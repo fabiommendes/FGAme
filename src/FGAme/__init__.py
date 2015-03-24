@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 ========
 Tutorial
@@ -14,8 +14,8 @@ bem definidas como massa, momento de inércia, velocidade, etc. A simulação da
 física é feita, em grande parte, de modo automático. Você verá o quanto é
 simples!
 
-O primeiro passo é definir o palco que os objetos habitarão. Isto pode ser feito
-criando um objeto da classe World().
+O primeiro passo é definir o palco que os objetos habitarão. Isto pode ser
+feito criando um objeto da classe World().
 
 >>> world = World()
 
@@ -67,8 +67,8 @@ Objetos dinâmicos
 
 Apesar do FGAme não fazer uma distinção explícita durante a criação, os objetos
 no mundo podem ser do tipo dinâmicos, cinemáticos ou estáticos. Todos eles
-participam das colisões normalmente, mas a resposta física pode ser diferente em
-cada caso. Os objetos dinâmicos se movimentam na tela e respondem às forças
+participam das colisões normalmente, mas a resposta física pode ser diferente
+em cada caso. Os objetos dinâmicos se movimentam na tela e respondem às forças
 externas e de colisão. Os objetos cinemáticos se movimentam (usualmente em
 movimento retilíneo uniforme), mas não sofrem a ação de nenhuma força. Já os
 objetos estáticos permanecem parados e não respondem a forças.
@@ -77,11 +77,12 @@ A diferenciação é feita apenas pelo valor das massas e das velocidades.
 Convertemos um objeto em cinemático atribuindo um valor infinito para a massa.
 Um objeto será estático se tanto a massa quanto a velocidade forem nulas.
 
->>> obj2.mass = 'inf' # automaticamente se torna estático pois a velocidade é nula
+>>> obj2.mass = 'inf' # automaticamente se torna estático pois a velocidade
+...                   # é nula
 
-O FGAme utiliza esta informação para acelerar os cálculos de detecção de colisão
-e resolução de forças. As propriedades dinâmicas/estáticas dos objetos, no
-entanto são inteiramente transparentes ao usuário.
+O FGAme utiliza esta informação para acelerar os cálculos de detecção de
+colisão e resolução de forças. As propriedades dinâmicas/estáticas dos objetos,
+no entanto são inteiramente transparentes ao usuário.
 
 Vale observar que a condição de dinâmico vs. estático pode ser atribuída
 independentemente para as variáveis lineares e angulares. No segundo caso, o
@@ -108,8 +109,8 @@ False
 >>> obj2.is_static()
 True
 
-Lembramos que as colisões são calculadas apenas se um dos objetos envolvidos for
-dinâmico. Deste modo, quando dois objetos cinemáticos ou um objeto estático
+Lembramos que as colisões são calculadas apenas se um dos objetos envolvidos
+for dinâmico. Deste modo, quando dois objetos cinemáticos ou um objeto estático
 e um cinemático se encontram, nenhuma força é aplicada e eles simplemente
 atravessam um pelo outro.
 
@@ -168,42 +169,42 @@ simulação.
 A tabela abaixo mostra os eventos mais comuns e a assinatura das funções de
 callback
 
-+----------------+-------------+---------------------------------------------------+
-| Evento         | Argumento   | Descrição                                         |
-+================+=============+===================================================+
-| key-down       | tecla       | Chamado no frame que uma tecla é pressionada.     |
-|                |             | O argumento pode ser um objeto 'tecla', que       |
-|                |             | depende do back end utilizado ou uma string,      |
-|                |             | que é portável para todos back ends.              |
-|                |             |                                                   |
-|                |             | A string corresponde à tecla escolhida. Teclas    |
-|                |             | especiais podem ser acessadas pelos seus nomes    |
-|                |             | como em 'space', 'up', 'down', etc.               |
-|                |             |                                                   |
-|                |             | Os callbacks do tipo 'key-down' são funções que   |
-|                |             | não recebem nenhum argumento.                     |
-+----------------+-------------+---------------------------------------------------+
-| key-up         | tecla       | Como em 'key-down', mas é executado no frame em   |
-|                |             | que a tecla é liberada pelo usuário.              |
-+----------------+-------------+---------------------------------------------------+
-| long-press     | tecla       | Semelhante aos anteriores, mas é executado em     |
-|                |             | *todos* os frames em que a tecla se mantiver      |
-|                |             | pressionada.                                      |
-+----------------+-------------+---------------------------------------------------+
-| mouse-motion   | nenhum      | Executado sempre que o ponteiro do mouse estiver  |
-|                |             | presente na tela.                                 |
-|                |             |                                                   |
-|                |             | O callback é uma função que recebe um vetor com a |
-|                |             | posição do mouse como primeiro argumento.         |
-+----------------+-------------+---------------------------------------------------+
-| mouse-click    | botão       | Como 'mouse-motion', mas só é executada após o    |
-|                |             | clique. Deve ser registrada com 'left', 'right'   |
-|                |             | 'middle' correspondendo a um dos 3 tipos de botão |
-|                |             | do mouse.                                         |
-|                |             |                                                   |
-|                |             | O callback recebe apeans a posição do ponteiro    |
-|                |             | como primeiro argumento.                          |
-+----------------+-------------+---------------------------------------------------+
++-------------+-----------+---------------------------------------------------+
+| Evento      | Argumento | Descrição                                         |
++=============+===========+===================================================+
+| key-down    | tecla     | Chamado no frame que uma tecla é pressionada.     |
+|             |           | O argumento pode ser um objeto 'tecla', que       |
+|             |           | depende do back end utilizado ou uma string,      |
+|             |           | que é portável para todos back ends.              |
+|             |           |                                                   |
+|             |           | A string corresponde à tecla escolhida. Teclas    |
+|             |           | especiais podem ser acessadas pelos seus nomes    |
+|             |           | como em 'space', 'up', 'down', etc.               |
+|             |           |                                                   |
+|             |           | Os callbacks do tipo 'key-down' são funções que   |
+|             |           | não recebem nenhum argumento.                     |
++-------------+-----------+---------------------------------------------------+
+| key-up      | tecla     | Como em 'key-down', mas é executado no frame em   |
+|             |           | que a tecla é liberada pelo usuário.              |
++-------------+-----------+---------------------------------------------------+
+| long-press  | tecla     | Semelhante aos anteriores, mas é executado em     |
+|             |           | *todos* os frames em que a tecla se mantiver      |
+|             |           | pressionada.                                      |
++-------------+-----------+---------------------------------------------------+
+| mouse-motion| nenhum    | Executado sempre que o ponteiro do mouse estiver  |
+|             |           | presente na tela.                                 |
+|             |           |                                                   |
+|             |           | O callback é uma função que recebe um vetor com a |
+|             |           | posição do mouse como primeiro argumento.         |
++-------------+-----------+---------------------------------------------------+
+| mouse-click | botão     | Como 'mouse-motion', mas só é executada após o    |
+|             |           | clique. Deve ser registrada com 'left', 'right'   |
+|             |           | 'middle' correspondendo a um dos 3 tipos de botão |
+|             |           | do mouse.                                         |
+|             |           |                                                   |
+|             |           | O callback recebe apeans a posição do ponteiro    |
+|             |           | como primeiro argumento.                          |
++-------------+-----------+---------------------------------------------------+
 
 Simulação simples
 =================
@@ -221,7 +222,8 @@ entre si por molas.
 ...         super(Gravity, self).__init__()
 ...
 ...         # Criamos dois objetos
-...         A = Circle(20, pos=pos.from_middle(100, 0), vel=(100, 300), color='red')
+...         A = Circle(20, pos=pos.from_middle(100, 0), vel=(100, 300),
+...                    color='red')
 ...         B = Circle(20, pos=pos.from_middle(-100, 0), vel=(-100, -300))
 ...         self.A, self.B = A, B
 ...         self.add([A, B])
@@ -247,31 +249,34 @@ organização de um motor de jogos orientado à física.
 Motores de jogos: uma introdução
 ================================
 
-Os pioneiros não tinham esse luxo: cada novo jogo implementado envolvia 
-programar como escrever os pixels na tela, como interagir com os dispositivos de
-entrada do usuário, e todas estas operações básicas. Na medida que os 
-computadores evoluíram, cada vez mais as tarefas comuns na implementação de 
-jogos foram movidas para bibliotecas/frameworks especializados deixando os 
-desenvolvedores muito mais focados nos aspectos criativos da construção do jogo. 
- 
+Os pioneiros não tinham esse luxo: cada novo jogo implementado envolvia
+programar como escrever os pixels na tela, como interagir com os dispositivos
+de entrada do usuário, e todas estas operações básicas. Na medida que os
+computadores evoluíram, cada vez mais as tarefas comuns na implementação de
+jogos foram movidas para bibliotecas/frameworks especializados deixando os
+desenvolvedores muito mais focados nos aspectos criativos da construção do
+jogo.
+
 Um motor de jogo idealmente deve chegar neste ponto: o desenvolvedor só liga as
-peças e define a lógica do jogo, mas sem se preocupar com os detalhes mais 
-baixos da programação. Por isto, motores de jogos modernos podem se tornar 
+peças e define a lógica do jogo, mas sem se preocupar com os detalhes mais
+baixos da programação. Por isto, motores de jogos modernos podem se tornar
 componentes extremamente sofisticados que chegam literalmente a possuir milhões
 de linhas de código.
 
 A FGAme, obviamente, é um projeto muito simples nesta escala e foi desenvolvido
-com o intuito muito mais pedagógico que comercial: os objetivos são ensinar 
+com o intuito muito mais pedagógico que comercial: os objetivos são ensinar
 conceitos de física para programadores e mostrar alguns princípios práticos de
-desenvolvimento de motores para jogos (especialmente jogos voltados para física).
+desenvolvimento de motores para jogos (especialmente jogos voltados para
+física).
 
 Começamos pincelando de forma geral o que um motor de jogos deve ser capaz de
-fazer e como isso normalmente se configura em termos de arquitetura de software.
+fazer e como isso normalmente se configura em termos de arquitetura de
+software.
 
 Desenhando na tela
 ==================
 
-Um motor de jogos que se preze deve ser capaz de, no mínimo, capturar as 
+Um motor de jogos que se preze deve ser capaz de, no mínimo, capturar as
 entradas do usuário e desenhar os elementos de jogo na tela (e talvez coordenar
 outras formas de saída tais como audio, respostas por vibração, etc).
 
@@ -281,12 +286,12 @@ da seguinte maneira::
     # Inicializa o estado do motor de jogos (configura hardware, lê arquivos
     # de configuração, savegames, etc)
     inicializa()
-    
+
     while True:
-        # Obtêm as entradas do usuário tais como cliques do mouse, teclas 
+        # Obtêm as entradas do usuário tais como cliques do mouse, teclas
         # digitadas, etc.
         lê_inputs()
-        
+
         # Atualiza estado de jogo (ex: move personagens, calcula pontos, danos,
         # colisões, etc)
         atualiza_frame()
@@ -296,7 +301,7 @@ da seguinte maneira::
         desenha()
 
 Vamos começar então com o mais básico possível, que é criar um "quase-jogo" que
-simplesmente desenha alguns objetos simples na tela. A FGAme pode utilizar 
+simplesmente desenha alguns objetos simples na tela. A FGAme pode utilizar
 vários métodos diferentes de renderização, mas por padrão, isto é feito com
 auxílio da biblioteca SDL. Entender o funcionamento da SDL é interessante pois
 vários jogos e motores de jogos são baseados nesta tecnologia e sua arquitetura
@@ -309,12 +314,12 @@ Veja como funciona na FGAme:
 >>> from FGAme import init_canvas
 >>> canvas = init_canvas(800, 600)   # doctest: +SKIP
 
-Observe que a mesma variável canvas pode ser recuperada posteriormente 
+Observe que a mesma variável canvas pode ser recuperada posteriormente
 utilizando a função .get_canvas() do objeto de configuração global
 
 >>> canvas = conf.get_canvas()   # ==> objeto canvas defindo anteriormente
 
-Este código criará uma janela de 800 x 600 pixels e retorna o objeto "canvas" 
+Este código criará uma janela de 800 x 600 pixels e retorna o objeto "canvas"
 que é utilizado para manipular e desenhar a tela.
 
 O objeto canvas é implementado em analogia a uma tela de pintura: mas no caso
@@ -326,19 +331,19 @@ um círculo no meio da tela utilizando
 
 Observe que as imagens não são atualizadas imediatamente. Isto ocorre porque a
 imagem é armazenada temporariamente na memória RAM e só é enviada para a tela
-quando exigimos esta operação explicitamente. Para isto, basta chamar o método 
+quando exigimos esta operação explicitamente. Para isto, basta chamar o método
 flip() no fim da seção de desenho.
 
 >>> canvas.flip()
 
 Uma maneira conveniente de fazer isto, é utilizar o objeto canvas dentro de
-um bloco with(). Ao final do bloco, a função flip() será chamada 
+um bloco with(). Ao final do bloco, a função flip() será chamada
 automaticamente.
 
 >>> with canvas:
 ...     canvas.paint_circle(pos=(400, 300), radius=50, color='black')
 ...     canvas.paint_circle(pos=(400, 300), radius=30, color='white')
-  
+
 Agora vemos os dois círculos pintados na tela.
 
 ==========
@@ -381,17 +386,17 @@ Loop principal
 ==============
 
 '''
-#===============================================================================
-# Importa pacotes
-#===============================================================================
-from FGAme import mathutils as math
+
 from FGAme.mathutils import Vector, Matrix
 from FGAme import draw
 from FGAme import bench
 from FGAme.core import *
+from FGAme import physics
 from FGAme.physics import *
+from FGAme.objects import *
 from FGAme.app import *
 from FGAme.orientation_objects import *
+from FGAme import mathutils as math
 
 if __name__ == '__main__':
     import doctest

@@ -1,13 +1,11 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics.elements import (
-    PHYS_HAS_MASS,
-    PHYS_HAS_SPEED
-)
-from FGAme.physics.elements import PhysElement
+from FGAme.physics.obj_all import PhysElement
 from FGAme.mathutils import Vector, VectorM, asvector, dot
 
-#==============================================================================
+__all__ = ['Particle', 'Dynamic']
+
+###############################################################################
 # Objetos que obedecem à interface de "partícula" de física. Este objetos
 # possuem grandezas lineares e parâmetros físicos associados à elas definidos.
 # Objetos mais complexos (e.g., corpos rígidos) podem herdar dessa classe e
@@ -15,10 +13,10 @@ from FGAme.mathutils import Vector, VectorM, asvector, dot
 # se
 # Apenas as propriedades físicas são definidas aqui. Cores, texturas, resposta
 # a eventos do usuário, etc devem ser implementadas em sub-classes.
-#==============================================================================
+###############################################################################
 
 
-class PhysPoint(PhysElement):
+class Dynamic(PhysElement):
 
     '''Objeto físico com apenas propriedades lineares.
 
@@ -50,7 +48,7 @@ class PhysPoint(PhysElement):
 
     Simula uma partícula em lançamento parabólico
 
-    >>> p = PhysPoint(vel=(8, 8))
+    >>> p = Particle(vel=(8, 8))
     >>> for i in range(8):
     ...     print('%4.1f, %4.1f' % tuple(p.pos))
     ...     p.apply_accel((0, -8), dt=0.25)
@@ -67,16 +65,16 @@ class PhysPoint(PhysElement):
     __slots__ = ['_pos', '_vel', '_accel', '_invmass']
 
     def __init__(self, pos=(0, 0), vel=(0, 0), mass=1.0):
-        super(PhysPoint, self).__init__(flags=PHYS_HAS_MASS | PHYS_HAS_SPEED)
+        super(Dynamic, self).__init__()
         self._pos = VectorM(*pos)
         self._vel = VectorM(*vel)
         self._accel = VectorM(0, 0)
         self._invmass = 1.0
         self.mass = mass
 
-    #==========================================================================
-    # Propriedades
-    #==========================================================================
+    ###########################################################################
+    #                             Propriedades
+    ###########################################################################
 
     @property
     def mass(self):
@@ -92,7 +90,7 @@ class PhysPoint(PhysElement):
             raise ValueError('mass cannot be null or negative')
         self._invmass = 1.0 / value
 
-    # Variáveis de estado -----------------------------------------------------
+    # Variáveis de estado #####################################################
     @property
     def pos(self):
         return Vector(*self._pos)
@@ -117,7 +115,7 @@ class PhysPoint(PhysElement):
     def accel(self, value):
         self._accel.copy_from(value)
 
-    # Parâmetros físicos derivados --------------------------------------------
+    # Parâmetros físicos derivados ############################################
     @property
     def linearE(self):
         return self._mass * dot(self.vel, self.vel) / 2
@@ -130,9 +128,9 @@ class PhysPoint(PhysElement):
     def momentumP(self):
         return self.mass * self.vel
 
-    #=========================================================================
-    # Deslocamentos
-    #=========================================================================
+    ###########################################################################
+    #                          Métodos da API
+    ###########################################################################
     def move(self, delta):
         '''Move o objeto por vetor de deslocamento delta'''
 
@@ -143,9 +141,7 @@ class PhysPoint(PhysElement):
 
         self._vel += delta
 
-    #=========================================================================
-    # Resposta a forças, impulsos e atualização da física
-    #=========================================================================
+    # Resposta a forças, impulsos e atualização da física #####################
     def external_force(self, t):
         '''Define uma força externa que depende do tempo t.
 
@@ -242,9 +238,7 @@ class PhysPoint(PhysElement):
 
         self.boost(impulse / self.mass)
 
-    #=========================================================================
-    # Controle de estado dinâmico
-    #=========================================================================
+    # Controle de estado dinâmico #############################################
     def is_dynamic_linear(self):
         # Implementação um pouco mais rápida
         return bool(self._invmass)
@@ -259,22 +253,23 @@ class PhysPoint(PhysElement):
     def is_kinematic_angular(self):
         return True
 
-    #=========================================================================
-    # Interface Python
-    #=========================================================================
-    # Define igualdade <==> identidade
-    def __eq__(self, other):
-        return self is other
-
-    def __hash__(self):
-        return id(self)
-
-    # Representação do objeto como string
+    # Representação do objeto como string #####################################
     def __repr__(self):
         tname = type(self).__name__
         pos = ', '.join('%.1f' % x for x in self.pos)
         vel = ', '.join('%.1f' % x for x in self.vel)
         return '%s(pos=(%s), vel=(%s))' % (tname, pos, vel)
+
+
+###############################################################################
+#                         Classe de partícula
+###############################################################################
+
+
+class Particle(Dynamic):
+
+    '''Define uma partícula'''
+
 
 if __name__ == '__main__':
     import doctest

@@ -24,8 +24,13 @@ Funções especiais para a criação de objetos
 
 '''
 
-from .force import *
-from .collision import *
-from .objects import *
+from .flags import *
+from .obj_all import Dynamic, Particle, RigidBody, LinearRigidBody
+from .obj_all import AABB, Circle, Ball
+from .obj_all import Poly, RegularPoly, Rectangle
+from .forces import *
+from .collision_base import *
 from .simulation import *
-from .world import *
+
+
+__all__ = ['Collision', 'get_collision', 'Simulation']

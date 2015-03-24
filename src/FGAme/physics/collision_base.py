@@ -1,11 +1,14 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 from FGAme.mathutils import Vector, cross, dot, shadow_x, shadow_y
 from FGAme.util import multifunction
 
-#=========================================================================
-# Classe Colisão -- representa uma colisão entre dois objetos.
-# Resolve a colisão sob demanda.
-#=========================================================================
+###############################################################################
+#                         Classe Colisão
+# ----------------------------------------------------------------------------
+#
+# Representa uma colisão entre dois objetos.  Resolve a colisão sob demanda.
+#
+###############################################################################
 
 
 class Collision(object):
@@ -174,9 +177,9 @@ class Collision(object):
     def object_B(self):
         return self.objects[1]
 
-#=========================================================================
+###############################################################################
 # Funções de detecção e início de resolução de colisão
-#=========================================================================
+###############################################################################
 
 
 class CollisionError(Exception):

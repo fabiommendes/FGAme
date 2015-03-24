@@ -4,7 +4,7 @@ from FGAme.physics.collision import (
     Collision, get_collision, get_collision_aabb
 )
 from FGAme.physics.elements import (
-    PhysCircle, PhysAABB, PhysPoly, PhysRectangle
+    Circle, AABB, Poly, Rectangle
 )
 
 u_x = Vector(1, 0)
@@ -16,10 +16,10 @@ DEFAULT_DIRECTIONS = [u_x.rotated(n * pi / 12) for n in
 # Colisões entre figuras primitivas simples
 ###############################################################################
 
-get_collision[PhysAABB, PhysAABB] = get_collision_aabb
+get_collision[AABB, AABB] = get_collision_aabb
 
 
-@get_collision.dispatch(PhysCircle, PhysCircle)
+@get_collision.dispatch(Circle, Circle)
 def circle_collision(A, B):
     '''Testa a colisão pela distância dos centros'''
 
@@ -37,7 +37,7 @@ def circle_collision(A, B):
 ###############################################################################
 
 
-@get_collision.dispatch(PhysPoly, PhysPoly)
+@get_collision.dispatch(Poly, Poly)
 def get_collision_poly(A, B, directions=None):
     '''Implementa a colisão entre dois polígonos arbitrários'''
 
@@ -83,22 +83,22 @@ def get_collision_poly(A, B, directions=None):
     return Collision(A, B, col_pt, norm, min_shadow)
 
 
-@get_collision.dispatch(PhysPoly, PhysAABB)
+@get_collision.dispatch(Poly, AABB)
 def get_collision_poly_aabb(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
-    B_poly = PhysRectangle(bbox=B.bbox, density=B.density)
+    B_poly = Rectangle(bbox=B.bbox, density=B.density)
     col = get_collision_poly(A, B_poly)
     if col is not None:
         col.objects = (A, B)
         return col
 
 
-@get_collision.dispatch(PhysAABB, PhysPoly)
+@get_collision.dispatch(AABB, Poly)
 def get_collision_aabb_poly(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
-    A_poly = PhysRectangle(bbox=A.bbox, density=A.density)
+    A_poly = Rectangle(bbox=A.bbox, density=A.density)
     col = get_collision_poly(A_poly, B)
     if col is not None:
         col.objects = (A, B)

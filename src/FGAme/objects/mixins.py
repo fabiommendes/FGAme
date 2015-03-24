@@ -5,9 +5,9 @@ Created on 22/03/2015
 '''
 
 from FGAme.mathutils import Vector
-from FGAme.physics.elements import PhysElement
+from FGAme.physics.obj_base import PhysElement
 from FGAme.core import EventDispatcherMeta, signal
-from FGAme.draw import Color, AABB, Shape
+from FGAme.draw import Color, Shape
 from FGAme.util import lazy
 
 
@@ -69,10 +69,7 @@ class HasLocalForces(object):
                              if isinstance(gravity, (float, int))
                              else Vector(*gravity))
 
-    #==========================================================================
-    # Propriedades
-    #==========================================================================
-
+    # Propriedades ############################################################
     @property
     def gravity(self):
         return self._gravity
@@ -106,9 +103,7 @@ class HasLocalForces(object):
     owns_damping = PhysElement.flag_owns_damping
     owns_adamping = PhysElement.flag_owns_adamping
 
-    #==========================================================================
-    # Métodos
-    #==========================================================================
+    # Métodos #################################################################
     def global_force(self):
         '''Calcula a força total devido à gravidade e amortecimento'''
 
@@ -213,13 +208,34 @@ class WorldObject(object):
 
 
 class ObjectMixin(WorldObject, HasLocalForces, HasVisualization):
+    _mixin_args = set([
+        'world', 'color', 'line_color',
+        'gravity', 'damping', 'adamping',
+        'owns_gravity', 'owns_damping', 'owns_adamping',
+    ])
+
+    def __init__(self, *args, **kwds):
+
+        mixin_kwds = self._extract_mixin_kwargs(kwds)
+        type(self).__bases__[0].__init__(self, *args, **kwds)
+        self._init_mixin(**mixin_kwds)
+
+    def _extract_mixin_kwargs(self, kwds):
+        D = {}
+        mixin_args = self._mixin_args
+        for k in kwds:
+            if k in mixin_args:
+                D[k] = kwds[k]
+        for k in D:
+            del kwds[k]
+        return D
 
     def _init_mixin(self,
                     world=None,
                     color=None,
                     gravity=None, damping=None, adamping=None,
                     owns_gravity=None, owns_damping=None, owns_adamping=None):
-        self._init_world_object(world)
         self._init_has_visualization(color)
         self._init_has_local_forces(gravity, damping, adamping,
                                     owns_gravity, owns_damping, owns_adamping)
+        self._init_world_object(world)
