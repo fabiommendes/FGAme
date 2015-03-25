@@ -1,4 +1,5 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import Vector, cross
 
 __all__ = [
@@ -213,23 +214,6 @@ class Vertices(object):
 
     def __init__(self, vertices):
         self._data = [Vector(*x) for x in vertices]
-
-    # Construtores alternativos ----------------------------------------------
-    @classmethod
-    def rect(cls):
-        pass
-
-    @classmethod
-    def triangle(cls):
-        pass
-
-    @classmethod
-    def regular(cls):
-        pass
-
-    @classmethod
-    def convex(cls):
-        pass
 
     # Outras funções ---------------------------------------------------------
     def iter_closing(self):

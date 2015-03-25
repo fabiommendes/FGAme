@@ -5,36 +5,36 @@ This module was inspired on Aric Coady's multimethod module in pypi.
 Introduction
 ------------
 
-Multiple argument dispatch is a technique in which different implementations of 
-a function can be used depending on the type and number of arguments. This module
-provides the ``multifunction`` and ``multimethod`` classes that provides 
+Multiple argument dispatch is a technique in which different implementations of
+a function can be used depending on the type and number of arguments. This
+module provides the ``multifunction`` and ``multimethod`` classes that provides
 multiple argument dispatch to Python. Multiple dispatch functions can be easily
 created by decorating an ordinary python function::
 
     @multifunction(*types)
     def func(*args):
         pass
-|
-*func* is now a ``multifunction`` which will delegate to the above implementation 
-when called with arguments of the specified types. If an exact match can't 
-be found, the next closest method is called (and cached). If there are 
-multiple or no candidate methods, a DispatchError (which derives from TypeError) 
-is raised.
-        
+| *func* is now a ``multifunction`` which will delegate to the above
+implementation when called with arguments of the specified types. If an exact
+match can't be found, the next closest method is called (and cached). If there
+are multiple or no candidate methods, a DispatchError (which derives from
+TypeError) is raised.
+
+
 Basic usage
 -----------
 
-The easiest way to create a new multifunction is to supplement an implementation 
-with the ``multifunction(*types)`` decorator.
+The easiest way to create a new multifunction is to supplement an
+implementation with the ``multifunction(*types)`` decorator.
 
 >>> @multifunction(int, int)
 ... def join(x, y):
 ...     "Join two objects, x and y"
 ...     return x + y
 
-This creates a multiple dispatch function that only accepts two integer 
+This creates a multiple dispatch function that only accepts two integer
 positional arguments.
- 
+
 >>> join(1, 1)
 2
 
@@ -43,24 +43,24 @@ Traceback (most recent call last):
 ...
 DispatchError: join(float, float): no methods found
 
-An alternative way to create a ``multifunction`` object is to use the explicit 
-``multifunction.new()`` constructor. 
+An alternative way to create a ``multifunction`` object is to use the explicit
+``multifunction.new()`` constructor.
 
 >>> join = multifunction.new('join', doc="Join two objects, x and y")
 
-After creating a ``multifunction`` instance, types can be mapped to their 
+After creating a ``multifunction`` instance, types can be mapped to their
 respective implementations functions by assigning keys to a dictionary.
 
 >>> join[int, int] = lambda x, y: x + y
->>> join[float, float] = lambda x, y: x + y + 0.1 
+>>> join[float, float] = lambda x, y: x + y + 0.1
 
 The ``join`` multifunction now accepts (int, int) and (float, float) arguments
 
 >>> join(1, 1) + join(1., 1.) # 2 + 2.1
 4.1
 
-The ``.dispatch()`` method is a more convenient way to add additional 
-implementations to the `multifunction`.  
+The ``.dispatch()`` method is a more convenient way to add additional
+implementations to the `multifunction`.
 
 >>> @join.dispatch(list, list)
 ... def join(x, y):
@@ -68,26 +68,26 @@ implementations to the `multifunction`.
 >>> join([1], [join(1, 1)])
 [1, 2]
 
-Multiple decorators are also accepted.
+Stacked decorators are also accepted.
 
 >>> @join.dispatch(float, int)
 ... @join.dispatch(int, float)
 ... def join_numbers(x, y):
 ...     return x + y
 
-If the implementation function have a different name than the multifunction, 
+If the implementation function have a different name than the multifunction,
 both will live in the same namespace.
 
 >>> join(1, 2.), join_numbers(1 + 2j, 2 + 1j)
 (3.0, (3+3j))
 
-A `multifunction` is a callable dictionary that maps tuples of types to 
+A `multifunction` is a callable dictionary that maps tuples of types into
 functions. All methods of regular dictionaries are accepted.
 
 >>> dict(join) # doctest: +ELLIPSIS
 {(<...>, <...>): <function ... at 0x...>, ...}
 
-We can remove an implementation by simply deleting it from the dictionary. 
+We can remove an implementation by simply deleting it from the dictionary.
 
 >>> del join[list, list]
 >>> join([1], [2])
@@ -95,8 +95,9 @@ Traceback (most recent call last):
 ...
 DispatchError: join(list, list): no methods found
 
-Use None to capture arbitrary types at a given position. The caller always tries
-to find the most specialized implementation, and uses None only as a fallback.
+Use None to capture arbitrary types at a given position. The caller always
+tries to find the most specialized implementation, and uses None only as a
+fallback.
 
 >>> @join.dispatch(None, int)
 ... def join(x, y):
@@ -104,7 +105,7 @@ to find the most specialized implementation, and uses None only as a fallback.
 >>> join(1, 2), join(1 + 0j, 2)
 (3, (2.9+0j))
 
-One can also define a fallback function that is called with an arbitrary number 
+One can also define a fallback function that is called with an arbitrary number
 of positional arguments. Just use the fallback decorator of a multifunction
 
 >>> @join.fallback
@@ -116,21 +117,21 @@ of positional arguments. Just use the fallback decorator of a multifunction
 Multi argument dispatch for class methods
 -----------------------------------------
 
-`multifunction`'s can be used inside class declarations as any regular function.  
-It has a small inconvenient that the type of first argument `self` must be present
-in the type signature. Since the class was not yet created, the type does not
-exist and the fallback ``None`` must be used. 
+`multifunction`'s can be used inside class declarations as any regular
+function. It has a small inconvenient that the type of first argument `self`
+must be present in the type signature. Since the class was not yet created, the
+type does not exist and the fallback ``None`` must be used.
 
 >>> class Foo(object):
 ...     @multifunction(None, int)
 ...     def double(self, x):
 ...         print(2 * x)
-... 
+...
 ...     @double.dispatch(None, complex)
 ...     def double(self, x):
 ...         print("sorry, I don't like complex numbers")
 
-The multiple argument dispatch works as before. 
+The multiple argument dispatch works as before.
 
 >>> Foo().double(2)
 4
@@ -139,13 +140,13 @@ sorry, I don't like complex numbers
 
 The ``multimethod`` class omits the type declaration for the first argument
 of the function (usually the first argument is self). It is convenient for
-using in the body of class declarations. 
+using in the body of class declarations.
 
 >>> class Bar(object):
 ...     @multimethod(int)       # the type of self is not declared...
-...     def double(self, x):    # ...but it appears on implementations as usual 
+...     def double(self, x):    # ...but it appears on implementations as usual
 ...         print(2 * x)
-... 
+...
 ...     @double.dispatch(complex)
 ...     def double(self, x):
 ...         print("sorry, I don't like complex numbers")
@@ -155,7 +156,7 @@ using in the body of class declarations.
 >>> Bar().double(2j)
 sorry, I don't like complex numbers
 
-``multifunction(None, ...)`` and ``multimethod(...)`` are equivalent. The 
+``multifunction(None, ...)`` and ``multimethod(...)`` are equivalent. The
 second is just a small convenience that helps code look clean and tidy.
 '''
 
@@ -166,19 +167,49 @@ import itertools
 
 __all__ = ['multifunction', 'multimethod', 'DispatchError']
 
+
 class DispatchError(TypeError):
-    pass
 
-class multifunction(MutableMapping):
-    '''Implements a multi argument dispatch function.'''
+    '''Raised when a multifunction does not find a suitable implementation'''
 
-    __slots__ = ['_name', '_doc', '_dict', '_cache', '_last', '_data']
-    _slots_set_ = set(__slots__)
-    _FUNCTYPE = type(lambda:None)
+###############################################################################
+# Import base class --- the C implementation offers a huge speed-up for cached
+# types
+###############################################################################
+try:
+    from .cmultidispatch import MultiFunctionBase
 
-    #===========================================================================
-    # Multimethod instance creation
-    #===========================================================================
+except (ImportError, SystemError):
+
+    class MultiFunctionBase(object):
+
+        def __init__(self, name='', doc=None):
+            self.init(name, doc)
+
+        def init(self, name, doc):
+            self._data = {}
+            self._cache = {}
+            self._name = name
+            self._doc = doc
+
+        def __call__(self, *args, **kwargs):
+            "Resolve and dispatch to best method."
+
+            types = tuple(map(type, args))
+            try:
+                return self._cache[types](*args, **kwargs)
+            except KeyError:
+                func = self.get_function(*types)
+            return func(*args, **kwargs)
+
+
+class multifunction(MultiFunctionBase, MutableMapping):
+
+    '''Decorates a function for supporting type-based argument dispatch.'''
+
+    _FUNCTYPE = type(lambda: None)
+
+    # Multimethod instance creation ###########################################
     def __new__(cls, *types):
         '''Return a decorator which will add the function to the current
         multifunction.'''
@@ -198,36 +229,32 @@ class multifunction(MutableMapping):
 
         Assign to local name in order to use decorator.'''
 
-        self = object.__new__(cls)
-        self._data = {}
-        self._cache = {}
-        self._dict = {}
-        self._name = name
-        self._doc = doc
+        self = MultiFunctionBase.__new__(cls)
+        self._init(name, doc)
         return self
 
     def dispatch(self, *types):
-        '''Returns a decorator that sets a function as an specific 
-        implementation of some type signature. Multiple types for the same 
+        '''Returns a decorator that sets a function as an specific
+        implementation of some type signature. Multiple types for the same
         argument position can be specified as tuples.
-        
+
         Examples
         --------
-        
+
         >>> add = multimethod.new('add')
         >>> @add.dispatch((int, float, complex), (int, float, complex))
         ... def add(x, y):
         ...     return x + y
-        
-        This method accepts int's, float's or complex's numbers as any of its 
+
+        This method accepts int's, float's or complex's numbers as any of its
         two arguments.
         '''
 
         def decorator(func):
             # compute all types signatures permutations
-            for tsig in  itertools.product(*(
-                    (t if isinstance(t, tuple) else [t])
-                        for t in types)):
+            for tsig in itertools.product(*(
+                (t if isinstance(t, tuple) else [t])
+                    for t in types)):
                 self[tsig] = func
 
             self._last = func
@@ -270,9 +297,8 @@ class multifunction(MutableMapping):
             self._cache[types] = func
         return func
 
-    #===========================================================================
-    # Find parents
-    #===========================================================================
+    # Find parents ############################################################
+
     @staticmethod
     def is_parent(tuple1, tuple2):
         '''Return True if first argument is parent of second one.
@@ -317,9 +343,7 @@ class multifunction(MutableMapping):
 
         return parents
 
-    #===========================================================================
-    # Dict magic methods
-    #===========================================================================
+    # Dict magic methods ######################################################
     def __setitem__(self, types, func):
         if self.__doc__ is None:
             self.__doc__ = getattr(func, '__doc__', None)
@@ -328,7 +352,8 @@ class multifunction(MutableMapping):
 
         self._data[types] = func
         if len(self._cache) == len(self._data) - 1:
-            self._cache[types] = func  # Cache has the same items as self._data
+            # Cache has the same items as self._data
+            self._cache[types] = func
         else:
             self._cache.clear()
             self._cache.update(self._data)
@@ -359,25 +384,6 @@ class multifunction(MutableMapping):
     def __iter__(self):
         return iter(self._data)
 
-    def __call__(self, *args, **kwargs):
-        "Resolve and dispatch to best method."
-
-        func = self.get_function(*(type(x) for x in args))
-        return func(*args, **kwargs)
-
-    def __getattr__(self, attr):
-        try:
-            return self._dict[attr]
-        except KeyError:
-            raise AttributeError(attr)
-
-    def __setattr__(self, attr, value):
-        cls = type(self)
-        if attr in self._slots_set_:
-            getattr(cls, attr).__set__(self, value)
-        else:
-            self._dict[attr] = value
-
     def __repr__(self):
         return '<{cls} {name} at 0x{id}>'.format(cls=type(self).__name__,
                                                  name=self._name,
@@ -389,9 +395,7 @@ class multifunction(MutableMapping):
         # python 2 return MethodType(self, MethodType, cls)
         return MethodType(self, MethodType)
 
-    #===========================================================================
-    # Function properties
-    #===========================================================================
+    # Function properties #####################################################
     @property
     def __annotations__(self):
         return {}
@@ -428,9 +432,9 @@ class multifunction(MutableMapping):
     def __doc__(self, value):
         self._doc = value
 
-    @property
-    def __dict__(self):
-        return self._dict
+#     @property
+#     def __dict__(self):
+#         return self._dict
 
     # Backwards compatibility with python 2, if necessary
     if sys.version_info[0] == 2:
@@ -441,7 +445,9 @@ class multifunction(MutableMapping):
         func_name = __name__
         func_doc = __doc__
 
+
 class multimethod(multifunction):
+
     '''Multi argument dispatch for functions that are used as methods inside a
     class declaration.
     '''
@@ -452,19 +458,19 @@ class multimethod(multifunction):
         method = self.get_function(*tuple(type(x) for x in args), **kwds)
         return method(other, *args, **kwds)
 
-# # class pattern(MutableSequence):
-# # # TODO: review implementation
-# #     def __init__(self):
-# #         pass
+# class pattern(MutableSequence):
+# TODO: review implementation
+# def __init__(self):
+# pass
 # #
 # #
-# # @pattern
-# # def fat(x):
-# #     return x * fat(x - 1)
+# @pattern
+# def fat(x):
+# return x * fat(x - 1)
 # #
-# # @fat.pattern(0)
-# # def fat(x):
-# #     return 1
+# @fat.pattern(0)
+# def fat(x):
+# return 1
 #
 # class vmultifunction(multifunction):
 #     '''Dispatch according to type or value.
@@ -505,7 +511,7 @@ class multimethod(multifunction):
 #     '''
 #
 #     def __setitem__(self, args, func):
-#         # Separate types from values
+# Separate types from values
 #         types = []
 #         values = []
 #         for idx, arg in enumerate(args):
@@ -516,7 +522,7 @@ class multimethod(multifunction):
 #                 break
 #         types = tuple(types)
 #
-#         # Set function
+# Set function
 #         try:
 #             curr_func = self[types]
 #         except KeyError:
@@ -539,3 +545,68 @@ class multimethod(multifunction):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+
+    from fasttrack import timeit
+
+    N = 2000000
+
+    def func(x, y):
+        return x + y
+
+#    def func(*args, **kwds):
+#        return args[0] + args[1]
+
+    import multimethod
+    import multimethods
+
+    @multifunction(float, float)
+    @multifunction(int, int)
+    @multifunction(float, int)
+    def md_func(x, y):
+        return x + y
+
+    @multimethod.multimethod(float, int)
+    @multimethod.multimethod(float, float)
+    @multimethod.multimethod(int, int)
+    def mm_func(x, y):
+        return x + y
+
+    @multimethods.multimethod(int, int)
+    def mms_func(x, y):
+        return x + y
+
+    @multimethods.multimethod(float, float)
+    def mms_func(x, y):
+        return x + y
+
+    @multimethods.multimethod(float, int)
+    def mms_func(x, y):
+        return x + y
+
+    with timeit('pure'):
+        for i in range(N):
+            func(1, 2)
+
+    with timeit('multidispatch'):
+        for i in range(N):
+            md_func(1, 2)
+
+    with timeit('multimethod'):
+        for i in range(N):
+            mm_func(1, 2)
+
+    with timeit('multimethods'):
+        for i in range(N):
+            mms_func(1, 2)
+
+    def manual(x, y):
+        if isinstance(x, float):
+            return x + y
+        elif isinstance(x, int) and isinstance(y, int):
+            return x + y
+        else:
+            return x + y
+
+    with timeit('manual'):
+        for i in range(N):
+            manual(1, 2)

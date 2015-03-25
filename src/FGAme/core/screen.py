@@ -4,7 +4,7 @@ from FGAme.mathutils import Vector
 from FGAme.draw import color_property
 
 ###############################################################################
-#                            Classe Screen genérica
+#                          Classe Screen genérica
 ###############################################################################
 
 
@@ -32,19 +32,16 @@ class Screen(object):
         self.zoom = zoom
         self.background = background
         self._direct = True
-        self.init()
 
     def init(self):
-        '''Executado ao fim da inicialização. Sub-classes podem sobrescrever
-        este método ao invés do método __init__.'''
-
-        pass
-
-    def start(self):
         '''Deve ser chamado como primeira função para iniciar explicitamente a
         tela e para abrir e mostrar a janela de jogo.'''
 
         pass
+
+    def show(self):
+        '''Deve ser chamado como primeira função para iniciar explicitamente a
+        tela e para abrir e mostrar a janela de jogo.'''
 
     @property
     def shape(self):
@@ -70,7 +67,10 @@ class Canvas(Screen):
         super(Canvas, self).__init__(shape, pos, zoom, background)
         self._drawing_funcs = {}
 
-    def start(self):
+    def init(self):
+        pass
+
+    def show(self):
         self.clear_background('white')
         self.flip()
 

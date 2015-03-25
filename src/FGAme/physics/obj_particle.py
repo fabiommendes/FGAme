@@ -113,7 +113,7 @@ class Dynamic(PhysElement):
 
     @accel.setter
     def accel(self, value):
-        self._accel.copy_from(value)
+        self._accel.update(value)
 
     # Parâmetros físicos derivados ############################################
     @property
@@ -226,7 +226,7 @@ class Dynamic(PhysElement):
         self._accel /= 2
         self.boost(self._accel * dt)
         self.move(self._vel * dt + a * (dt ** 2 / 2.))
-        self._accel.copy_from(a)
+        self._accel.update(a)
 
     def apply_impulse(self, impulse, pos=None, relative=False):
         '''Aplica um impulso linear ao objeto. Isto altera sua velocidade

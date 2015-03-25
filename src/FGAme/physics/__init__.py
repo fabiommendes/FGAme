@@ -31,6 +31,6 @@ from .obj_all import Poly, RegularPoly, Rectangle
 from .forces import *
 from .collision_base import *
 from .simulation import *
-
+from . import collision_pairwise as col_pairs
 
 __all__ = ['Collision', 'get_collision', 'Simulation']

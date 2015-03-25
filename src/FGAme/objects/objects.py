@@ -3,28 +3,27 @@ from FGAme.objects.mixins import ObjectMixin
 
 
 class AABB(ObjectMixin, physics.AABB):
-    pass
+    _init_physics = physics.AABB.__init__
 
 
 class Circle(ObjectMixin, physics.Circle):
-    pass
+    _init_physics = physics.Circle.__init__
 
 
 class Ball(ObjectMixin, physics.Ball):
-    pass
+    _init_physics = physics.Ball.__init__
 
 
 class Poly(ObjectMixin, physics.Poly):
-    pass
+    _init_physics = physics.Poly.__init__
 
 
 class Rectangle(ObjectMixin, physics.Rectangle):
-    pass
+    _init_physics = physics.Rectangle.__init__
 
 
 class RegularPoly(ObjectMixin, physics.RegularPoly):
-
-    pass
+    _init_physics = physics.RegularPoly.__init__
 
 if __name__ == '__main__':
     x = AABB(shape=(100, 200), world=set())

@@ -1,9 +1,9 @@
 from FGAme.mathutils import Vector, dot, area, center_of_mass, clip, pi
 
-from FGAme.physics.collision import (
+from FGAme.physics.collision_base import (
     Collision, get_collision, get_collision_aabb
 )
-from FGAme.physics.elements import (
+from FGAme.physics.obj_all import (
     Circle, AABB, Poly, Rectangle
 )
 

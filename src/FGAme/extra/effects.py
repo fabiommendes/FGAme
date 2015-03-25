@@ -1,7 +1,8 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 from random import shuffle, random
 from math import sqrt
 from FGAme.objects import Poly
+
 
 def explode(obj, world, energy=0, prob_rec=0.5):
     world.remove(obj)
@@ -9,15 +10,17 @@ def explode(obj, world, energy=0, prob_rec=0.5):
     new_objects = []
 
     if N == 3:
-        sides = [ obj.get_side(i).norm() for i in range(3) ]
+        sides = [obj.get_side(i).norm() for i in range(3)]
         idx = sides.index(max(sides))
         middle = (obj.vertices[idx] + obj.vertices[(idx + 1) % N]) / 2
         pt0 = obj.vertices[idx]
         pt1 = obj.vertices[(idx + 1) % N]
         pt2 = obj.vertices[(idx + 2) % N]
 
-        new_objects.append(Poly([pt0, middle, pt2], color=obj.color, omega=obj.omega, density=obj.density))
-        new_objects.append(Poly([middle, pt1, pt2], color=obj.color, omega=obj.omega, density=obj.density))
+        new_objects.append(
+            Poly([pt0, middle, pt2], color=obj.color, omega=obj.omega, density=obj.density))
+        new_objects.append(
+            Poly([middle, pt1, pt2], color=obj.color, omega=obj.omega, density=obj.density))
 
     else:
         # Determina os vértices da triangulação e cria objeto
@@ -25,13 +28,18 @@ def explode(obj, world, energy=0, prob_rec=0.5):
             pt1 = obj.vertices[i]
             pt2 = obj.vertices[(i + 1) % N]
             pt3 = obj.pos
-            new = Poly([pt1, pt2, pt3], color=obj.color, omega=obj.omega, density=obj.density)
+            new = Poly([pt1,
+                        pt2,
+                        pt3],
+                       color=obj.color,
+                       omega=obj.omega,
+                       density=obj.density)
             new_objects.append(new)
 
     # Distribui as energias adicionais aleatoriamente entre os objetos
     N = len(new_objects)
     Z = sum(x ** 2 for x in range(1, N + 1))
-    energies = [ energy * x ** 2 / Z for x in range(1, N + 1) ]
+    energies = [energy * x ** 2 / Z for x in range(1, N + 1)]
     shuffle(energies)
 
     # Processa os novos objetos criados

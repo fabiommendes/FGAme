@@ -134,11 +134,11 @@ class Simulation(EventDispatcher):
     #                         Controle de eventos
     ###########################################################################
     # Delegações
-    long_press = signal('long-press', 'key', delegate='input')
-    key_up = signal('key-up', 'key', delegate='input')
-    key_down = signal('key-down', 'key', delegate='input')
-    mouse_motion = signal('mouse-motion', delegate='input')
-    mouse_click = signal('mouse-click', 'button', delegate='input')
+    long_press = signal('long-press', 'key', delegate_to='input')
+    key_up = signal('key-up', 'key', delegate_to='input')
+    key_down = signal('key-down', 'key', delegate_to='input')
+    mouse_motion = signal('mouse-motion', delegate_to='input')
+    mouse_click = signal('mouse-click', 'button', delegate_to='input')
 
     # Eventos privados
     frame_enter = signal('frame-enter')

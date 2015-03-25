@@ -20,10 +20,16 @@ try:
             "build_ext": build_ext},
         ext_modules=[
             Extension(
-                "FGAme.mathutils.linalg_fast",
-                ["src/FGAme/mathutils/linalg_fast.pyx"],
+                "FGAme.mathutils.cvector",
+                ["src/FGAme/mathutils/cvector.pyx"],
                 libraries=(
                     [] if sys.platform in win_platforms else ['m']),
+                include_dirs=['src/FGAme']),
+
+            Extension(
+                "FGAme.util.cmultidispatch",
+                ["src/FGAme/util/cmultidispatch.pyx"],
+                libraries=[],
                 include_dirs=['src/FGAme']),
         ])
 except ImportError:

@@ -81,14 +81,16 @@ class RigidBody(Dynamic):
                 inertia = density * self.area() * self.ROG_sqr()
 
         elif mass is not None:
-            density = float(mass) / self.area()
+            mass = float(mass)
+            density = mass / self.area()
             if inertia is None:
                 inertia = mass * self.ROG_sqr()
 
         elif inertia is not None:
-            density = float(inertia) / (self.area() * self.ROG_sqr())
+            inertia = float(inertia)
+            density = inertia / (self.area() * self.ROG_sqr())
             if mass is None:
-                mass = float(inertia) / self.ROG_sqr()
+                mass = inertia / self.ROG_sqr()
 
         else:
             density = 1.0

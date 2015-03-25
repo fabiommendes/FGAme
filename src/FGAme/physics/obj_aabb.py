@@ -69,7 +69,7 @@ class AABB(LinearRigidBody):
     def __repr__(self):
         tname = type(self).__name__
         vel = ', '.join('%.1f' % x for x in self.vel)
-        data = ', '.join('%.1f' % x for x in self.bbox())
+        data = ', '.join('%.1f' % x for x in self.bbox)
         return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
 
     # Torna as os limites da AABB modificáveis ################################

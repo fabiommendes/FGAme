@@ -1,18 +1,13 @@
-# Importa as funções rápidas caso a variável de ambiente PYGAME_SLOWMATH não
-# seja definida
-import os as _os
-if not _os.environ.get('PYGAME_SLOWMATH', False):
-    try:
-        from .linalg_fast import *
-    except ImportError:
-        from .linalg import *
-else:
-    from .linalg import *
+from math import *
 
+try:
+    from .cvector import *
+except ImportError:
+    from .vector import *
 
+from .matrix import *
 from .util import *
 from .vertices import *
 from .aabb import *
 from .circle import *
-from math import *
 from .abstract import *

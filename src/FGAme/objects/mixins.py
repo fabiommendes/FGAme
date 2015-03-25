@@ -121,12 +121,12 @@ class HasLocalForces(object):
 
         a = self._accel
         if self._damping:
-            a.copy_from(self._vel)
+            a.update(self._vel)
             a *= -self._damping
             if self._gravity is not None:
                 a += self._gravity
         elif self._gravity is not None:
-            a.copy_from(self._gravity)
+            a.update(self._gravity)
         else:
             a *= 0
 
@@ -177,15 +177,15 @@ class HasInputEvents(object):
     _is_mixin_ = True
     _slots_ = ['_input']
 
-    long_press = signal('long-press', 'key', delegate='_input')
-    key_up = signal('key-up', 'key', delegate='_input')
-    key_down = signal('key-down', 'key', delegate='_input')
-    mouse_motion = signal('mouse-motion', delegate='_input')
-    mouse_click = signal('mouse-click', 'button', delegate='_input')
+    long_press = signal('long-press', 'key', delegate_to='_input')
+    key_up = signal('key-up', 'key', delegate_to='_input')
+    key_down = signal('key-down', 'key', delegate_to='_input')
+    mouse_motion = signal('mouse-motion', delegate_to='_input')
+    mouse_click = signal('mouse-click', 'button', delegate_to='_input')
 
     @lazy
     def input(self):
-        self.input = self.world.simulation.input
+        self.input = self.world._simulation.input
         return self.input
 
 
@@ -217,7 +217,7 @@ class ObjectMixin(WorldObject, HasLocalForces, HasVisualization):
     def __init__(self, *args, **kwds):
 
         mixin_kwds = self._extract_mixin_kwargs(kwds)
-        type(self).__bases__[0].__init__(self, *args, **kwds)
+        self._init_physics(*args, **kwds)
         self._init_mixin(**mixin_kwds)
 
     def _extract_mixin_kwargs(self, kwds):

@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 ===================
 Controle de eventos
@@ -263,11 +263,57 @@ bar triggered!
 >>> x.trigger_bar(2)
 >>> x.trigger_foobar(3)
 foobar triggered with 3!
+
+Sinais delegados
+================
+
+As vezes é interessante expor um evento ao usuário mesmo quando a classe não
+pode ser responsável por dispará-lo. Sinais delegados fazem justamente isso:
+sempre que o usuário registrar um handler, ele delegará o registro para um
+atributo específico da classe. Considere o exemplo mais concreto:
+
+>>> class Foo(EventDispatcher):
+...      do_foo = signal('do-foo', num_args=1)
+
+A classe Foo é responsável por acionar os sinais 'do-foo'. Agora criamos uma
+classe Bar que delega o sinal 'do-foo' para um atributo.
+
+>>> class Bar(EventDispatcher):
+...     def __init__(self, foo):
+...         self._foo = foo
+...
+...     do_foo = signal('do-foo', delegate_to='_foo')
+
+Agora criamos um objeto e registramos um handler
+
+>>> foo = Foo()
+>>> bar = Bar(foo)
+>>> id1 = bar.listen('do-foo', handler)
+
+Observe que bar não pode acionar diretamente o evento 'do-foo', mas temos que
+fazer isto via o objeto originalmente responsável pelo evento
+
+>>> bar.trigger_do_foo(0)
+Traceback (most recent call last):
+...
+RuntimeError: signals can only be trigged by the owner
+
+>>> foo.trigger_do_foo(0)
+called with args=(0,), kwargs={}
+
+
+Funções auxiliares
+==================
+
+Na maioria das vezes, não é necessário explicitar qual tipo de sinal deve ser
+utilizado
+
+
 '''
 
 from functools import partial
 from collections import namedtuple
-import six
+from FGAme.util import six
 
 ControlElem = namedtuple('ControlElem', ['idx', 'owner', 'wrapped', 'handler',
                                          'args', 'kwargs'])
@@ -281,7 +327,8 @@ def pyname(value):
 
 
 def wrap_handler(func, args, kwds, pre_args=0):
-    '''Embrulha função com os argumentos posicionais e de keyword adicionais'''
+    '''Fixa os argumentos posicionais e keywords na função.
+    Retorna uma função que sempre exige pre_args argumentos posicionais'''
 
     func_out = func
 
@@ -319,9 +366,14 @@ def wrap_handler(func, args, kwds, pre_args=0):
     return func_out
 
 
+###############################################################################
+#                          Classes de sinais
+###############################################################################
+
+
 class Signal(object):
 
-    '''Representa um sinal anunciado por um objeto.'''
+    '''Representa um sinal comum anunciado por um objeto.'''
 
     sig_args = ()
 
@@ -341,7 +393,8 @@ class Signal(object):
         raise AttributeError('not writable')
 
     def __repr__(self):
-        return 'Signal(%r, %s)' % (self.name, self.num_args)
+        tname = type(self).__name__
+        return '%s(%r, %s)' % (tname, self.name, self.num_args)
 
     def default_control(self):
         '''Retorna o objeto tipo SignalCtl apropriado para essa classe de
@@ -349,9 +402,10 @@ class Signal(object):
 
         return SignalCtl(self)
 
-    #=========================================================================
-    # Funções de fábrica para os métodos listen_<sinal> e trigger_<sinal>
-    #=========================================================================
+    ###########################################################################
+    # Fábrica de funções para os métodos listen_<sinal> e trigger_<sinal>
+    ###########################################################################
+
     def _factory_listen_method(self):
         signal = self  # não confundir com o self da função fabricada!
 
@@ -515,6 +569,13 @@ class Signal(object):
 
 class FilteredSignal(Signal):
 
+    '''Implementa um sinal filtrado: ou seja, um sinal que assume um segundo
+    argumento e dispacha apenas os handlers registrados para aquele argumento.
+
+    Útil para eventos do tipo key-press onde podemos acionar os handlers
+    seletivamente de acordo com a tecla pressionada.
+    '''
+
     def __init__(self, name, num_args=0, filter_names=None):
         super(FilteredSignal, self).__init__(name, num_args)
         self._num_filters = 1
@@ -575,12 +636,25 @@ class FilteredSignal(Signal):
         #                            % {'signal': signal.name})
         return trigger_method
 
+    def __repr__(self):
+        names = ''
+        if self._filter_names:
+            names = ', filter_names=%s' % list(self._filter_names)
+        tname = type(self).__name__
+        return '%s(%r, %s%s)' % (tname, self.name, self.num_args, names)
+
 
 class DelegateSignal(Signal):
 
-    def __init__(self, name, delegate, num_filters=0, filter_names=None):
+    '''Delega o sinal para um atributo da classe.
+
+    Sinais deste tipo não podem ser emitidos diretamente, mas é possível
+    registrar handlers que serão encaminhados para o método listen do atributo
+    responsável por gerenciar o despacho de eventos'''
+
+    def __init__(self, name, delegate_to, num_filters=0, filter_names=None):
         super(DelegateSignal, self).__init__(name)
-        self.delegate = delegate
+        self.delegate_to = delegate_to
         self._num_filters = num_filters
         self._filter_names = filter_names
 
@@ -589,8 +663,8 @@ class DelegateSignal(Signal):
 
         def listen_method(self, *args, **kwds):
             kwds.setdefault('owner', self)
-            delegate = getattr(self, signal.delegate)
-            return delegate.listen(signal.name, *args, **kwds)
+            delegate_to = getattr(self, signal.delegate_to)
+            return delegate_to.listen(signal.name, *args, **kwds)
 
         return listen_method
 
@@ -602,7 +676,14 @@ class DelegateSignal(Signal):
         return trigger_method
 
 
+###############################################################################
+#                     Atributos de controle de sinais
+###############################################################################
+
 class SignalCtl(object):
+
+    '''A classe SignalCtl implementa uma interface para gerenciar os handlers
+    registrados para um determinado sinal'''
 
     def __init__(self, signal):
         self._signal = signal
@@ -657,13 +738,28 @@ class SignalCtl(object):
 
 class SignalCtlMulti(SignalCtl):
 
+    '''Gerencia handlers de sinais filtrados'''
+
+    # TODO: talvez implementar como um dicionario de SignalCtl
+
     def __init__(self, signal):
         super(SignalCtlMulti, self).__init__(signal)
         self.book = {}
         self._control = {}
 
 
+###############################################################################
+#              Classe mãe para objetos que aceitam event dispatch
+###############################################################################
+
+
 class EventDispatcherMeta(type):
+
+    '''Meta-classe para EventDispatcher.
+
+    Fabrica e registra automaticamente os métodos liste_* e trigger_*. Salva
+    algumas constantes úteis obtidas por introspecção e  Além disto, atualiza
+    os __slots__ caso a classe filho os utilize.'''
 
     def __new__(cls, name, bases, ns):
 
@@ -709,13 +805,20 @@ class EventDispatcherMeta(type):
         na hierarquia de classes por um conflito de metaclasses ou por um
         conflito com o campo __slots__ que previne herança múltipla.
 
-        O método __init__ é renomado para _init_events para poder se tornar
+        O método __init__ é renomeado para _init_events para poder se tornar
         acessível aos membros da classe decorada.
+
+        Observe que classes decoradas desta maneira não são subclasses de
+        EventDispatcher. Deste modo, os mecanismos de criação e registro de
+        novos sinais não funcionarão automaticamente. Caso uma sub-classe
+        queira definir um novo sinal, será necessário decorá-la manualmente.
         '''
 
         ev_type._init_events = EventDispatcher.__init__
         ev_type._listen = EventDispatcher.listen
         ev_type._trigger = EventDispatcher.trigger
+
+        # TODO: implementar @EventDispatcherMeta.decorate
         return ev_type
 
 
@@ -730,7 +833,8 @@ class EventDispatcher(object):
         for signal in self._signals.values():
             ctl = signal.default_control()
             setattr(self, '_%s_ctl' % pyname(signal.name), ctl)
-            setattr(self, '_%s_book' % pyname(signal.name), ctl.book)
+            if not isinstance(signal, DelegateSignal):
+                setattr(self, '_%s_book' % pyname(signal.name), ctl.book)
 
             # Registra os métodos criados pelo mecanismo on_signal...
             auto_method = getattr(self, 'on_' + pyname(signal.name), None)
@@ -757,17 +861,36 @@ class EventDispatcher(object):
                 self.listen(signal.name, *args, **kwargs)
 
     def trigger(self, signal, *args, **kwds):
+        '''Aciona o sinal com os argumentos fornecidos.'''
+
         implementation = getattr(self, 'trigger_' + pyname(signal))
         return implementation(*args, **kwds)
 
     def listen(self, signal, *args, **kwds):
+        '''Registra um handler para um determinado sinal.
+
+        A assinatura correta para esta função depende do tipo de sinal
+        considerado. Para sinais simples, basta utilizar::
+
+            obj.listen(<nome do sinal>, <handler>)
+
+        Sinais filtrados (aqueles que pedem um ou mais argumentos adicionais),
+        devem ser registrados como::
+
+            obj.listen(<nome do sinal>, <filtro>, <handler>)
+
+        Opcionalmente, é possível acrescentar argumentos por nome ou posição
+        que serão passados automaticamente para o handler quando o sinal for
+        acionado.
+        '''
+
         implementation = getattr(self, 'listen_' + pyname(signal))
         return implementation(*args, **kwds)
 
-#=========================================================================
-# Funções úteis e decoradores
-#=========================================================================
 
+###############################################################################
+#                    Funções úteis e decoradores
+###############################################################################
 
 def listen(name, *args, **kwds):
     '''Decorador que registra uma função como sendo um callback de um
@@ -790,20 +913,35 @@ def signal(name, *filters, **kwds):
 
     Possui a assinatura signal(nome, [arg1, ...,[ num_args]]), onde arg_i são
     strings com os nomes dos argumentos e o valor opcional num_args é um número
-    representando o número de argumentos para o handler padrão.'''
+    representando o número de argumentos para o handler padrão.
 
-    num_args = kwds.get('num_args', 0)
+    O tipo de sinal é escolhido automaticamente a partir dos argumentos:
+
+    >>> signal('foo', num_args=1)
+    Signal('foo', 1)
+
+    >>> signal('foo', 'bar')
+    FilteredSignal('foo', 0, filter_names=['bar'])
+
+    >>> signal('foo', delegate_to='_foo_attr')
+    DelegateSignal('foo', 0)
+    '''
+
+    # Extrai argumentos
     num_filters = len(filters)
-    delegate = kwds.pop('delegate', None)
-    if delegate:
+    num_args = kwds.pop('num_args', 0)
+    delegate_to = kwds.pop('delegate_to', None)
+    if kwds:
+        raise TypeError('invalid argument: %r' % kwds.popitem()[0])
+
+    if delegate_to:
         if num_filters == 0:
-            return DelegateSignal(name, delegate=delegate)
+            return DelegateSignal(name, delegate_to=delegate_to)
         else:
-            return DelegateSignal(
-                name,
-                delegate=delegate,
-                num_filters=num_filters,
-                filter_names=filters)
+            return DelegateSignal(name,
+                                  delegate_to=delegate_to,
+                                  num_filters=num_filters,
+                                  filter_names=filters)
     elif num_filters == 0:
         return Signal(name, num_args=num_args)
     elif num_filters == 1:

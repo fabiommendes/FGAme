@@ -1,4 +1,5 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+
 '''
 Realiza o logging do funcionamento do FGAme
 ===========================================
@@ -19,7 +20,7 @@ Exemplos::
         log.exception('Something happened!')
 
 A mensagem passada para o logger é dividia em duas partes separadas por dois
-pontos (:). A primeira parte corresponde ao título e a segunda à mensagem 
+pontos (:). A primeira parte corresponde ao título e a segunda à mensagem
 propriamente dita.
 
     log.info('FGAme.app: Este é um teste')
@@ -67,12 +68,13 @@ COLORS = {
 
 logging.TRACE = 9
 LOG_LEVELS = {
-    'trace': logging.TRACE,  #@UndefinedVariable
+    'trace': logging.TRACE,  # @UndefinedVariable
     'debug': logging.DEBUG,
     'info': logging.INFO,
     'warning': logging.WARNING,
     'error': logging.ERROR,
     'critical': logging.CRITICAL}
+
 
 def formatter_message(message, use_color=True):
     '''Formata a mensagem para saída colorida e formatada.'''
@@ -212,7 +214,7 @@ class ColoredFormatter(logging.Formatter):
         except:
             pass
         levelname = record.levelname
-        if record.levelno == logging.TRACE:  #@UndefinedVariable
+        if record.levelno == logging.TRACE:  # @UndefinedVariable
             levelname = 'TRACE'
             record.levelname = levelname
         if self.use_color and levelname in COLORS:
@@ -223,6 +225,7 @@ class ColoredFormatter(logging.Formatter):
 
 
 class ConsoleHandler(logging.StreamHandler):
+
     def filter(self, record):
         try:
             msg = record.msg
@@ -236,6 +239,7 @@ class ConsoleHandler(logging.StreamHandler):
 
 
 class LogFile(object):
+
     def __init__(self, channel, func):
         self.buffer = ''
         self.func = func
@@ -264,7 +268,7 @@ def logger_config_update(section, key, value):
 #: Default logger instance
 log = logging.getLogger('FGAme')
 log.logfile_activated = None
-log.trace = partial(log.log, logging.TRACE)  #@UndefinedVariable
+log.trace = partial(log.log, logging.TRACE)  # @UndefinedVariable
 
 # set this logger as the default
 logging.root = log

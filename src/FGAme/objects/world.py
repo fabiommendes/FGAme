@@ -2,9 +2,9 @@ from __future__ import print_function
 
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
-from FGAme.core import EventDispatcher, signal
-from FGAme.core import conf
+from FGAme.core import EventDispatcher, signal, conf, init_input
 from FGAme.draw import RenderTree, color_property
+from FGAme.util import delegate_to
 
 
 class World(EventDispatcher):
@@ -20,11 +20,12 @@ class World(EventDispatcher):
 
         self.background = background
         self._render_tree = RenderTree()
+        self._input = init_input()
 
         if simulation:
-            self.simulation = simulation
+            self._simulation = simulation
         else:
-            self.simulation = Simulation(
+            self._simulation = Simulation(
                 gravity=gravity,
                 damping=damping,
                 adamping=adamping,
@@ -33,40 +34,16 @@ class World(EventDispatcher):
                 dfriction=dfriction,
                 stop_velocity=stop_velocity)
 
-        # Controle de callbacks
         self.is_paused = False
         super(World, self).__init__()
 
     background = color_property('background', 'white')
 
     # Propriedades do objeto Simulation #######################################
-    @property
-    def gravity(self):
-        return self.simulation.gravity
-
-    @gravity.setter
-    def gravity(self, value):
-        self.simulation.gravity = value
-
-    @property
-    def damping(self):
-        return self.simulation.damping
-
-    @damping.setter
-    def damping(self, value):
-        self.simulation.damping = value
-
-    @property
-    def adamping(self):
-        return self.simulation.adamping
-
-    @adamping.setter
-    def adamping(self, value):
-        self.simulation.adamping = value
-
-    @property
-    def time(self):
-        return self.simulation.time
+    gravity = delegate_to('_simulation.gravity')
+    damping = delegate_to('_simulation.damping')
+    adamping = delegate_to('_simulation.adamping')
+    time = delegate_to('_simulation.time', read_only=True)
 
     # Gerenciamento de objetos ################################################
     def add(self, obj, layer=0):
@@ -75,7 +52,7 @@ class World(EventDispatcher):
         Exemplos
         --------
 
-        >>> obj = AABB((-10, 10, -10, 10))
+        >>> obj = AABB(-10, 10, -10, 10)
         >>> world = World()
         >>> world.add(obj, layer=1)
         '''
@@ -91,7 +68,7 @@ class World(EventDispatcher):
             self._render_tree.add(obj, layer)
         else:
             self._render_tree.add(obj.visualization, layer)
-            self.simulation.add(obj)
+            self._simulation.add(obj)
 
     def remove(self, obj):
         '''Descarta um objeto do mundo'''
@@ -99,17 +76,17 @@ class World(EventDispatcher):
         if getattr(obj, 'is_drawable', False):
             drawable = obj.visualization
             self._render_tree.remove(obj)
-            self.simulation.remove(obj)
+            self._simulation.remove(obj)
         else:
             self._render_tree.remove(obj)
 
     # Controle de eventos #####################################################
     # Delegações
-    long_press = signal('long-press', 'key', delegate='simulation')
-    key_up = signal('key-up', 'key', delegate='simulation')
-    key_down = signal('key-down', 'key', delegate='simulation')
-    mouse_motion = signal('mouse-motion', delegate='simulation')
-    mouse_click = signal('mouse-click', 'button', delegate='simulation')
+    long_press = signal('long-press', 'key', delegate_to='_input')
+    key_up = signal('key-up', 'key', delegate_to='_input')
+    key_down = signal('key-down', 'key', delegate_to='_input')
+    mouse_motion = signal('mouse-motion', delegate_to='_input')
+    mouse_click = signal('mouse-click', 'button', delegate_to='_input')
 
     # Eventos privados
     frame_enter = signal('frame-enter')
@@ -140,10 +117,10 @@ class World(EventDispatcher):
         self.trigger('frame-enter')
         if self.is_paused:
             return
-        self.simulation.update(dt)
+        self._simulation.update(dt)
         self._render_tree.update(dt)
 
-        return self.simulation.time
+        return self._simulation.time
 
     # Laço principal ##########################################################
     def run(self, timeout=None, real_time=True):

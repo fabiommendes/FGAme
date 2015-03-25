@@ -9,8 +9,9 @@ class PyGameCanvas(Canvas):
 
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
 
-    def init(self):
+    def show(self):
         self._screen = pygame.display.set_mode((self.width, self.height))
+        super(PyGameCanvas, self).show()
 
     def flip(self):
         pygame.display.update()
