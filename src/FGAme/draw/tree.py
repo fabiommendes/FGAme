@@ -56,32 +56,3 @@ class RenderTree(object):
 #                     Grupos e composições de objetos
 ###############################################################################
 # TODO: fundir com RenderTree e colocar RenderTree na hierarquia de drawable
-
-class Group(object):
-
-    '''Define um grupo de objetos desenháveis'''
-
-    def __init__(self, members):
-        self.members = list(members)
-
-    def add(self, member):
-        self.members.append(member)
-
-    def rotate(self, theta, axis=None):
-        super(Group, self).rotate(theta, axis)
-        for member in self.members:
-            member.rotate(theta, member.pos)
-
-    def scale(self, scale):
-        if scale != 1:
-            super(Group, self).scale(scale)
-            for member in self.members:
-                member.scale(scale)
-                if member.pos[0] or member.pos[1]:
-                    member.move((scale - 1) * member._pos)
-
-    def as_poly(self):
-        return TypeError
-
-    def as_vertices(self, relative=False, scaled=True):
-        raise TypeError

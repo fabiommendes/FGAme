@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 import six
+from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathutils import Vector
 from FGAme.physics import flags
 
@@ -30,7 +31,7 @@ def raises_method(ex=NOT_IMPLEMENTED):
 ###############################################################################
 
 
-class PhysElementMeta(type):
+class PhysElementMeta(EventDispatcherMeta):
 
     '''Metaclasse para todas as classes que representam objetos físicos'''
 
@@ -38,6 +39,15 @@ class PhysElementMeta(type):
                  '__dict__', '__weakref__', '__slots__', '__subclasshook__']
 
     def __new__(cls, name, bases, ns):
+        # Aplica transformações da EventDispatcherMeta
+        has_slots = '__slots__' in ns
+        ns.setdefault('__slots__', [])
+        ns = cls._populate_namespace(name, bases, ns)
+
+        # Força EventDispatcher ser a classe mãe na hierarquia
+        if bases == (object,):
+            bases = (EventDispatcher,)
+
         # Insere uma cláusula de __slots__ vazia
         ns.setdefault('__slots__', [])
 
@@ -87,6 +97,8 @@ class PhysElementMeta(type):
             _properties_.update(getattr(base, '_properties_', []))
         ns['_properties_'] = _properties_
         ns['__slots__'] = list(set(ns['__slots__']))
+        if not has_slots:
+            del ns['__slots__']
         new = type.__new__(cls, name, true_bases, ns)
 
         # Atualiza as docstrings vazias utilizando as docstrings da primeira
@@ -141,10 +153,10 @@ class PhysElement(object):
     Acesso a flags
 
     >>> elem = PhysElement()
-    >>> elem.flag_has_mass
+    >>> elem.flag_owns_gravity
     False
-    >>> elem.flag_has_mass = True
-    >>> elem.flag_has_mass
+    >>> elem.flag_owns_gravity = True
+    >>> elem.flag_owns_gravity
     True
 
     Acesso a propriedades
@@ -156,12 +168,13 @@ class PhysElement(object):
 
     '''
 
-    __slots__ = ['_flags', '_dict_']
+    __slots__ = ['_flags', '_dict_', '_force', '_force_ctl']
     _properties_ = set()
 
     def __init__(self, flags=0, dict_=None):
         self._flags = flags
         self._dict_ = dict_
+        EventDispatcher.__init__(self)
 
     def __getattr__(self, attr):
         # Captura slots não inicializados
@@ -663,6 +676,8 @@ class PhysElement(object):
             self._setp('old_omega', self.omega)
             self.omega = 0.0
 
+    # Sinais ##################################################################
+    collision = signal('collision', num_args=1)
 
 if __name__ == '__main__':
     import doctest

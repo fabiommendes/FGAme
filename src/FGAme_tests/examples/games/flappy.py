@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 Flappy Triangle on 18/11/2014
 '''
@@ -6,11 +6,14 @@ Flappy Triangle on 18/11/2014
 from FGAme import *
 from random import uniform
 
+
 class Flappy(Poly):
+
     def __init__(self, **kwds):
-        super(Flappy, self).__init__([(0, 0), (40, 0), (20, 80)], color='red', **kwds)
+        super(Flappy, self).__init__(
+            [(0, 0), (40, 0), (20, 80)], color='red', **kwds)
         self.pos = (200, 300)
-        self.rotate(uniform(0, 2 * pi))
+        self.rotate(uniform(0, 2 * math.pi))
         self.inertia *= 10
         self.omega = uniform(-2, 2)
         self.receiving_input = True
@@ -36,7 +39,9 @@ class Flappy(Poly):
 
         self.receiving_input = False
 
+
 class Game(World):
+
     def __init__(self):
         super(Game, self).__init__(gravity=200)
 
@@ -67,7 +72,7 @@ class Game(World):
         self.obstacles.append([lower, upper])
 
     def detect_exit(self):
-        '''Detecta se um obstáculo saiu da tela e insere um novo em caso 
+        '''Detecta se um obstáculo saiu da tela e insere um novo em caso
         afirmativo'''
 
         L = self.obstacles
@@ -87,10 +92,14 @@ class Game(World):
         self.stop()
         GameOver().run()
 
+
 class GameOver(World):
+
     def __init__(self):
+        from FGAme.extra.letters import add_word
+
         super(GameOver, self).__init__(background=(255, 0, 0), gravity=10)
-        Poly.rect(shape=(600, 100), pos=(0, -200), theta=pi / 9,
+        Poly.rect(shape=(600, 100), pos=(0, -200), theta=math.pi / 9,
                   centered=True, world=self, mass='inf', color=(255, 0, 0))
         letters = add_word('game over', self, scale=5, pos=(-220, 50))
         for l in letters:

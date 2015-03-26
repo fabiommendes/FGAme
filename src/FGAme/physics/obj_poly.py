@@ -184,6 +184,8 @@ class RegularPoly(Poly):
 
 class Rectangle(Poly):
 
+    __slots__ = []
+
     def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None,

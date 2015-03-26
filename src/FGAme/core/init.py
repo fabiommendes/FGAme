@@ -125,10 +125,17 @@ class Control(object):
     def get_canvas(self):
         '''Retorna o objeto canvas inicializado'''
 
-        canvas = self._canvas_object
-        if canvas is None:
-            raise RuntimeError('canvas is not yet defined')
-        return canvas
+        return self._canvas_object or self.init_canvas()
+
+    def get_input(self):
+        '''Retorna o objeto canvas inicializado'''
+
+        return self._input_object or self.init_input()
+
+    def get_mainloop(self):
+        '''Retorna o objeto canvas inicializado'''
+
+        return self._mainloop_object or self.init_mainloop()
 
     ###########################################################################
     # Init functions

@@ -56,7 +56,7 @@ class RigidBody(Dynamic):
     '''
 
     __slots__ = ['_omega', '_theta', '_alpha', '_density', '_invinertia',
-                 '_xmin', '_xmax', '_ymin', '_ymax']
+                 '_xmin', '_xmax', '_ymin', '_ymax', '_torque', '_torque_ctl']
 
     def __init__(self, xmin, xmax, ymin, ymax,
                  pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
@@ -347,6 +347,8 @@ class LinearRigidBody(RigidBody):
     '''
     Classe que implementa corpos rígidos sem dinâmica angular.
     '''
+
+    __slots__ = []
 
     def __init__(self, xmin, xmax, ymin, ymax,
                  pos=(0, 0), vel=(0, 0),

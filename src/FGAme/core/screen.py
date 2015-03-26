@@ -90,7 +90,7 @@ class Canvas(Screen):
 
     # Objetos primitivos ######################################################
 
-    def paint_circle(self, pos, radius, color='black', solid=True):
+    def paint_circle(self, radius, pos, color='black', solid=True):
         '''Pinta um círculo especificando a posição do centro, seu raio e
         opcionalmente a cor.
 
@@ -104,7 +104,7 @@ class Canvas(Screen):
 
     def paint_aabb(self, xmin, xmax, ymin, ymax, color='black', solid=True):
         dx, dy = xmax - xmin, ymax - ymin
-        self.draw_rect((xmin, ymin), (dx, dy), color=color, solid=solid)
+        self.paint_rect((xmin, ymin), (dx, dy), color=color, solid=solid)
 
     def paint_rect(self, rect, color='black', solid=True):
         x, y, w, h = rect
@@ -112,6 +112,9 @@ class Canvas(Screen):
             [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], color, solid)
 
     def paint_line(self, pt1, pt2, color='black', solid=True):
+        raise NotImplementedError
+
+    def paint_pixel(self, point, color='black'):
         raise NotImplementedError
 
     def clear_background(self, color=None):
@@ -142,8 +145,7 @@ class Canvas(Screen):
         deslocamento da tela.'''
 
         if self._direct:
-            self.paint_circle(circle.pos, circle.radius,
-                              circle.color, True)
+            self.paint_circle(circle.radius, circle.pos, circle.color, True)
         else:
             raise NotImplementedError
 

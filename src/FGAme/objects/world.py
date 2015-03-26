@@ -1,8 +1,6 @@
-from __future__ import print_function
-
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
-from FGAme.core import EventDispatcher, signal, conf, init_input
+from FGAme.core import EventDispatcher, signal, init, conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
 
@@ -20,7 +18,7 @@ class World(EventDispatcher):
 
         self.background = background
         self._render_tree = RenderTree()
-        self._input = init_input()
+        self._input = conf.get_input()
 
         if simulation:
             self._simulation = simulation
@@ -129,12 +127,12 @@ class World(EventDispatcher):
         O parâmetro `real_time` especifica se o tempo considerado consiste no
         tempo real ou no tempo de simulação.'''
 
-        conf._mainloop_object.run(self, timeout=timeout)
+        conf.get_mainloop().run(self, timeout=timeout)
 
     def stop(self):
         '''Finaliza o laço principal de simulação'''
 
-        conf._mainloop_object.stop()
+        conf.get_mainloop().stop()
 
     def set_next_state(self, value):
         '''Passa a simulação para o próximo estado'''

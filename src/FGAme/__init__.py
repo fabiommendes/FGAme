@@ -387,7 +387,7 @@ Loop principal
 
 '''
 
-from FGAme.mathutils import Vector, Matrix
+from FGAme.mathutils import Vector, Matrix, pi
 from FGAme import draw
 from FGAme import bench
 from FGAme.core import *

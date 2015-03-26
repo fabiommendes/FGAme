@@ -10,7 +10,6 @@ class CommonCircle(object):
 
     '''Classe Mix-in com definições comuns ao círculo'''
 
-    _slots_ = ['_radius']
     _is_mixin_ = True
 
     def area(self):
@@ -75,9 +74,9 @@ class Circle(CommonCircle, LinearRigidBody):
 
     >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
     >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
-
-
     '''
+
+    __slots__ = ['_radius']
 
     def __init__(self, radius, pos=(0, 0), vel=(0, 0),
                  mass=None, density=None):
@@ -96,6 +95,8 @@ class Ball(CommonCircle, RigidBody):
     distância entre os centros com a soma dos raios.
 
     Objetos da classe Ball são capazes de realizar rotações.'''
+
+    __slots__ = ['_radius']
 
     def __init__(self, radius, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None):

@@ -270,6 +270,8 @@ class Particle(Dynamic):
 
     '''Define uma partícula'''
 
+    __slots__ = []
+
 
 if __name__ == '__main__':
     import doctest

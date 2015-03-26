@@ -199,7 +199,7 @@ class VectorM(Vector):
         self._x = x * cos_t - y * sin_t + axis[0]
         self._y = x * sin_t + y * cos_t + axis[1]
 
-    def copy_from(self, other):
+    def update(self, other):
         '''Copia as coordenadas x, y do objeto other'''
 
         try:

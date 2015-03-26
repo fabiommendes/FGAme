@@ -21,7 +21,7 @@ class PyGameCanvas(Canvas):
         X, Y = self.width, self.height
         return (trunc(x), trunc(Y - y))
 
-    def paint_circle(self, pos, radius, color='black', solid=True):
+    def paint_circle(self, radius, pos, color='black', solid=True):
         pos = self._map_point(pos)
         color = Color(color)
         pygame.draw.circle(self._screen, color, pos, trunc(radius))

@@ -40,11 +40,11 @@ class Circle(object):
     # Pontos de interceptação
     #==========================================================================
 
-    def intercepts_circle(self, other):
+    def intersects_circle(self, other):
         '''Retorna True se o círculo intercepta outro círculo ou False, caso
         contrário'''
 
-    def intercepts_point(self, point, tol=1e-6):
+    def intersects_point(self, point, tol=1e-6):
         '''Retorna True se o ponto está na fronteira do círculo dada a margem
         de tolerância tol.'''
 

@@ -1,1 +1,1 @@
-from .math_tests import *
+from FGAme_tests.mathutils import *

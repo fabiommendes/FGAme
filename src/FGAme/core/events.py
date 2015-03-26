@@ -762,6 +762,12 @@ class EventDispatcherMeta(type):
     os __slots__ caso a classe filho os utilize.'''
 
     def __new__(cls, name, bases, ns):
+        ns = cls._populate_namespace(name, bases, ns)
+        return type.__new__(cls, name, bases, ns)
+
+    @classmethod
+    def _populate_namespace(cls, name, bases, ns):
+        ns = dict(ns)
 
         # Lê os sinais e monta um dicionário de sinais
         signals = {}
@@ -793,7 +799,15 @@ class EventDispatcherMeta(type):
 
         ns['_listen'] = listen
 
-        return type.__new__(cls, name, bases, ns)
+        # Atribui valores de slots, caso necessário
+        if '__slots__' in ns:
+            slots = list(ns['__slots__'])
+            for signal in signals:
+                slots.append('_%s_ctl' % signal)
+                slots.append('_%s_book' % signal)
+            ns['__slots__'] = slots
+
+        return ns
 
     @classmethod
     def decorate(cls, ev_type):
