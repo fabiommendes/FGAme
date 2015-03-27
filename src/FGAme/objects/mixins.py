@@ -5,7 +5,7 @@ Created on 22/03/2015
 '''
 
 from FGAme.mathutils import Vector
-from FGAme.physics.obj_base import PhysElement
+from FGAme.physics import Dynamic, flags
 from FGAme.core import EventDispatcherMeta, signal
 from FGAme.draw import Color, Shape
 from FGAme.util import lazy
@@ -54,17 +54,17 @@ class HasLocalForces(object):
 
         self._damping = 0.0
         if damping is not None:
-            self.flag_owns_damping = True
+            self.flags |= flags.OWNS_ADAMPING
             self._damping = float(damping)
 
         self._adamping = 0.0
         if adamping is not None:
-            self.flag_owns_adamping = True
+            self.flags |= flags.OWNS_DAMPING
             self._adamping = float(adamping)
 
         self._gravity = Vector(0, 0)
         if gravity is not None:
-            self.flag_owns_gravity = True
+            self.flags |= flags.OWNS_GRAVITY
             self._gravity = (Vector(0, -gravity)
                              if isinstance(gravity, (float, int))
                              else Vector(*gravity))
@@ -77,7 +77,7 @@ class HasLocalForces(object):
     @gravity.setter
     def gravity(self, value):
         self._gravity = Vector(*value)
-        self.owns_gravity = True
+        self.flags |= flags.OWNS_GRAVITY
 
     @property
     def damping(self):
@@ -86,7 +86,7 @@ class HasLocalForces(object):
     @damping.setter
     def damping(self, value):
         self._damping = float(value)
-        self.owns_damping = True
+        self.flags |= flags.OWNS_DAMPING
 
     @property
     def adamping(self):
@@ -95,13 +95,21 @@ class HasLocalForces(object):
     @adamping.setter
     def adamping(self, value):
         self._adamping = float(value)
-        self.owns_adamping = True
+        self.flags |= flags.OWNS_ADAMPING
 
     # Redireciona as propriedades acessoras das flags para manter simetria
     # entre os argumentos do construtor e atributos do objeto
-    owns_gravity = PhysElement.flag_owns_gravity
-    owns_damping = PhysElement.flag_owns_damping
-    owns_adamping = PhysElement.flag_owns_adamping
+    @property
+    def owns_gravity(self):
+        return bool(self.flags & flags.OWNS_GRAVITY)
+
+    @property
+    def owns_damping(self):
+        return bool(self.flags & flags.OWNS_DAMPING)
+
+    @property
+    def owns_adamping(self):
+        return bool(self.flags & flags.OWNS_ADAMPING)
 
     # Métodos #################################################################
     def global_force(self):

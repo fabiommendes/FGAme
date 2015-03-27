@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.physics.obj_all import LinearRigidBody
-from FGAme.mathutils import aabb_bbox, AABB
+from FGAme.mathutils import aabb_bbox, AABB, sqrt
 
 __all__ = ['AABB']
 
@@ -51,6 +51,8 @@ class AABB(LinearRigidBody):
 
     '''
 
+    __slots__ = []
+
     def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
                  pos=None, vel=(0, 0), mass=None, density=None,
                  bbox=None, shape=None, rect=None):
@@ -62,8 +64,10 @@ class AABB(LinearRigidBody):
                                            ymin=ymin, ymax=ymax)
 
         pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
-        super(AABB, self).__init__(xmin, xmax, ymin, ymax,
-                                   pos, vel,
+        self._delta_x = dx = (xmax - xmin) / 2
+        self._delta_y = dy = (ymax - ymin) / 2
+        self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
+        super(AABB, self).__init__(pos, vel,
                                    mass=mass, density=density)
 
     def __repr__(self):
@@ -75,47 +79,55 @@ class AABB(LinearRigidBody):
     # Torna as os limites da AABB modificáveis ################################
     @property
     def xmin(self):
-        return self._xmin
+        return self._pos.x - self._delta_x
 
     @xmin.setter
     def xmin(self, value):
-        self._xmin = float(value)
-        self._pos.x = (self._xmax - self._xmin) / 2
+        xmin = float(value)
+        xmax = self.xmax
+        self._pos.x = (xmax + xmin) / 2
+        self._delta_x = (xmax - xmin) / 2
 
     @property
     def xmax(self):
-        return self._xmax
+        return self._pos.x + self._delta_x
 
     @xmax.setter
     def xmax(self, value):
-        self._xmax = float(value)
-        self._pos.x = (self._xmax - self._xmin) / 2
+        xmin = self.xmin
+        xmax = float(value)
+        self._pos.x = (xmax + xmin) / 2
+        self._delta_x = (xmax - xmin) / 2
 
     @property
     def ymin(self):
-        return self._ymin
+        return self._pos.y - self._delta_y
 
     @ymin.setter
     def ymin(self, value):
-        self._ymin = float(value)
-        self._pos.y = (self._ymax - self._ymin) / 2
+        ymin = float(value)
+        ymax = self.ymax
+        self._pos.y = (ymax + ymin) / 2
+        self._delta_y = (ymax - ymin) / 2
 
     @property
     def ymax(self):
-        return self._ymax
+        return self._pos.y + self._delta_y
 
     @ymax.setter
     def ymax(self, value):
-        self._ymax = float(value)
-        self._pos.y = (self._ymax - self._ymin) / 2
+        ymin = self.ymin
+        ymax = float(value)
+        self._pos.y = (ymax + ymin) / 2
+        self._delta_y = (ymax - ymin) / 2
 
     # Propriedades geométricas ################################################
     def area(self):
-        return (self._xmax - self._xmin) * (self._ymax - self._ymin)
+        return (self.xmax - self.xmin) * (self.ymax - self.ymin)
 
     def ROG_sqr(self):
-        a = (self._xmax - self._xmin)
-        b = (self._ymax - self._ymin)
+        a = (self.xmax - self.xmin)
+        b = (self.ymax - self.ymin)
         return (a ** 2 + b ** 2) / 12
 
     def primitive(self):

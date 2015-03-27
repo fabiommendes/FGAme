@@ -177,16 +177,16 @@ class DispatchError(TypeError):
 # types
 ###############################################################################
 try:
-    from .cmultidispatch import MultiFunctionBase
+    from FGAme.util.cmultidispatch import MultiFunctionBase
 
-except (ImportError, SystemError):
+except (ImportError, SystemError) as ex:
 
     class MultiFunctionBase(object):
 
         def __init__(self, name='', doc=None):
             self.init(name, doc)
 
-        def init(self, name, doc):
+        def _init(self, name, doc):
             self._data = {}
             self._cache = {}
             self._name = name
@@ -543,8 +543,11 @@ class multimethod(multifunction):
 #         super(vmultifunction, self).__setitem__(types, func)
 
 if __name__ == '__main__':
+    print('f')
     import doctest
     doctest.testmod()
+
+    print('f')
 
     from fasttrack import timeit
 

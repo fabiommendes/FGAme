@@ -1,8 +1,9 @@
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
-from FGAme.core import EventDispatcher, signal, init, conf
+from FGAme.core import EventDispatcher, signal, conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
+from FGAme.physics.obj_base import Dynamic
 
 
 class World(EventDispatcher):
@@ -62,10 +63,8 @@ class World(EventDispatcher):
             return
 
         # Adiciona na lista de renderização
-        if getattr(obj, 'is_drawable', False):
-            self._render_tree.add(obj, layer)
-        else:
-            self._render_tree.add(obj.visualization, layer)
+        self._render_tree.add(obj.visualization, layer)
+        if isinstance(obj, Dynamic):
             self._simulation.add(obj)
 
     def remove(self, obj):

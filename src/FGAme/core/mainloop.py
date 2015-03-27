@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 import time
 from FGAme.core import env
+import gc
+
+# gc.disable()
+gc.enable()
 
 
 class MainLoop(object):
@@ -45,6 +49,7 @@ class MainLoop(object):
         screen = env.canvas_object
         sim_start = gettime()
         screen.show()
+        N = 0
 
         while self._running:
             t0 = gettime()
@@ -64,8 +69,11 @@ class MainLoop(object):
             wait = self.dt - (t - t0)
             t0 = t
             if wait > 0:
-                sleep(wait)
+                gc.collect()
+                sleep(max(0, self.dt - (t - t0)))
             else:
+                N += 1
+                print(N / (t - sim_start))
                 state.trigger('frame-skip', -wait)
 
             # Verifica que já ultrapassou o tempo de simulação

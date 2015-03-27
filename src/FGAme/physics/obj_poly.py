@@ -2,7 +2,7 @@
 
 from FGAme.physics.obj_all import RigidBody
 from FGAme.mathutils import aabb_bbox
-from FGAme.mathutils import Vector, VectorM, dot, cross
+from FGAme.mathutils import Vector, VectorM, RotMatrix, dot, cross
 from FGAme.mathutils import area, center_of_mass, ROG_sqr
 from FGAme.mathutils import sin, cos, pi
 
@@ -13,25 +13,27 @@ class Poly(RigidBody):
 
     '''Define um polígono arbitrário de N lados.'''
 
-    __slots__ = ['vertices', 'num_sides', '_normals_idxs', 'num_normals']
+    __slots__ = ['_vertices', 'num_sides', '_normals_idxs', 'num_normals']
 
     def __init__(self,
                  vertices,
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None):
 
-        self.vertices = [VectorM(*pt) for pt in vertices]
-        xmin = min(pt.x for pt in self.vertices)
-        xmax = max(pt.x for pt in self.vertices)
-        ymin = min(pt.y for pt in self.vertices)
-        ymax = max(pt.y for pt in self.vertices)
-        pos_cm = center_of_mass(self.vertices)
+        vertices = [VectorM(*pt) for pt in vertices]
+        pos_cm = center_of_mass(vertices)
+        vertices = [v - pos_cm for v in vertices]
+        self._vertices = vertices
 
-        super(Poly, self).__init__(xmin, xmax, ymin, ymax,
-                                   pos_cm, vel, theta, omega,
+        # Cache de vértices
+        self._cache_theta = None
+        self._cache_rvertices_last = None
+        self._cache_rbbox_last = None
+        self.cbb_radius = max(v.norm() for v in vertices)
+        super(Poly, self).__init__(pos_cm, vel, theta, omega,
                                    mass=mass, density=density, inertia=inertia)
 
-        self.num_sides = len(self.vertices)
+        self.num_sides = len(vertices)
         self._normals_idxs = self.get_li_indexes()
         self.num_normals = len(self._normals_idxs or self.vertices)
 
@@ -44,7 +46,7 @@ class Poly(RigidBody):
 
         # Movemos para a posição especificada caso pos seja fornecido
         if pos is not None:
-            self.pos = pos
+            self.pos = pos_cm
 
     def get_li_indexes(self):
         '''Retorna os índices referents às normais linearmente independentes
@@ -109,53 +111,67 @@ class Poly(RigidBody):
     ###########################################################################
     #                     Sobrescrita de métodos
     ###########################################################################
+    @property
+    def vertices(self):
+        pos = self.pos
+        return [v + pos for v in self._rvertices]
 
-    def move(self, delta):
-        super(Poly, self).move(delta)
-        for v in self.vertices:
-            v += delta
+    @property
+    def _rvertices(self):
+        if self._theta == self._cache_theta:
+            return self._cache_rvertices_last
+        else:
+            R = RotMatrix(self.theta)
+            vert = [R * v for v in self._vertices]
+            xmin = min(v.x for v in vert)
+            xmax = max(v.x for v in vert)
+            ymin = min(v.y for v in vert)
+            ymax = max(v.y for v in vert)
+            bbox = (xmin, xmax, ymin, ymax)
 
-    def rotate(self, theta):
-        super(Poly, self).rotate(theta)
+            self._cache_rvertices_last = vert
+            self._cache_theta = self._theta
+            self._cache_rbbox_last = bbox
 
-        # Realiza a matriz de rotação manualmente para melhor performance
-        cos_t, sin_t = cos(theta), sin(theta)
-        X, Y = self._pos
-        for v in self.vertices:
-            x = v.x - X
-            y = v.y - Y
-            v.x = cos_t * x - sin_t * y + X
-            v.y = cos_t * y + sin_t * x + Y
+            return vert
 
-        self._xmin = min(pt.x for pt in self.vertices)
-        self._xmax = max(pt.x for pt in self.vertices)
-        self._ymin = min(pt.y for pt in self.vertices)
-        self._ymax = max(pt.y for pt in self.vertices)
+    @property
+    def _rbbox(self):
+        if self._theta == self._cache_theta:
+            return self._cache_rbbox_last
+        else:
+            self._rvertices
+            return self._cache_rbbox_last
 
     def scale(self, scale, update_physics=False):
-        # Atualiza os pontos
-        Rcm = self.pos
-        for v in self.vertices:
-            v -= Rcm
-            v *= scale
-            v += Rcm
-
-        # Atualiza AABB
-        X = [x for (x, _) in self.vertices]
-        Y = [y for (_, y) in self.vertices]
-        self._xmin, self._xmax = min(X), max(X)
-        self._ymin, self._ymax = min(Y), max(Y)
+        self._vertices = [scale * v for v in self._vertices]
 
     def area(self):
-        return area(self.vertices)
+        return area(self._vertices)
 
     def ROG_sqr(self):
-        return ROG_sqr(self.vertices)
+        return ROG_sqr(self._vertices)
 
+    @property
+    def xmin(self):
+        return self._pos.x + self._rbbox[0]
+
+    @property
+    def xmax(self):
+        return self._pos.x + self._rbbox[1]
+
+    @property
+    def ymin(self):
+        return self._pos.y + self._rbbox[2]
+
+    @property
+    def ymax(self):
+        return self._pos.y + + self._rbbox[3]
 
 ###############################################################################
 #                         Especialização de polígonos
 ###############################################################################
+
 
 class RegularPoly(Poly):
 
@@ -214,7 +230,6 @@ class Rectangle(Poly):
         )
 
 
-# TODO
 @classmethod
 def triangle(cls, sides, pos=(0, 0), **kwds):
     '''Cria um triângulo especificando o tamanho dos lados'''

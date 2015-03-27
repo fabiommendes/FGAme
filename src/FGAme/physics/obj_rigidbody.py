@@ -48,69 +48,53 @@ class RigidBody(Dynamic):
     rect
         Uma tupla com (xmin, ymin, Lx, Ly)
 
-
-    Example
-    -------
-
-    >>> b = RigidBody()
     '''
 
-    __slots__ = ['_omega', '_theta', '_alpha', '_density', '_invinertia',
-                 '_xmin', '_xmax', '_ymin', '_ymax', '_torque', '_torque_ctl']
+    __slots__ = []
 
-    def __init__(self, xmin, xmax, ymin, ymax,
-                 pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
+    def __init__(self, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None):
 
-        # Define a caixa de contorno
-        self._xmin = float(xmin)
-        self._xmax = float(xmax)
-        self._ymin = float(ymin)
-        self._ymax = float(ymax)
-        if xmin >= xmax:
-            raise ValueError('invalid bounding box: xmin >= xmax')
-        if ymin >= ymax:
-            raise ValueError('invalid bounding box: ymin >= ymax')
+        super(RigidBody, self).__init__(pos, vel, theta, omega, inertia='inf')
 
         # Harmoniza massa, inércia e densidade
         if density is not None:
             density = float(density)
             if mass is None:
                 mass = density * self.area()
+            else:
+                mass = float(mass)
             if inertia is None:
                 inertia = density * self.area() * self.ROG_sqr()
+            else:
+                inertia = float(inertia)
 
         elif mass is not None:
             mass = float(mass)
             density = mass / self.area()
             if inertia is None:
                 inertia = mass * self.ROG_sqr()
-
-        elif inertia is not None:
-            inertia = float(inertia)
-            density = inertia / (self.area() * self.ROG_sqr())
-            if mass is None:
-                mass = inertia / self.ROG_sqr()
+            else:
+                inertia = float(inertia)
 
         else:
             density = 1.0
             mass = density * self.area()
-            inertia = density * self.area() * self.ROG_sqr()
+            if inertia is None:
+                inertia = density * self.area() * self.ROG_sqr()
+            else:
+                inertia = float(inertia)
 
         self._invmass = 1.0 / mass
         self._invinertia = 1.0 / inertia
         self._density = float(density)
 
         # Inicializa as variáveis de estado
-        super(RigidBody, self).__init__(pos, vel, mass)
         self._omega = float(omega or 0)
         self._theta = 0.0
         if theta is not None:
             self.rotate(theta)
         self._alpha = 0.0
-
-    def _init_inertias(self, density, mass, inertia):
-        pass
 
     ###########################################################################
     #                 Propriedades e constantes físicas
@@ -210,136 +194,16 @@ class RigidBody(Dynamic):
 
     @property
     def bbox(self):
-        return (self._xmin, self._xmax, self._ymin, self._ymax)
+        return (self.xmin, self.xmax, self.ymin, self.ymax)
 
     @property
     def shape(self):
-        return (self._xmax - self._xmin, self._ymax - self._ymin)
+        return (self.xmax - self.xmin, self.ymax - self.ymin)
 
     @property
     def rect(self):
-        x, y = self._xmin, self._ymin
-        return (x, y, self._xmax - x, self._ymax - y)
-
-    # Parâmetros físicos derivados ############################################
-
-    def angularE(self):
-        '''Retorna a contribuição angular para a energia cinética'''
-
-        return self._inertia * self.omega ** 2 / 2
-
-    def kineticE(self):
-        '''Retorna a energia cinética total'''
-
-        return self.linearE + self.angularE
-
-    def momentumL(self):
-        '''Retorna o vetor momentum linear'''
-
-        return self.inertia * self.omega
-
-    ###########################################################################
-    #                         Propriedades geométricas
-    ###########################################################################
-    def area(self):
-        '''Retorna a área do objeto'''
-
-        raise NotImplementedError('must be implemented in child classes')
-
-    def ROG_sqr(self):
-        '''Retorna o raio de giração ao quadrado'''
-
-        raise NotImplementedError('must be implemented in child classes')
-
-    def ROG(self):
-        '''Retorna o raio de giração'''
-
-        return sqrt(self.ROG_sqr())
-
-    ###########################################################################
-    #                             Deslocamentos
-    ###########################################################################
-
-    def move(self, delta):
-        x, y = delta
-        self._pos += delta
-        self._xmin += x
-        self._xmax += x
-        self._ymin += y
-        self._ymax += y
-
-    def rotate(self, theta):
-        '''Rotaciona o objeto por um ângulo theta'''
-
-        self._theta += theta
-
-    def aboost(self, delta):
-        '''Adiciona um valor delta à velocidade ângular'''
-
-        self._omega += delta
-
-    def vpoint(self, pos, relative=False):
-        '''Retorna a velocidade linear de um ponto em pos preso rigidamente ao
-        objeto.
-
-        Se o parâmetro `relative` for verdadeiro, o vetor `pos` é interpretado
-        como a posição relativa ao centro de massa. O padrão é considerá-lo
-        como a posição absoluta no centro de coordenadas do mundo.'''
-
-        x, y = pos - self._pos
-        return self._vel + self._omega * Vector(-y, x)
-
-    ###########################################################################
-    #          Resposta a forças, impulsos e atualização da física
-    ###########################################################################
-
-    def external_torque(self, t):
-        '''Define uma torque externo análogo ao método .external_force()'''
-
-        return None
-
-    def init_alpha(self):
-        '''Reinicializa a aceleração angular com o valor nulo.'''
-
-        self._alpha = 0
-
-    def apply_torque(self, torque, dt):
-        '''Aplica um torque durante um intervalo de tempo dt.'''
-
-        self.apply_alpha(torque * self._invinertia, dt)
-
-    def apply_alpha(self, alpha, dt):
-        '''Aplica uma aceleração angular durante um intervalo de tempo dt.
-
-        Tem efeito em objetos cinemáticos.'''
-
-        dt = dt / 2
-        self.aboost(alpha * dt)
-        self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
-
-    def apply_aimpulse(self, itorque):
-        '''Aplica um impulso angular ao objeto.'''
-
-        self.aboost(itorque / self.inertia)
-
-    ###########################################################################
-    #                       Controle de estado dinâmico
-    ###########################################################################
-
-    def is_dynamic_angular(self):
-        return bool(self._invinertia)
-
-    def is_kinematic_angular(self):
-        return not bool(self._invinertia)
-
-    # Faz os objetos serem ordenados pelo valor da sua coordenada xmin. Isto
-    # facilita a implementação do reordenamento de objetos, já que é possível
-    # aplicar a função sort() diretamente na lista de objetos.
-    def __gt__(self, other):
-        return self._xmin > other._xmin
-
-    def __lt__(self, other):
-        return self._xmin < other._xmin
+        x, y = self.xmin, self.ymin
+        return (x, y, self.xmax - x, self.ymax - y)
 
 
 class LinearRigidBody(RigidBody):
@@ -350,15 +214,12 @@ class LinearRigidBody(RigidBody):
 
     __slots__ = []
 
-    def __init__(self, xmin, xmax, ymin, ymax,
-                 pos=(0, 0), vel=(0, 0),
+    def __init__(self, pos=(0, 0), vel=(0, 0),
                  mass=None, density=None):
 
-        super(LinearRigidBody, self).__init__(
-            xmin, xmax, ymin, ymax, pos, vel,
-            mass=mass, density=density
-        )
-        self._invinertia = 0.0
+        super(LinearRigidBody, self).__init__(pos, vel, 0.0, 0.0,
+                                              mass=mass, density=density,
+                                              inertia='inf')
 
     @property
     def inertia(self):
@@ -366,8 +227,9 @@ class LinearRigidBody(RigidBody):
 
     @inertia.setter
     def inertia(self, value):
-        if 1 / value:
-            raise ValueError('LinearObjects have infinite inertia')
+        if float(value) != INF:
+            raise ValueError('LinearObjects have infinite inertia, '
+                             'got %r' % value)
 
     @property
     def omega(self):
@@ -386,12 +248,6 @@ class LinearRigidBody(RigidBody):
     def theta(self, value):
         if value:
             raise ValueError('LinearObjects have fixed orientation')
-
-    def is_dynamic_angular(self):
-        return False
-
-    def is_kinematic_angular(self):
-        return True
 
 if __name__ == '__main__':
     import doctest

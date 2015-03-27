@@ -1,5 +1,7 @@
 cdef extern from 'Python.h':
     cdef int PyTuple_SET_ITEM(tuple, int, object)
+    cdef object PyTuple_GET_ITEM(tuple, int)
+    cdef object PyTuple_GetItem(tuple, int)
     cdef tuple PyTuple_New(int)
     cdef void Py_INCREF(object)
     cdef void Py_DECREF(object)
@@ -25,13 +27,16 @@ cdef class MultiFunctionBase(object):
         cdef int N = len(args), M = len(kwargs)
         cdef tuple types = PyTuple_New(N)
         for i in range(N):
-            PyTuple_SET_ITEM(types, i, type(args[i]))
+            tt_i = type(args[i])
+            Py_INCREF(tt_i)
+            PyTuple_SET_ITEM(types, i, tt_i)
         Py_INCREF(types)
 
         try:
             func = self._c_cache[types]
         except KeyError:
-            func = self.get_function(*types)
+            func = self.get_function(*tuple(types))
+        Py_DECREF(types)
 
         if M == 0:
             return func(*args)

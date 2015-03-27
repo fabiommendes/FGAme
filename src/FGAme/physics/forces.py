@@ -318,12 +318,12 @@ class SingleConservativeForce(SingleForce):
     def totalE(self):
         '''Energia total do par de partículas'''
 
-        return self.obj.kineticE + self.potentialE()
+        return self.obj.kineticE() + self.potentialE()
 
     def kineticE(self):
         '''Energia cinética do par de partículas'''
 
-        return self.obj.kineticE
+        return self.obj.kineticE()
 
     def potentialE(self):
         '''Energia potencial do par de partículas'''
@@ -353,12 +353,12 @@ class GravitySF(SingleConservativeForce):
             R = r0 - R
             r = R.norm()
             r3 = (r + epsilon) ** 2 * r
-            R *= G * obj._mass * M / r3
+            R *= G * obj.mass * M / r3
             return R
 
         def U(R):
             R = (R - r0).norm()
-            return -self._G * obj._mass * M / (R + self._epsilon)
+            return -self._G * obj.mass * M / (R + self._epsilon)
 
         super(GravitySF, self).__init__(obj, F, U)
 
@@ -394,8 +394,8 @@ class SpringSF(SingleConservativeForce):
             return Vector(kx * Dx + kxy * Dy, ky * Dy + kxy * Dx)
 
         def U(R):
-            Dx = x0 - R._x
-            Dy = y0 - R._y
+            Dx = x0 - R.x
+            Dy = y0 - R.y
             return (kx * Dx ** 2 + ky * Dy ** 2 + 2 * kxy * Dx * Dy) / 2
 
         super(SpringSF, self).__init__(obj, F, U)
@@ -499,12 +499,12 @@ class PairForce(object):
     def accel_A(self, t):
         '''Função que calcula a aceleração sobre o objeto A no instante t'''
 
-        return self.force_A(t) / self._A._mass
+        return self.force_A(t) / self._A.mass
 
     def accel_B(self, t):
         '''Função que calcula a aceleração sobre o objeto B no instante t'''
 
-        return self.force_A(t) / self._A._mass
+        return self.force_A(t) / self._A.mass
 
     def __iter__(self):
         yield self.force_A
@@ -540,7 +540,7 @@ class PairConservativeForce(PairForce):
     def totalE(self):
         '''Energia total do par de partículas'''
 
-        return self.A.kineticE + self.B.kineticE + self.potentialE()
+        return self.A.kineticE() + self.B.kineticE() + self.potentialE()
 
     def kineticE(self):
         '''Energia cinética do par de partículas'''
@@ -624,12 +624,12 @@ class GravityF(PairConservativeForce):
             R = Rb - Ra
             r = R.norm()
             r3 = (r + epsilon) ** 2 * r
-            R *= G * A._mass * B._mass / r3
+            R *= G * A.mass * B.mass / r3
             return R
 
         def U(Ra, Rb):
             R = (Ra - Rb).norm()
-            return -self._G * B._mass * A._mass / (R + self._epsilon)
+            return -self._G * B.mass * A.mass / (R + self._epsilon)
 
         super(GravityF, self).__init__(A, B, F, U)
 

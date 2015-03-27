@@ -22,4 +22,10 @@ for _ in range(NUM_ABBS):
     world.add(aabb)
 
 # Inicia a simulação
-world.run()
+# world.run()
+
+# Benchmark
+print('simulating')
+for i in range(1000):
+    world._simulation.update(1. / 60)
+print('done')

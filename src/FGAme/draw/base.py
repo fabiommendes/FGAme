@@ -73,6 +73,10 @@ class Drawable(object):
     def update(self, dt):
         '''Update its state after elapsing a time dt'''
 
+    @property
+    def visualization(self):
+        return self
+
 ###############################################################################
 #                            Objetos primitivos
 ###############################################################################
@@ -194,8 +198,19 @@ class Poly(Shape):
     canvas_primitive = 'poly'
 
     def __init__(self, vertices, **kwds):
-        obj = Poly(vertices)
+        obj = m.Poly(vertices)
         super(Poly, self).__init__(obj, **kwds)
 
     def get_vertices(self, tol=1e-6):
         return self.geometric.vertices
+
+
+class Rectangle(Poly):
+    __slots__ = []
+
+    def __init__(self, bbox=None, rect=None, shape=None, pos=None,
+                 xmin=None, ymin=None, xmax=None, ymax=None, **kwds):
+
+        obj = m.Rectangle(bbox=bbox, rect=rect, shape=shape, pos=pos,
+                          xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
+        super(Poly, self).__init__(**kwds)

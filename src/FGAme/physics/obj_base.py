@@ -2,10 +2,9 @@
 
 import six
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vector
-from FGAme.physics import flags
+from FGAme.mathutils import Vector, VectorM, asvector, dot, cross, sqrt
 
-__all__ = ['PhysElement']
+__all__ = ['Dynamic']
 
 
 ###############################################################################
@@ -29,6 +28,7 @@ def raises_method(ex=NOT_IMPLEMENTED):
 ###############################################################################
 #          Classes Base --- todos objetos físicos derivam delas
 ###############################################################################
+Dynamic = None
 
 
 class PhysElementMeta(EventDispatcherMeta):
@@ -41,8 +41,11 @@ class PhysElementMeta(EventDispatcherMeta):
     def __new__(cls, name, bases, ns):
         # Aplica transformações da EventDispatcherMeta
         has_slots = '__slots__' in ns
-        ns.setdefault('__slots__', [])
+        slots = ns.setdefault('__slots__', [])
         ns = cls._populate_namespace(name, bases, ns)
+
+        # Remove __slots__ creiados pela EventDispatcher
+        ns['__slots__'] = slots
 
         # Força EventDispatcher ser a classe mãe na hierarquia
         if bases == (object,):
@@ -92,13 +95,12 @@ class PhysElementMeta(EventDispatcherMeta):
                     ns['__slots__'].extend(slots)
 
         # Atualiza a lista de propriedades e retira slots repetidos
-        _properties_ = set(ns.get('_properties_', []))
-        for base in bases:
-            _properties_.update(getattr(base, '_properties_', []))
-        ns['_properties_'] = _properties_
         ns['__slots__'] = list(set(ns['__slots__']))
         if not has_slots:
             del ns['__slots__']
+        else:
+            if Dynamic is None:
+                ns['__slots__'].append('__dict__')
         new = type.__new__(cls, name, true_bases, ns)
 
         # Atualiza as docstrings vazias utilizando as docstrings da primeira
@@ -123,337 +125,121 @@ class PhysElementMeta(EventDispatcherMeta):
 
 
 @six.add_metaclass(PhysElementMeta)
-class PhysElement(object):
+class Dynamic(object):
 
-    '''Classe mãe para os objetos que possuem física definida.
+    '''Classe mãe de todos objetos com propriedades dinâmicas.
 
-    Não possui propriedades, mas apenas define flags e (possivelmente) um
-    dicionário extra de parâmetros. Por razões de performance e eficiência na
-    alocação de memória, todas as sub-classes devem definir seus __slots__.
+    Attributes
+    ----------
 
-    É possível armazenar variáveis adicionais no dicionário privado do objeto
-    utilizando o atributo _dict_. Para isso, a classe deve definir um conjunto
-    de strings de atributos opcionais na variável _properties_. A
-    metaclasse se encarrega de simular o comportamento de __slots__ no
-    sentido que as sub-classes não precisam definir as _optinal_vars_ da
-    classe mãe.
+    ::
+        **Propriedades físicas do objeto**
+    mass
+        Massa do objeto. Possui o valor padrão de 1. Uma massa infinita
+        transforma o objeto num objeto cinemático que não responde a forças
+        lineares.
 
-    Todas as variáveis dentro deste objeto possuem valores padrão de None.
-
-    É possível criar parâmetros localmente utilizando o método
-    'set_property()'. Estas propriedades são acessadas como atributos e podem
-    ser listadas pelo método get_properties()
-
-    Example
-    -------
-
-    Esta classe define apenas funcionalidades básicas, como acesso às flags de
-    física e propriedades.
-
-    Acesso a flags
-
-    >>> elem = PhysElement()
-    >>> elem.flag_owns_gravity
-    False
-    >>> elem.flag_owns_gravity = True
-    >>> elem.flag_owns_gravity
-    True
-
-    Acesso a propriedades
-
-    >>> elem.set_property('foo', 'bar')
-    >>> elem.foo
-    'bar'
-
+    ::
+        **Variáveis dinâmicas**
+    pos
+        Posição do centro de massa do objeto
+    vel
+        Velocidade linear medida a partir do centro de massa
+    accel
+        Aceleração acumulada recalculada em cada frame
 
     '''
 
-    __slots__ = ['_flags', '_dict_', '_force', '_force_ctl']
-    _properties_ = set()
+    __slots__ = [
+        'flags', 'cbb_radius',
+        '_pos', '_vel', '_accel', '_theta', '_omega', '_alpha',
+        '_invmass', '_invinertia'
+    ]
 
-    def __init__(self, flags=0, dict_=None):
-        self._flags = flags
-        self._dict_ = dict_
+    def __init__(self, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
+                 mass=1.0, inertia=1.0):
         EventDispatcher.__init__(self)
 
-    def __getattr__(self, attr):
-        # Captura slots não inicializados
-        if hasattr(type(self), attr):
-            raise AttributeError(attr)
+        self.flags = 0
 
-        D = self._dict_
-        if D is not None:
-            try:
-                return self._dict_[attr]
-            except KeyError:
-                pass
+        self._pos = VectorM(*pos)
+        self._vel = VectorM(*vel)
+        self._theta = float(theta)
+        self._omega = float(omega)
 
-        if attr in self._properties_:
-            return None
-        else:
-            raise AttributeError(attr)
+        self._accel = VectorM(0, 0)
+        self._alpha = 0.0
 
-# Mantêm a simetria com __getattr__, mas possivelmente incorre numa perda de
-# performance. Do jeito que está, as propriedades são definidas como somente
-# para leitura. É necessário definir propridedades explicitamente na classe
-# para obter acesso de escrita.
-#
-# É fácil fazer alguma mágica na metaclasse para definir acesso rw, caso
-# pareça interessante.
-#
-#     def __setattr__(self, attr, value):
-#         try:
-#             descriptor = self.__class__.__dict__[attr]
-#         except KeyError:
-#             if (attr in self._properties_ or
-#                     (self._dict_ is not None and attr in self._dict_)):
-#                 self._dict_[attr] = value
-#         else:
-#             descriptor.__set__(self, value)
+        self._invmass = self._invinertia = 1.0
+        self.mass = mass
+        self.inertia = inertia
 
-    @property
-    def _dict(self):
-        if self._dict_ is None:
-            self._dict_ = {}
-        return self._dict_
+    ###########################################################################
+    #                            Serviços Python
+    ###########################################################################
 
-    def set_property(self, name, value):
-        '''Define uma propriedade do objeto'''
-
-        if name.startswith('_'):
-            raise ValueError('cannot change private properties'
-                             ' (names starting with _)')
-
-        self._dict[name] = value
-
-    def get_property(self, name):
-        '''Retorna uma propriedade do objeto'''
-
-        if name.startswith('_'):
-            raise ValueError('cannot access private properties'
-                             ' (names starting with _)')
-
-        try:
-            return self._dict_[name]
-        except (KeyError, TypeError):
-            if name in self._properties_:
-                return None
-            else:
-                raise ValueError('property')
-
-    def get_properties(self):
-        '''Retorna um dicionário com todas as propriedades definidas para o
-        objeto em questão'''
-
-        items = (self._dict_ or {}).items()
-        return {k: v for (k, v) in items if not k.startswith('_')}
-
-    def _getp(self, name, default):
-        '''Versão mais rápida e privada de get_property(). Pode acessar
-        qualquer propriedade adicional'''
-
-        try:
-            return self._dict_.get(name, default)
-        except (TypeError, KeyError):
-            return default
-
-    def _setp(self, name, value):
-        '''Versão mais rápida e privada de set_property(). Pode acessar
-        qualquer propriedade adicional'''
-
-        try:
-            self._dict_[name] = value
-        except TypeError:
-
-            self._dict_ = {name: value}
-
-    def _delp(self, name):
-        '''Apaga uma propriedade do dicionário'''
-
-        del self._dict_[name]
-        if not self._dict_:
-            self._dict_ = None
-
-    def _clearp(self, *names):
-        '''Limpa propriedades do dicionário, caso estejam definidas'''
-
-        D = self._dict_
-        if D is not None:
-            for name in names:
-                if name in D:
-                    del D[name]
-
-        if not D:
-            self._dict_ = None  # Interface Python
-
-    # Define igualdade <==> identidade ########################################
     def __eq__(self, other):
         return self is other
 
     def __hash__(self):
         return id(self)
 
-    # Valores padrão ##########################################################
-    mass = float('inf')
-    inertia = float('inf')
-    pos = Vector(0, 0)
-    vel = Vector(0, 0)
-    theta = 0.0
-    omega = 0.0
+    def __repr__(self):
+        tname = type(self).__name__
+        pos = ', '.join('%.1f' % x for x in self.pos)
+        vel = ', '.join('%.1f' % x for x in self.vel)
+        return '%s(pos=(%s), vel=(%s))' % (tname, pos, vel)
 
-    area = 0
-    ROG_sqr = 0
-    ROG = 0
+    # TODO: def __copy__(self): ?
+    # TODO: def __getstate__(self): ?
 
-    # Métodos com implementações inócuas ######################################
-    move = do_nothing()
-    boost = do_nothing()
-    rotate = do_nothing()
-    aboost = do_nothing()
+    # Sinais
+    collision = signal('collision', num_args=1)
 
     ###########################################################################
-    #                           Controle de flags
+    #                            Controle de flags
     ###########################################################################
-# Propriedades de controle de flags -- metacódigo
-#
-# Descomente e rode este código caso queira recalcular as propriedades
-# associadas à cada flag de física.
-#
-#     from FGAme.physics.flags import _FlagBits
-#     template = '''
-#     @property
-#     def flag_flagname(self):
-#         return bool(self._flags & flags.FLAGNAME)
-#
-#     @flag_flagname.setter
-#     def flag_flagname(self, value):
-#         if value:
-#             self._flags |= flags.FLAGNAME
-#         else:
-#             self._flags &= ~flags.FLAGNAME'''
-#
-#     attrs = [(n, k) for (k, n) in _FlagBits.__dict__.items()
-#              if isinstance(n, int)]
-#     for n, k in sorted(attrs):
-#         func_def = template.replace('flagname', k)
-#         func_def = func_def.replace('FLAGNAME', k.upper())
-#         print(func_def)
+    def set_flag(self, flag, value):
+        '''Atribui um valor de verdade para a flag especificada.
 
-    # Definições geradas pelo código acima
-    @property
-    def flag_has_inertia(self):
-        return bool(self._flags & flags.HAS_INERTIA)
+        O argumento pode ser uma string ou a constante em FGAme.physics.flags
+        associada à flag'''
 
-    @flag_has_inertia.setter
-    def flag_has_inertia(self, value):
+        if isinstance(flag, str):
+            flag = self._get_flag(flag)
         if value:
-            self._flags |= flags.HAS_INERTIA
+            self.flags |= flag
         else:
-            self._flags &= ~flags.HAS_INERTIA
+            self.flags &= ~flag
 
-    @property
-    def flag_has_linear(self):
-        return bool(self._flags & flags.HAS_LINEAR)
+    def toggle_flag(self, flag):
+        '''Inverte o valor da flag.
 
-    @flag_has_linear.setter
-    def flag_has_linear(self, value):
+        O argumento pode ser uma string ou a constante em FGAme.physics.flags
+        associada à flag'''
+
+        if isinstance(flag, str):
+            flag = self._get_flag(flag)
+
+        value = not (self.flags & flag)
         if value:
-            self._flags |= flags.HAS_LINEAR
+            self.flags |= flag
         else:
-            self._flags &= ~flags.HAS_LINEAR
+            self.flags &= ~flag
 
-    @property
-    def flag_has_angular(self):
-        return bool(self._flags & flags.HAS_ANGULAR)
+    def get_flag(self, flag):
+        '''Retorna o valor da flag.
 
-    @flag_has_angular.setter
-    def flag_has_angular(self, value):
-        if value:
-            self._flags |= flags.HAS_ANGULAR
-        else:
-            self._flags &= ~flags.HAS_ANGULAR
+        O argumento pode ser uma string ou a constante em FGAme.physics.flags
+        associada à flag'''
 
-    @property
-    def flag_has_bbox(self):
-        return bool(self._flags & flags.HAS_BBOX)
-
-    @flag_has_bbox.setter
-    def flag_has_bbox(self, value):
-        if value:
-            self._flags |= flags.HAS_BBOX
-        else:
-            self._flags &= ~flags.HAS_BBOX
-
-    @property
-    def flag_owns_gravity(self):
-        return bool(self._flags & flags.OWNS_GRAVITY)
-
-    @flag_owns_gravity.setter
-    def flag_owns_gravity(self, value):
-        if value:
-            self._flags |= flags.OWNS_GRAVITY
-        else:
-            self._flags &= ~flags.OWNS_GRAVITY
-
-    @property
-    def flag_owns_damping(self):
-        return bool(self._flags & flags.OWNS_DAMPING)
-
-    @flag_owns_damping.setter
-    def flag_owns_damping(self, value):
-        if value:
-            self._flags |= flags.OWNS_DAMPING
-        else:
-            self._flags &= ~flags.OWNS_DAMPING
-
-    @property
-    def flag_owns_adamping(self):
-        return bool(self._flags & flags.OWNS_ADAMPING)
-
-    @flag_owns_adamping.setter
-    def flag_owns_adamping(self, value):
-        if value:
-            self._flags |= flags.OWNS_ADAMPING
-        else:
-            self._flags &= ~flags.OWNS_ADAMPING
-
-    @property
-    def flag_accel_static(self):
-        return bool(self._flags & flags.ACCEL_STATIC)
-
-    @flag_accel_static.setter
-    def flag_accel_static(self, value):
-        if value:
-            self._flags |= flags.ACCEL_STATIC
-        else:
-            self._flags &= ~flags.ACCEL_STATIC
-
-    @property
-    def flag_has_world(self):
-        return bool(self._flags & flags.HAS_WORLD)
-
-    @flag_has_world.setter
-    def flag_has_world(self, value):
-        if value:
-            self._flags |= flags.HAS_WORLD
-        else:
-            self._flags &= ~flags.HAS_WORLD
-
-    @property
-    def flag_has_visualization(self):
-        return bool(self._flags & flags.HAS_VISUALIZATION)
-
-    @flag_has_visualization.setter
-    def flag_has_visualization(self, value):
-        if value:
-            self._flags |= flags.HAS_VISUALIZATION
-        else:
-            self._flags &= ~flags.HAS_VISUALIZATION
+        if isinstance(flag, str):
+            flag = self._get_flag(flag)
+        return bool(self.flags | flag)
 
     ###########################################################################
     #               Manipulação/consulta do estado dinâmico
     ###########################################################################
-
     def is_dynamic(self, what=None):
         '''Retorna True se o objeto for dinâmico ou nas variáveis lineares ou
         nas angulares. Um objeto é considerado dinâmico nas variáveis lineares
@@ -478,12 +264,12 @@ class PhysElement(object):
     def is_dynamic_linear(self):
         '''Verifica se o objeto é dinâmico nas variáveis lineares'''
 
-        return self.mass == INF
+        return bool(self._invmass)
 
     def is_dynamic_angular(self):
         '''Verifica se o objeto é dinâmico nas variáveis angulares'''
 
-        return self.inertia == INF
+        return bool(self._invinertia)
 
     def make_dynamic(self, what=None):
         '''Resgata a massa, inércia e velocidades anteriores de um objeto
@@ -597,7 +383,7 @@ class PhysElement(object):
         `obj.make_kinematic()`.'''
 
         if not self.is_kinematic_linear():
-            self._setp('old_mass', self.mass)
+            self._old_mass = self.mass
             self.mass = 'inf'
 
     def make_kinematic_angular(self):
@@ -606,7 +392,7 @@ class PhysElement(object):
         `obj.make_kinematic()`.'''
 
         if not self.is_kinematic_angular():
-            self._setp('old_inertia', self.inertia)
+            self._old_inertia = self.inertia
             self.inertia = 'inf'
 
     # Static ##################################################################
@@ -663,7 +449,7 @@ class PhysElement(object):
 
         self.make_kinematic_linear()
         if self.vel != ORIGIN:
-            self._setp('old_vel', self.vel)
+            self._old_vel = self.vel
             self.vel = (0, 0)
 
     def make_static_angular(self):
@@ -673,11 +459,317 @@ class PhysElement(object):
 
         self.make_kinematic_angular()
         if self.omega != 0:
-            self._setp('old_omega', self.omega)
+            self._old_omega = self.omega
             self.omega = 0.0
 
-    # Sinais ##################################################################
-    collision = signal('collision', num_args=1)
+    ###########################################################################
+    #                        Propriedades físicas
+    ###########################################################################
+
+    @property
+    def mass(self):
+        try:
+            return 1.0 / self._invmass
+        except ZeroDivisionError:
+            return float('inf')
+
+    @mass.setter
+    def mass(self, value):
+        value = float(value)
+        if value <= 0:
+            raise ValueError('mass cannot be null or negative')
+        self._invmass = 1.0 / value
+
+    @property
+    def inertia(self):
+        try:
+            return 1.0 / self._invinertia
+        except ZeroDivisionError:
+            return float('inf')
+
+    @inertia.setter
+    def inertia(self, value):
+        value = float(value)
+        if value <= 0:
+            raise ValueError('inertia cannot be null or negative')
+        self._invinertia = 1.0 / value
+
+    # Variáveis de estado
+#     @property
+#     def pos(self):
+#         return Vector(*self._pos)
+#
+#     @pos.setter
+#     def pos(self, value):
+#         self.move(value - self._pos)
+#     @property
+#     def vel(self):
+#         return Vector(*self._vel)
+#
+#     @vel.setter
+#     def vel(self, value):
+#         self.boost(value - self._vel)
+#
+#     @property
+#     def accel(self):
+#         return Vector(*self._accel)
+#
+#     @accel.setter
+#     def accel(self, value):
+#         self._accel.update(value)
+
+    # Grandezas físicos derivadas
+    def linearE(self):
+        '''Energia cinética das variáveis lineares'''
+
+        return dot(self.vel, self.vel) / (2 * self._invmass)
+
+    def angularE(self):
+        '''Energia cinética das variáveis angulares'''
+
+        if self.omega:
+            return self.omega ** 2 / (2 * self._invinertia)
+        else:
+            return 0
+
+    def kineticE(self):
+        '''Energia cinética total'''
+
+        return self.linearE() + self.angularE()
+
+    def momentumP(self):
+        '''Momentum linear'''
+
+        return self.vel / self._invmass
+
+    def momentumL(self):
+        '''Momentum angular em torno do centro de massa'''
+
+        if self.omega:
+            return self.inertia * self.omega
+        else:
+            return 0.0
+
+    def momentumL_origin(self):
+        '''Momentum angular em torno da origem'''
+
+        return cross(self.pos, self.momentumP()) + self.momentumL()
+
+    ###########################################################################
+    #                        Propriedades Geométricas
+    ###########################################################################
+    def area(self):
+        '''Retorna a área do objeto'''
+
+        raise NotImplementedError('must be implemented in child classes')
+
+    def ROG_sqr(self):
+        '''Retorna o raio de giração ao quadrado'''
+
+        raise NotImplementedError('must be implemented in child classes')
+
+    def ROG(self):
+        '''Retorna o raio de giração'''
+
+        return sqrt(self.ROG_sqr())
+
+    ###########################################################################
+    #                      Aplicação de forças e torques
+    ###########################################################################
+    def move(self, delta_or_x, y=None):
+        '''Move o objeto por vetor de deslocamento delta'''
+
+        if y is None:
+            self._pos += delta_or_x
+        else:
+            self._pos += (delta_or_x, y)
+
+    def boost(self, delta_or_x, y=None):
+        '''Adiciona um valor vetorial delta à velocidade linear'''
+
+        if y is None:
+            self._vel += delta_or_x
+        else:
+            self._vel += (delta_or_x, y)
+
+    # Resposta a forças, impulsos e atualização da física #####################
+    def force(self, t):
+        '''Define uma força externa que depende do tempo t.
+
+        Pode ser utilizado por sub-implementações para definir uma força
+        externa aplicada aos objetos de uma sub-classe ou usando o recurso de
+        "monkey patching" do Python
+        '''
+
+        return ORIGIN
+
+    def init_accel(self):
+        '''Inicializa o vetor de aceleração com o valor nulo'''
+
+        self._accel *= 0
+
+    def apply_force(self, force, dt, pos=None, relative=False):
+        '''Aplica uma força linear durante um intervalo de tempo dt'''
+
+        if force is None:
+            if self._invmass:
+                self.apply_accel(self._accel, dt)
+        else:
+            self.apply_accel(force * self._invmass, dt)
+
+        if pos is not None:
+            if relative:
+                tau = cross(pos, force)
+            else:
+                tau = cross(pos - self._pos, force)
+            self.apply_torque(tau, dt)
+
+    def apply_accel(self, a, dt):
+        '''Aplica uma aceleração linear durante um intervalo de tempo dt.
+
+        Tem efeito em objetos cinemáticos.
+
+        Observations
+        ------------
+
+        Implementa a integração de Velocity-Verlet para o sistema. Este
+        integrador é superior ao Euler por dois motivos: primeiro, trata-se de
+        um integrador de ordem superior (O(dt^4) vs O(dt^2)). Além disto, ele
+        possui a propriedade simplética, o que implica que o erro da energia
+        não tende a divergir, mas sim oscilar ora positivamente ora
+        negativamente em torno de zero. Isto é extremamente desejável para
+        simulações de física que parecam realistas.
+
+        A integração de Euler seria implementada como:
+
+            x(t + dt) = x(t) + v(t) * dt + a(t) * dt**2 / 2
+            v(t + dt) = v(t) + a(t) * dt
+
+        Em código Python
+
+        >>> self.move(self.vel * dt + a * (dt**2/2))           # doctest: +SKIP
+        >>> self.boost(a * dt)                                 # doctest: +SKIP
+
+        Este método simples e intuitivo sofre com o efeito da "deriva de
+        energia". Devido aos erros de truncamento, o valor da energia da
+        solução numérica flutua com relação ao valor exato. Na grande maioria
+        dos sistemas, esssa flutuação ocorre com mais probabilidade para a
+        região de maior energia e portanto a energia tende a crescer
+        continuamente, estragando a credibilidade da simulação.
+
+        Velocity-Verlet está numa classe de métodos numéricos que não sofrem
+        com esse problema. A principal desvantagem, no entanto, é que devemos
+        manter uma variável adicional com o último valor conhecido da
+        aceleração. Esta pequena complicação é mais que compensada pelo ganho
+        em precisão numérica. O algorítmo consiste em:
+
+            x(t + dt) = x(t) + v(t) * dt + a(t) * dt**2 / 2
+            v(t + dt) = v(t) + [(a(t) + a(t + dt)) / 2] * dt
+
+        O termo a(t + dt) normalemente só pode ser calculado se soubermos como
+        obter as acelerações como função das posições x(t + dt). Na prática,
+        cada iteração de .apply_accel() calcula o valor da posição em x(t + dt)
+        e da velocidade no passo anterior v(t). Calcular v(t + dt) requer uma
+        avaliação de a(t + dt), que só estará disponível na iteração seguinte.
+        A próxima iteração segue então para calcular v(t + dt) e x(t + 2*dt), e
+        assim sucessivamente.
+
+        A ordem de acurácia de cada passo do algoritmo Velocity-Verlet é de
+        O(dt^4) para uma força que dependa exclusivamente da posição e tempo.
+        Caso haja dependência na velocidade, a acurácia reduz e ficaríamos
+        sujeitos aos efeitos da deriva de energia. Normalmente as forças
+        físicas que dependem da velocidade são dissipativas e tendem a reduzir
+        a energia total do sistema muito mais rapidamente que a deriva de
+        energia tende a fornecer energia espúria ao sistema. Deste modo, a
+        acurácia ficaria reduzida, mas a simulação ainda manteria alguma
+        credibilidade.
+        '''
+
+        # TODO: reimplementar algoritmo correto
+        if a is None:
+            a = self._accel
+        else:
+            a = asvector(a)
+
+        self.move(self._vel * dt + a * (dt ** 2 / 2.0))
+        self.boost(a * dt)
+
+    def apply_impulse(self, impulse_or_x, y=None):
+        '''Aplica um impulso linear ao objeto. Isto altera sua velocidade
+        linear com relação ao centro de massa.
+
+        Se for chamado com dois agumentos aplica o impulso em um ponto
+        específico e também resolve a dinâmica angular.
+        '''
+
+        if y is None:
+            self.boost(impulse_or_x * self._invmass)
+        else:
+            self.boost(Vector(impulse_or_x, y) * self._invmass)
+
+    # Variáveis angulares #####################################################
+    def rotate(self, theta):
+        '''Rotaciona o objeto por um ângulo theta'''
+
+        self._theta += theta
+
+    def aboost(self, delta):
+        '''Adiciona um valor delta à velocidade ângular'''
+
+        self._omega += delta
+
+    def vpoint(self, pos_or_x, y=None, relative=False):
+        '''Retorna a velocidade linear de um ponto em pos preso rigidamente ao
+        objeto.
+
+        Se o parâmetro `relative` for verdadeiro, o vetor `pos` é interpretado
+        como a posição relativa ao centro de massa. O padrão é considerá-lo
+        como a posição absoluta no centro de coordenadas do mundo.'''
+
+        if relative:
+            if y is None:
+                x, y = pos_or_x
+                return self._vel + self._omega * Vector(-y, x)
+            else:
+                return self._vel + self._omega * Vector(-y, pos_or_x)
+
+        else:
+            if y is None:
+                x, y = pos_or_x - self._pos
+                return self._vel + self._omega * Vector(-y, x)
+            else:
+                x = pos_or_x - self._pos.x
+                y = y - self._pos.y
+                return self._vel + self._omega * Vector(-y, x)
+
+    def torque(self, t):
+        '''Define uma torque externo análogo ao método .force()'''
+
+        return None
+
+    def init_alpha(self):
+        '''Reinicializa a aceleração angular com o valor nulo.'''
+
+        self._alpha = 0
+
+    def apply_torque(self, torque, dt):
+        '''Aplica um torque durante um intervalo de tempo dt.'''
+
+        self.apply_alpha(torque * self._invinertia, dt)
+
+    def apply_alpha(self, alpha, dt):
+        '''Aplica uma aceleração angular durante um intervalo de tempo dt.
+
+        Tem efeito em objetos cinemáticos.'''
+
+        dt = dt / 2
+        self.aboost(alpha * dt)
+        self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
+
+    def apply_aimpulse(self, itorque):
+        '''Aplica um impulso angular ao objeto.'''
+
+        self.aboost(itorque / self.inertia)
 
 if __name__ == '__main__':
     import doctest

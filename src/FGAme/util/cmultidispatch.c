@@ -432,7 +432,7 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_5FGAme_4util_14cmultidispatch_MultiFunctionBase;
 
-/* "FGAme/util/cmultidispatch.pyx":7
+/* "FGAme/util/cmultidispatch.pyx":9
  *     cdef void Py_DECREF(object)
  * 
  * cdef class MultiFunctionBase(object):             # <<<<<<<<<<<<<<
@@ -673,7 +673,7 @@ static PyObject *__pyx_n_s_name_2;
 static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_test;
 
-/* "FGAme/util/cmultidispatch.pyx":13
+/* "FGAme/util/cmultidispatch.pyx":15
  *     cdef dict _c_cache
  * 
  *     def __init__(MultiFunctionBase self, name='', doc=None):             # <<<<<<<<<<<<<<
@@ -720,7 +720,7 @@ static int __pyx_pw_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_1__init__(
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -735,7 +735,7 @@ static int __pyx_pw_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_1__init__(
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 13; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 15; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.util.cmultidispatch.MultiFunctionBase.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -761,14 +761,14 @@ static int __pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase___init__(s
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "FGAme/util/cmultidispatch.pyx":14
+  /* "FGAme/util/cmultidispatch.pyx":16
  * 
  *     def __init__(MultiFunctionBase self, name='', doc=None):
  *         self._init(name, doc)             # <<<<<<<<<<<<<<
  * 
  *     def _init(MultiFunctionBase self, name, doc):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_init); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -782,7 +782,7 @@ static int __pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase___init__(s
       __pyx_t_4 = 1;
     }
   }
-  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   if (__pyx_t_3) {
     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __Pyx_GIVEREF(__pyx_t_3); __pyx_t_3 = NULL;
@@ -793,13 +793,13 @@ static int __pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase___init__(s
   __Pyx_INCREF(__pyx_v_doc);
   PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_doc);
   __Pyx_GIVEREF(__pyx_v_doc);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 14; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/util/cmultidispatch.pyx":13
+  /* "FGAme/util/cmultidispatch.pyx":15
  *     cdef dict _c_cache
  * 
  *     def __init__(MultiFunctionBase self, name='', doc=None):             # <<<<<<<<<<<<<<
@@ -822,7 +822,7 @@ static int __pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase___init__(s
   return __pyx_r;
 }
 
-/* "FGAme/util/cmultidispatch.pyx":16
+/* "FGAme/util/cmultidispatch.pyx":18
  *         self._init(name, doc)
  * 
  *     def _init(MultiFunctionBase self, name, doc):             # <<<<<<<<<<<<<<
@@ -861,11 +861,11 @@ static PyObject *__pyx_pw_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_3_in
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_doc)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_init", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_init", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_init") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_init") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -878,7 +878,7 @@ static PyObject *__pyx_pw_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_3_in
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_init", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 16; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_init", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.util.cmultidispatch.MultiFunctionBase._init", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -900,26 +900,26 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_2_in
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init", 0);
 
-  /* "FGAme/util/cmultidispatch.pyx":17
+  /* "FGAme/util/cmultidispatch.pyx":19
  * 
  *     def _init(MultiFunctionBase self, name, doc):
  *         self._data = {}             # <<<<<<<<<<<<<<
  *         self._c_cache = {}
  *         self._name = name
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_data, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/util/cmultidispatch.pyx":18
+  /* "FGAme/util/cmultidispatch.pyx":20
  *     def _init(MultiFunctionBase self, name, doc):
  *         self._data = {}
  *         self._c_cache = {}             # <<<<<<<<<<<<<<
  *         self._name = name
  *         self._doc = doc
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->_c_cache);
@@ -927,25 +927,25 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_2_in
   __pyx_v_self->_c_cache = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "FGAme/util/cmultidispatch.pyx":19
+  /* "FGAme/util/cmultidispatch.pyx":21
  *         self._data = {}
  *         self._c_cache = {}
  *         self._name = name             # <<<<<<<<<<<<<<
  *         self._doc = doc
  * 
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_name_2, __pyx_v_name) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_name_2, __pyx_v_name) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 21; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/util/cmultidispatch.pyx":20
+  /* "FGAme/util/cmultidispatch.pyx":22
  *         self._c_cache = {}
  *         self._name = name
  *         self._doc = doc             # <<<<<<<<<<<<<<
  * 
  *     def __call__(MultiFunctionBase self, *args, **kwargs):
  */
-  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_doc_2, __pyx_v_doc) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 20; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_doc_2, __pyx_v_doc) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 22; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/util/cmultidispatch.pyx":16
+  /* "FGAme/util/cmultidispatch.pyx":18
  *         self._init(name, doc)
  * 
  *     def _init(MultiFunctionBase self, name, doc):             # <<<<<<<<<<<<<<
@@ -966,7 +966,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_2_in
   return __pyx_r;
 }
 
-/* "FGAme/util/cmultidispatch.pyx":22
+/* "FGAme/util/cmultidispatch.pyx":24
  *         self._doc = doc
  * 
  *     def __call__(MultiFunctionBase self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -1006,6 +1006,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
   int __pyx_v_M;
   PyObject *__pyx_v_types = 0;
   int __pyx_v_i;
+  PyObject *__pyx_v_tt_i = NULL;
   PyObject *__pyx_v_func = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1027,64 +1028,83 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__call__", 0);
 
-  /* "FGAme/util/cmultidispatch.pyx":25
+  /* "FGAme/util/cmultidispatch.pyx":27
  *         "Resolve and dispatch to best method."
  * 
  *         cdef int N = len(args), M = len(kwargs)             # <<<<<<<<<<<<<<
  *         cdef tuple types = PyTuple_New(N)
  *         for i in range(N):
  */
-  __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_GET_SIZE(__pyx_v_args); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_N = __pyx_t_1;
-  __pyx_t_1 = PyDict_Size(__pyx_v_kwargs); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 25; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_Size(__pyx_v_kwargs); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_M = __pyx_t_1;
 
-  /* "FGAme/util/cmultidispatch.pyx":26
+  /* "FGAme/util/cmultidispatch.pyx":28
  * 
  *         cdef int N = len(args), M = len(kwargs)
  *         cdef tuple types = PyTuple_New(N)             # <<<<<<<<<<<<<<
  *         for i in range(N):
- *             PyTuple_SET_ITEM(types, i, type(args[i]))
+ *             tt_i = type(args[i])
  */
-  __pyx_t_2 = PyTuple_New(__pyx_v_N); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 26; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(__pyx_v_N); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_v_types = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "FGAme/util/cmultidispatch.pyx":27
+  /* "FGAme/util/cmultidispatch.pyx":29
  *         cdef int N = len(args), M = len(kwargs)
  *         cdef tuple types = PyTuple_New(N)
  *         for i in range(N):             # <<<<<<<<<<<<<<
- *             PyTuple_SET_ITEM(types, i, type(args[i]))
- *         Py_INCREF(types)
+ *             tt_i = type(args[i])
+ *             Py_INCREF(tt_i)
  */
   __pyx_t_3 = __pyx_v_N;
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_i = __pyx_t_4;
 
-    /* "FGAme/util/cmultidispatch.pyx":28
+    /* "FGAme/util/cmultidispatch.pyx":30
  *         cdef tuple types = PyTuple_New(N)
  *         for i in range(N):
- *             PyTuple_SET_ITEM(types, i, type(args[i]))             # <<<<<<<<<<<<<<
+ *             tt_i = type(args[i])             # <<<<<<<<<<<<<<
+ *             Py_INCREF(tt_i)
+ *             PyTuple_SET_ITEM(types, i, tt_i)
+ */
+    __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_args, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 30; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_INCREF(((PyObject *)Py_TYPE(__pyx_t_2)));
+    __Pyx_XDECREF_SET(__pyx_v_tt_i, ((PyObject*)((PyObject *)Py_TYPE(__pyx_t_2))));
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "FGAme/util/cmultidispatch.pyx":31
+ *         for i in range(N):
+ *             tt_i = type(args[i])
+ *             Py_INCREF(tt_i)             # <<<<<<<<<<<<<<
+ *             PyTuple_SET_ITEM(types, i, tt_i)
+ *         Py_INCREF(types)
+ */
+    Py_INCREF(((PyObject *)__pyx_v_tt_i));
+
+    /* "FGAme/util/cmultidispatch.pyx":32
+ *             tt_i = type(args[i])
+ *             Py_INCREF(tt_i)
+ *             PyTuple_SET_ITEM(types, i, tt_i)             # <<<<<<<<<<<<<<
  *         Py_INCREF(types)
  * 
  */
-    __pyx_t_2 = __Pyx_GetItemInt_Tuple(__pyx_v_args, __pyx_v_i, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 28; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
-    __Pyx_GOTREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_v_types, __pyx_v_i, ((PyObject *)Py_TYPE(__pyx_t_2)));
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    PyTuple_SET_ITEM(__pyx_v_types, __pyx_v_i, ((PyObject *)__pyx_v_tt_i));
   }
 
-  /* "FGAme/util/cmultidispatch.pyx":29
- *         for i in range(N):
- *             PyTuple_SET_ITEM(types, i, type(args[i]))
+  /* "FGAme/util/cmultidispatch.pyx":33
+ *             Py_INCREF(tt_i)
+ *             PyTuple_SET_ITEM(types, i, tt_i)
  *         Py_INCREF(types)             # <<<<<<<<<<<<<<
  * 
  *         try:
  */
   Py_INCREF(__pyx_v_types);
 
-  /* "FGAme/util/cmultidispatch.pyx":31
+  /* "FGAme/util/cmultidispatch.pyx":35
  *         Py_INCREF(types)
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -1098,18 +1118,18 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
     __Pyx_XGOTREF(__pyx_t_7);
     /*try:*/ {
 
-      /* "FGAme/util/cmultidispatch.pyx":32
+      /* "FGAme/util/cmultidispatch.pyx":36
  * 
  *         try:
  *             func = self._c_cache[types]             # <<<<<<<<<<<<<<
  *         except KeyError:
- *             func = self.get_function(*types)
+ *             func = self.get_function(*tuple(types))
  */
       if (unlikely(__pyx_v_self->_c_cache == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L5_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L5_error;}
       }
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_c_cache, __pyx_v_types); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 32; __pyx_clineno = __LINE__; goto __pyx_L5_error;};
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_c_cache, __pyx_v_types); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 36; __pyx_clineno = __LINE__; goto __pyx_L5_error;};
       __Pyx_GOTREF(__pyx_t_2);
       __pyx_v_func = __pyx_t_2;
       __pyx_t_2 = 0;
@@ -1121,38 +1141,41 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
     __pyx_L5_error:;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "FGAme/util/cmultidispatch.pyx":33
+    /* "FGAme/util/cmultidispatch.pyx":37
  *         try:
  *             func = self._c_cache[types]
  *         except KeyError:             # <<<<<<<<<<<<<<
- *             func = self.get_function(*types)
- * 
+ *             func = self.get_function(*tuple(types))
+ *         Py_DECREF(types)
  */
     __pyx_t_3 = PyErr_ExceptionMatches(__pyx_builtin_KeyError);
     if (__pyx_t_3) {
       __Pyx_AddTraceback("FGAme.util.cmultidispatch.MultiFunctionBase.__call__", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_9) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_8, &__pyx_t_9) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GOTREF(__pyx_t_9);
 
-      /* "FGAme/util/cmultidispatch.pyx":34
+      /* "FGAme/util/cmultidispatch.pyx":38
  *             func = self._c_cache[types]
  *         except KeyError:
- *             func = self.get_function(*types)             # <<<<<<<<<<<<<<
+ *             func = self.get_function(*tuple(types))             # <<<<<<<<<<<<<<
+ *         Py_DECREF(types)
  * 
- *         if M == 0:
  */
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_function); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_function); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_10);
-      __pyx_t_11 = PySequence_Tuple(__pyx_v_types); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      __pyx_t_11 = PySequence_Tuple(__pyx_v_types); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_11, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 34; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      __pyx_t_12 = PySequence_Tuple(__pyx_t_11); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_12);
-      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_func, __pyx_t_12);
-      __pyx_t_12 = 0;
+      __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_12, NULL); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      __Pyx_GOTREF(__pyx_t_11);
+      __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+      __Pyx_XDECREF_SET(__pyx_v_func, __pyx_t_11);
+      __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -1173,8 +1196,17 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
     __pyx_L12_try_end:;
   }
 
-  /* "FGAme/util/cmultidispatch.pyx":36
- *             func = self.get_function(*types)
+  /* "FGAme/util/cmultidispatch.pyx":39
+ *         except KeyError:
+ *             func = self.get_function(*tuple(types))
+ *         Py_DECREF(types)             # <<<<<<<<<<<<<<
+ * 
+ *         if M == 0:
+ */
+  Py_DECREF(__pyx_v_types);
+
+  /* "FGAme/util/cmultidispatch.pyx":41
+ *         Py_DECREF(types)
  * 
  *         if M == 0:             # <<<<<<<<<<<<<<
  *             return func(*args)
@@ -1183,7 +1215,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
   __pyx_t_13 = ((__pyx_v_M == 0) != 0);
   if (__pyx_t_13) {
 
-    /* "FGAme/util/cmultidispatch.pyx":37
+    /* "FGAme/util/cmultidispatch.pyx":42
  * 
  *         if M == 0:
  *             return func(*args)             # <<<<<<<<<<<<<<
@@ -1191,9 +1223,9 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
  *             return func(*args, **kwargs)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_9 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_v_func, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_v_func, __pyx_t_9, NULL); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_r = __pyx_t_8;
@@ -1202,7 +1234,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
   }
   /*else*/ {
 
-    /* "FGAme/util/cmultidispatch.pyx":39
+    /* "FGAme/util/cmultidispatch.pyx":44
  *             return func(*args)
  *         else:
  *             return func(*args, **kwargs)             # <<<<<<<<<<<<<<
@@ -1210,11 +1242,11 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
  *     property _cache:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_8 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = PySequence_Tuple(__pyx_v_args); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_9 = __pyx_v_kwargs;
     __Pyx_INCREF(__pyx_t_9);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_v_func, __pyx_t_8, __pyx_t_9); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 39; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_v_func, __pyx_t_8, __pyx_t_9); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -1223,7 +1255,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
     goto __pyx_L0;
   }
 
-  /* "FGAme/util/cmultidispatch.pyx":22
+  /* "FGAme/util/cmultidispatch.pyx":24
  *         self._doc = doc
  * 
  *     def __call__(MultiFunctionBase self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -1243,13 +1275,14 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_types);
+  __Pyx_XDECREF(__pyx_v_tt_i);
   __Pyx_XDECREF(__pyx_v_func);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "FGAme/util/cmultidispatch.pyx":42
+/* "FGAme/util/cmultidispatch.pyx":47
  * 
  *     property _cache:
  *         def __get__(MultiFunctionBase self):             # <<<<<<<<<<<<<<
@@ -1274,7 +1307,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_6_ca
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "FGAme/util/cmultidispatch.pyx":43
+  /* "FGAme/util/cmultidispatch.pyx":48
  *     property _cache:
  *         def __get__(MultiFunctionBase self):
  *             return self._c_cache             # <<<<<<<<<<<<<<
@@ -1284,7 +1317,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_6_ca
   __pyx_r = __pyx_v_self->_c_cache;
   goto __pyx_L0;
 
-  /* "FGAme/util/cmultidispatch.pyx":42
+  /* "FGAme/util/cmultidispatch.pyx":47
  * 
  *     property _cache:
  *         def __get__(MultiFunctionBase self):             # <<<<<<<<<<<<<<
@@ -1451,8 +1484,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 27; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 33; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 29; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 37; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -1552,11 +1585,11 @@ PyMODINIT_FUNC PyInit_cmultidispatch(void)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 7; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase.tp_print = 0;
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase, "__call__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 7; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase, "__call__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
       __pyx_wrapperbase_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__call__ = *((PyWrapperDescrObject *)wrapper)->d_base;
       __pyx_wrapperbase_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__call__.doc = __pyx_doc_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__call__;
@@ -1564,7 +1597,7 @@ PyMODINIT_FUNC PyInit_cmultidispatch(void)
     }
   }
   #endif
-  if (PyObject_SetAttrString(__pyx_m, "MultiFunctionBase", (PyObject *)&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 7; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "MultiFunctionBase", (PyObject *)&__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 9; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_5FGAme_4util_14cmultidispatch_MultiFunctionBase = &__pyx_type_5FGAme_4util_14cmultidispatch_MultiFunctionBase;
   /*--- Type import code ---*/
   /*--- Variable import code ---*/
@@ -1574,7 +1607,7 @@ PyMODINIT_FUNC PyInit_cmultidispatch(void)
   /* "FGAme/util/cmultidispatch.pyx":1
  * cdef extern from 'Python.h':             # <<<<<<<<<<<<<<
  *     cdef int PyTuple_SET_ITEM(tuple, int, object)
- *     cdef tuple PyTuple_New(int)
+ *     cdef object PyTuple_GET_ITEM(tuple, int)
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);

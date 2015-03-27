@@ -1,13 +1,14 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 Ilustra a interseção entre duas figuras geométricas
 '''
 
 from FGAme import *
+from FGAme.mathutils import clip, convex_hull
 
 world = World()
-A = Poly.rect(shape=(200, 100), mass='inf')
-B = Poly.regular(3, 200, pos=(70, 50), color='blue', mass='inf')
+A = Rectangle(shape=(200, 100), mass='inf')
+B = RegularPoly(3, 200, pos=(70, 50), color='blue', mass='inf')
 D = Poly(clip(A.vertices, B.vertices), color='red', mass='inf')
 C = Circle(5, color='red')
 vertices = A.vertices + B.vertices + D.vertices

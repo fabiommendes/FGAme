@@ -32,5 +32,6 @@ from .forces import *
 from .collision_base import *
 from .simulation import *
 from . import collision_pairwise as col_pairs
+from . import flags
 
 __all__ = ['Collision', 'get_collision', 'Simulation']

@@ -25,9 +25,9 @@ class Pong(World):
         pong.make_static('angular')
         pong.move((2 * W - 50, H - Y / 2))
         pong.listen('collision', self.pong_collision)
-        pong.external_force = \
-            lambda t: -25000 * Vector(pong.pos.x - self.pong_x, 0)
-        pong.damping = 6
+        pong.mass *= 5
+        pong.force = lambda t: -1000000 * Vector(pong.pos.x - self.pong_x, 0)
+        pong.damping = 10
         self.pong_x = self.pong.pos.x
 
         # Cria a barra de tempo
@@ -91,11 +91,7 @@ class Pong(World):
         '''Inicializa o a bola'''
 
         H, W = self.screen_height / 2, self.screen_width / 2
-        ball = Poly.regular(
-            self.ball_sides,
-            self.ball_size,
-            color='red',
-            density=1)
+        ball = RegularPoly(self.ball_sides, self.ball_size, color='red')
         ball.inertia *= self.inertia_multiplier
         ball.move((W, H))
         V = self.ball_speed
@@ -107,8 +103,8 @@ class Pong(World):
         '''Cria um objeto aleatório que fica no meio da tela'''
 
         # Cria obstáculo
-        obj = Poly.regular(self.obstacle_sides, self.obstacle_size,
-                           color=self.obstacle_color, density=1)
+        obj = RegularPoly(self.obstacle_sides, self.obstacle_size,
+                          color=self.obstacle_color, density=1)
         obj.scale(uniform(0.75, 2))
         obj.rotate(uniform(0, 2 * math.pi))
         obj.inertia *= self.inertia_multiplier
@@ -132,12 +128,8 @@ class Pong(World):
         W, H = self.screen_width / 2, self.screen_height / 2
         pos_x = 2 * self.hit_size - W + 3 * self.hit_size * n_hits + 10
         pos_y = H - 2 * self.hit_size - 10
-        hit = draw.Circle(
-            radius=self.hit_size,
-            pos=(
-                pos_x,
-                pos_y),
-            color=color)
+        hit = draw.Circle(radius=self.hit_size, pos=(pos_x, pos_y),
+                          color=color)
         self.add(hit, layer=1)
 
     # Callbacks de interação com o usuário ####################################
@@ -158,7 +150,7 @@ class Pong(World):
     def move_left(self):
         '''Executado quando o usuário aperta a seta para o lado'''
 
-        self.pong.boost((-400, 0))
+        self.pong.boost((-1000, 0))
 
     def update_time(self):
         '''Atualizado a cada frame para incrementar a barra de contagem do
@@ -248,7 +240,7 @@ def game_over():
 
     Sx, Sy = 5, 2
     world = World(background=(255, 0, 0), gravity=10)
-    letters = add_word('game over', world, scale=5, pos=(-220, 50))
+    letters = add_word('game over', world, scale=5, pos=(180, 350))
     for l in letters:
         l.omega = uniform(-0.1, 0.1)
         l.vel += uniform(-Sx, Sx), uniform(-Sy, Sy)

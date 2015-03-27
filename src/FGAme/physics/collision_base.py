@@ -19,12 +19,25 @@ class Collision(object):
     a colisão entre os objetos respeitando os vínculos de is_dynamic*.
     '''
 
+#     created = 0
+#     deleted = 0
+#
+#     def __del__(self):
+#         Collision.deleted = Collision.deleted + 1
+#         delta = Collision.created - Collision.deleted
+#         tot = Collision.created
+#         print(tot, float(delta) / tot)
+
     def __init__(self, A, B, pos, n, delta=None, world=None):
+        #Collision.created = Collision.created + 1
+        # TODO: find memory leaks
+
         self.objects = A, B
         self.world = world
         self.pos = pos
         self.normal = n
         self.delta = delta
+        self.is_active = True
 
     def get_impulse(self, dt=0):
         '''Calcula o impulso devido à colisão. Retorna o impulso gerado pelo

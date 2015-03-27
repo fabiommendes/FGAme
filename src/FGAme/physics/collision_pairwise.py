@@ -1,4 +1,5 @@
 from FGAme.mathutils import Vector, dot, area, center_of_mass, clip, pi
+from FGAme.mathutils import shadow_x, shadow_y
 
 from FGAme.physics.collision_base import (
     Collision, get_collision, get_collision_aabb
@@ -87,6 +88,9 @@ def get_collision_poly(A, B, directions=None):
 def get_collision_poly_aabb(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
+    if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
+        return None
+
     B_poly = Rectangle(bbox=B.bbox, density=B.density)
     col = get_collision_poly(A, B_poly)
     if col is not None:
@@ -97,6 +101,9 @@ def get_collision_poly_aabb(A, B):
 @get_collision.dispatch(AABB, Poly)
 def get_collision_aabb_poly(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
+
+    if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
+        return None
 
     A_poly = Rectangle(bbox=A.bbox, density=A.density)
     col = get_collision_poly(A_poly, B)

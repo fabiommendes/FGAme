@@ -59,11 +59,11 @@ Archlinux
 
 Alguns dos pacotes necessários estão nos repositórios principais e alguns estão
 disponíveis apenas no AUR. Certifique-se que a versão desejada do PIP e do 
-Cython estão instaladas 
+Cython estão instaladas:: 
 
   # pacman -S python-pip cython
   
-para Python 3 ou
+para Python 3 ou::
 
   # pacman -S python2-pip cython python2-pygame
   
@@ -74,7 +74,7 @@ repositórios principais. A versão de desenvolvimento do Pygame possui suporte
 para Python3 e pode ser instalada a partir do pacote ``python-pygame-hg`` no 
 AUR. Ela deve ser instalada antes de proceder com a instalação da FGAme.
 
-Finalmente, execute o PIP para compilar e instalar a FGAme
+Finalmente, execute o PIP para compilar e instalar a FGAme::
 
    # pip install FGAme
 
@@ -123,13 +123,12 @@ Baixe e instale os arquivos na ordem mesma ordem da lista indicada abaixo::
 	
 As versões 64 bits estão disponíveis aqui::
 	
-	* Python 3.4: https://www.python.org/ftp/python/3.4.3/python-3.4.3.amd64.msi
-	* Pygame para Python3: http://www.lfd.uci.edu/~gohlke/pythonlibs/z94jfosk/pygame-1.9.2a0-cp34-none-win_amd64.whl
-	* GCC:  
-	* Cython: http://www.lfd.uci.edu/~gohlke/pythonlibs/z94jfosk/Cython-0.22-cp34-none-win_amd64.whl
+	* `Link Python 3.4 <https://www.python.org/ftp/python/3.4.3/python-3.4.3.amd64.msi/>`
+	* `Link Pygame para Python3 <http://www.lfd.uci.edu/~gohlke/pythonlibs/z94jfosk/pygame-1.9.2a0-cp34-none-win_amd64.whl/>`  
+	* `Link Cython: <http://www.lfd.uci.edu/~gohlke/pythonlibs/z94jfosk/Cython-0.22-cp34-none-win_amd64.whl/>`
 
 
-Agora execute o PIP no terminal do Windows:
+Agora execute o PIP no terminal do Windows::
 
 	# pip install FGAme 
 

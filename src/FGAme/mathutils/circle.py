@@ -11,15 +11,11 @@ class Circle(object):
     >>> C = Circle(50, (50, 0))
     '''
 
-    __slots__ = ['radius', 'center_x', 'center_y']
+    __slots__ = ['radius', 'pos']
 
     def __init__(self, radius, pos=(0, 0)):
         self.radius = radius
-        self.center_x, self.center_y = pos
-
-    @property
-    def pos(self):
-        return Vector(self.center_x, self.center_y)
+        self.pos = pos
 
     def __repr__(self):
         s_center = '%.1f, %.1f' % self.center

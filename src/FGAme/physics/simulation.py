@@ -2,8 +2,10 @@
 
 from FGAme.mathutils import Vector, shadow_y
 from FGAme.physics import get_collision, get_collision_aabb, CollisionError
+from FGAme.physics import flags
 from FGAme.core import EventDispatcher, signal, init
 from FGAme.core import env
+from FGAme.physics.flags import ACCEL_STATIC
 
 ###############################################################################
 #                                Simulação
@@ -26,7 +28,11 @@ class Simulation(EventDispatcher):
     def __init__(self, gravity=None, damping=0, adamping=0,
                  rest_coeff=1, sfriction=0, dfriction=0, stop_velocity=1e-6):
 
+        super(Simulation, self).__init__()
+        self._dt = 0.0
         self._objects = []
+        self._broad_collisions = []
+        self._fine_collisions = []
 
         # Inicia a gravidade e as constantes de força dissipativa
         self.gravity = gravity or (0, 0)
@@ -40,18 +46,22 @@ class Simulation(EventDispatcher):
         self.stop_velocity = float(stop_velocity)
         self.time = 0
 
-        # Controle de callbacks
-        init()
-        self.input = env.input_object
-        super(Simulation, self).__init__()
+    ###########################################################################
+    #                           Serviços Python
+    ###########################################################################
+    def __iter__(self):
+        return iter(self._objects)
+
+    def __contains__(self, obj):
+        return obj in self._objects
+
+    frame_enter = signal('frame-enter')
+    collision = signal('collision', num_args=1)
 
     ###########################################################################
     #                             Propriedades
     ###########################################################################
 
-    #
-    # Vetor com a aceleração da gravidade (em px/s^2)
-    #
     @property
     def gravity(self):
         return self._gravity
@@ -63,13 +73,10 @@ class Simulation(EventDispatcher):
         except TypeError:
             gravity = self._gravity = Vector(0, -value)
 
-        for obj in self._objects:
+        for obj in self:
             if not obj.owns_gravity:
                 obj._gravity = gravity
 
-    #
-    # Constante de amortecimento para a aceleração linear
-    #
     @property
     def damping(self):
         return self._damping
@@ -82,9 +89,6 @@ class Simulation(EventDispatcher):
             if not obj.owns_damping:
                 obj._damping = value
 
-    #
-    # Constante de amortecimento para a aceleração angular
-    #
     @property
     def adamping(self):
         return self._adamping
@@ -98,7 +102,7 @@ class Simulation(EventDispatcher):
                 obj._adamping = value
 
     ###########################################################################
-    #                         Gerenciamento de objetos
+    #                   Gerenciamento de objetos e colisões
     ###########################################################################
     def add(self, obj):
         '''Adiciona um novo objeto ao mundo.
@@ -114,7 +118,6 @@ class Simulation(EventDispatcher):
 
         if obj not in self._objects:
             self._objects.append(obj)
-            self._objects.sort()
             if not obj.owns_gravity:
                 obj._gravity = self.gravity
             if not obj.owns_damping:
@@ -131,146 +134,123 @@ class Simulation(EventDispatcher):
             pass
 
     ###########################################################################
-    #                         Controle de eventos
-    ###########################################################################
-    # Delegações
-    long_press = signal('long-press', 'key', delegate_to='input')
-    key_up = signal('key-up', 'key', delegate_to='input')
-    key_down = signal('key-down', 'key', delegate_to='input')
-    mouse_motion = signal('mouse-motion', delegate_to='input')
-    mouse_click = signal('mouse-click', 'button', delegate_to='input')
-
-    # Eventos privados
-    frame_enter = signal('frame-enter')
-    collision = signal('collision', num_args=1)
-    # TODO: collision_pair = signal('collision-pair', 'obj1', 'obj2',
-    # num_args=1)
-
-    ###########################################################################
     #                     Simulação de Física
     ###########################################################################
     def update(self, dt):
         '''Rotina principal da simulação de física.'''
 
-        self.trigger('frame-enter')
-        self.resolve_forces(dt)
-        self.pre_update(dt)
-        collisions = self.detect_collisions(dt)
-        self.resolve_collisions(collisions, dt)
-        self.post_update(dt)
-        self.time += dt
-        return self.time
+        self.trigger_frame_enter()
+        self._dt = float(dt)
 
-    def pre_update(self, dt):
-        '''Executa a rotina de pré-atualização em todos os objetos.
+        self.broad_phase()
+        self.fine_phase()
+        self.update_accelerations()
+        self.resolve_accelerations()
+        self.resolve_collisions()
 
-        A fase de pré-atualização é executada no início de cada frame antes da
-        atualização da física. Nesta fase objetos podem atualizar o estado
-        interno ou realizar qualquer tipo de modificação antes do cálculo das
-        forças e colisões.
-        '''
+        self.time += self._dt
 
-        # Chama a pre-atualização de cada objeto
-        t = self.time
-        for obj in self._objects:
-            # obj.pre_update(t, dt)
-            # obj.is_colliding = False
-            pass
-
-    def post_update(self, dt):
-        '''Executa a rotina de pós-atualização em todos os objetos.
-
-        Este passo é executado em cada frame após resolver a dinâmica de
-        forças e colisões.'''
-
-        t = self.time
-        for obj in self._objects:
-            # obj.post_update(t, dt)
-            pass
-
-    def detect_collisions(self, dt):
+    def broad_phase(self):
         '''Retorna uma lista com todas as colisões atuais.
 
         Uma colisão é caracterizada por um objeto da classe Collision() ou
         subclasse.'''
 
-        objects = sorted(self._objects)
-        collisions = []
-        objects.sort()
+        objects = self._objects
+        col_idx = 0
+        objects.sort(key=lambda obj: obj.pos.x - obj.cbb_radius)
+        self._broad_collisions[:] = []
 
-        # Os objetos estão ordenados. Este loop detecta as colisões AABB e,
-        # caso elas aconteçam, delega a tarefa de detecção fina de colisão para
-        # a função get_collision
+        # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
+        # salva o resultado na lista broad collisions
         for i, A in enumerate(objects):
-            xmax = A._xmax
-            A_static = bool(A._invinertia == A._invmass)
+            A_radius = A.cbb_radius
+            A_right = A.pos.x + A_radius
+            A_dynamic = A.is_dynamic()
 
             for j in range(i + 1, len(objects)):
                 B = objects[j]
+                B_radius = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
-                if B._xmin > xmax:
+                B_left = B.pos.x - B_radius
+                if B_left > A_right:
                     break
 
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
-                if A_static and (B._invmass == B._invinertia == 0):
+                if not A_dynamic and not B.is_dynamic():
                     continue
 
-                # Somente testa as colisões positivas por AABB
-                if shadow_y(A, B) < 0:
+                # Testa a colisão entre os círculos de contorno
+                if (A.pos - B.pos).norm() > A_radius + B_radius:
                     continue
 
-                # Detecta colisões e atualiza as listas internas de colisões de
-                # cada objeto
-                col = self.get_collision(A, B)
-                if col is not None:
-                    col.world = self
-                    collisions.append(col)
-                    # A.trigger('collision', col)
-                    # B.trigger('collision', col)
-        return collisions
+                # Adiciona à lista de colisões grosseiras
+                col_idx += 1
+                self._broad_collisions.append((A, B))
 
-    def resolve_collisions(self, collisions, dt):
-        '''Resolve todas as colisões na lista collisions'''
+    def fine_phase(self):
+        # Detecta colisões e atualiza as listas internas de colisões de
+        # cada objeto
+        self._fine_collisions[:] = []
 
-        for col in collisions:
-            col.resolve(dt)
+        for A, B in self._broad_collisions:
+            col = self.get_fine_collision(A, B)
 
-    def resolve_forces(self, dt):
-        '''Resolve a dinâmica de forças durante o intervalo dt'''
+            if col is not None:
+                col.world = self
+                A.trigger('collision', col)
+                B.trigger('collision', col)
+                if col.is_active:
+                    self._fine_collisions.append(col)
+
+    def update_accelerations(self):
+        return
 
         t = self.time
+        ACCEL_STATIC = flags.ACCEL_STATIC
+        ALPHA_STATIC = 0  # flags.ALPHA_STATIC
 
         # Acumula as forças e acelerações
         # FIXME: consertar mecanismo de aceleração externa
         for obj in self._objects:
             if obj._invmass:
                 obj.init_accel()
-                #F += obj.external_force(t) or (0, 0)
-            elif obj.flag_accel_static:
+                if obj.force is not None:
+                    obj._accel += obj.force(t) * obj._invmass
+
+            elif obj.flags & ACCEL_STATIC:
                 obj.init_accel()
-                obj.apply_accel(obj._accel)
+                obj.apply_accel(obj._accel, dt)
 
             if obj._invinertia:
                 obj.init_alpha()
                 #tau += obj.external_torque(t) or 0
-            elif obj.flag_accel_static:
-                a = obj._init_frame_alpha()
-                obj.apply_alpha(a)
 
-        # Applica as forças e acelerações
+            elif obj.flags & ALPHA_STATIC:
+                obj.init_alpha()
+                obj.apply_alpha(self._alpha, dt)
+
+    def resolve_accelerations(self):
+        '''Resolve a dinâmica de forças durante o intervalo dt'''
+
+        dt = self._dt
         for obj in self._objects:
             if obj._invmass:
-                obj.apply_accel(obj._accel, dt)
+                obj.apply_accel(None, dt)
             elif obj._vel.x or obj._vel.y:
                 obj.move(obj._vel * dt)
 
             if obj._invinertia:
-                obj.apply_alpha(obj._alpha, dt)
+                obj.apply_alpha(None, dt)
             elif obj._omega:
                 obj.rotate(obj._omega * dt)
 
-    def get_collision(self, A, B):
+    def resolve_collisions(self):
+        for col in self._fine_collisions:
+            col.resolve()
+
+    def get_fine_collision(self, A, B):
         '''Retorna a colisão entre os objetos A e B depois que a colisão AABB
         foi detectada'''
 

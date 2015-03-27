@@ -8,7 +8,7 @@ from random import uniform
 # Constantes da simulação
 SPEED = 300
 SHAPE = (30, 30)
-NUM_POLYS = 100
+NUM_POLYS = 80
 
 # Inicializa o mundo
 world = World(gravity=50, dfriction=0)

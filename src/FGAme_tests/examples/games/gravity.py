@@ -4,11 +4,13 @@ Implementa o exemplo de "pseudo-gravidade" da documentação.
 '''
 
 from FGAme import *
-from FGAme.force import SpringF, GravityF, SpringSF, GravitySF
+from FGAme.physics.forces import SpringF, GravityF, SpringSF, GravitySF
 
-#get_mainloop(fps=240)
+# get_mainloop(fps=240)
+
 
 class Gravity(World):
+
     def __init__(self):
         # Chamamos o __init__ da classe pai
         super(Gravity, self).__init__()
@@ -22,15 +24,14 @@ class Gravity(World):
         # Definimos a força de interação entre ambos
         K = self.K = A.mass
         F = SpringF(A, B, (K, 2 * K))
-        F = GravityF(A, B, 3e4)
+        F = GravityF(A, B, 2e4)
         Fa = SpringSF(A, 2 * K, r0=(0, 0))
         Fb = GravitySF(B, 0.9e4, epsilon=10)
-        A.external_force, B.external_force = F.forces()
-        #A.external_force = Fa
-        #B.external_force = Fb
+        A.force, B.force = F.forces()
 
         E0 = F.totalE()
         #E0 = Fa.totalE() + Fb.totalE()
+
         @self.listen('frame-enter')
         def printP():
             print('%.e' % (Fa.totalE() + Fb.totalE() - E0))

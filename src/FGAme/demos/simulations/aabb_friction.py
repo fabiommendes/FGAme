@@ -17,7 +17,13 @@ world.set_bounds(width=10)
 A = AABB(pos=(400, 100), shape=(50, 50), color='black')
 B = AABB(pos=(150, 500), shape=(50, 50), vel=(200, -400), color='red')
 
+
+def pause():
+    print('', B.bbox, '\n', A.bbox, '\n')
+    world.toggle_pause()
+
+
 # Inicia a simulação
 world.add([A, B])
-world.listen('key-down', 'p', world.toggle_pause)
+world.listen('key-down', 'space', pause)
 world.run()
