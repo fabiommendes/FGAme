@@ -59,7 +59,7 @@ cdef class Vector(object):
             self._x = x_or_data
             self._y = y
 
-    def __init__(self, x, y):
+    def __init__(self, x_or_data, y=None):
         pass
 
     def as_tuple(self):
@@ -146,6 +146,8 @@ cdef class Vector(object):
             scalar = float(other)
             return self._new(self._x * scalar, self._y * scalar)
         except TypeError:
+            if isinstance(other, Vector):
+                raise
             return other.__rmul__(self)
 
     def __div__(Vector self, other):
@@ -260,6 +262,14 @@ cdef class Vector(object):
 
 cdef class VectorM(Vector):
     '''Como Vector, mas com elementos mutáveis'''
+    
+    def __setitem__(Vector self, i, value):
+        if i == 0:
+            self._x = value
+        elif i == 1:
+            self._y = value
+        else:
+            raise IndexError
 
     def __iadd__(Vector self, other):
         '''x.__iadd__(y) <==> x += y'''
@@ -304,17 +314,22 @@ cdef class VectorM(Vector):
         self._x = x * cos_t - y * sin_t + axis[0]
         self._y = x * sin_t + y * cos_t + axis[1]
 
-    def update(Vector self, other):
+    def update(Vector self, other, y=None):
         '''Copia as coordenadas x, y do objeto other'''
 
         cdef Vector vector 
-        try:
-            vector = other
-            self._x = vector._x
-            self._y = vector._y
-        except AttributeError:
-            self._x = other[0]
-            self._y = other[1]
+        if y is None:
+            try:
+                vector = other
+                self._x = vector._x
+                self._y = vector._y
+            except TypeError:
+                x, y = map(float, other)
+                self._x = x
+                self._y = y
+        else:
+            self._x = float(other)
+            self._y = float(y)
 
     def copy(self):
         '''Retorna uma cópia de si mesmo'''

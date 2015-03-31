@@ -35,7 +35,7 @@ cdef class MultiFunctionBase(object):
         try:
             func = self._c_cache[types]
         except KeyError:
-            func = self.get_function(*tuple(types))
+            func = self.get_implementation(*tuple(types))
         Py_DECREF(types)
 
         if M == 0:

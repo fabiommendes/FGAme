@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 from __future__ import print_function
 
 from FGAme.mathutils import *
@@ -28,7 +28,6 @@ class Scenario:
         pos = Vector(650, 190)
         shape = (width, height)
         p = Rectangle(pos=pos, shape=shape, color=(158, 86, 38))
-        p.is_dynamic = False
         yield p
 
         for _ in range(4):
@@ -54,22 +53,17 @@ scene = Scenario()
 # Cria triângulo
 L = 40
 h = 10 * sqrt(12)
-tri = RegularPoly(3, L, color=(200, 0, 0))
-tri.inertia *= 10
+tri = RegularPoly(3, L, color=(200, 0, 0), density=10)
 tri.move((65, 250 + L))
-tri.boost((150, 150))
+tri.boost((250, 250))
 tri.aboost(-5)
 # tri.is_dynamic_angular = False
 
 # Inicializa o mundo
-world = World(
-    background=(
-        0,
-        204,
-        255),
-    gravity=80,
-    dfriction=0.3,
-    rest_coeff=0.5)
+world = World(background=(0, 204, 255),
+              gravity=300,
+              dfriction=0.3,
+              rest_coeff=0.7)
 for obj in scene.get_objects():
     world.add(obj)
 world.add(tri)

@@ -7,8 +7,6 @@ AABB.
 
 from FGAme import World, AABB
 
-print(AABB)
-
 # Cria mundo com coeficiente de atrito global não-nulo
 world = World(dfriction=0.1)
 world.set_bounds(width=10)

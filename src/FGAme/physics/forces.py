@@ -295,7 +295,7 @@ class SingleForce(object):
                 return func(pos)
             self._func_ready = new_func
         else:
-            raise ValueError('invalid value for fargs: %r' % fargs)
+            raise ValueError('invalid mode: %r' % mode)
 
     def __call__(self, t):
         return self._func_ready(t)
@@ -464,7 +464,7 @@ class PairForce(object):
                 return func(A_pos, B_pos)
             self._func_ready = new_func
         else:
-            raise ValueError('invalid value for fargs: %r' % fargs)
+            raise ValueError('invalid mode: : %r' % mode)
 
     # Atributos somente para leitura
     A = property(lambda x: x._A)
@@ -585,13 +585,13 @@ class SpringF(PairConservativeForce):
 
         # Define forças e potenciais
         def F(rA, rB):
-            Dx = rB._x - rA._x + dx
-            Dy = rB._y - rA._y + dy
+            Dx = rB.x - rA.x + dx
+            Dy = rB.y - rA.y + dy
             return Vector(kx * Dx + kxy * Dy, +ky * Dy + kxy * Dx)
 
         def U(rA, rB):
-            Dx = rB._x - rA._x + dx
-            Dy = rB._y - rA._y + dy
+            Dx = rB.x - rA.x + dx
+            Dy = rB.y - rA.y + dy
             return (kx * Dx ** 2 + ky * Dy ** 2 + 2 * kxy * Dx * Dy) / 2
 
         super(SpringF, self).__init__(A, B, F, U)

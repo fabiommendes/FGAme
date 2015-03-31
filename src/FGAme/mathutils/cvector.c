@@ -463,7 +463,7 @@ struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector {
 };
 
 
-/* "FGAme/mathutils/cvector.pyx":261
+/* "FGAme/mathutils/cvector.pyx":263
  * 
  * 
  * cdef class VectorM(Vector):             # <<<<<<<<<<<<<<
@@ -507,7 +507,7 @@ struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector {
 static struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *__pyx_vtabptr_5FGAme_9mathutils_7cvector_Vector;
 
 
-/* "FGAme/mathutils/cvector.pyx":261
+/* "FGAme/mathutils/cvector.pyx":263
  * 
  * 
  * cdef class VectorM(Vector):             # <<<<<<<<<<<<<<
@@ -794,10 +794,11 @@ static PyObject *__pyx_builtin_ImportError;
 static PyObject *__pyx_builtin_IndexError;
 static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_AttributeError;
+static PyObject *__pyx_builtin_map;
 static PyObject *__pyx_builtin_sum;
 static PyObject *__pyx_builtin_zip;
 static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector___cinit__(struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, PyObject *__pyx_v_x_or_data, PyObject *__pyx_v_y); /* proto */
-static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_x, CYTHON_UNUSED PyObject *__pyx_v_y); /* proto */
+static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_x_or_data, CYTHON_UNUSED PyObject *__pyx_v_y); /* proto */
 static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_4as_tuple(struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_6norm(struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_8norm_sqr(struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self); /* proto */
@@ -825,16 +826,17 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_4__del__(CYTHON_UNUSED
 static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y___get__(struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self); /* proto */
 static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_2__set__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_4__del__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
+static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___setitem__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_i, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__isub__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__imul__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
 #if PY_MAJOR_VERSION < 3
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
 #endif
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_theta, PyObject *__pyx_v_axis); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12update(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12rotate(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_theta, PyObject *__pyx_v_axis); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14update(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other, PyObject *__pyx_v_y); /* proto */
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_16copy(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x___get__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self); /* proto */
 static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_2__set__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_4__del__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self); /* proto */
@@ -863,6 +865,7 @@ static char __pyx_k_y2[] = "y2";
 static char __pyx_k_all[] = "__all__";
 static char __pyx_k_dot[] = "dot";
 static char __pyx_k_get[] = "get";
+static char __pyx_k_map[] = "map";
 static char __pyx_k_new[] = "_new";
 static char __pyx_k_sum[] = "sum";
 static char __pyx_k_zip[] = "zip";
@@ -878,6 +881,7 @@ static char __pyx_k_send[] = "send";
 static char __pyx_k_test[] = "__test__";
 static char __pyx_k_close[] = "close";
 static char __pyx_k_cross[] = "cross";
+static char __pyx_k_other[] = "other";
 static char __pyx_k_s_s_s[] = "%s(%s, %s)";
 static char __pyx_k_theta[] = "theta";
 static char __pyx_k_throw[] = "throw";
@@ -924,6 +928,7 @@ static PyObject *__pyx_kp_s_home_chips_git_FGAme_src_FGAme;
 static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_s_iter;
 static PyObject *__pyx_n_s_main;
+static PyObject *__pyx_n_s_map;
 static PyObject *__pyx_n_s_math;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_new;
@@ -931,6 +936,7 @@ static PyObject *__pyx_n_s_norm;
 static PyObject *__pyx_n_s_norm_sqr;
 static PyObject *__pyx_n_s_normalized;
 static PyObject *__pyx_n_s_os;
+static PyObject *__pyx_n_s_other;
 static PyObject *__pyx_n_s_pi;
 static PyObject *__pyx_n_s_pyx_vtable;
 static PyObject *__pyx_n_s_rmul;
@@ -1146,7 +1152,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector___cinit__(struct __pyx_ob
  *             self._x = x_or_data
  *             self._y = y             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self, x, y):
+ *     def __init__(self, x_or_data, y=None):
  */
     __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_v_y); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 60; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_v_self->_y = __pyx_t_8;
@@ -1178,7 +1184,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector___cinit__(struct __pyx_ob
 /* "FGAme/mathutils/cvector.pyx":62
  *             self._y = y
  * 
- *     def __init__(self, x, y):             # <<<<<<<<<<<<<<
+ *     def __init__(self, x_or_data, y=None):             # <<<<<<<<<<<<<<
  *         pass
  * 
  */
@@ -1186,7 +1192,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector___cinit__(struct __pyx_ob
 /* Python wrapper */
 static int __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static int __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_3__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  CYTHON_UNUSED PyObject *__pyx_v_x = 0;
+  CYTHON_UNUSED PyObject *__pyx_v_x_or_data = 0;
   CYTHON_UNUSED PyObject *__pyx_v_y = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -1195,8 +1201,9 @@ static int __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_3__init__(PyObject *__pyx
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x,&__pyx_n_s_y,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_x_or_data,&__pyx_n_s_y,0};
     PyObject* values[2] = {0,0};
+    values[1] = ((PyObject *)Py_None);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -1209,42 +1216,44 @@ static int __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_3__init__(PyObject *__pyx
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x_or_data)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         case  1:
-        if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
-        else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (kw_args > 0) {
+          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y);
+          if (value) { values[1] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
         if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
-    } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
-      goto __pyx_L5_argtuple_error;
     } else {
-      values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
-      values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
     }
-    __pyx_v_x = values[0];
+    __pyx_v_x_or_data = values[0];
     __pyx_v_y = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 62; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.mathutils.cvector.Vector.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self), __pyx_v_x, __pyx_v_y);
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self), __pyx_v_x_or_data, __pyx_v_y);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_x, CYTHON_UNUSED PyObject *__pyx_v_y) {
+static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_2__init__(CYTHON_UNUSED struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_x_or_data, CYTHON_UNUSED PyObject *__pyx_v_y) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
@@ -2913,7 +2922,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_25__mul__(PyObject 
  *             scalar = float(other)
  *             return self._new(self._x * scalar, self._y * scalar)             # <<<<<<<<<<<<<<
  *         except TypeError:
- *             return other.__rmul__(self)
+ *             if isinstance(other, Vector):
  */
       __Pyx_XDECREF(__pyx_r);
       __pyx_t_3 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, (__pyx_v_self->_x * __pyx_v_scalar), (__pyx_v_self->_y * __pyx_v_scalar), 0)); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 147; __pyx_clineno = __LINE__; goto __pyx_L4_error;}
@@ -2929,8 +2938,8 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_25__mul__(PyObject 
  *             scalar = float(other)
  *             return self._new(self._x * scalar, self._y * scalar)
  *         except TypeError:             # <<<<<<<<<<<<<<
- *             return other.__rmul__(self)
- * 
+ *             if isinstance(other, Vector):
+ *                 raise
  */
     __pyx_t_8 = PyErr_ExceptionMatches(__pyx_builtin_TypeError);
     if (__pyx_t_8) {
@@ -2943,12 +2952,38 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_25__mul__(PyObject 
       /* "FGAme/mathutils/cvector.pyx":149
  *             return self._new(self._x * scalar, self._y * scalar)
  *         except TypeError:
+ *             if isinstance(other, Vector):             # <<<<<<<<<<<<<<
+ *                 raise
+ *             return other.__rmul__(self)
+ */
+      __pyx_t_2 = __Pyx_TypeCheck(__pyx_v_other, ((PyObject*)__pyx_ptype_5FGAme_9mathutils_7cvector_Vector)); 
+      __pyx_t_1 = (__pyx_t_2 != 0);
+      if (__pyx_t_1) {
+
+        /* "FGAme/mathutils/cvector.pyx":150
+ *         except TypeError:
+ *             if isinstance(other, Vector):
+ *                 raise             # <<<<<<<<<<<<<<
+ *             return other.__rmul__(self)
+ * 
+ */
+        __Pyx_GIVEREF(__pyx_t_3);
+        __Pyx_GIVEREF(__pyx_t_9);
+        __Pyx_XGIVEREF(__pyx_t_10);
+        __Pyx_ErrRestore(__pyx_t_3, __pyx_t_9, __pyx_t_10);
+        __pyx_t_3 = 0; __pyx_t_9 = 0; __pyx_t_10 = 0; 
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+      }
+
+      /* "FGAme/mathutils/cvector.pyx":151
+ *             if isinstance(other, Vector):
+ *                 raise
  *             return other.__rmul__(self)             # <<<<<<<<<<<<<<
  * 
  *     def __div__(Vector self, other):
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_rmul); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+      __pyx_t_12 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_rmul); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
       __Pyx_GOTREF(__pyx_t_12);
       __pyx_t_13 = NULL;
       if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_12))) {
@@ -2961,16 +2996,16 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_25__mul__(PyObject 
         }
       }
       if (!__pyx_t_13) {
-        __pyx_t_11 = __Pyx_PyObject_CallOneArg(__pyx_t_12, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __pyx_t_11 = __Pyx_PyObject_CallOneArg(__pyx_t_12, ((PyObject *)__pyx_v_self)); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
         __Pyx_GOTREF(__pyx_t_11);
       } else {
-        __pyx_t_14 = PyTuple_New(1+1); if (unlikely(!__pyx_t_14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __pyx_t_14 = PyTuple_New(1+1); if (unlikely(!__pyx_t_14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
         __Pyx_GOTREF(__pyx_t_14);
         PyTuple_SET_ITEM(__pyx_t_14, 0, __pyx_t_13); __Pyx_GIVEREF(__pyx_t_13); __pyx_t_13 = NULL;
         __Pyx_INCREF(((PyObject *)__pyx_v_self));
         PyTuple_SET_ITEM(__pyx_t_14, 0+1, ((PyObject *)__pyx_v_self));
         __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
-        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_14, NULL); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 149; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __pyx_t_11 = __Pyx_PyObject_Call(__pyx_t_12, __pyx_t_14, NULL); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
         __Pyx_GOTREF(__pyx_t_11);
         __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
       }
@@ -3030,7 +3065,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_25__mul__(PyObject 
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":151
+/* "FGAme/mathutils/cvector.pyx":153
  *             return other.__rmul__(self)
  * 
  *     def __div__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -3052,7 +3087,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_28__div__(PyObject 
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__div__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 153; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_27__div__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
@@ -3078,7 +3113,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_27__div__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__div__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":154
+  /* "FGAme/mathutils/cvector.pyx":156
  *         '''x.__div__(y) <==> x / y'''
  * 
  *         return self._new(self._x / other, self._y / other)             # <<<<<<<<<<<<<<
@@ -3086,27 +3121,27 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_27__div__(struct __
  *     def __truediv__(Vector self, other):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, __pyx_t_3, __pyx_t_4, 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 154; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, __pyx_t_3, __pyx_t_4, 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":151
+  /* "FGAme/mathutils/cvector.pyx":153
  *             return other.__rmul__(self)
  * 
  *     def __div__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -3127,7 +3162,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_27__div__(struct __
 }
 #endif /*!(#if PY_MAJOR_VERSION < 3)*/
 
-/* "FGAme/mathutils/cvector.pyx":156
+/* "FGAme/mathutils/cvector.pyx":158
  *         return self._new(self._x / other, self._y / other)
  * 
  *     def __truediv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -3148,7 +3183,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_30__truediv__(PyObj
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__truediv__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 156; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 158; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_29__truediv__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
@@ -3172,7 +3207,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_29__truediv__(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__truediv__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":159
+  /* "FGAme/mathutils/cvector.pyx":161
  *         '''x.__div__(y) <==> x / y'''
  * 
  *         return self._new(self._x / other, self._y / other)             # <<<<<<<<<<<<<<
@@ -3180,27 +3215,27 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_29__truediv__(struc
  *     def __add__(self, other):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyNumber_Divide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyNumber_Divide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, __pyx_t_3, __pyx_t_4, 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 159; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, __pyx_t_3, __pyx_t_4, 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 161; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":156
+  /* "FGAme/mathutils/cvector.pyx":158
  *         return self._new(self._x / other, self._y / other)
  * 
  *     def __truediv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -3220,7 +3255,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_29__truediv__(struc
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":161
+/* "FGAme/mathutils/cvector.pyx":163
  *         return self._new(self._x / other, self._y / other)
  * 
  *     def __add__(self, other):             # <<<<<<<<<<<<<<
@@ -3270,7 +3305,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__add__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":164
+  /* "FGAme/mathutils/cvector.pyx":166
  *         '''x.__add__(y) <==> x + y'''
  * 
  *         cdef double X=0, Y=0             # <<<<<<<<<<<<<<
@@ -3280,7 +3315,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __pyx_v_X = 0.0;
   __pyx_v_Y = 0.0;
 
-  /* "FGAme/mathutils/cvector.pyx":166
+  /* "FGAme/mathutils/cvector.pyx":168
  *         cdef double X=0, Y=0
  *         cdef Vector aux
  *         new = None             # <<<<<<<<<<<<<<
@@ -3290,7 +3325,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __Pyx_INCREF(Py_None);
   __pyx_v_new = Py_None;
 
-  /* "FGAme/mathutils/cvector.pyx":169
+  /* "FGAme/mathutils/cvector.pyx":171
  * 
  *         # Processa o primeiro argumento
  *         if isinstance(self, Vector):             # <<<<<<<<<<<<<<
@@ -3301,20 +3336,20 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "FGAme/mathutils/cvector.pyx":170
+    /* "FGAme/mathutils/cvector.pyx":172
  *         # Processa o primeiro argumento
  *         if isinstance(self, Vector):
  *             aux = self             # <<<<<<<<<<<<<<
  *             X += aux._x
  *             Y += aux._y
  */
-    if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 170; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 172; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_3 = __pyx_v_self;
     __Pyx_INCREF(__pyx_t_3);
     __pyx_v_aux = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":171
+    /* "FGAme/mathutils/cvector.pyx":173
  *         if isinstance(self, Vector):
  *             aux = self
  *             X += aux._x             # <<<<<<<<<<<<<<
@@ -3323,7 +3358,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
  */
     __pyx_v_X = (__pyx_v_X + __pyx_v_aux->_x);
 
-    /* "FGAme/mathutils/cvector.pyx":172
+    /* "FGAme/mathutils/cvector.pyx":174
  *             aux = self
  *             X += aux._x
  *             Y += aux._y             # <<<<<<<<<<<<<<
@@ -3332,14 +3367,14 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
  */
     __pyx_v_Y = (__pyx_v_Y + __pyx_v_aux->_y);
 
-    /* "FGAme/mathutils/cvector.pyx":173
+    /* "FGAme/mathutils/cvector.pyx":175
  *             X += aux._x
  *             Y += aux._y
  *             new = self._new             # <<<<<<<<<<<<<<
  *         else:
  *             x, y = self
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_new); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 173; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_new); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF_SET(__pyx_v_new, __pyx_t_3);
     __pyx_t_3 = 0;
@@ -3347,7 +3382,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":175
+    /* "FGAme/mathutils/cvector.pyx":177
  *             new = self._new
  *         else:
  *             x, y = self             # <<<<<<<<<<<<<<
@@ -3364,7 +3399,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -3377,21 +3412,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
       index = 0; __pyx_t_3 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_3)) goto __pyx_L4_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L4_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_6 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L5_unpacking_done;
@@ -3399,7 +3434,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 175; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L5_unpacking_done:;
     }
     __pyx_v_x = __pyx_t_3;
@@ -3407,41 +3442,41 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
     __pyx_v_y = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":176
+    /* "FGAme/mathutils/cvector.pyx":178
  *         else:
  *             x, y = self
  *             X += x             # <<<<<<<<<<<<<<
  *             Y += y
  * 
  */
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 176; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 176; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 176; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 178; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_X = __pyx_t_7;
 
-    /* "FGAme/mathutils/cvector.pyx":177
+    /* "FGAme/mathutils/cvector.pyx":179
  *             x, y = self
  *             X += x
  *             Y += y             # <<<<<<<<<<<<<<
  * 
  *         # Processa o segundo argumento
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 177; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 179; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_Y = __pyx_t_7;
   }
   __pyx_L3:;
 
-  /* "FGAme/mathutils/cvector.pyx":180
+  /* "FGAme/mathutils/cvector.pyx":182
  * 
  *         # Processa o segundo argumento
  *         if isinstance(other, Vector):             # <<<<<<<<<<<<<<
@@ -3452,20 +3487,20 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (__pyx_t_1) {
 
-    /* "FGAme/mathutils/cvector.pyx":181
+    /* "FGAme/mathutils/cvector.pyx":183
  *         # Processa o segundo argumento
  *         if isinstance(other, Vector):
  *             aux = other             # <<<<<<<<<<<<<<
  *             X += aux._x
  *             Y += aux._y
  */
-    if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 181; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 183; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_other;
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_aux, ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":182
+    /* "FGAme/mathutils/cvector.pyx":184
  *         if isinstance(other, Vector):
  *             aux = other
  *             X += aux._x             # <<<<<<<<<<<<<<
@@ -3474,7 +3509,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
  */
     __pyx_v_X = (__pyx_v_X + __pyx_v_aux->_x);
 
-    /* "FGAme/mathutils/cvector.pyx":183
+    /* "FGAme/mathutils/cvector.pyx":185
  *             aux = other
  *             X += aux._x
  *             Y += aux._y             # <<<<<<<<<<<<<<
@@ -3483,7 +3518,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
  */
     __pyx_v_Y = (__pyx_v_Y + __pyx_v_aux->_y);
 
-    /* "FGAme/mathutils/cvector.pyx":184
+    /* "FGAme/mathutils/cvector.pyx":186
  *             X += aux._x
  *             Y += aux._y
  *             if new is None:             # <<<<<<<<<<<<<<
@@ -3494,14 +3529,14 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
     __pyx_t_2 = (__pyx_t_1 != 0);
     if (__pyx_t_2) {
 
-      /* "FGAme/mathutils/cvector.pyx":185
+      /* "FGAme/mathutils/cvector.pyx":187
  *             Y += aux._y
  *             if new is None:
  *                 new = other._new             # <<<<<<<<<<<<<<
  *         else:
  *             x, y = other
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_new); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 185; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_new); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_new, __pyx_t_4);
       __pyx_t_4 = 0;
@@ -3512,7 +3547,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":187
+    /* "FGAme/mathutils/cvector.pyx":189
  *                 new = other._new
  *         else:
  *             x, y = other             # <<<<<<<<<<<<<<
@@ -3529,7 +3564,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -3542,21 +3577,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_3);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
       index = 0; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_3 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_3)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_6 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L9_unpacking_done;
@@ -3564,7 +3599,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 187; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L9_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_4);
@@ -3572,41 +3607,41 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
     __Pyx_XDECREF_SET(__pyx_v_y, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":188
+    /* "FGAme/mathutils/cvector.pyx":190
  *         else:
  *             x, y = other
  *             X += x             # <<<<<<<<<<<<<<
  *             Y += y
  * 
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_x); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_x); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 188; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 190; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_X = __pyx_t_7;
 
-    /* "FGAme/mathutils/cvector.pyx":189
+    /* "FGAme/mathutils/cvector.pyx":191
  *             x, y = other
  *             X += x
  *             Y += y             # <<<<<<<<<<<<<<
  * 
  *         return new(X, Y)
  */
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 189; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_Y = __pyx_t_7;
   }
   __pyx_L6:;
 
-  /* "FGAme/mathutils/cvector.pyx":191
+  /* "FGAme/mathutils/cvector.pyx":193
  *             Y += y
  * 
  *         return new(X, Y)             # <<<<<<<<<<<<<<
@@ -3614,9 +3649,9 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
  *     def __sub__(self, other):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_new);
   __pyx_t_8 = __pyx_v_new; __pyx_t_9 = NULL;
@@ -3631,7 +3666,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
       __pyx_t_10 = 1;
     }
   }
-  __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_11);
   if (__pyx_t_9) {
     PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __Pyx_GIVEREF(__pyx_t_9); __pyx_t_9 = NULL;
@@ -3642,7 +3677,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __Pyx_GIVEREF(__pyx_t_5);
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 191; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 193; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -3650,7 +3685,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":161
+  /* "FGAme/mathutils/cvector.pyx":163
  *         return self._new(self._x / other, self._y / other)
  * 
  *     def __add__(self, other):             # <<<<<<<<<<<<<<
@@ -3678,7 +3713,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_31__add__(PyObject 
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":193
+/* "FGAme/mathutils/cvector.pyx":195
  *         return new(X, Y)
  * 
  *     def __sub__(self, other):             # <<<<<<<<<<<<<<
@@ -3728,7 +3763,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__sub__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":197
+  /* "FGAme/mathutils/cvector.pyx":199
  * 
  * 
  *         cdef double X=0, Y=0             # <<<<<<<<<<<<<<
@@ -3738,7 +3773,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __pyx_v_X = 0.0;
   __pyx_v_Y = 0.0;
 
-  /* "FGAme/mathutils/cvector.pyx":199
+  /* "FGAme/mathutils/cvector.pyx":201
  *         cdef double X=0, Y=0
  *         cdef Vector aux
  *         new = None             # <<<<<<<<<<<<<<
@@ -3748,7 +3783,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __Pyx_INCREF(Py_None);
   __pyx_v_new = Py_None;
 
-  /* "FGAme/mathutils/cvector.pyx":202
+  /* "FGAme/mathutils/cvector.pyx":204
  * 
  *         # Processa o primeiro argumento
  *         if isinstance(self, Vector):             # <<<<<<<<<<<<<<
@@ -3759,20 +3794,20 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "FGAme/mathutils/cvector.pyx":203
+    /* "FGAme/mathutils/cvector.pyx":205
  *         # Processa o primeiro argumento
  *         if isinstance(self, Vector):
  *             aux = self             # <<<<<<<<<<<<<<
  *             X += aux._x
  *             Y += aux._y
  */
-    if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 203; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_self) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_self, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 205; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_3 = __pyx_v_self;
     __Pyx_INCREF(__pyx_t_3);
     __pyx_v_aux = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":204
+    /* "FGAme/mathutils/cvector.pyx":206
  *         if isinstance(self, Vector):
  *             aux = self
  *             X += aux._x             # <<<<<<<<<<<<<<
@@ -3781,7 +3816,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
  */
     __pyx_v_X = (__pyx_v_X + __pyx_v_aux->_x);
 
-    /* "FGAme/mathutils/cvector.pyx":205
+    /* "FGAme/mathutils/cvector.pyx":207
  *             aux = self
  *             X += aux._x
  *             Y += aux._y             # <<<<<<<<<<<<<<
@@ -3790,14 +3825,14 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
  */
     __pyx_v_Y = (__pyx_v_Y + __pyx_v_aux->_y);
 
-    /* "FGAme/mathutils/cvector.pyx":206
+    /* "FGAme/mathutils/cvector.pyx":208
  *             X += aux._x
  *             Y += aux._y
  *             new = self._new             # <<<<<<<<<<<<<<
  *         else:
  *             x, y = self
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_new); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 206; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_new); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF_SET(__pyx_v_new, __pyx_t_3);
     __pyx_t_3 = 0;
@@ -3805,7 +3840,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":208
+    /* "FGAme/mathutils/cvector.pyx":210
  *             new = self._new
  *         else:
  *             x, y = self             # <<<<<<<<<<<<<<
@@ -3822,7 +3857,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -3835,21 +3870,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       __Pyx_INCREF(__pyx_t_3);
       __Pyx_INCREF(__pyx_t_4);
       #else
-      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_GetIter(__pyx_v_self); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
       index = 0; __pyx_t_3 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_3)) goto __pyx_L4_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
       index = 1; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L4_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_6 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L5_unpacking_done;
@@ -3857,7 +3892,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 208; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L5_unpacking_done:;
     }
     __pyx_v_x = __pyx_t_3;
@@ -3865,41 +3900,41 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
     __pyx_v_y = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":209
+    /* "FGAme/mathutils/cvector.pyx":211
  *         else:
  *             x, y = self
  *             X += x             # <<<<<<<<<<<<<<
  *             Y += y
  * 
  */
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_4, __pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 209; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 211; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_X = __pyx_t_7;
 
-    /* "FGAme/mathutils/cvector.pyx":210
+    /* "FGAme/mathutils/cvector.pyx":212
  *             x, y = self
  *             X += x
  *             Y += y             # <<<<<<<<<<<<<<
  * 
  *         # Processa o segundo argumento
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 210; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 212; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_Y = __pyx_t_7;
   }
   __pyx_L3:;
 
-  /* "FGAme/mathutils/cvector.pyx":213
+  /* "FGAme/mathutils/cvector.pyx":215
  * 
  *         # Processa o segundo argumento
  *         if isinstance(other, Vector):             # <<<<<<<<<<<<<<
@@ -3910,20 +3945,20 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __pyx_t_1 = (__pyx_t_2 != 0);
   if (__pyx_t_1) {
 
-    /* "FGAme/mathutils/cvector.pyx":214
+    /* "FGAme/mathutils/cvector.pyx":216
  *         # Processa o segundo argumento
  *         if isinstance(other, Vector):
  *             aux = other             # <<<<<<<<<<<<<<
  *             X -= aux._x
  *             Y -= aux._y
  */
-    if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 214; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 216; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_other;
     __Pyx_INCREF(__pyx_t_4);
     __Pyx_XDECREF_SET(__pyx_v_aux, ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4));
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":215
+    /* "FGAme/mathutils/cvector.pyx":217
  *         if isinstance(other, Vector):
  *             aux = other
  *             X -= aux._x             # <<<<<<<<<<<<<<
@@ -3932,7 +3967,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
  */
     __pyx_v_X = (__pyx_v_X - __pyx_v_aux->_x);
 
-    /* "FGAme/mathutils/cvector.pyx":216
+    /* "FGAme/mathutils/cvector.pyx":218
  *             aux = other
  *             X -= aux._x
  *             Y -= aux._y             # <<<<<<<<<<<<<<
@@ -3941,7 +3976,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
  */
     __pyx_v_Y = (__pyx_v_Y - __pyx_v_aux->_y);
 
-    /* "FGAme/mathutils/cvector.pyx":217
+    /* "FGAme/mathutils/cvector.pyx":219
  *             X -= aux._x
  *             Y -= aux._y
  *             if new is None:             # <<<<<<<<<<<<<<
@@ -3952,14 +3987,14 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
     __pyx_t_2 = (__pyx_t_1 != 0);
     if (__pyx_t_2) {
 
-      /* "FGAme/mathutils/cvector.pyx":218
+      /* "FGAme/mathutils/cvector.pyx":220
  *             Y -= aux._y
  *             if new is None:
  *                 new = other._new             # <<<<<<<<<<<<<<
  *         else:
  *             x, y = other
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_new); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 218; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_other, __pyx_n_s_new); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_new, __pyx_t_4);
       __pyx_t_4 = 0;
@@ -3970,7 +4005,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":220
+    /* "FGAme/mathutils/cvector.pyx":222
  *                 new = other._new
  *         else:
  *             x, y = other             # <<<<<<<<<<<<<<
@@ -3987,7 +4022,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -4000,21 +4035,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_3);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_5 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_6 = Py_TYPE(__pyx_t_5)->tp_iternext;
       index = 0; __pyx_t_4 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_4)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_3 = __pyx_t_6(__pyx_t_5); if (unlikely(!__pyx_t_3)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_3);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_6(__pyx_t_5), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_6 = NULL;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       goto __pyx_L9_unpacking_done;
@@ -4022,7 +4057,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_6 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 220; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L9_unpacking_done:;
     }
     __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_4);
@@ -4030,41 +4065,41 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
     __Pyx_XDECREF_SET(__pyx_v_y, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":221
+    /* "FGAme/mathutils/cvector.pyx":223
  *         else:
  *             x, y = other
  *             X -= x             # <<<<<<<<<<<<<<
  *             Y -= y
  * 
  */
-    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyNumber_InPlaceSubtract(__pyx_t_3, __pyx_v_x); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_InPlaceSubtract(__pyx_t_3, __pyx_v_x); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 221; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_4); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 223; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_X = __pyx_t_7;
 
-    /* "FGAme/mathutils/cvector.pyx":222
+    /* "FGAme/mathutils/cvector.pyx":224
  *             x, y = other
  *             X -= x
  *             Y -= y             # <<<<<<<<<<<<<<
  * 
  *         return new(X, Y)
  */
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_3 = PyNumber_InPlaceSubtract(__pyx_t_4, __pyx_v_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyNumber_InPlaceSubtract(__pyx_t_4, __pyx_v_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 222; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_Y = __pyx_t_7;
   }
   __pyx_L6:;
 
-  /* "FGAme/mathutils/cvector.pyx":224
+  /* "FGAme/mathutils/cvector.pyx":226
  *             Y -= y
  * 
  *         return new(X, Y)             # <<<<<<<<<<<<<<
@@ -4072,9 +4107,9 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
  *     def __neg__(Vector self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_X); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_Y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(__pyx_v_new);
   __pyx_t_8 = __pyx_v_new; __pyx_t_9 = NULL;
@@ -4089,7 +4124,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
       __pyx_t_10 = 1;
     }
   }
-  __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_11 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_11);
   if (__pyx_t_9) {
     PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __Pyx_GIVEREF(__pyx_t_9); __pyx_t_9 = NULL;
@@ -4100,7 +4135,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __Pyx_GIVEREF(__pyx_t_5);
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 224; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 226; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -4108,7 +4143,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   __pyx_t_3 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":193
+  /* "FGAme/mathutils/cvector.pyx":195
  *         return new(X, Y)
  * 
  *     def __sub__(self, other):             # <<<<<<<<<<<<<<
@@ -4136,7 +4171,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_33__sub__(PyObject 
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":226
+/* "FGAme/mathutils/cvector.pyx":228
  *         return new(X, Y)
  * 
  *     def __neg__(Vector self):             # <<<<<<<<<<<<<<
@@ -4170,7 +4205,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_35__neg__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__neg__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":228
+  /* "FGAme/mathutils/cvector.pyx":230
  *     def __neg__(Vector self):
  *         '''x.__neg() <==> -x'''
  *         return self._new(-self._x, -self._y)             # <<<<<<<<<<<<<<
@@ -4178,13 +4213,13 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_35__neg__(struct __
  *     def __nonzero__(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, (-__pyx_v_self->_x), (-__pyx_v_self->_y), 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 228; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)((struct __pyx_vtabstruct_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self->__pyx_vtab)->_new(__pyx_v_self, (-__pyx_v_self->_x), (-__pyx_v_self->_y), 0)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 230; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":226
+  /* "FGAme/mathutils/cvector.pyx":228
  *         return new(X, Y)
  * 
  *     def __neg__(Vector self):             # <<<<<<<<<<<<<<
@@ -4203,7 +4238,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_35__neg__(struct __
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":230
+/* "FGAme/mathutils/cvector.pyx":232
  *         return self._new(-self._x, -self._y)
  * 
  *     def __nonzero__(self):             # <<<<<<<<<<<<<<
@@ -4229,7 +4264,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_37__nonzero__(CYTHON_UNUS
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__nonzero__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":231
+  /* "FGAme/mathutils/cvector.pyx":233
  * 
  *     def __nonzero__(self):
  *         return True             # <<<<<<<<<<<<<<
@@ -4239,7 +4274,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_37__nonzero__(CYTHON_UNUS
   __pyx_r = 1;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":230
+  /* "FGAme/mathutils/cvector.pyx":232
  *         return self._new(-self._x, -self._y)
  * 
  *     def __nonzero__(self):             # <<<<<<<<<<<<<<
@@ -4253,7 +4288,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_37__nonzero__(CYTHON_UNUS
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":233
+/* "FGAme/mathutils/cvector.pyx":235
  *         return True
  * 
  *     def __richcmp__(Vector self, other, int method):             # <<<<<<<<<<<<<<
@@ -4270,7 +4305,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_40__richcmp__(PyObj
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__richcmp__ (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 233; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_self), __pyx_ptype_5FGAme_9mathutils_7cvector_Vector, 1, "self", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_v_self), ((PyObject *)__pyx_v_other), ((int)__pyx_v_method));
 
   /* function exit code */
@@ -4297,7 +4332,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__richcmp__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":234
+  /* "FGAme/mathutils/cvector.pyx":236
  * 
  *     def __richcmp__(Vector self, other, int method):
  *         x, y = other             # <<<<<<<<<<<<<<
@@ -4314,7 +4349,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     #if CYTHON_COMPILING_IN_CPYTHON
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -4327,21 +4362,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
     __Pyx_INCREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_t_2);
     #else
-    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     #endif
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_3 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyObject_GetIter(__pyx_v_other); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext;
     index = 0; __pyx_t_1 = __pyx_t_4(__pyx_t_3); if (unlikely(!__pyx_t_1)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_1);
     index = 1; __pyx_t_2 = __pyx_t_4(__pyx_t_3); if (unlikely(!__pyx_t_2)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_2);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_4(__pyx_t_3), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_4(__pyx_t_3), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = NULL;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L4_unpacking_done;
@@ -4349,7 +4384,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_4 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 234; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 236; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_x = __pyx_t_1;
@@ -4357,7 +4392,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
   __pyx_v_y = __pyx_t_2;
   __pyx_t_2 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":235
+  /* "FGAme/mathutils/cvector.pyx":237
  *     def __richcmp__(Vector self, other, int method):
  *         x, y = other
  *         return self._x == x and self._y == y             # <<<<<<<<<<<<<<
@@ -4365,11 +4400,11 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
  *     cpdef Vector _new(self, double x, double y):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_v_x, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyObject_RichCompare(__pyx_t_1, __pyx_v_x, Py_EQ); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_5) {
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
@@ -4378,9 +4413,9 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     goto __pyx_L5_bool_binop_done;
   }
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_y, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 235; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_y, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_INCREF(__pyx_t_1);
   __pyx_t_2 = __pyx_t_1;
@@ -4390,7 +4425,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":233
+  /* "FGAme/mathutils/cvector.pyx":235
  *         return True
  * 
  *     def __richcmp__(Vector self, other, int method):             # <<<<<<<<<<<<<<
@@ -4413,7 +4448,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_39__richcmp__(struc
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":237
+/* "FGAme/mathutils/cvector.pyx":239
  *         return self._x == x and self._y == y
  * 
  *     cpdef Vector _new(self, double x, double y):             # <<<<<<<<<<<<<<
@@ -4441,13 +4476,13 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
   if (unlikely(__pyx_skip_dispatch)) ;
   /* Check if overridden in Python */
   else if (unlikely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dictoffset != 0)) {
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_new); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_new); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_42_new)) {
       __Pyx_XDECREF(((PyObject *)__pyx_r));
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_y); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_1);
       __pyx_t_5 = __pyx_t_1; __pyx_t_6 = NULL;
@@ -4462,7 +4497,7 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_6) {
         PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -4473,11 +4508,11 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
       __Pyx_GIVEREF(__pyx_t_4);
       __pyx_t_3 = 0;
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (!(likely(((__pyx_t_2) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_r = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_2);
       __pyx_t_2 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4486,7 +4521,7 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "FGAme/mathutils/cvector.pyx":238
+  /* "FGAme/mathutils/cvector.pyx":240
  * 
  *     cpdef Vector _new(self, double x, double y):
  *         return type(self)(x, y)             # <<<<<<<<<<<<<<
@@ -4494,9 +4529,9 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
  *     property x:
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_x); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_y); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_INCREF(((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))));
   __pyx_t_8 = ((PyObject *)Py_TYPE(((PyObject *)__pyx_v_self))); __pyx_t_4 = NULL;
@@ -4511,7 +4546,7 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   if (__pyx_t_4) {
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __Pyx_GIVEREF(__pyx_t_4); __pyx_t_4 = NULL;
@@ -4522,16 +4557,16 @@ static struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_f_5FGAme_9mathu
   __Pyx_GIVEREF(__pyx_t_5);
   __pyx_t_2 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 238; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (!(likely(((__pyx_t_1) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 240; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_r = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":237
+  /* "FGAme/mathutils/cvector.pyx":239
  *         return self._x == x and self._y == y
  * 
  *     cpdef Vector _new(self, double x, double y):             # <<<<<<<<<<<<<<
@@ -4587,11 +4622,11 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_42_new(PyObject *__
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("_new", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("_new", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_new") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "_new") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -4599,12 +4634,12 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_6Vector_42_new(PyObject *__
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_x = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_x == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_y = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_y == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_x = __pyx_PyFloat_AsDouble(values[0]); if (unlikely((__pyx_v_x == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_y = __pyx_PyFloat_AsDouble(values[1]); if (unlikely((__pyx_v_y == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("_new", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("_new", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.mathutils.cvector.Vector._new", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4626,7 +4661,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_41_new(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_new", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_5FGAme_9mathutils_7cvector_6Vector__new(__pyx_v_self, __pyx_v_x, __pyx_v_y, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 237; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = ((PyObject *)__pyx_f_5FGAme_9mathutils_7cvector_6Vector__new(__pyx_v_self, __pyx_v_x, __pyx_v_y, 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 239; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4643,7 +4678,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_41_new(struct __pyx
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":241
+/* "FGAme/mathutils/cvector.pyx":243
  * 
  *     property x:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -4673,7 +4708,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x___get__(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":242
+  /* "FGAme/mathutils/cvector.pyx":244
  *     property x:
  *         def __get__(Vector self):
  *             return self._x             # <<<<<<<<<<<<<<
@@ -4681,13 +4716,13 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x___get__(struct _
  *         def __set__(self, value):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 242; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 244; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":241
+  /* "FGAme/mathutils/cvector.pyx":243
  * 
  *     property x:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -4706,7 +4741,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x___get__(struct _
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":244
+/* "FGAme/mathutils/cvector.pyx":246
  *             return self._x
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -4735,7 +4770,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_2__set__(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":245
+  /* "FGAme/mathutils/cvector.pyx":247
  * 
  *         def __set__(self, value):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -4743,9 +4778,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_2__set__(CYTHON_UNUSED
  *         def __del__(self):
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 245; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":244
+  /* "FGAme/mathutils/cvector.pyx":246
  *             return self._x
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -4761,7 +4796,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_2__set__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":247
+/* "FGAme/mathutils/cvector.pyx":249
  *             raise AttributeError
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -4790,7 +4825,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_4__del__(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__del__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":248
+  /* "FGAme/mathutils/cvector.pyx":250
  * 
  *         def __del__(self):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -4798,9 +4833,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_4__del__(CYTHON_UNUSED
  *     property y:
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 248; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 250; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":247
+  /* "FGAme/mathutils/cvector.pyx":249
  *             raise AttributeError
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -4816,7 +4851,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1x_4__del__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":251
+/* "FGAme/mathutils/cvector.pyx":253
  * 
  *     property y:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -4846,7 +4881,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y___get__(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":252
+  /* "FGAme/mathutils/cvector.pyx":254
  *     property y:
  *         def __get__(Vector self):
  *             return self._y             # <<<<<<<<<<<<<<
@@ -4854,13 +4889,13 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y___get__(struct _
  *         def __set__(self, value):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 252; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->_y); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 254; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":251
+  /* "FGAme/mathutils/cvector.pyx":253
  * 
  *     property y:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -4879,7 +4914,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y___get__(struct _
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":254
+/* "FGAme/mathutils/cvector.pyx":256
  *             return self._y
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -4908,7 +4943,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_2__set__(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":255
+  /* "FGAme/mathutils/cvector.pyx":257
  * 
  *         def __set__(self, value):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -4916,9 +4951,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_2__set__(CYTHON_UNUSED
  *         def __del__(self):
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 255; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 257; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":254
+  /* "FGAme/mathutils/cvector.pyx":256
  *             return self._y
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -4934,7 +4969,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_2__set__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":257
+/* "FGAme/mathutils/cvector.pyx":259
  *             raise AttributeError
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -4963,7 +4998,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_4__del__(CYTHON_UNUSED
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__del__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":258
+  /* "FGAme/mathutils/cvector.pyx":260
  * 
  *         def __del__(self):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -4971,9 +5006,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_4__del__(CYTHON_UNUSED
  * 
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 258; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 260; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":257
+  /* "FGAme/mathutils/cvector.pyx":259
  *             raise AttributeError
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -4989,8 +5024,121 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_4__del__(CYTHON_UNUSED
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":264
+/* "FGAme/mathutils/cvector.pyx":266
  *     '''Como Vector, mas com elementos mutveis'''
+ * 
+ *     def __setitem__(Vector self, i, value):             # <<<<<<<<<<<<<<
+ *         if i == 0:
+ *             self._x = value
+ */
+
+/* Python wrapper */
+static int __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_i, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__setitem__(PyObject *__pyx_v_self, PyObject *__pyx_v_i, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__setitem__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___setitem__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_i), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___setitem__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_i, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_t_2;
+  double __pyx_t_3;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__setitem__", 0);
+
+  /* "FGAme/mathutils/cvector.pyx":267
+ * 
+ *     def __setitem__(Vector self, i, value):
+ *         if i == 0:             # <<<<<<<<<<<<<<
+ *             self._x = value
+ *         elif i == 1:
+ */
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_i, __pyx_int_0, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_2) {
+
+    /* "FGAme/mathutils/cvector.pyx":268
+ *     def __setitem__(Vector self, i, value):
+ *         if i == 0:
+ *             self._x = value             # <<<<<<<<<<<<<<
+ *         elif i == 1:
+ *             self._y = value
+ */
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_v_self->__pyx_base._x = __pyx_t_3;
+    goto __pyx_L3;
+  }
+
+  /* "FGAme/mathutils/cvector.pyx":269
+ *         if i == 0:
+ *             self._x = value
+ *         elif i == 1:             # <<<<<<<<<<<<<<
+ *             self._y = value
+ *         else:
+ */
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_i, __pyx_int_1, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 269; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_2) {
+
+    /* "FGAme/mathutils/cvector.pyx":270
+ *             self._x = value
+ *         elif i == 1:
+ *             self._y = value             # <<<<<<<<<<<<<<
+ *         else:
+ *             raise IndexError
+ */
+    __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 270; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_v_self->__pyx_base._y = __pyx_t_3;
+    goto __pyx_L3;
+  }
+  /*else*/ {
+
+    /* "FGAme/mathutils/cvector.pyx":272
+ *             self._y = value
+ *         else:
+ *             raise IndexError             # <<<<<<<<<<<<<<
+ * 
+ *     def __iadd__(Vector self, other):
+ */
+    __Pyx_Raise(__pyx_builtin_IndexError, 0, 0, 0);
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 272; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  }
+  __pyx_L3:;
+
+  /* "FGAme/mathutils/cvector.pyx":266
+ *     '''Como Vector, mas com elementos mutveis'''
+ * 
+ *     def __setitem__(Vector self, i, value):             # <<<<<<<<<<<<<<
+ *         if i == 0:
+ *             self._x = value
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.__setitem__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "FGAme/mathutils/cvector.pyx":274
+ *             raise IndexError
  * 
  *     def __iadd__(Vector self, other):             # <<<<<<<<<<<<<<
  *         '''x.__iadd__(y) <==> x += y'''
@@ -4998,23 +5146,23 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_6Vector_1y_4__del__(CYTHON_UNUSED
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__iadd__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM___iadd__[] = "x.__iadd__(y) <==> x += y";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__iadd__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__[] = "x.__iadd__(y) <==> x += y";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM___iadd__;
+struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__;
 #endif
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__iadd__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__iadd__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__iadd__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5026,45 +5174,45 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__iadd__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":267
+  /* "FGAme/mathutils/cvector.pyx":277
  *         '''x.__iadd__(y) <==> x += y'''
  * 
  *         self._x += other[0]             # <<<<<<<<<<<<<<
  *         self._y += other[1]
  *         return self
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 267; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 277; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_4;
 
-  /* "FGAme/mathutils/cvector.pyx":268
+  /* "FGAme/mathutils/cvector.pyx":278
  * 
  *         self._x += other[0]
  *         self._y += other[1]             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 268; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 278; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_4;
 
-  /* "FGAme/mathutils/cvector.pyx":269
+  /* "FGAme/mathutils/cvector.pyx":279
  *         self._x += other[0]
  *         self._y += other[1]
  *         return self             # <<<<<<<<<<<<<<
@@ -5076,8 +5224,8 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":264
- *     '''Como Vector, mas com elementos mutveis'''
+  /* "FGAme/mathutils/cvector.pyx":274
+ *             raise IndexError
  * 
  *     def __iadd__(Vector self, other):             # <<<<<<<<<<<<<<
  *         '''x.__iadd__(y) <==> x += y'''
@@ -5097,7 +5245,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":271
+/* "FGAme/mathutils/cvector.pyx":281
  *         return self
  * 
  *     def __isub__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5106,23 +5254,23 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM___iadd__(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__isub__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_2__isub__[] = "x.__isub__(y) <==> x -= y";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__isub__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_4__isub__[] = "x.__isub__(y) <==> x -= y";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__isub__;
+struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__isub__;
 #endif
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__isub__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__isub__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__isub__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__isub__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__isub__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5134,45 +5282,45 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__isub__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":274
+  /* "FGAme/mathutils/cvector.pyx":284
  *         '''x.__isub__(y) <==> x -= y'''
  * 
  *         self._x -= other[0]             # <<<<<<<<<<<<<<
  *         self._y -= other[1]
  *         return self
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_InPlaceSubtract(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_InPlaceSubtract(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 274; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 284; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_4;
 
-  /* "FGAme/mathutils/cvector.pyx":275
+  /* "FGAme/mathutils/cvector.pyx":285
  * 
  *         self._x -= other[0]
  *         self._y -= other[1]             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_other, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyNumber_InPlaceSubtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_InPlaceSubtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 275; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_4 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 285; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_4;
 
-  /* "FGAme/mathutils/cvector.pyx":276
+  /* "FGAme/mathutils/cvector.pyx":286
  *         self._x -= other[0]
  *         self._y -= other[1]
  *         return self             # <<<<<<<<<<<<<<
@@ -5184,7 +5332,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct _
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":271
+  /* "FGAme/mathutils/cvector.pyx":281
  *         return self
  * 
  *     def __isub__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5205,7 +5353,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct _
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":278
+/* "FGAme/mathutils/cvector.pyx":288
  *         return self
  * 
  *     def __imul__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5214,23 +5362,23 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_2__isub__(struct _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__imul__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_4__imul__[] = "x.__imul__(y) <==> x *= y";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__imul__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_6__imul__[] = "x.__imul__(y) <==> x *= y";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__imul__;
+struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__imul__;
 #endif
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__imul__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__imul__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__imul__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__imul__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__imul__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5241,39 +5389,39 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__imul__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":281
+  /* "FGAme/mathutils/cvector.pyx":291
  *         '''x.__imul__(y) <==> x *= y'''
  * 
  *         self._x *= other             # <<<<<<<<<<<<<<
  *         self._y *= other
  *         return self
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_InPlaceMultiply(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_InPlaceMultiply(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 281; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 291; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":282
+  /* "FGAme/mathutils/cvector.pyx":292
  * 
  *         self._x *= other
  *         self._y *= other             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyNumber_InPlaceMultiply(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_InPlaceMultiply(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 282; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 292; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":283
+  /* "FGAme/mathutils/cvector.pyx":293
  *         self._x *= other
  *         self._y *= other
  *         return self             # <<<<<<<<<<<<<<
@@ -5285,7 +5433,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct _
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":278
+  /* "FGAme/mathutils/cvector.pyx":288
  *         return self
  * 
  *     def __imul__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5305,7 +5453,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct _
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":285
+/* "FGAme/mathutils/cvector.pyx":295
  *         return self
  * 
  *     def __idiv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5315,16 +5463,16 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_4__imul__(struct _
 
 /* Python wrapper */
 #if PY_MAJOR_VERSION < 3
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__idiv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__[] = "x.__idiv__(y) <==> x /= y";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__idiv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__[] = "x.__idiv__(y) <==> x /= y";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__;
+struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__;
 #endif
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__idiv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__idiv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__idiv__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
@@ -5333,7 +5481,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__idiv__(PyObject
 #endif /*!(#if PY_MAJOR_VERSION < 3)*/
 
 #if PY_MAJOR_VERSION < 3
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5344,39 +5492,39 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__idiv__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":288
+  /* "FGAme/mathutils/cvector.pyx":298
  *         '''x.__idiv__(y) <==> x /= y'''
  * 
  *         self._x /= other             # <<<<<<<<<<<<<<
  *         self._y /= other
  *         return self
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 288; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 298; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":289
+  /* "FGAme/mathutils/cvector.pyx":299
  * 
  *         self._x /= other
  *         self._y /= other             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 289; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":290
+  /* "FGAme/mathutils/cvector.pyx":300
  *         self._x /= other
  *         self._y /= other
  *         return self             # <<<<<<<<<<<<<<
@@ -5388,7 +5536,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct _
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":285
+  /* "FGAme/mathutils/cvector.pyx":295
  *         return self
  * 
  *     def __idiv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5409,7 +5557,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct _
 }
 #endif /*!(#if PY_MAJOR_VERSION < 3)*/
 
-/* "FGAme/mathutils/cvector.pyx":292
+/* "FGAme/mathutils/cvector.pyx":302
  *         return self
  * 
  *     def __itruediv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5418,23 +5566,23 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__(struct _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__itruediv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__[] = "x.__idiv__(y) <==> x /= y";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11__itruediv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__[] = "x.__idiv__(y) <==> x /= y";
 #if CYTHON_COMPILING_IN_CPYTHON
-struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__;
+struct wrapperbase __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__;
 #endif
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__itruediv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11__itruediv__(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__itruediv__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5445,39 +5593,39 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__itruediv__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":295
+  /* "FGAme/mathutils/cvector.pyx":305
  *         '''x.__idiv__(y) <==> x /= y'''
  * 
  *         self._x /= other             # <<<<<<<<<<<<<<
  *         self._y /= other
  *         return self
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_1, __pyx_v_other); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 295; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":296
+  /* "FGAme/mathutils/cvector.pyx":306
  * 
  *         self._x /= other
  *         self._y /= other             # <<<<<<<<<<<<<<
  *         return self
  * 
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyNumber_InPlaceDivide(__pyx_t_2, __pyx_v_other); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 296; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __pyx_PyFloat_AsDouble(__pyx_t_1); if (unlikely((__pyx_t_3 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 306; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_3;
 
-  /* "FGAme/mathutils/cvector.pyx":297
+  /* "FGAme/mathutils/cvector.pyx":307
  *         self._x /= other
  *         self._y /= other
  *         return self             # <<<<<<<<<<<<<<
@@ -5489,7 +5637,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(stru
   __pyx_r = ((PyObject *)__pyx_v_self);
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":292
+  /* "FGAme/mathutils/cvector.pyx":302
  *         return self
  * 
  *     def __itruediv__(Vector self, other):             # <<<<<<<<<<<<<<
@@ -5509,7 +5657,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(stru
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":299
+/* "FGAme/mathutils/cvector.pyx":309
  *         return self
  * 
  *     def rotate(Vector self, theta, axis=(0, 0)):             # <<<<<<<<<<<<<<
@@ -5518,9 +5666,9 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__(stru
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11rotate(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_10rotate[] = "Realiza rota\303\247\303\243o *inplace*";
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11rotate(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13rotate(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_12rotate[] = "Realiza rota\303\247\303\243o *inplace*";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13rotate(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_theta = 0;
   PyObject *__pyx_v_axis = 0;
   int __pyx_lineno = 0;
@@ -5554,7 +5702,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11rotate(PyObject 
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "rotate") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "rotate") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5569,20 +5717,20 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11rotate(PyObject 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("rotate", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("rotate", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.rotate", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), __pyx_v_theta, __pyx_v_axis);
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12rotate(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), __pyx_v_theta, __pyx_v_axis);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_theta, PyObject *__pyx_v_axis) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12rotate(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_theta, PyObject *__pyx_v_axis) {
   PyObject *__pyx_v_x = NULL;
   PyObject *__pyx_v_y = NULL;
   double __pyx_v_cos_t;
@@ -5602,14 +5750,14 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("rotate", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":302
+  /* "FGAme/mathutils/cvector.pyx":312
  *         '''Realiza rotao *inplace*'''
  * 
  *         x, y = self -axis             # <<<<<<<<<<<<<<
  *         cos_t, sin_t = cos(theta), sin(theta)
  *         self._x = x * cos_t - y * sin_t + axis[0]
  */
-  __pyx_t_1 = PyNumber_Subtract(((PyObject *)__pyx_v_self), __pyx_v_axis); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Subtract(((PyObject *)__pyx_v_self), __pyx_v_axis); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if ((likely(PyTuple_CheckExact(__pyx_t_1))) || (PyList_CheckExact(__pyx_t_1))) {
     PyObject* sequence = __pyx_t_1;
@@ -5621,7 +5769,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
     if (unlikely(size != 2)) {
       if (size > 2) __Pyx_RaiseTooManyValuesError(2);
       else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     #if CYTHON_COMPILING_IN_CPYTHON
     if (likely(PyTuple_CheckExact(sequence))) {
@@ -5634,15 +5782,15 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_INCREF(__pyx_t_3);
     #else
-    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   } else {
     Py_ssize_t index = -1;
-    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = Py_TYPE(__pyx_t_4)->tp_iternext;
@@ -5650,7 +5798,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
     __Pyx_GOTREF(__pyx_t_2);
     index = 1; __pyx_t_3 = __pyx_t_5(__pyx_t_4); if (unlikely(!__pyx_t_3)) goto __pyx_L3_unpacking_failed;
     __Pyx_GOTREF(__pyx_t_3);
-    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (__Pyx_IternextUnpackEndCheck(__pyx_t_5(__pyx_t_4), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_5 = NULL;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     goto __pyx_L4_unpacking_done;
@@ -5658,7 +5806,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_5 = NULL;
     if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 302; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_L4_unpacking_done:;
   }
   __pyx_v_x = __pyx_t_2;
@@ -5666,83 +5814,83 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
   __pyx_v_y = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":303
+  /* "FGAme/mathutils/cvector.pyx":313
  * 
  *         x, y = self -axis
  *         cos_t, sin_t = cos(theta), sin(theta)             # <<<<<<<<<<<<<<
  *         self._x = x * cos_t - y * sin_t + axis[0]
  *         self._y = x * sin_t + y * cos_t + axis[1]
  */
-  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_theta); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_theta); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_7 = cos(__pyx_t_6);
-  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_theta); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 303; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_v_theta); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 313; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_8 = sin(__pyx_t_6);
   __pyx_v_cos_t = __pyx_t_7;
   __pyx_v_sin_t = __pyx_t_8;
 
-  /* "FGAme/mathutils/cvector.pyx":304
+  /* "FGAme/mathutils/cvector.pyx":314
  *         x, y = self -axis
  *         cos_t, sin_t = cos(theta), sin(theta)
  *         self._x = x * cos_t - y * sin_t + axis[0]             # <<<<<<<<<<<<<<
  *         self._y = x * sin_t + y * cos_t + axis[1]
  * 
  */
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cos_t); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_cos_t); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_v_x, __pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Multiply(__pyx_v_x, __pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sin_t); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_sin_t); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_v_y, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Multiply(__pyx_v_y, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyNumber_Subtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Subtract(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_axis, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_2 = __Pyx_GetItemInt(__pyx_v_axis, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_2 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Add(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Add(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 304; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_3); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 314; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_self->__pyx_base._x = __pyx_t_8;
 
-  /* "FGAme/mathutils/cvector.pyx":305
+  /* "FGAme/mathutils/cvector.pyx":315
  *         cos_t, sin_t = cos(theta), sin(theta)
  *         self._x = x * cos_t - y * sin_t + axis[0]
  *         self._y = x * sin_t + y * cos_t + axis[1]             # <<<<<<<<<<<<<<
  * 
- *     def update(Vector self, other):
+ *     def update(Vector self, other, y=None):
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sin_t); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_sin_t); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyNumber_Multiply(__pyx_v_x, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Multiply(__pyx_v_x, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cos_t); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_cos_t); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = PyNumber_Multiply(__pyx_v_y, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_y, __pyx_t_3); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyNumber_Add(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_axis, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = __Pyx_GetItemInt(__pyx_v_axis, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyNumber_Add(__pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 305; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_8 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->__pyx_base._y = __pyx_t_8;
 
-  /* "FGAme/mathutils/cvector.pyx":299
+  /* "FGAme/mathutils/cvector.pyx":309
  *         return self
  * 
  *     def rotate(Vector self, theta, axis=(0, 0)):             # <<<<<<<<<<<<<<
@@ -5768,164 +5916,326 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_10rotate(struct __
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":307
+/* "FGAme/mathutils/cvector.pyx":317
  *         self._y = x * sin_t + y * cos_t + axis[1]
  * 
- *     def update(Vector self, other):             # <<<<<<<<<<<<<<
+ *     def update(Vector self, other, y=None):             # <<<<<<<<<<<<<<
  *         '''Copia as coordenadas x, y do objeto other'''
  * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13update(PyObject *__pyx_v_self, PyObject *__pyx_v_other); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_12update[] = "Copia as coordenadas x, y do objeto other";
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13update(PyObject *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15update(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_14update[] = "Copia as coordenadas x, y do objeto other";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15update(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  PyObject *__pyx_v_other = 0;
+  PyObject *__pyx_v_y = 0;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("update (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12update(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), ((PyObject *)__pyx_v_other));
+  {
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_other,&__pyx_n_s_y,0};
+    PyObject* values[2] = {0,0};
+    values[1] = ((PyObject *)Py_None);
+    if (unlikely(__pyx_kwds)) {
+      Py_ssize_t kw_args;
+      const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
+      switch (pos_args) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        case  0: break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+      kw_args = PyDict_Size(__pyx_kwds);
+      switch (pos_args) {
+        case  0:
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_other)) != 0)) kw_args--;
+        else goto __pyx_L5_argtuple_error;
+        case  1:
+        if (kw_args > 0) {
+          PyObject* value = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y);
+          if (value) { values[1] = value; kw_args--; }
+        }
+      }
+      if (unlikely(kw_args > 0)) {
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "update") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      }
+    } else {
+      switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  2: values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
+        case  1: values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
+        break;
+        default: goto __pyx_L5_argtuple_error;
+      }
+    }
+    __pyx_v_other = values[0];
+    __pyx_v_y = values[1];
+  }
+  goto __pyx_L4_argument_unpacking_done;
+  __pyx_L5_argtuple_error:;
+  __Pyx_RaiseArgtupleInvalid("update", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __pyx_L3_error:;
+  __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.update", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_RefNannyFinishContext();
+  return NULL;
+  __pyx_L4_argument_unpacking_done:;
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14update(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self), __pyx_v_other, __pyx_v_y);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12update(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14update(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self, PyObject *__pyx_v_other, PyObject *__pyx_v_y) {
   struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *__pyx_v_vector = 0;
+  PyObject *__pyx_v_x = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  PyObject *__pyx_t_2 = NULL;
+  int __pyx_t_1;
+  int __pyx_t_2;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  double __pyx_t_5;
-  int __pyx_t_6;
-  PyObject *__pyx_t_7 = NULL;
-  PyObject *__pyx_t_8 = NULL;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  double __pyx_t_7;
+  int __pyx_t_8;
   PyObject *__pyx_t_9 = NULL;
+  PyObject *__pyx_t_10 = NULL;
+  PyObject *__pyx_t_11 = NULL;
+  PyObject *__pyx_t_12 = NULL;
+  PyObject *__pyx_t_13 = NULL;
+  PyObject *__pyx_t_14 = NULL;
+  PyObject *(*__pyx_t_15)(PyObject *);
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("update", 0);
+  __Pyx_INCREF(__pyx_v_y);
 
-  /* "FGAme/mathutils/cvector.pyx":311
+  /* "FGAme/mathutils/cvector.pyx":321
  * 
  *         cdef Vector vector
- *         try:             # <<<<<<<<<<<<<<
- *             vector = other
- *             self._x = vector._x
+ *         if y is None:             # <<<<<<<<<<<<<<
+ *             try:
+ *                 vector = other
  */
-  {
-    __Pyx_ExceptionSave(&__pyx_t_1, &__pyx_t_2, &__pyx_t_3);
-    __Pyx_XGOTREF(__pyx_t_1);
-    __Pyx_XGOTREF(__pyx_t_2);
-    __Pyx_XGOTREF(__pyx_t_3);
-    /*try:*/ {
+  __pyx_t_1 = (__pyx_v_y == Py_None);
+  __pyx_t_2 = (__pyx_t_1 != 0);
+  if (__pyx_t_2) {
 
-      /* "FGAme/mathutils/cvector.pyx":312
+    /* "FGAme/mathutils/cvector.pyx":322
  *         cdef Vector vector
- *         try:
- *             vector = other             # <<<<<<<<<<<<<<
- *             self._x = vector._x
- *             self._y = vector._y
+ *         if y is None:
+ *             try:             # <<<<<<<<<<<<<<
+ *                 vector = other
+ *                 self._x = vector._x
  */
-      if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 312; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-      __pyx_t_4 = __pyx_v_other;
-      __Pyx_INCREF(__pyx_t_4);
-      __pyx_v_vector = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4);
-      __pyx_t_4 = 0;
+    {
+      __Pyx_ExceptionSave(&__pyx_t_3, &__pyx_t_4, &__pyx_t_5);
+      __Pyx_XGOTREF(__pyx_t_3);
+      __Pyx_XGOTREF(__pyx_t_4);
+      __Pyx_XGOTREF(__pyx_t_5);
+      /*try:*/ {
 
-      /* "FGAme/mathutils/cvector.pyx":313
- *         try:
- *             vector = other
- *             self._x = vector._x             # <<<<<<<<<<<<<<
- *             self._y = vector._y
- *         except AttributeError:
+        /* "FGAme/mathutils/cvector.pyx":323
+ *         if y is None:
+ *             try:
+ *                 vector = other             # <<<<<<<<<<<<<<
+ *                 self._x = vector._x
+ *                 self._y = vector._y
  */
-      __pyx_t_5 = __pyx_v_vector->_x;
-      __pyx_v_self->__pyx_base._x = __pyx_t_5;
+        if (!(likely(((__pyx_v_other) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_other, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 323; __pyx_clineno = __LINE__; goto __pyx_L4_error;}
+        __pyx_t_6 = __pyx_v_other;
+        __Pyx_INCREF(__pyx_t_6);
+        __pyx_v_vector = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_6);
+        __pyx_t_6 = 0;
 
-      /* "FGAme/mathutils/cvector.pyx":314
- *             vector = other
- *             self._x = vector._x
- *             self._y = vector._y             # <<<<<<<<<<<<<<
- *         except AttributeError:
- *             self._x = other[0]
+        /* "FGAme/mathutils/cvector.pyx":324
+ *             try:
+ *                 vector = other
+ *                 self._x = vector._x             # <<<<<<<<<<<<<<
+ *                 self._y = vector._y
+ *             except TypeError:
  */
-      __pyx_t_5 = __pyx_v_vector->_y;
-      __pyx_v_self->__pyx_base._y = __pyx_t_5;
+        __pyx_t_7 = __pyx_v_vector->_x;
+        __pyx_v_self->__pyx_base._x = __pyx_t_7;
+
+        /* "FGAme/mathutils/cvector.pyx":325
+ *                 vector = other
+ *                 self._x = vector._x
+ *                 self._y = vector._y             # <<<<<<<<<<<<<<
+ *             except TypeError:
+ *                 x, y = map(float, other)
+ */
+        __pyx_t_7 = __pyx_v_vector->_y;
+        __pyx_v_self->__pyx_base._y = __pyx_t_7;
+      }
+      __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+      goto __pyx_L11_try_end;
+      __pyx_L4_error:;
+      __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+      /* "FGAme/mathutils/cvector.pyx":326
+ *                 self._x = vector._x
+ *                 self._y = vector._y
+ *             except TypeError:             # <<<<<<<<<<<<<<
+ *                 x, y = map(float, other)
+ *                 self._x = x
+ */
+      __pyx_t_8 = PyErr_ExceptionMatches(__pyx_builtin_TypeError);
+      if (__pyx_t_8) {
+        __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.update", __pyx_clineno, __pyx_lineno, __pyx_filename);
+        if (__Pyx_GetException(&__pyx_t_6, &__pyx_t_9, &__pyx_t_10) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_GOTREF(__pyx_t_9);
+        __Pyx_GOTREF(__pyx_t_10);
+
+        /* "FGAme/mathutils/cvector.pyx":327
+ *                 self._y = vector._y
+ *             except TypeError:
+ *                 x, y = map(float, other)             # <<<<<<<<<<<<<<
+ *                 self._x = x
+ *                 self._y = y
+ */
+        __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __Pyx_GOTREF(__pyx_t_11);
+        __Pyx_INCREF(((PyObject *)((PyObject*)(&PyFloat_Type))));
+        PyTuple_SET_ITEM(__pyx_t_11, 0, ((PyObject *)((PyObject*)(&PyFloat_Type))));
+        __Pyx_GIVEREF(((PyObject *)((PyObject*)(&PyFloat_Type))));
+        __Pyx_INCREF(__pyx_v_other);
+        PyTuple_SET_ITEM(__pyx_t_11, 1, __pyx_v_other);
+        __Pyx_GIVEREF(__pyx_v_other);
+        __pyx_t_12 = __Pyx_PyObject_Call(__pyx_builtin_map, __pyx_t_11, NULL); if (unlikely(!__pyx_t_12)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __Pyx_GOTREF(__pyx_t_12);
+        __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
+        if ((likely(PyTuple_CheckExact(__pyx_t_12))) || (PyList_CheckExact(__pyx_t_12))) {
+          PyObject* sequence = __pyx_t_12;
+          #if CYTHON_COMPILING_IN_CPYTHON
+          Py_ssize_t size = Py_SIZE(sequence);
+          #else
+          Py_ssize_t size = PySequence_Size(sequence);
+          #endif
+          if (unlikely(size != 2)) {
+            if (size > 2) __Pyx_RaiseTooManyValuesError(2);
+            else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
+            {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          }
+          #if CYTHON_COMPILING_IN_CPYTHON
+          if (likely(PyTuple_CheckExact(sequence))) {
+            __pyx_t_11 = PyTuple_GET_ITEM(sequence, 0); 
+            __pyx_t_13 = PyTuple_GET_ITEM(sequence, 1); 
+          } else {
+            __pyx_t_11 = PyList_GET_ITEM(sequence, 0); 
+            __pyx_t_13 = PyList_GET_ITEM(sequence, 1); 
+          }
+          __Pyx_INCREF(__pyx_t_11);
+          __Pyx_INCREF(__pyx_t_13);
+          #else
+          __pyx_t_11 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          __Pyx_GOTREF(__pyx_t_11);
+          __pyx_t_13 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          __Pyx_GOTREF(__pyx_t_13);
+          #endif
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        } else {
+          Py_ssize_t index = -1;
+          __pyx_t_14 = PyObject_GetIter(__pyx_t_12); if (unlikely(!__pyx_t_14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          __Pyx_GOTREF(__pyx_t_14);
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+          __pyx_t_15 = Py_TYPE(__pyx_t_14)->tp_iternext;
+          index = 0; __pyx_t_11 = __pyx_t_15(__pyx_t_14); if (unlikely(!__pyx_t_11)) goto __pyx_L14_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_11);
+          index = 1; __pyx_t_13 = __pyx_t_15(__pyx_t_14); if (unlikely(!__pyx_t_13)) goto __pyx_L14_unpacking_failed;
+          __Pyx_GOTREF(__pyx_t_13);
+          if (__Pyx_IternextUnpackEndCheck(__pyx_t_15(__pyx_t_14), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          __pyx_t_15 = NULL;
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          goto __pyx_L15_unpacking_done;
+          __pyx_L14_unpacking_failed:;
+          __Pyx_DECREF(__pyx_t_14); __pyx_t_14 = 0;
+          __pyx_t_15 = NULL;
+          if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
+          {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+          __pyx_L15_unpacking_done:;
+        }
+        __pyx_v_x = __pyx_t_11;
+        __pyx_t_11 = 0;
+        __Pyx_DECREF_SET(__pyx_v_y, __pyx_t_13);
+        __pyx_t_13 = 0;
+
+        /* "FGAme/mathutils/cvector.pyx":328
+ *             except TypeError:
+ *                 x, y = map(float, other)
+ *                 self._x = x             # <<<<<<<<<<<<<<
+ *                 self._y = y
+ *         else:
+ */
+        __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_v_x); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 328; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __pyx_v_self->__pyx_base._x = __pyx_t_7;
+
+        /* "FGAme/mathutils/cvector.pyx":329
+ *                 x, y = map(float, other)
+ *                 self._x = x
+ *                 self._y = y             # <<<<<<<<<<<<<<
+ *         else:
+ *             self._x = float(other)
+ */
+        __pyx_t_7 = __pyx_PyFloat_AsDouble(__pyx_v_y); if (unlikely((__pyx_t_7 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L6_except_error;}
+        __pyx_v_self->__pyx_base._y = __pyx_t_7;
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+        goto __pyx_L5_exception_handled;
+      }
+      goto __pyx_L6_except_error;
+      __pyx_L6_except_error:;
+      __Pyx_XGIVEREF(__pyx_t_3);
+      __Pyx_XGIVEREF(__pyx_t_4);
+      __Pyx_XGIVEREF(__pyx_t_5);
+      __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+      goto __pyx_L1_error;
+      __pyx_L5_exception_handled:;
+      __Pyx_XGIVEREF(__pyx_t_3);
+      __Pyx_XGIVEREF(__pyx_t_4);
+      __Pyx_XGIVEREF(__pyx_t_5);
+      __Pyx_ExceptionReset(__pyx_t_3, __pyx_t_4, __pyx_t_5);
+      __pyx_L11_try_end:;
     }
-    __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-    goto __pyx_L10_try_end;
-    __pyx_L3_error:;
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    goto __pyx_L3;
+  }
+  /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":315
- *             self._x = vector._x
- *             self._y = vector._y
- *         except AttributeError:             # <<<<<<<<<<<<<<
- *             self._x = other[0]
- *             self._y = other[1]
- */
-    __pyx_t_6 = PyErr_ExceptionMatches(__pyx_builtin_AttributeError);
-    if (__pyx_t_6) {
-      __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.update", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_7, &__pyx_t_8) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 315; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
-      __Pyx_GOTREF(__pyx_t_4);
-      __Pyx_GOTREF(__pyx_t_7);
-      __Pyx_GOTREF(__pyx_t_8);
-
-      /* "FGAme/mathutils/cvector.pyx":316
- *             self._y = vector._y
- *         except AttributeError:
- *             self._x = other[0]             # <<<<<<<<<<<<<<
- *             self._y = other[1]
+    /* "FGAme/mathutils/cvector.pyx":331
+ *                 self._y = y
+ *         else:
+ *             self._x = float(other)             # <<<<<<<<<<<<<<
+ *             self._y = float(y)
  * 
  */
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_other, 0, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_9 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;};
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 316; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_v_self->__pyx_base._x = __pyx_t_5;
+    __pyx_t_7 = __Pyx_PyObject_AsDouble(__pyx_v_other); if (unlikely(__pyx_t_7 == ((double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 331; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_v_self->__pyx_base._x = __pyx_t_7;
 
-      /* "FGAme/mathutils/cvector.pyx":317
- *         except AttributeError:
- *             self._x = other[0]
- *             self._y = other[1]             # <<<<<<<<<<<<<<
+    /* "FGAme/mathutils/cvector.pyx":332
+ *         else:
+ *             self._x = float(other)
+ *             self._y = float(y)             # <<<<<<<<<<<<<<
  * 
  *     def copy(self):
  */
-      __pyx_t_9 = __Pyx_GetItemInt(__pyx_v_other, 1, long, 1, __Pyx_PyInt_From_long, 0, 0, 1); if (unlikely(__pyx_t_9 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;};
-      __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_9); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 317; __pyx_clineno = __LINE__; goto __pyx_L5_except_error;}
-      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_v_self->__pyx_base._y = __pyx_t_5;
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      goto __pyx_L4_exception_handled;
-    }
-    goto __pyx_L5_except_error;
-    __pyx_L5_except_error:;
-    __Pyx_XGIVEREF(__pyx_t_1);
-    __Pyx_XGIVEREF(__pyx_t_2);
-    __Pyx_XGIVEREF(__pyx_t_3);
-    __Pyx_ExceptionReset(__pyx_t_1, __pyx_t_2, __pyx_t_3);
-    goto __pyx_L1_error;
-    __pyx_L4_exception_handled:;
-    __Pyx_XGIVEREF(__pyx_t_1);
-    __Pyx_XGIVEREF(__pyx_t_2);
-    __Pyx_XGIVEREF(__pyx_t_3);
-    __Pyx_ExceptionReset(__pyx_t_1, __pyx_t_2, __pyx_t_3);
-    __pyx_L10_try_end:;
+    __pyx_t_7 = __Pyx_PyObject_AsDouble(__pyx_v_y); if (unlikely(__pyx_t_7 == ((double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 332; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_v_self->__pyx_base._y = __pyx_t_7;
   }
+  __pyx_L3:;
 
-  /* "FGAme/mathutils/cvector.pyx":307
+  /* "FGAme/mathutils/cvector.pyx":317
  *         self._y = x * sin_t + y * cos_t + axis[1]
  * 
- *     def update(Vector self, other):             # <<<<<<<<<<<<<<
+ *     def update(Vector self, other, y=None):             # <<<<<<<<<<<<<<
  *         '''Copia as coordenadas x, y do objeto other'''
  * 
  */
@@ -5934,21 +6244,26 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12update(struct __
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_XDECREF(__pyx_t_7);
-  __Pyx_XDECREF(__pyx_t_8);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_9);
+  __Pyx_XDECREF(__pyx_t_10);
+  __Pyx_XDECREF(__pyx_t_11);
+  __Pyx_XDECREF(__pyx_t_12);
+  __Pyx_XDECREF(__pyx_t_13);
+  __Pyx_XDECREF(__pyx_t_14);
   __Pyx_AddTraceback("FGAme.mathutils.cvector.VectorM.update", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_vector);
+  __Pyx_XDECREF(__pyx_v_x);
+  __Pyx_XDECREF(__pyx_v_y);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":319
- *             self._y = other[1]
+/* "FGAme/mathutils/cvector.pyx":334
+ *             self._y = float(y)
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
  *         '''Retorna uma cpia de si mesmo'''
@@ -5956,20 +6271,20 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_12update(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_14copy[] = "Retorna uma c\303\263pia de si mesmo";
-static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_17copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_16copy[] = "Retorna uma c\303\263pia de si mesmo";
+static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_17copy(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("copy (wrapper)", 0);
-  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_16copy(((struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self) {
+static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_16copy(struct __pyx_obj_5FGAme_9mathutils_7cvector_VectorM *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -5980,7 +6295,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __py
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("copy", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":322
+  /* "FGAme/mathutils/cvector.pyx":337
  *         '''Retorna uma cpia de si mesmo'''
  * 
  *         return VectorM(self._x, self._y)             # <<<<<<<<<<<<<<
@@ -5988,11 +6303,11 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __py
  *     property x:
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 322; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 322; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 322; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -6000,15 +6315,15 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __py
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_1 = 0;
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_5FGAme_9mathutils_7cvector_VectorM)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 322; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_5FGAme_9mathutils_7cvector_VectorM)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 337; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":319
- *             self._y = other[1]
+  /* "FGAme/mathutils/cvector.pyx":334
+ *             self._y = float(y)
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
  *         '''Retorna uma cpia de si mesmo'''
@@ -6028,7 +6343,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_14copy(struct __py
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":325
+/* "FGAme/mathutils/cvector.pyx":340
  * 
  *     property x:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -6058,7 +6373,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x___get__(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":326
+  /* "FGAme/mathutils/cvector.pyx":341
  *     property x:
  *         def __get__(Vector self):
  *             return self._x             # <<<<<<<<<<<<<<
@@ -6066,13 +6381,13 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x___get__(struct 
  *         def __set__(self, value):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 326; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._x); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 341; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":325
+  /* "FGAme/mathutils/cvector.pyx":340
  * 
  *     property x:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -6091,7 +6406,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x___get__(struct 
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":328
+/* "FGAme/mathutils/cvector.pyx":343
  *             return self._x
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -6121,17 +6436,17 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_2__set__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":329
+  /* "FGAme/mathutils/cvector.pyx":344
  * 
  *         def __set__(self, value):
  *             self._x = value             # <<<<<<<<<<<<<<
  * 
  *         def __del__(self):
  */
-  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 329; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->__pyx_base._x = __pyx_t_1;
 
-  /* "FGAme/mathutils/cvector.pyx":328
+  /* "FGAme/mathutils/cvector.pyx":343
  *             return self._x
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -6150,7 +6465,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_2__set__(struct __pyx
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":331
+/* "FGAme/mathutils/cvector.pyx":346
  *             self._x = value
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -6179,7 +6494,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_4__del__(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__del__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":332
+  /* "FGAme/mathutils/cvector.pyx":347
  * 
  *         def __del__(self):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -6187,9 +6502,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_4__del__(CYTHON_UNUSE
  *     property y:
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 332; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 347; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":331
+  /* "FGAme/mathutils/cvector.pyx":346
  *             self._x = value
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -6205,7 +6520,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1x_4__del__(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":335
+/* "FGAme/mathutils/cvector.pyx":350
  * 
  *     property y:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -6235,7 +6550,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y___get__(struct 
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":336
+  /* "FGAme/mathutils/cvector.pyx":351
  *     property y:
  *         def __get__(Vector self):
  *             return self._y             # <<<<<<<<<<<<<<
@@ -6243,13 +6558,13 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y___get__(struct 
  *         def __set__(self, value):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 336; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base._y); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 351; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "FGAme/mathutils/cvector.pyx":335
+  /* "FGAme/mathutils/cvector.pyx":350
  * 
  *     property y:
  *         def __get__(Vector self):             # <<<<<<<<<<<<<<
@@ -6268,7 +6583,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y___get__(struct 
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":338
+/* "FGAme/mathutils/cvector.pyx":353
  *             return self._y
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -6298,17 +6613,17 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y_2__set__(struct __pyx
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":339
+  /* "FGAme/mathutils/cvector.pyx":354
  * 
  *         def __set__(self, value):
  *             self._y = value             # <<<<<<<<<<<<<<
  * 
  *         def __del__(self):
  */
-  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 339; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __pyx_PyFloat_AsDouble(__pyx_v_value); if (unlikely((__pyx_t_1 == (double)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 354; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->__pyx_base._y = __pyx_t_1;
 
-  /* "FGAme/mathutils/cvector.pyx":338
+  /* "FGAme/mathutils/cvector.pyx":353
  *             return self._y
  * 
  *         def __set__(self, value):             # <<<<<<<<<<<<<<
@@ -6327,7 +6642,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y_2__set__(struct __pyx
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":341
+/* "FGAme/mathutils/cvector.pyx":356
  *             self._y = value
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -6356,7 +6671,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y_4__del__(CYTHON_UNUSE
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__del__", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":342
+  /* "FGAme/mathutils/cvector.pyx":357
  * 
  *         def __del__(self):
  *             raise AttributeError             # <<<<<<<<<<<<<<
@@ -6364,9 +6679,9 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y_4__del__(CYTHON_UNUSE
  * def asvector(v):
  */
   __Pyx_Raise(__pyx_builtin_AttributeError, 0, 0, 0);
-  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 342; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  {__pyx_filename = __pyx_f[0]; __pyx_lineno = 357; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":341
+  /* "FGAme/mathutils/cvector.pyx":356
  *             self._y = value
  * 
  *         def __del__(self):             # <<<<<<<<<<<<<<
@@ -6382,7 +6697,7 @@ static int __pyx_pf_5FGAme_9mathutils_7cvector_7VectorM_1y_4__del__(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":344
+/* "FGAme/mathutils/cvector.pyx":359
  *             raise AttributeError
  * 
  * def asvector(v):             # <<<<<<<<<<<<<<
@@ -6417,7 +6732,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("asvector", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":347
+  /* "FGAme/mathutils/cvector.pyx":362
  *     '''Retorna o objeto como uma instncia da classe Vetor'''
  * 
  *     if isinstance(v, Vector):             # <<<<<<<<<<<<<<
@@ -6428,7 +6743,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "FGAme/mathutils/cvector.pyx":348
+    /* "FGAme/mathutils/cvector.pyx":363
  * 
  *     if isinstance(v, Vector):
  *         return v             # <<<<<<<<<<<<<<
@@ -6442,7 +6757,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":350
+    /* "FGAme/mathutils/cvector.pyx":365
  *         return v
  *     else:
  *         return Vector(*v)             # <<<<<<<<<<<<<<
@@ -6450,9 +6765,9 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
  * #===============================================================================
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = PySequence_Tuple(__pyx_v_v); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PySequence_Tuple(__pyx_v_v); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_5FGAme_9mathutils_7cvector_Vector)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_5FGAme_9mathutils_7cvector_Vector)), __pyx_t_3, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_r = __pyx_t_4;
@@ -6460,7 +6775,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
     goto __pyx_L0;
   }
 
-  /* "FGAme/mathutils/cvector.pyx":344
+  /* "FGAme/mathutils/cvector.pyx":359
  *             raise AttributeError
  * 
  * def asvector(v):             # <<<<<<<<<<<<<<
@@ -6480,7 +6795,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_asvector(CYTHON_UNUSED PyOb
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":355
+/* "FGAme/mathutils/cvector.pyx":370
  * # Funes com vetores
  * #===============================================================================
  * def dot(v1, v2):             # <<<<<<<<<<<<<<
@@ -6521,11 +6836,11 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_3dot(PyObject *__pyx_self, 
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_v2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("dot", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("dot", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dot") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "dot") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6538,7 +6853,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_3dot(PyObject *__pyx_self, 
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("dot", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("dot", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.mathutils.cvector.dot", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6566,7 +6881,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dot", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":360
+  /* "FGAme/mathutils/cvector.pyx":375
  *     cdef Vector u1, u2
  * 
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):             # <<<<<<<<<<<<<<
@@ -6586,33 +6901,33 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "FGAme/mathutils/cvector.pyx":361
+    /* "FGAme/mathutils/cvector.pyx":376
  * 
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):
  *         u1 = v1             # <<<<<<<<<<<<<<
  *         u2 = v2
  *         return u1._x * u2._x + u1._y * u2._y
  */
-    if (!(likely(((__pyx_v_v1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 361; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_v1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_v1;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_v_u1 = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":362
+    /* "FGAme/mathutils/cvector.pyx":377
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):
  *         u1 = v1
  *         u2 = v2             # <<<<<<<<<<<<<<
  *         return u1._x * u2._x + u1._y * u2._y
  *     else:
  */
-    if (!(likely(((__pyx_v_v2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_v2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_v2;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_v_u2 = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":363
+    /* "FGAme/mathutils/cvector.pyx":378
  *         u1 = v1
  *         u2 = v2
  *         return u1._x * u2._x + u1._y * u2._y             # <<<<<<<<<<<<<<
@@ -6620,7 +6935,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
  *         return sum(zip(v1, v2))
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyFloat_FromDouble(((__pyx_v_u1->_x * __pyx_v_u2->_x) + (__pyx_v_u1->_y * __pyx_v_u2->_y))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(((__pyx_v_u1->_x * __pyx_v_u2->_x) + (__pyx_v_u1->_y * __pyx_v_u2->_y))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_r = __pyx_t_4;
     __pyx_t_4 = 0;
@@ -6628,7 +6943,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":365
+    /* "FGAme/mathutils/cvector.pyx":380
  *         return u1._x * u2._x + u1._y * u2._y
  *     else:
  *         return sum(zip(v1, v2))             # <<<<<<<<<<<<<<
@@ -6636,7 +6951,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
  * def cross(v1, v2):
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_v1);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_v1);
@@ -6644,15 +6959,15 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
     __Pyx_INCREF(__pyx_v_v2);
     PyTuple_SET_ITEM(__pyx_t_4, 1, __pyx_v_v2);
     __Pyx_GIVEREF(__pyx_v_v2);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_zip, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_sum, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_r = __pyx_t_5;
@@ -6660,7 +6975,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
     goto __pyx_L0;
   }
 
-  /* "FGAme/mathutils/cvector.pyx":355
+  /* "FGAme/mathutils/cvector.pyx":370
  * # Funes com vetores
  * #===============================================================================
  * def dot(v1, v2):             # <<<<<<<<<<<<<<
@@ -6682,7 +6997,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_2dot(CYTHON_UNUSED PyObject
   return __pyx_r;
 }
 
-/* "FGAme/mathutils/cvector.pyx":367
+/* "FGAme/mathutils/cvector.pyx":382
  *         return sum(zip(v1, v2))
  * 
  * def cross(v1, v2):             # <<<<<<<<<<<<<<
@@ -6723,11 +7038,11 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_5cross(PyObject *__pyx_self
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_v2)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("cross", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("cross", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cross") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "cross") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6740,7 +7055,7 @@ static PyObject *__pyx_pw_5FGAme_9mathutils_7cvector_5cross(PyObject *__pyx_self
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("cross", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("cross", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("FGAme.mathutils.cvector.cross", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -6774,7 +7089,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("cross", 0);
 
-  /* "FGAme/mathutils/cvector.pyx":372
+  /* "FGAme/mathutils/cvector.pyx":387
  *     cdef Vector u1, u2
  * 
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):             # <<<<<<<<<<<<<<
@@ -6794,33 +7109,33 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "FGAme/mathutils/cvector.pyx":373
+    /* "FGAme/mathutils/cvector.pyx":388
  * 
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):
  *         u1 = v1             # <<<<<<<<<<<<<<
  *         u2 = v2
  *         return u1._x * u2._y - u2._x * u1._y
  */
-    if (!(likely(((__pyx_v_v1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_v1) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v1, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_v1;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_v_u1 = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":374
+    /* "FGAme/mathutils/cvector.pyx":389
  *     if isinstance(v1, Vector) and isinstance(v2, Vector):
  *         u1 = v1
  *         u2 = v2             # <<<<<<<<<<<<<<
  *         return u1._x * u2._y - u2._x * u1._y
  *     else:
  */
-    if (!(likely(((__pyx_v_v2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (!(likely(((__pyx_v_v2) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_v2, __pyx_ptype_5FGAme_9mathutils_7cvector_Vector))))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __pyx_t_4 = __pyx_v_v2;
     __Pyx_INCREF(__pyx_t_4);
     __pyx_v_u2 = ((struct __pyx_obj_5FGAme_9mathutils_7cvector_Vector *)__pyx_t_4);
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":375
+    /* "FGAme/mathutils/cvector.pyx":390
  *         u1 = v1
  *         u2 = v2
  *         return u1._x * u2._y - u2._x * u1._y             # <<<<<<<<<<<<<<
@@ -6828,7 +7143,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
  *         x1, y1 = v1
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyFloat_FromDouble(((__pyx_v_u1->_x * __pyx_v_u2->_y) - (__pyx_v_u2->_x * __pyx_v_u1->_y))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 375; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyFloat_FromDouble(((__pyx_v_u1->_x * __pyx_v_u2->_y) - (__pyx_v_u2->_x * __pyx_v_u1->_y))); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_r = __pyx_t_4;
     __pyx_t_4 = 0;
@@ -6836,7 +7151,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
   }
   /*else*/ {
 
-    /* "FGAme/mathutils/cvector.pyx":377
+    /* "FGAme/mathutils/cvector.pyx":392
  *         return u1._x * u2._y - u2._x * u1._y
  *     else:
  *         x1, y1 = v1             # <<<<<<<<<<<<<<
@@ -6853,7 +7168,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6866,21 +7181,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       __Pyx_INCREF(__pyx_t_4);
       __Pyx_INCREF(__pyx_t_5);
       #else
-      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_6 = PyObject_GetIter(__pyx_v_v1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyObject_GetIter(__pyx_v_v1); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
       index = 0; __pyx_t_4 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_4)) goto __pyx_L6_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
       index = 1; __pyx_t_5 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_5)) goto __pyx_L6_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_7 = NULL;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       goto __pyx_L7_unpacking_done;
@@ -6888,7 +7203,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L7_unpacking_done:;
     }
     __pyx_v_x1 = __pyx_t_4;
@@ -6896,7 +7211,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
     __pyx_v_y1 = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":378
+    /* "FGAme/mathutils/cvector.pyx":393
  *     else:
  *         x1, y1 = v1
  *         x2, y2 = v2             # <<<<<<<<<<<<<<
@@ -6913,7 +7228,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       if (unlikely(size != 2)) {
         if (size > 2) __Pyx_RaiseTooManyValuesError(2);
         else if (size >= 0) __Pyx_RaiseNeedMoreValuesError(size);
-        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       }
       #if CYTHON_COMPILING_IN_CPYTHON
       if (likely(PyTuple_CheckExact(sequence))) {
@@ -6926,21 +7241,21 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       __Pyx_INCREF(__pyx_t_5);
       __Pyx_INCREF(__pyx_t_4);
       #else
-      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_5 = PySequence_ITEM(sequence, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_4 = PySequence_ITEM(sequence, 1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_4);
       #endif
     } else {
       Py_ssize_t index = -1;
-      __pyx_t_6 = PyObject_GetIter(__pyx_v_v2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_6 = PyObject_GetIter(__pyx_v_v2); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_7 = Py_TYPE(__pyx_t_6)->tp_iternext;
       index = 0; __pyx_t_5 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_5)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_5);
       index = 1; __pyx_t_4 = __pyx_t_7(__pyx_t_6); if (unlikely(!__pyx_t_4)) goto __pyx_L8_unpacking_failed;
       __Pyx_GOTREF(__pyx_t_4);
-      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      if (__Pyx_IternextUnpackEndCheck(__pyx_t_7(__pyx_t_6), 2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_t_7 = NULL;
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       goto __pyx_L9_unpacking_done;
@@ -6948,7 +7263,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
       if (__Pyx_IterFinish() == 0) __Pyx_RaiseNeedMoreValuesError(index);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __pyx_L9_unpacking_done:;
     }
     __pyx_v_x2 = __pyx_t_5;
@@ -6956,7 +7271,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
     __pyx_v_y2 = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":379
+    /* "FGAme/mathutils/cvector.pyx":394
  *         x1, y1 = v1
  *         x2, y2 = v2
  *         return x1 * y2 - x2 * y1             # <<<<<<<<<<<<<<
@@ -6964,11 +7279,11 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
  * if __name__ == '__main__':
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_4 = PyNumber_Multiply(__pyx_v_x1, __pyx_v_y2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyNumber_Multiply(__pyx_v_x1, __pyx_v_y2); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 394; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyNumber_Multiply(__pyx_v_x2, __pyx_v_y1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyNumber_Multiply(__pyx_v_x2, __pyx_v_y1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 394; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = PyNumber_Subtract(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyNumber_Subtract(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 394; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -6977,7 +7292,7 @@ static PyObject *__pyx_pf_5FGAme_9mathutils_7cvector_4cross(CYTHON_UNUSED PyObje
     goto __pyx_L0;
   }
 
-  /* "FGAme/mathutils/cvector.pyx":367
+  /* "FGAme/mathutils/cvector.pyx":382
  *         return sum(zip(v1, v2))
  * 
  * def cross(v1, v2):             # <<<<<<<<<<<<<<
@@ -7228,6 +7543,19 @@ static PyObject *__pyx_tp_new_5FGAme_9mathutils_7cvector_VectorM(PyTypeObject *t
   return o;
 }
 
+static int __pyx_mp_ass_subscript_5FGAme_9mathutils_7cvector_VectorM(PyObject *o, PyObject *i, PyObject *v) {
+  if (v) {
+    return __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__setitem__(o, i, v);
+  }
+  else {
+    if (__pyx_ptype_5FGAme_9mathutils_7cvector_Vector->tp_as_mapping && __pyx_ptype_5FGAme_9mathutils_7cvector_Vector->tp_as_mapping->mp_ass_subscript)
+      return __pyx_ptype_5FGAme_9mathutils_7cvector_Vector->tp_as_mapping->mp_ass_subscript(o, i, v);
+    PyErr_Format(PyExc_NotImplementedError,
+      "Subscript deletion not supported by %.200s", Py_TYPE(o)->tp_name);
+    return -1;
+  }
+}
+
 static PyObject *__pyx_getprop_5FGAme_9mathutils_7cvector_7VectorM_x(PyObject *o, CYTHON_UNUSED void *x) {
   return __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1x_1__get__(o);
 }
@@ -7255,9 +7583,9 @@ static int __pyx_setprop_5FGAme_9mathutils_7cvector_7VectorM_y(PyObject *o, PyOb
 }
 
 static PyMethodDef __pyx_methods_5FGAme_9mathutils_7cvector_VectorM[] = {
-  {"rotate", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11rotate, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_10rotate},
-  {"update", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13update, METH_O, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_12update},
-  {"copy", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15copy, METH_NOARGS, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_14copy},
+  {"rotate", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_13rotate, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_12rotate},
+  {"update", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_15update, METH_VARARGS|METH_KEYWORDS, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_14update},
+  {"copy", (PyCFunction)__pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_17copy, METH_NOARGS, __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_16copy},
   {0, 0, 0, 0}
 };
 
@@ -7327,11 +7655,11 @@ static PyNumberMethods __pyx_tp_as_number_VectorM = {
   #if PY_MAJOR_VERSION < 3
   0, /*nb_hex*/
   #endif
-  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_1__iadd__, /*nb_inplace_add*/
-  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__isub__, /*nb_inplace_subtract*/
-  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__imul__, /*nb_inplace_multiply*/
+  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_3__iadd__, /*nb_inplace_add*/
+  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_5__isub__, /*nb_inplace_subtract*/
+  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__imul__, /*nb_inplace_multiply*/
   #if PY_MAJOR_VERSION < 3
-  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_7__idiv__, /*nb_inplace_divide*/
+  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__idiv__, /*nb_inplace_divide*/
   #endif
   0, /*nb_inplace_remainder*/
   0, /*nb_inplace_power*/
@@ -7347,7 +7675,7 @@ static PyNumberMethods __pyx_tp_as_number_VectorM = {
   0, /*nb_true_divide*/
   #endif
   0, /*nb_inplace_floor_divide*/
-  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_9__itruediv__, /*nb_inplace_true_divide*/
+  __pyx_pw_5FGAme_9mathutils_7cvector_7VectorM_11__itruediv__, /*nb_inplace_true_divide*/
   0, /*nb_index*/
   #if PY_VERSION_HEX >= 0x03050000
   0, /*nb_matrix_multiply*/
@@ -7355,6 +7683,20 @@ static PyNumberMethods __pyx_tp_as_number_VectorM = {
   #if PY_VERSION_HEX >= 0x03050000
   0, /*nb_inplace_matrix_multiply*/
   #endif
+};
+
+static PyMappingMethods __pyx_tp_as_mapping_VectorM = {
+  #if CYTHON_COMPILING_IN_PYPY
+  __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_15__len__, /*mp_length*/
+  #else
+  0, /*mp_length*/
+  #endif
+  #if CYTHON_COMPILING_IN_PYPY
+  __pyx_pw_5FGAme_9mathutils_7cvector_6Vector_24__getitem__, /*mp_subscript*/
+  #else
+  0, /*mp_subscript*/
+  #endif
+  __pyx_mp_ass_subscript_5FGAme_9mathutils_7cvector_VectorM, /*mp_ass_subscript*/
 };
 
 static PyTypeObject __pyx_type_5FGAme_9mathutils_7cvector_VectorM = {
@@ -7378,7 +7720,7 @@ static PyTypeObject __pyx_type_5FGAme_9mathutils_7cvector_VectorM = {
   #endif
   &__pyx_tp_as_number_VectorM, /*tp_as_number*/
   0, /*tp_as_sequence*/
-  0, /*tp_as_mapping*/
+  &__pyx_tp_as_mapping_VectorM, /*tp_as_mapping*/
   0, /*tp_hash*/
   0, /*tp_call*/
   #if CYTHON_COMPILING_IN_PYPY
@@ -7579,6 +7921,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_import, __pyx_k_import, sizeof(__pyx_k_import), 0, 0, 1, 1},
   {&__pyx_n_s_iter, __pyx_k_iter, sizeof(__pyx_k_iter), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
+  {&__pyx_n_s_map, __pyx_k_map, sizeof(__pyx_k_map), 0, 0, 1, 1},
   {&__pyx_n_s_math, __pyx_k_math, sizeof(__pyx_k_math), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_new, __pyx_k_new, sizeof(__pyx_k_new), 0, 0, 1, 1},
@@ -7586,6 +7929,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_norm_sqr, __pyx_k_norm_sqr, sizeof(__pyx_k_norm_sqr), 0, 0, 1, 1},
   {&__pyx_n_s_normalized, __pyx_k_normalized, sizeof(__pyx_k_normalized), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
+  {&__pyx_n_s_other, __pyx_k_other, sizeof(__pyx_k_other), 0, 0, 1, 1},
   {&__pyx_n_s_pi, __pyx_k_pi, sizeof(__pyx_k_pi), 0, 0, 1, 1},
   {&__pyx_n_s_pyx_vtable, __pyx_k_pyx_vtable, sizeof(__pyx_k_pyx_vtable), 0, 0, 1, 1},
   {&__pyx_n_s_rmul, __pyx_k_rmul, sizeof(__pyx_k_rmul), 0, 0, 1, 1},
@@ -7616,9 +7960,10 @@ static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_ImportError = __Pyx_GetBuiltinName(__pyx_n_s_ImportError); if (!__pyx_builtin_ImportError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_IndexError = __Pyx_GetBuiltinName(__pyx_n_s_IndexError); if (!__pyx_builtin_IndexError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 130; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 148; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_AttributeError = __Pyx_GetBuiltinName(__pyx_n_s_AttributeError); if (!__pyx_builtin_AttributeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 245; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_AttributeError = __Pyx_GetBuiltinName(__pyx_n_s_AttributeError); if (!__pyx_builtin_AttributeError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 247; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_map = __Pyx_GetBuiltinName(__pyx_n_s_map); if (!__pyx_builtin_map) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 327; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_sum = __Pyx_GetBuiltinName(__pyx_n_s_sum); if (!__pyx_builtin_sum) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_zip = __Pyx_GetBuiltinName(__pyx_n_s_zip); if (!__pyx_builtin_zip) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -7639,14 +7984,14 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "FGAme/mathutils/cvector.pyx":299
+  /* "FGAme/mathutils/cvector.pyx":309
  *         return self
  * 
  *     def rotate(Vector self, theta, axis=(0, 0)):             # <<<<<<<<<<<<<<
  *         '''Realiza rotao *inplace*'''
  * 
  */
-  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_0, __pyx_int_0); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 299; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__2 = PyTuple_Pack(2, __pyx_int_0, __pyx_int_0); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 309; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
@@ -7661,41 +8006,41 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "FGAme/mathutils/cvector.pyx":344
+  /* "FGAme/mathutils/cvector.pyx":359
  *             raise AttributeError
  * 
  * def asvector(v):             # <<<<<<<<<<<<<<
  *     '''Retorna o objeto como uma instncia da classe Vetor'''
  * 
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_v); if (unlikely(!__pyx_tuple__4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_s_v); if (unlikely(!__pyx_tuple__4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
-  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_asvector, 344, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__5 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__4, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_asvector, 359, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":355
+  /* "FGAme/mathutils/cvector.pyx":370
  * # Funes com vetores
  * #===============================================================================
  * def dot(v1, v2):             # <<<<<<<<<<<<<<
  *     '''Calcula o produto escalar entre dois vetores'''
  * 
  */
-  __pyx_tuple__6 = PyTuple_Pack(4, __pyx_n_s_v1, __pyx_n_s_v2, __pyx_n_s_u1, __pyx_n_s_u2); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__6 = PyTuple_Pack(4, __pyx_n_s_v1, __pyx_n_s_v2, __pyx_n_s_u1, __pyx_n_s_u2); if (unlikely(!__pyx_tuple__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_dot, 355, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(2, 0, 4, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_dot, 370, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "FGAme/mathutils/cvector.pyx":367
+  /* "FGAme/mathutils/cvector.pyx":382
  *         return sum(zip(v1, v2))
  * 
  * def cross(v1, v2):             # <<<<<<<<<<<<<<
  *     '''Retorna a compontente z do produto vetorial de dois vetores bidimensionais'''
  * 
  */
-  __pyx_tuple__8 = PyTuple_Pack(8, __pyx_n_s_v1, __pyx_n_s_v2, __pyx_n_s_u1, __pyx_n_s_u2, __pyx_n_s_x1, __pyx_n_s_y1, __pyx_n_s_x2, __pyx_n_s_y2); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__8 = PyTuple_Pack(8, __pyx_n_s_v1, __pyx_n_s_v2, __pyx_n_s_u1, __pyx_n_s_u2, __pyx_n_s_x1, __pyx_n_s_y1, __pyx_n_s_x2, __pyx_n_s_y2); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_cross, 367, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(2, 0, 8, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_home_chips_git_FGAme_src_FGAme, __pyx_n_s_cross, 382, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -7904,62 +8249,62 @@ PyMODINIT_FUNC PyInit_cvector(void)
   __pyx_vtabptr_5FGAme_9mathutils_7cvector_VectorM = &__pyx_vtable_5FGAme_9mathutils_7cvector_VectorM;
   __pyx_vtable_5FGAme_9mathutils_7cvector_VectorM.__pyx_base = *__pyx_vtabptr_5FGAme_9mathutils_7cvector_Vector;
   __pyx_type_5FGAme_9mathutils_7cvector_VectorM.tp_base = __pyx_ptype_5FGAme_9mathutils_7cvector_Vector;
-  if (PyType_Ready(&__pyx_type_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_5FGAme_9mathutils_7cvector_VectorM.tp_print = 0;
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__iadd__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__iadd__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM___iadd__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM___iadd__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM___iadd__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM___iadd__;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__iadd__;
     }
   }
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__isub__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__isub__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__isub__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__isub__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_2__isub__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_2__isub__;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__isub__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__isub__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_4__isub__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__isub__;
     }
   }
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__imul__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__imul__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__imul__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__imul__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_4__imul__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_4__imul__;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__imul__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__imul__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_6__imul__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__imul__;
     }
   }
   #endif
   #if PY_MAJOR_VERSION < 3
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__idiv__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__idiv__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_6__idiv__;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__idiv__;
     }
   }
   #endif
   #endif
   #if CYTHON_COMPILING_IN_CPYTHON
   {
-    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__itruediv__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    PyObject *wrapper = PyObject_GetAttrString((PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM, "__itruediv__"); if (unlikely(!wrapper)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     if (Py_TYPE(wrapper) == &PyWrapperDescr_Type) {
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__ = *((PyWrapperDescrObject *)wrapper)->d_base;
-      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__;
-      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_8__itruediv__;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__ = *((PyWrapperDescrObject *)wrapper)->d_base;
+      __pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__.doc = __pyx_doc_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__;
+      ((PyWrapperDescrObject *)wrapper)->d_base = &__pyx_wrapperbase_5FGAme_9mathutils_7cvector_7VectorM_10__itruediv__;
     }
   }
   #endif
-  if (__Pyx_SetVtable(__pyx_type_5FGAme_9mathutils_7cvector_VectorM.tp_dict, __pyx_vtabptr_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "VectorM", (PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 261; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_5FGAme_9mathutils_7cvector_VectorM.tp_dict, __pyx_vtabptr_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "VectorM", (PyObject *)&__pyx_type_5FGAme_9mathutils_7cvector_VectorM) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 263; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_5FGAme_9mathutils_7cvector_VectorM = &__pyx_type_5FGAme_9mathutils_7cvector_VectorM;
   if (PyType_Ready(&__pyx_type_5FGAme_9mathutils_7cvector___pyx_scope_struct____iter__) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_5FGAme_9mathutils_7cvector___pyx_scope_struct____iter__.tp_print = 0;
@@ -8105,74 +8450,74 @@ PyMODINIT_FUNC PyInit_cvector(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_all, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":344
+  /* "FGAme/mathutils/cvector.pyx":359
  *             raise AttributeError
  * 
  * def asvector(v):             # <<<<<<<<<<<<<<
  *     '''Retorna o objeto como uma instncia da classe Vetor'''
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_1asvector, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_1asvector, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_asvector, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 344; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_asvector, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":355
+  /* "FGAme/mathutils/cvector.pyx":370
  * # Funes com vetores
  * #===============================================================================
  * def dot(v1, v2):             # <<<<<<<<<<<<<<
  *     '''Calcula o produto escalar entre dois vetores'''
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_3dot, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_3dot, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_dot, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 355; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_dot, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 370; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":367
+  /* "FGAme/mathutils/cvector.pyx":382
  *         return sum(zip(v1, v2))
  * 
  * def cross(v1, v2):             # <<<<<<<<<<<<<<
  *     '''Retorna a compontente z do produto vetorial de dois vetores bidimensionais'''
  * 
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_5cross, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5FGAme_9mathutils_7cvector_5cross, NULL, __pyx_n_s_FGAme_mathutils_cvector); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cross, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 367; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_cross, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "FGAme/mathutils/cvector.pyx":381
+  /* "FGAme/mathutils/cvector.pyx":396
  *         return x1 * y2 - x2 * y1
  * 
  * if __name__ == '__main__':             # <<<<<<<<<<<<<<
  *     import doctest
  *     doctest.testmod()
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_name); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 381; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_name); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 396; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_main, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 381; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = (__Pyx_PyString_Equals(__pyx_t_1, __pyx_n_s_main, Py_EQ)); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 396; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_5) {
 
-    /* "FGAme/mathutils/cvector.pyx":382
+    /* "FGAme/mathutils/cvector.pyx":397
  * 
  * if __name__ == '__main__':
  *     import doctest             # <<<<<<<<<<<<<<
  *     doctest.testmod()
  */
-    __pyx_t_1 = __Pyx_Import(__pyx_n_s_doctest, 0, -1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_Import(__pyx_n_s_doctest, 0, -1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    if (PyDict_SetItem(__pyx_d, __pyx_n_s_doctest, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (PyDict_SetItem(__pyx_d, __pyx_n_s_doctest, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 397; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "FGAme/mathutils/cvector.pyx":383
+    /* "FGAme/mathutils/cvector.pyx":398
  * if __name__ == '__main__':
  *     import doctest
  *     doctest.testmod()             # <<<<<<<<<<<<<<
  */
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_doctest); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_doctest); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_testmod); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_testmod); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_2 = NULL;
@@ -8186,10 +8531,10 @@ PyMODINIT_FUNC PyInit_cvector(void)
       }
     }
     if (__pyx_t_2) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     } else {
-      __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 398; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;

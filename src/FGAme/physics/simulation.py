@@ -1,11 +1,9 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector, shadow_y
-from FGAme.physics import get_collision, get_collision_aabb, CollisionError
+from FGAme.mathutils import Vector
+from FGAme.physics import get_collision, get_collision_generic, CollisionError
 from FGAme.physics import flags
-from FGAme.core import EventDispatcher, signal, init
-from FGAme.core import env
-from FGAme.physics.flags import ACCEL_STATIC
+from FGAme.core import EventDispatcher, signal
 
 ###############################################################################
 #                                Simulação
@@ -151,21 +149,23 @@ class Simulation(EventDispatcher):
         self.time += self._dt
 
     def broad_phase(self):
-        '''Retorna uma lista com todas as colisões atuais.
+        '''Detecta todas as possíveis colisões utilizando um algoritmo
+        grosseiro de detecção.
 
-        Uma colisão é caracterizada por um objeto da classe Collision() ou
-        subclasse.'''
+        Esta função implementa a detecção via CBB (Circular bounding box), e
+        salva todas os pares de possíveis objetos em colisão numa lista
+        interna.'''
 
         objects = self._objects
         col_idx = 0
-        objects.sort(key=lambda obj: obj.pos.x - obj.cbb_radius)
+        objects.sort(key=lambda obj: obj._pos.x - obj.cbb_radius)
         self._broad_collisions[:] = []
 
         # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
         # salva o resultado na lista broad collisions
         for i, A in enumerate(objects):
             A_radius = A.cbb_radius
-            A_right = A.pos.x + A_radius
+            A_right = A._pos.x + A_radius
             A_dynamic = A.is_dynamic()
 
             for j in range(i + 1, len(objects)):
@@ -173,7 +173,7 @@ class Simulation(EventDispatcher):
                 B_radius = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
-                B_left = B.pos.x - B_radius
+                B_left = B._pos.x - B_radius
                 if B_left > A_right:
                     break
 
@@ -182,7 +182,7 @@ class Simulation(EventDispatcher):
                     continue
 
                 # Testa a colisão entre os círculos de contorno
-                if (A.pos - B.pos).norm() > A_radius + B_radius:
+                if (A._pos - B._pos).norm() > A_radius + B_radius:
                     continue
 
                 # Adiciona à lista de colisões grosseiras
@@ -190,6 +190,8 @@ class Simulation(EventDispatcher):
                 self._broad_collisions.append((A, B))
 
     def fine_phase(self):
+        '''Escaneia a lista de colisões grosseiras e detecta quais delas
+        realmente aconteceram'''
         # Detecta colisões e atualiza as listas internas de colisões de
         # cada objeto
         self._fine_collisions[:] = []
@@ -199,20 +201,21 @@ class Simulation(EventDispatcher):
 
             if col is not None:
                 col.world = self
-                A.trigger('collision', col)
-                B.trigger('collision', col)
-                if col.is_active:
-                    self._fine_collisions.append(col)
+                self._fine_collisions.append(col)
 
     def update_accelerations(self):
-        return
+        '''Atualiza o vetor interno que mede as acelerações lineares e
+        angulares de cada objeto.
+
+        Para tanto, usa informação tanto de forças globais quanto dos atributos
+        *force* e *torque* de cada objeto.'''
 
         t = self.time
+        dt = self._dt
         ACCEL_STATIC = flags.ACCEL_STATIC
         ALPHA_STATIC = 0  # flags.ALPHA_STATIC
 
         # Acumula as forças e acelerações
-        # FIXME: consertar mecanismo de aceleração externa
         for obj in self._objects:
             if obj._invmass:
                 obj.init_accel()
@@ -225,14 +228,15 @@ class Simulation(EventDispatcher):
 
             if obj._invinertia:
                 obj.init_alpha()
-                #tau += obj.external_torque(t) or 0
+                if obj.torque is not None:
+                    obj._alpha += obj.torque(t) * obj._invinertia
 
             elif obj.flags & ALPHA_STATIC:
                 obj.init_alpha()
                 obj.apply_alpha(self._alpha, dt)
 
     def resolve_accelerations(self):
-        '''Resolve a dinâmica de forças durante o intervalo dt'''
+        '''Resolve as acelerações acumuladas em update_accelerations()'''
 
         dt = self._dt
         for obj in self._objects:
@@ -243,12 +247,18 @@ class Simulation(EventDispatcher):
 
             if obj._invinertia:
                 obj.apply_alpha(None, dt)
-            elif obj._omega:
-                obj.rotate(obj._omega * dt)
+            elif obj.omega:
+                obj.rotate(obj.omega * dt)
 
     def resolve_collisions(self):
+        '''Resolve as colisões'''
+
         for col in self._fine_collisions:
-            col.resolve()
+            A, B = col.objects
+            A.trigger('collision', col)
+            B.trigger('collision', col)
+            if col.is_active:
+                col.resolve()
 
     def get_fine_collision(self, A, B):
         '''Retorna a colisão entre os objetos A e B depois que a colisão AABB
@@ -268,10 +278,12 @@ class Simulation(EventDispatcher):
                 return
             col.normal *= -1
         except CollisionError:
-            get_collision[type(A), type(B)] = get_collision_aabb
-            get_collision[type(B), type(A)] = get_collision_aabb
-            return get_collision_aabb(A, B)
+            get_collision[type(A), type(B)] = get_collision_generic
+            get_collision[type(B), type(A)] = get_collision_generic
+            return get_collision_generic(A, B)
         else:
+            direct = get_collision.get_implementation(type(B), type(A))
+
             def inverse(A, B):
                 '''Automatically created collision for A, B from the supported
                 collision B, A'''
@@ -279,7 +291,6 @@ class Simulation(EventDispatcher):
                 if col is not None:
                     return col.swapped()
 
-            direct = get_collision[type(B), type(A)]
             get_collision[type(A), type(B)] = inverse
             return col
 

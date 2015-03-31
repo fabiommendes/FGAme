@@ -659,13 +659,13 @@ static char __pyx_k_doc_2[] = "_doc";
 static char __pyx_k_range[] = "range";
 static char __pyx_k_name_2[] = "_name";
 static char __pyx_k_KeyError[] = "KeyError";
-static char __pyx_k_get_function[] = "get_function";
+static char __pyx_k_get_implementation[] = "get_implementation";
 static PyObject *__pyx_kp_s_;
 static PyObject *__pyx_n_s_KeyError;
 static PyObject *__pyx_n_s_data;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_doc_2;
-static PyObject *__pyx_n_s_get_function;
+static PyObject *__pyx_n_s_get_implementation;
 static PyObject *__pyx_n_s_init;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_name;
@@ -1123,7 +1123,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
  *         try:
  *             func = self._c_cache[types]             # <<<<<<<<<<<<<<
  *         except KeyError:
- *             func = self.get_function(*tuple(types))
+ *             func = self.get_implementation(*tuple(types))
  */
       if (unlikely(__pyx_v_self->_c_cache == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -1145,7 +1145,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
  *         try:
  *             func = self._c_cache[types]
  *         except KeyError:             # <<<<<<<<<<<<<<
- *             func = self.get_function(*tuple(types))
+ *             func = self.get_implementation(*tuple(types))
  *         Py_DECREF(types)
  */
     __pyx_t_3 = PyErr_ExceptionMatches(__pyx_builtin_KeyError);
@@ -1159,11 +1159,11 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
       /* "FGAme/util/cmultidispatch.pyx":38
  *             func = self._c_cache[types]
  *         except KeyError:
- *             func = self.get_function(*tuple(types))             # <<<<<<<<<<<<<<
+ *             func = self.get_implementation(*tuple(types))             # <<<<<<<<<<<<<<
  *         Py_DECREF(types)
  * 
  */
-      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_function); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
+      __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_get_implementation); if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_11 = PySequence_Tuple(__pyx_v_types); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 38; __pyx_clineno = __LINE__; goto __pyx_L7_except_error;}
       __Pyx_GOTREF(__pyx_t_11);
@@ -1198,7 +1198,7 @@ static PyObject *__pyx_pf_5FGAme_4util_14cmultidispatch_17MultiFunctionBase_4__c
 
   /* "FGAme/util/cmultidispatch.pyx":39
  *         except KeyError:
- *             func = self.get_function(*tuple(types))
+ *             func = self.get_implementation(*tuple(types))
  *         Py_DECREF(types)             # <<<<<<<<<<<<<<
  * 
  *         if M == 0:
@@ -1474,7 +1474,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_data, __pyx_k_data, sizeof(__pyx_k_data), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_doc_2, __pyx_k_doc_2, sizeof(__pyx_k_doc_2), 0, 0, 1, 1},
-  {&__pyx_n_s_get_function, __pyx_k_get_function, sizeof(__pyx_k_get_function), 0, 0, 1, 1},
+  {&__pyx_n_s_get_implementation, __pyx_k_get_implementation, sizeof(__pyx_k_get_implementation), 0, 0, 1, 1},
   {&__pyx_n_s_init, __pyx_k_init, sizeof(__pyx_k_init), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},

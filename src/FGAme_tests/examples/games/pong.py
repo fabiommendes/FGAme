@@ -14,8 +14,8 @@ class Pong(World):
         self.set_bounds(width=(-300, 10))
 
         # Linha central
-        # self.add(draw.Rectangle(shape=(15, 550), pos=(400, 300),
-        #                        color=(200, 200, 200)))
+        self.add(draw.AABB(shape=(15, 550), pos=(400, 300),
+                           color=(200, 200, 200)))
 
         # Cria a bola com uma velocidade aleatória
         self.ball = Circle(30, color='red', world=self)
@@ -23,24 +23,10 @@ class Pong(World):
         self.ball.vel = (+700, choice([-1, 1]) * uniform(200, 400))
 
         # Cria a barras
-        self.pong1 = AABB(
-            shape=[
-                20,
-                130],
-            pos=(
-                50,
-                300),
-            world=self,
-            mass='inf')
-        self.pong2 = AABB(
-            shape=[
-                20,
-                130],
-            pos=(
-                750,
-                300),
-            world=self,
-            mass='inf')
+        self.pong1 = AABB(shape=[20, 130], pos=(50, 300),
+                          world=self, mass='inf')
+        self.pong2 = AABB(shape=[20, 130], pos=(750, 300),
+                          world=self, mass='inf')
 
         # Registra eventos
         self.listen('long-press', 'up', self.move_up, obj=self.pong2)

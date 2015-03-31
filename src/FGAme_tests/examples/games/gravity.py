@@ -24,9 +24,6 @@ class Gravity(World):
         # Definimos a força de interação entre ambos
         K = self.K = A.mass
         F = SpringF(A, B, (K, 2 * K))
-        F = GravityF(A, B, 2e4)
-        Fa = SpringSF(A, 2 * K, r0=(0, 0))
-        Fb = GravitySF(B, 0.9e4, epsilon=10)
         A.force, B.force = F.forces()
 
         E0 = F.totalE()
@@ -34,7 +31,7 @@ class Gravity(World):
 
         @self.listen('frame-enter')
         def printP():
-            print('%.e' % (Fa.totalE() + Fb.totalE() - E0))
+            print('%.e' % (F.totalE() + F.totalE() - E0))
             #print(F.totalE() / E0)
 
 if __name__ == '__main__':

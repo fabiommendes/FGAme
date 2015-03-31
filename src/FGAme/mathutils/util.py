@@ -1,8 +1,4 @@
-#-*- coding: utf8 -*-
-
-#
-# Importa todas as funções matemáticas do módulo math e acrescenta mais algumas
-#
+# -*- coding: utf8 -*-
 
 
 def sign(x):

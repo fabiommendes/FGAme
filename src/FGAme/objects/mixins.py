@@ -4,145 +4,9 @@ Created on 22/03/2015
 @author: chips
 '''
 
-from FGAme.mathutils import Vector
-from FGAme.physics import Dynamic, flags
 from FGAme.core import EventDispatcherMeta, signal
 from FGAme.draw import Color, Shape
 from FGAme.util import lazy
-
-
-class HasLocalForces(object):
-
-    '''Classe mix-in para todos os objetos que possuam uma gravidade e damping
-    locais associados a um mundo
-
-    **Forças locais**
-
-    gravity
-        Valor da aceleração da gravidade aplicada ao objeto
-    damping, adamping
-        Constante de amortecimento linear/angular para forças viscosas
-        aplicadas ao objeto
-    owns_gravity, owns_damping, owns_adamping
-        Se Falso (padrão) utiliza os valores de gravity e damping/adamping
-        fornecidos pelo mundo
-    accel_static
-        Caso verdadeiro, aplica as acelerações de gravidade, damping/adamping
-        no objeto mesmo se ele for estático
-
-
-    Example
-    -------
-
-    >>> elem = PhysWorldElement(gravity=9.8)
-    >>> elem.gravity
-    Vector(0, -9.8)
-    >>> elem.owns_gravity
-    True
-    >>> elem.owns_damping
-    False
-
-    '''
-
-    _slots_ = ['_damping', '_adamping', '_gravity', '_damping']
-    _is_mixin_ = True
-
-    def _init_has_local_forces(
-            self,
-            gravity=None, damping=None, adamping=None,
-            owns_gravity=None, owns_damping=None, owns_adamping=None):
-
-        self._damping = 0.0
-        if damping is not None:
-            self.flags |= flags.OWNS_ADAMPING
-            self._damping = float(damping)
-
-        self._adamping = 0.0
-        if adamping is not None:
-            self.flags |= flags.OWNS_DAMPING
-            self._adamping = float(adamping)
-
-        self._gravity = Vector(0, 0)
-        if gravity is not None:
-            self.flags |= flags.OWNS_GRAVITY
-            self._gravity = (Vector(0, -gravity)
-                             if isinstance(gravity, (float, int))
-                             else Vector(*gravity))
-
-    # Propriedades ############################################################
-    @property
-    def gravity(self):
-        return self._gravity
-
-    @gravity.setter
-    def gravity(self, value):
-        self._gravity = Vector(*value)
-        self.flags |= flags.OWNS_GRAVITY
-
-    @property
-    def damping(self):
-        return self._damping
-
-    @damping.setter
-    def damping(self, value):
-        self._damping = float(value)
-        self.flags |= flags.OWNS_DAMPING
-
-    @property
-    def adamping(self):
-        return self._adamping
-
-    @adamping.setter
-    def adamping(self, value):
-        self._adamping = float(value)
-        self.flags |= flags.OWNS_ADAMPING
-
-    # Redireciona as propriedades acessoras das flags para manter simetria
-    # entre os argumentos do construtor e atributos do objeto
-    @property
-    def owns_gravity(self):
-        return bool(self.flags & flags.OWNS_GRAVITY)
-
-    @property
-    def owns_damping(self):
-        return bool(self.flags & flags.OWNS_DAMPING)
-
-    @property
-    def owns_adamping(self):
-        return bool(self.flags & flags.OWNS_ADAMPING)
-
-    # Métodos #################################################################
-    def global_force(self):
-        '''Calcula a força total devido à gravidade e amortecimento'''
-
-        return self._mass * (self._gravity - self._damping * self._vel)
-
-    def global_accel(self):
-        '''Calcula a contribuição para a aceleração devido à gravidade e
-        amortecimento'''
-
-        return self._gravity - self._damping * self._vel
-
-    def init_accel(self):
-        '''Inicializa o vetor de aceleração com os valores devidos à gravidade
-        e ao amortecimento'''
-
-        a = self._accel
-        if self._damping:
-            a.update(self._vel)
-            a *= -self._damping
-            if self._gravity is not None:
-                a += self._gravity
-        elif self._gravity is not None:
-            a.update(self._gravity)
-        else:
-            a *= 0
-
-    def init_alpha(self):
-        '''Inicializa o vetor de aceleração com os valores devidos à gravidade
-        e ao amortecimento'''
-
-        self._alpha = - self._adamping * self._omega
 
 
 class HasVisualization(object):
@@ -215,11 +79,9 @@ class WorldObject(object):
             world.add(self)
 
 
-class ObjectMixin(WorldObject, HasLocalForces, HasVisualization):
+class ObjectMixin(WorldObject, HasVisualization):
     _mixin_args = set([
         'world', 'color', 'line_color',
-        'gravity', 'damping', 'adamping',
-        'owns_gravity', 'owns_damping', 'owns_adamping',
     ])
 
     def __init__(self, *args, **kwds):
@@ -240,10 +102,6 @@ class ObjectMixin(WorldObject, HasLocalForces, HasVisualization):
 
     def _init_mixin(self,
                     world=None,
-                    color=None,
-                    gravity=None, damping=None, adamping=None,
-                    owns_gravity=None, owns_damping=None, owns_adamping=None):
+                    color=None):
         self._init_has_visualization(color)
-        self._init_has_local_forces(gravity, damping, adamping,
-                                    owns_gravity, owns_damping, owns_adamping)
         self._init_world_object(world)

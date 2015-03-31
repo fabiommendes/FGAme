@@ -8,7 +8,7 @@ from random import uniform
 # Constantes da simulação
 SPEED = 300
 SHAPE = (30, 30)
-NUM_POLYS = 80
+NUM_POLYS = 100
 
 # Inicializa o mundo
 world = World(gravity=50, dfriction=0)
@@ -19,7 +19,6 @@ for _ in range(NUM_POLYS):
     pos = Vector(uniform(30, 770), uniform(30, 570))
     vel = Vector(uniform(-SPEED, SPEED), uniform(-SPEED, SPEED))
     obj = Rectangle(shape=SHAPE, vel=vel, pos=pos, color=(200, 0, 0))
-    obj.inertia *= 10
     world.add(obj)
 
 # Inicia a simulação

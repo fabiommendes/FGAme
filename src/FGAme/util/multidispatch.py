@@ -199,7 +199,7 @@ except (ImportError, SystemError) as ex:
             try:
                 return self._cache[types](*args, **kwargs)
             except KeyError:
-                func = self.get_function(*types)
+                func = self.get_implementation(*types)
             return func(*args, **kwargs)
 
 
@@ -276,7 +276,7 @@ class multifunction(MultiFunctionBase, MutableMapping):
         else:
             return func
 
-    def get_function(self, *types):
+    def get_implementation(self, *types):
         '''Returns the appropriate implementation function from the given types,
         considering inheritance.'''
 
@@ -455,7 +455,7 @@ class multimethod(multifunction):
     __slots__ = multifunction.__slots__
 
     def __call__(self, other, *args, **kwds):
-        method = self.get_function(*tuple(type(x) for x in args), **kwds)
+        method = self.get_implementation(*tuple(type(x) for x in args), **kwds)
         return method(other, *args, **kwds)
 
 # class pattern(MutableSequence):

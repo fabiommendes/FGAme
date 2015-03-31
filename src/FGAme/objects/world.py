@@ -3,7 +3,7 @@ from FGAme.physics import Simulation
 from FGAme.core import EventDispatcher, signal, conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
-from FGAme.physics.obj_base import Dynamic
+from FGAme.physics import Dynamic
 
 
 class World(EventDispatcher):

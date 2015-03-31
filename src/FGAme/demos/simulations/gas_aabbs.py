@@ -1,4 +1,4 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
 '''
 Este exemplo ilustra a simulação de um gás de caixas alinhadas aos eixos
 '''
@@ -22,10 +22,4 @@ for _ in range(NUM_ABBS):
     world.add(aabb)
 
 # Inicia a simulação
-# world.run()
-
-# Benchmark
-print('simulating')
-for i in range(1000):
-    world._simulation.update(1. / 60)
-print('done')
+world.run()

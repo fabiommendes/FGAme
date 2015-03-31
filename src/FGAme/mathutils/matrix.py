@@ -352,7 +352,7 @@ class RotMatrix(Matrix):
         super(RotMatrix, self).__init__(M)
 
     def rotated(self, theta):
-        return RotMatrix(self._theta + theta)
+        return RotMatrix(self.theta + theta)
 
     def transposed(self):
         if self._transposed is None:
@@ -364,7 +364,7 @@ class RotMatrix(Matrix):
 
     @property
     def theta(self):
-        return self._theta
+        return self.theta
 
 
 class mMatrix(Matrix):

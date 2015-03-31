@@ -10,7 +10,7 @@ __all__ = ['Vector', 'VectorM', 'asvector', 'dot', 'cross']
 class Vector(object):
     __slots__ = ['_x', '_y']
 
-    def __init__(self, x, y):
+    def __init__(self, x_or_data, y=None):
         '''Representa um vetor bidimensional.
 
         Exemplo
@@ -42,6 +42,10 @@ class Vector(object):
         '''
 
         try:
+            if y is None:
+                x, y = x_or_data
+            else:
+                x = x_or_data
             self._x = float(x)
             self._y = float(y)
         except TypeError:
@@ -161,6 +165,14 @@ class VectorM(Vector):
 
     '''Como Vector, mas com elementos mutáveis'''
 
+    def __setitem__(self, i, value):
+        if i == 0:
+            self._x = value
+        elif i == 1:
+            self._y = value
+        else:
+            raise IndexError
+
     def __iadd__(self, other):
         '''x.__iadd__(y) <==> x += y'''
 
@@ -199,15 +211,14 @@ class VectorM(Vector):
         self._x = x * cos_t - y * sin_t + axis[0]
         self._y = x * sin_t + y * cos_t + axis[1]
 
-    def update(self, other):
+    def update(self, other, y=None):
         '''Copia as coordenadas x, y do objeto other'''
 
-        try:
-            self._x = other._x
-            self._y = other._y
-        except AttributeError:
-            self._x = other[0]
-            self._y = other[1]
+        if y is None:
+            self._x, self._y = other
+        else:
+            self._x = other
+            self._y = y
 
     def copy(self):
         '''Retorna uma cópia de si mesmo'''

@@ -1,10 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme import *
-from FGAme.mathutils import pi
 from random import uniform
-
-# FIXME: descobrir porque a detecção de colisão entre polígonos está errada
 
 
 def random_color():

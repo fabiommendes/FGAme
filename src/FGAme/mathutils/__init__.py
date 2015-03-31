@@ -5,9 +5,11 @@ try:
 except ImportError:
     from .vector import *
 
+from .array import *
 from .matrix import *
-from .util import *
-from .vertices import *
+from .vec_array import *
 from .aabb import *
 from .circle import *
+from .poly import *
 from .abstract import *
+from .util import *
