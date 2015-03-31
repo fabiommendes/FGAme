@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics.obj_all import RigidBody
+from FGAme.physics import RigidBody
 from FGAme.mathutils import aabb_bbox
 from FGAme.mathutils import Vector, VectorM, RotMatrix, dot, cross
 from FGAme.mathutils import area, center_of_mass, ROG_sqr
@@ -18,7 +18,7 @@ class Poly(RigidBody):
     def __init__(self,
                  vertices,
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None):
+                 mass=None, density=None, inertia=None, **kwds):
 
         vertices = [VectorM(*pt) for pt in vertices]
         pos_cm = center_of_mass(vertices)
@@ -31,7 +31,8 @@ class Poly(RigidBody):
         self._cache_rbbox_last = None
         self.cbb_radius = max(v.norm() for v in vertices)
         super(Poly, self).__init__(pos_cm, vel, theta, omega,
-                                   mass=mass, density=density, inertia=inertia)
+                                   mass=mass, density=density, inertia=inertia,
+                                   **kwds)
 
         self.num_sides = len(vertices)
         self._normals_idxs = self.get_li_indexes()
@@ -44,9 +45,9 @@ class Poly(RigidBody):
         if self.num_normals == self.num_sides:
             self._normals_idxs = None
 
-        # Movemos para a posição especificada caso pos seja fornecido
+        # Movemos para a posição especificada caso _pos seja fornecido
         if pos is not None:
-            self.pos = pos_cm
+            self._pos = pos_cm
 
     def get_li_indexes(self):
         '''Retorna os índices referents às normais linearmente independentes
@@ -113,12 +114,12 @@ class Poly(RigidBody):
     ###########################################################################
     @property
     def vertices(self):
-        pos = self.pos
+        pos = self._pos
         return [v + pos for v in self._rvertices]
 
     @property
     def _rvertices(self):
-        if self._theta == self._cache_theta:
+        if self.theta == self._cache_theta:
             return self._cache_rvertices_last
         else:
             R = RotMatrix(self.theta)
@@ -130,14 +131,14 @@ class Poly(RigidBody):
             bbox = (xmin, xmax, ymin, ymax)
 
             self._cache_rvertices_last = vert
-            self._cache_theta = self._theta
+            self._cache_theta = self.theta
             self._cache_rbbox_last = bbox
 
             return vert
 
     @property
     def _rbbox(self):
-        if self._theta == self._cache_theta:
+        if self.theta == self._cache_theta:
             return self._cache_rbbox_last
         else:
             self._rvertices
@@ -179,14 +180,13 @@ class RegularPoly(Poly):
 
     def __init__(self, N, length,
                  pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None):
+                 **kwds):
         '''Cria um polígono regoular com N lados de tamanho "length".'''
 
         self.length = length
         vertices = self._vertices(N, length, pos)
-        del N, length, pos
-
-        Poly.__init__(**locals())
+        super(RegularPoly, self).__init__(vertices, None, vel, theta, omega,
+                                          **kwds)
 
     def _vertices(self, N, length, pos):
         self.length = length
@@ -204,8 +204,7 @@ class Rectangle(Poly):
 
     def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None,
-                 bbox=None, rect=None, shape=None):
+                 bbox=None, rect=None, shape=None, **kwds):
         '''Cria um retângulo especificando ou a caixa de contorno ou a posição
         do centro de massa e a forma.
 
@@ -225,9 +224,7 @@ class Rectangle(Poly):
 
         super(Rectangle, self).__init__(
             [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)],
-            None, vel, theta, omega,
-            mass=mass, density=density, inertia=inertia
-        )
+            None, vel, theta, omega, **kwds)
 
 
 @classmethod

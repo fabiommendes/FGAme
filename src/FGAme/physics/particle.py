@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics.obj_all import Dynamic
+from FGAme.physics import Dynamic
 
 __all__ = ['Particle']
 

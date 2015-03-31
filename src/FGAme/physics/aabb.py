@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics.obj_all import LinearRigidBody
+from FGAme.physics import LinearRigidBody
 from FGAme.mathutils import aabb_bbox, AABB, sqrt
 
 __all__ = ['AABB']
@@ -55,7 +55,7 @@ class AABB(LinearRigidBody):
 
     def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
                  pos=None, vel=(0, 0), mass=None, density=None,
-                 bbox=None, shape=None, rect=None):
+                 bbox=None, shape=None, rect=None, **kwds):
 
         # Define as propriedades das caixas de contorno
         xmin, xmax, ymin, ymax = aabb_bbox(bbox=bbox, rect=rect,
@@ -68,13 +68,13 @@ class AABB(LinearRigidBody):
         self._delta_y = dy = (ymax - ymin) / 2
         self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
         super(AABB, self).__init__(pos, vel,
-                                   mass=mass, density=density)
+                                   mass=mass, density=density, **kwds)
 
     def __repr__(self):
         tname = type(self).__name__
-        vel = ', '.join('%.1f' % x for x in self.vel)
+        vel = ', '.join('%.1f' % x for x in self._vel)
         data = ', '.join('%.1f' % x for x in self.bbox)
-        return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
+        return '%s(bbox=[%s], _vel=(%s))' % (tname, data, vel)
 
     # Torna as os limites da AABB modificáveis ################################
     @property

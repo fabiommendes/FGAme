@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import pi, sqrt, Circle
-from FGAme.physics.obj_all import LinearRigidBody, RigidBody
+from FGAme.physics import LinearRigidBody, RigidBody
 
 __all__ = ['Circle', 'Ball']
 
@@ -28,7 +28,7 @@ class CommonCircle(object):
         return self.cbb_radius / sqrt(2)
 
     def primitive(self):
-        return Circle(radius=self.radius, pos=self.pos)
+        return Circle(radius=self.radius, pos=self._pos)
 
     @property
     def radius(self):
@@ -61,9 +61,9 @@ class CommonCircle(object):
 
     def __repr__(self):
         tname = type(self).__name__
-        vel = ', '.join('%.1f' % x for x in self.vel)
-        pos = ', '.join('%.1f' % x for x in self.pos)
-        return '%s(pos=(%s), vel=(%s), radius=%.1f)' % (
+        vel = ', '.join('%.1f' % x for x in self._vel)
+        pos = ', '.join('%.1f' % x for x in self._pos)
+        return '%s(_pos=(%s), _vel=(%s), radius=%.1f)' % (
             tname, pos, vel, self.radius)
 
 
@@ -89,10 +89,11 @@ class Circle(CommonCircle, LinearRigidBody):
     __slots__ = ['_radius']
 
     def __init__(self, radius, pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None):
+                 mass=None, density=None, **kwds):
 
         self.cbb_radius = float(radius)
-        super(Circle, self).__init__(pos, vel, mass=mass, density=density)
+        super(Circle, self).__init__(pos, vel, mass=mass, density=density,
+                                     **kwds)
 
 
 class Ball(CommonCircle, RigidBody):
@@ -105,11 +106,12 @@ class Ball(CommonCircle, RigidBody):
     __slots__ = ['_radius']
 
     def __init__(self, radius, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None):
+                 mass=None, density=None, inertia=None, **kwds):
 
         self.cbb_radius = float(radius)
         super(Ball, self).__init__(pos, vel, theta, omega,
-                                   mass=mass, density=density, inertia=inertia)
+                                   mass=mass, density=density, inertia=inertia,
+                                   **kwds)
 
 
 if __name__ == '__main__':

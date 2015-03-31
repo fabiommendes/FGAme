@@ -1,11 +1,11 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector, sqrt
-from FGAme.physics.obj_all import Dynamic
+from FGAme.physics import Dynamic
 
 __all__ = ['RigidBody', 'LinearRigidBody']
 
 INF = float('inf')
+INERTIA_SCALE = 0.1
 
 
 class RigidBody(Dynamic):
@@ -53,9 +53,10 @@ class RigidBody(Dynamic):
     __slots__ = []
 
     def __init__(self, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None):
+                 mass=None, density=None, inertia=None, **kwds):
 
-        super(RigidBody, self).__init__(pos, vel, theta, omega, inertia='inf')
+        super(RigidBody, self).__init__(pos, vel, theta, omega, inertia='inf',
+                                        **kwds)
 
         # Harmoniza massa, inércia e densidade
         if density is not None:
@@ -65,7 +66,8 @@ class RigidBody(Dynamic):
             else:
                 mass = float(mass)
             if inertia is None:
-                inertia = density * self.area() * self.ROG_sqr()
+                inertia = density * \
+                    self.area() * self.ROG_sqr() / INERTIA_SCALE
             else:
                 inertia = float(inertia)
 
@@ -73,7 +75,7 @@ class RigidBody(Dynamic):
             mass = float(mass)
             density = mass / self.area()
             if inertia is None:
-                inertia = mass * self.ROG_sqr()
+                inertia = mass * self.ROG_sqr() / INERTIA_SCALE
             else:
                 inertia = float(inertia)
 
@@ -81,7 +83,8 @@ class RigidBody(Dynamic):
             density = 1.0
             mass = density * self.area()
             if inertia is None:
-                inertia = density * self.area() * self.ROG_sqr()
+                inertia = density * \
+                    self.area() * self.ROG_sqr() / INERTIA_SCALE
             else:
                 inertia = float(inertia)
 
@@ -90,8 +93,8 @@ class RigidBody(Dynamic):
         self._density = float(density)
 
         # Inicializa as variáveis de estado
-        self._omega = float(omega or 0)
-        self._theta = 0.0
+        self.omega = float(omega or 0)
+        self.theta = 0.0
         if theta is not None:
             self.rotate(theta)
         self._alpha = 0.0
@@ -136,9 +139,6 @@ class RigidBody(Dynamic):
         if value <= 0:
             raise ValueError('inertia cannot be null or negative')
         elif value != INF:
-            self._density = value / (self.area() * self.ROG_sqr())
-            if self._invmass:
-                self._invmass = 1.0 / (self._density * self.area())
             self._invinertia = 1.0 / value
         else:
             self._invinertia = 0.0
@@ -154,28 +154,10 @@ class RigidBody(Dynamic):
         if self._invmass:
             self._invmass = 1.0 / (self.area() * rho)
         if self._invinertia:
-            self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
-
-    # Variáveis de estado #####################################################
-
-    @property
-    def theta(self):
-        return self._theta
-
-    @theta.setter
-    def theta(self, value):
-        self.rotate(value - self._theta)
-
-    @property
-    def omega(self):
-        return self._omega
-
-    @omega.setter
-    def omega(self, value):
-        self.aboost(value - self._omega)
+            self._invinertia = INERTIA_SCALE / \
+                (self.area() * rho * self.ROG_sqr())
 
     # Propriedades da caixa de contorno #######################################
-
     @property
     def xmin(self):
         return self._xmin
@@ -215,11 +197,11 @@ class LinearRigidBody(RigidBody):
     __slots__ = []
 
     def __init__(self, pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None):
+                 mass=None, density=None, **kwds):
 
         super(LinearRigidBody, self).__init__(pos, vel, 0.0, 0.0,
                                               mass=mass, density=density,
-                                              inertia='inf')
+                                              inertia='inf', **kwds)
 
     @property
     def inertia(self):
