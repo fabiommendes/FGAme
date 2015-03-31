@@ -10,13 +10,19 @@ um motor de jogos didático cujo maior objetivo é o uso em sala de aula.
 
 Este não é (e provavelmente nunca será) um motor de alto desempenho. Ainda que
 se tenha dado alguma atenção à otimização, esta não é uma prioridade do projeto.
-Dito isto, computadores modernos são poderosos o suficiente para, apesar das 
-limitações desta biblioteca, ainda assim podem ser capazes de simular muitas 
+Dito isto, computadores modernos são poderosos o suficiente para que, apesar das 
+limitações do Python e desta biblioteca, serem capazes de simular muitas 
 dezenas de polígonos e criar jogos interessantes baseados em física.
 
-O foco da FGAme está ná física e não na apresentação gráfica. Espere um motor 
+O foco da FGAme está na física e não na apresentação gráfica. Espere um motor 
 de jogos bastante limitado no segundo quesito, mas relativamente versátil e 
 muito simples de utilizar no primeiro.
+
+Máquina virtual
+===============
+
+Caso você queira testar a FGAme mas não tem muita experiência em 
+desenvolvimento de Python no Linux
 
 Instalação
 ==========
@@ -102,7 +108,7 @@ distribuição e instale apenas aqueles que estão faltando.
   * FGAme: https://github.com/fabiommendes/FGAme
   
 Em cada caso, consulte o arquivo README ou INSTALL para instruções de 
-instalação. Na maior parte dos casos basta descompactar o arquivo de código
+instalação. Na maior parte dos casos, basta descompactar o arquivo de código
 fonte, entrar na pasta descomprimida e executar::
  
 	# python setup.py build

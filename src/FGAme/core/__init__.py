@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.core.env import env
 from FGAme.core.logger import *
 from FGAme.core.events import *

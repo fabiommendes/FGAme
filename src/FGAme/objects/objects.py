@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme import physics
 from FGAme.objects.mixins import ObjectMixin
 

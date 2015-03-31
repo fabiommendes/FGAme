@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from FGAme.mathutils import Vector
 
 __all__ = ['AABB',

@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 class Shape(object):
 
     def intercepts(self, obj):

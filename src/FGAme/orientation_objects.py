@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.util import lazy
 from FGAme.mathutils import Vector
 

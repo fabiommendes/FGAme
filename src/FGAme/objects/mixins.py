@@ -85,7 +85,6 @@ class ObjectMixin(WorldObject, HasVisualization):
     ])
 
     def __init__(self, *args, **kwds):
-
         mixin_kwds = self._extract_mixin_kwargs(kwds)
         self._init_physics(*args, **kwds)
         self._init_mixin(**mixin_kwds)

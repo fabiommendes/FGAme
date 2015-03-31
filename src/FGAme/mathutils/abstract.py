@@ -1,9 +1,11 @@
+# -*- coding: utf8 -*-
 '''
 Abstract classes for representing Geometric figures
 '''
 
 import abc
 import copy
+from FGAme.util import six
 
 
 def not_implemented(self):
@@ -24,8 +26,8 @@ def attr_factory(name):
 #                     Abstract base classes: definitions
 ###############################################################################
 
-
-class AbstractGeometry(abc.ABC):
+@six.add_metaclass(abc.ABCMeta)
+class AbstractGeometry(object):
 
     '''Subclasshook checks if class has all fields defined in the metaclass.
 
@@ -75,19 +77,4 @@ class AbstractPoly(AbstractGeometry):
 
 
 if __name__ == '__main__':
-    from FGAme import mathutils
-    from FGAme import draw
-    from FGAme import physics
-    from FGAme.physics import elements
-
-    data = {mathutils: '', draw: '', physics: '', elements: 'Phys'}
-    template = {'Circle': AbstractCircle,
-                'AABB': AbstractAABB}
-
-    D = {}
-    for module, prefix in data.items():
-        for k, v in template.items():
-            D[getattr(module, prefix + k)] = v
-
-    for k, v in D.items():
-        assert issubclass(k, v), (k, v)
+    pass

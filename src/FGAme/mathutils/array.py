@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from collections import MutableSequence
 import operator
 from FGAme.mathutils.arithmetic import mAbstractArray, mArithmetic

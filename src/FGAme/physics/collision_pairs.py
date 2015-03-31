@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import Vector, dot, area, center_of_mass, clip, pi
 from FGAme.mathutils import shadow_x, shadow_y
 

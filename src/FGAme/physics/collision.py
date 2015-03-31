@@ -2,7 +2,6 @@
 from FGAme.core import env
 from FGAme.mathutils import Vector, cross, dot
 from FGAme.util import lazy
-from scipy.constants.constants import alpha
 
 ###############################################################################
 #                         Classe Colisão

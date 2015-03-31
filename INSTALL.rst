@@ -23,5 +23,4 @@ Se você quiser desenvolver em cima da árvore de código fonte aqui disponível
 é necessário compilar as extensões em Cython. Neste caso, execute
 
 	$ python setup.py build_ext --inplace
-	
-e mova os arquivos .so para os locais apropriados.
+

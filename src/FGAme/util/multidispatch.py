@@ -452,8 +452,6 @@ class multimethod(multifunction):
     class declaration.
     '''
 
-    __slots__ = multifunction.__slots__
-
     def __call__(self, other, *args, **kwds):
         method = self.get_implementation(*tuple(type(x) for x in args), **kwds)
         return method(other, *args, **kwds)

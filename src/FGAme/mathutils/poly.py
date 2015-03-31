@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import RotMatrix, VecArray, aabb_bbox
 from math import sqrt, pi, sin
 

@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
 
-import six
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathutils import Vector, VectorM, asvector, dot, cross, sqrt
 from FGAme.physics import flags
+from FGAme.util import six
 
 __all__ = ['Dynamic']
 
@@ -88,6 +88,11 @@ class PhysElementMeta(EventDispatcherMeta):
                             del allvars[attr]
                             break
 
+                # Em Python 2, utiliza o objeto im_func dos métodos, caso ele
+                # exista
+                allvars = {name: getattr(var, 'im_func', var) for (name, var)
+                           in allvars.items()}
+
                 ns.update(allvars)
 
                 # Atualiza a lista de __slots__ utilizando o atributo _slots_
@@ -120,7 +125,11 @@ class PhysElementMeta(EventDispatcherMeta):
                     except AttributeError:
                         continue
                     if other.__doc__:
-                        method.__doc__ = other.__doc__
+                        # TODO: six it
+                        try:
+                            method.__doc__ = other.__doc__
+                        except AttributeError:
+                            pass
                     break
 
         return new

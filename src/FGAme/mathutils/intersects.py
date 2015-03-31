@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 '''
 Encontra os pontos de intersecção entre dois objetos.
 '''

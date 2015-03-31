@@ -1,3 +1,6 @@
+# -*- coding: utf8 -*-
+
+
 class Ray(object):
 
     def __init__(self, point, direction):

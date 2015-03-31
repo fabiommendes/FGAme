@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from unittest import TestCase
 import operator
 

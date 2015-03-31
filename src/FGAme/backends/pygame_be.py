@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from math import trunc
 import string
 import pygame

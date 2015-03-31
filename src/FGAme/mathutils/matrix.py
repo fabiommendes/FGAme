@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import Vector, dot
 from math import sqrt, sin, cos
 

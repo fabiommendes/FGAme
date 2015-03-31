@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 import operator
 
 identity = lambda x: x

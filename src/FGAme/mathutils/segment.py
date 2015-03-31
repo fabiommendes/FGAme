@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.mathutils import VectorM, Vector
 
 

@@ -1,3 +1,5 @@
+# -*- coding: utf8 -*-
+
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
 from FGAme.core import EventDispatcher, signal, conf
