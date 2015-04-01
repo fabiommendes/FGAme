@@ -2,6 +2,7 @@
 import copy
 from FGAme.draw import Color
 from FGAme import mathutils as m
+from FGAme.core import PyGameTextureManager
 
 
 class Drawable(object):
@@ -137,6 +138,11 @@ class Shape(Drawable):
     def __getattr__(self, attr):
         return getattr(self.geometric, attr)
 
+    def draw(self, canvas):
+        '''Desenha o objeto no objeto canvas fornecido'''
+
+        getattr(canvas, self.canvas_primitive)(self)
+
 
 class Circle(Shape):
 
@@ -173,8 +179,12 @@ class AABB(Shape):
     ymax = delegate_property('ymax')
     bbox = delegate_property('bbox')
     rect = delegate_property('rect')
-    pos = delegate_property('pos')
     shape = delegate_property('shape')
+    pos = delegate_property('pos')
+    pos = delegate_property('pos_sw')
+    pos = delegate_property('pos_nw')
+    pos = delegate_property('pos_se')
+    pos = delegate_property('pos_ne')
 
     def __init__(self,
                  bbox=None, rect=None, shape=None, pos=None,
@@ -214,3 +224,13 @@ class Rectangle(Poly):
         obj = m.Rectangle(bbox=bbox, rect=rect, shape=shape, pos=pos,
                           xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
         super(Poly, self).__init__(**kwds)
+
+
+class Image(AABB):
+    manager = PyGameTextureManager()
+    canvas_primitive = 'image'
+
+    def __init__(self, name, pos=(0, 0)):
+        self._data = self.manager.get_image(name)
+        shape = self.manager.get_shape(self._data)
+        super(Image, self).__init__(pos=pos, shape=shape)

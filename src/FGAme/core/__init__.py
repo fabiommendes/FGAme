@@ -6,6 +6,7 @@ from FGAme.core.events import *
 from FGAme.core.input import *
 from FGAme.core.screen import *
 from FGAme.core.mainloop import *
+from FGAme.core.image import *
 
 ###############################################################################
 #                     Interface de inicialização

@@ -3,8 +3,13 @@
 from math import trunc
 import string
 import pygame
+import pygame.locals as pg
+from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION
+
 from FGAme.core import env, Canvas, Input, MainLoop
 from FGAme.draw import Color
+
+pygame.init()
 
 
 class PyGameCanvas(Canvas):
@@ -42,6 +47,19 @@ class PyGameCanvas(Canvas):
     def paint_line(self, pt1, pt2, color='black', solid=True):
         raise NotImplementedError
 
+    def paint_pixel(self, pos, color='black'):
+        x, y = self._map_point(*pos)
+        # TODO: talvez use pygame.display.get_surface() para obter a tela
+        # correta
+        # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
+        self._screen.set_at(x, y, Color(color))
+
+    def paint_image(self, pos, image):
+        x, y, dx, dy = image.get_rect()
+        x += pos[0]
+        y += pos[1]
+        self._screen.blit(image, (x, y, dx, dy))
+
     def clear_background(self, color=None):
         if color is None:
             if self.background is None:
@@ -57,10 +75,6 @@ class PyGameInput(Input):
 
     def __init__(self):
         super(PyGameInput, self).__init__()
-
-        # Registra conversão de teclas
-        import pygame.locals as pg
-
         D = dict(up=pg.K_UP, down=pg.K_DOWN, left=pg.K_LEFT, right=pg.K_RIGHT,
                  space=pg.K_SPACE,
                  )
@@ -73,13 +87,8 @@ class PyGameInput(Input):
 
         self._key_conversions = {v: k for (k, v) in D.items()}
 
-    #=========================================================================
-    # Laço principal de escuta de eventos
-    #=========================================================================
+    # Laço principal de escuta de eventos #####################################
     def query(self):
-        from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION
-        import pygame
-        pygame.init()
         D = self._key_conversions
         window_height = env.window_height
 

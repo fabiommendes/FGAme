@@ -80,7 +80,6 @@ class Canvas(Screen):
         raise NotImplementedError
 
     # Context managers ########################################################
-
     def __enter__(self):
         if self.background is not None:
             self.clear_background(self.background)
@@ -89,6 +88,11 @@ class Canvas(Screen):
         self.flip()
 
     # Objetos primitivos ######################################################
+    def paint_pixel(self, pos, color='black'):
+        '''Pinta um pixel na posição especificada na tela'''
+
+        x, y = pos
+        self.paint_rect((x, y, 1, 1), color)
 
     def paint_circle(self, radius, pos, color='black', solid=True):
         '''Pinta um círculo especificando a posição do centro, seu raio e
@@ -100,24 +104,37 @@ class Canvas(Screen):
         raise NotImplementedError
 
     def paint_poly(self, L_points, color='black', solid=True):
+        '''Pinta um polígono a partir de uma lista de vértices'''
+
         raise NotImplementedError
 
     def paint_aabb(self, xmin, xmax, ymin, ymax, color='black', solid=True):
+        '''Pinta uma caixa de contorno alinhada aos eixos'''
+
         dx, dy = xmax - xmin, ymax - ymin
         self.paint_rect((xmin, ymin), (dx, dy), color=color, solid=solid)
 
-    def paint_rect(self, rect, color='black', solid=True):
+    def paint_rect(self, rect, color='black'):
+        '''Semelhante à paint_aabb(), mas utiliza uma tupla com
+        (xmin, ymin, width, height) como entrada e somente pinta cores
+        sólidas'''
+
         x, y, w, h = rect
         self.paint_poly(
-            [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], color, solid)
+            [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], color)
 
     def paint_line(self, pt1, pt2, color='black', solid=True):
+        '''Pinta na tela uma linha que vai do ponto pt1 até o ponto pt2'''
+
         raise NotImplementedError
 
-    def paint_pixel(self, point, color='black'):
-        raise NotImplementedError
+    def paint_image(self, pos, texture):
+        '''Pinta uma textura/imagem na tela. O parâmetro pos especifica a
+        posição do canto inferior esquerdo'''
 
     def clear_background(self, color=None):
+        '''Limpa o fundo com a cor especificada'''
+
         raise NotImplementedError
 
     # Objetos derivados #######################################################
@@ -174,3 +191,13 @@ class Canvas(Screen):
             self.paint_poly(poly.vertices, poly.color)
         else:
             raise NotImplementedError
+
+    def draw_image(self, image):
+        if self._direct:
+            pos = image.pos_sw
+            self.paint_image(pos, image._data)
+        else:
+            raise NotImplementedError
+
+    def draw(self, object):
+        object.draw(self)

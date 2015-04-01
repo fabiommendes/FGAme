@@ -27,14 +27,6 @@ class AABB(object):
         )
 
     @property
-    def pos(self):
-        '''Centro da AABB'''
-
-        x = (self.xmin + self.xmax) / 2
-        y = (self.ymin + self.ymax) / 2
-        return Vector(x, y)
-
-    @property
     def shape(self):
         '''Formato da AABB (width, height)'''
 
@@ -51,6 +43,30 @@ class AABB(object):
     @property
     def bbox(self):
         return (self.xmin, self.xmax, self.ymin, self.ymax)
+
+    @property
+    def pos(self):
+        '''Centro da AABB'''
+
+        x = (self.xmin + self.xmax) / 2
+        y = (self.ymin + self.ymax) / 2
+        return Vector(x, y)
+
+    @property
+    def pos_sw(self):
+        return Vector(self.xmin, self.ymin)
+
+    @property
+    def pos_se(self):
+        return Vector(self.xmax, self.ymin)
+
+    @property
+    def pos_nw(self):
+        return Vector(self.xmin, self.ymax)
+
+    @property
+    def pos_ne(self):
+        return Vector(self.xmax, self.ymax)
 
     # Magic methods ###########################################################
     def __repr__(self):

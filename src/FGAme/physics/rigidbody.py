@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+from FGAme.mathutils import Vector
 from FGAme.physics import Dynamic
 
 __all__ = ['RigidBody', 'LinearRigidBody']
@@ -186,6 +187,22 @@ class RigidBody(Dynamic):
     def rect(self):
         x, y = self.xmin, self.ymin
         return (x, y, self.xmax - x, self.ymax - y)
+
+    @property
+    def pos_sw(self):
+        return Vector(self.xmin, self.ymin)
+
+    @property
+    def pos_se(self):
+        return Vector(self.xmax, self.ymin)
+
+    @property
+    def pos_nw(self):
+        return Vector(self.xmin, self.ymax)
+
+    @property
+    def pos_ne(self):
+        return Vector(self.xmax, self.ymax)
 
 
 class LinearRigidBody(RigidBody):
