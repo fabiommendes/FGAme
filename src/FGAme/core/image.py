@@ -13,12 +13,7 @@ class TextureManager(object):
         self._images = {}
         self._pillow = {}
         if path is None:
-            # __file__ do __main__ nem sempre está definido
-            #script_path = sys.modules['__main__'].__file__
-            #base_path = os.path.split(script_path)[0]
-            #path = os.path.join(base_path, 'images')
-            # FIXME
-            path = '/home/chips/'
+            path = get_default_image_path()
         self._path = os.path.abspath(path)
 
     def save_image(self, name, image):
@@ -77,6 +72,19 @@ class TextureManager(object):
     # Informações sobre a imagem ##############################################
     def get_shape(self, img):
         raise NotImplementedError
+
+
+###############################################################################
+#                                Funções úteis
+###############################################################################
+def get_default_image_path():
+    '''Retorna o caminho para a pasta /images/ abaixo do caminho do script
+    principal em execução'''
+
+    script_path = sys.modules['__main__'].__file__
+    base_path = os.path.split(script_path)[0]
+    path = os.path.join(base_path, 'images')
+    return path
 
 
 import pygame

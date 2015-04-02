@@ -8,17 +8,21 @@ class RenderTree(object):
     is_tree = True
 
     def __init__(self, parent=None):
-        self._data = [[]]
+        self._data = []
         self.parent = None
 
     def add(self, obj, layer=0):
         '''Adiciona um objeto ou um galho (outro elemento de RenderTree) na
         camada especificada'''
 
-        if layer >= len(self._data):
-            for _ in range(len(self._data) - layer + 1):
-                self._data.append([])
-        self._data[layer].append(obj)
+        for i, (layer_idx, data) in enumerate(list(self._data)):
+            if layer == layer_idx:
+                data.append(obj)
+            elif layer < layer_idx:
+                self._data.insert(i, (layer, [obj]))
+                break
+        else:
+            self._data.append((layer, [obj]))
 
     # TODO: Mover objetos entre Layers ou modifica a ordem do objeto dentro de
     # um layer
@@ -29,23 +33,40 @@ class RenderTree(object):
         percorre os objetos na ordem contrária.'''
 
         if reverse:
-            for L in reversed(self._data):
+            for _, L in reversed(self._data):
                 for obj in reversed(L):
                     yield obj
         else:
-            for L in self._data:
+            for _, L in self._data:
                 for obj in L:
                     yield obj
 
-    def iter_layers(self):
+    def iter_layers(self, skip_empty=False):
         '''Itera sobre as camadas'''
 
-        return iter(self._data)
+        if skip_empty:
+            for (_, L) in self._data:
+                yield L
+
+        else:
+            idx = self._data[0][0]
+            for i, L in self._data:
+                if i == idx:
+                    idx += 1
+                    yield L
+                else:
+                    while idx < i:
+                        idx += 1
+                        yield []
 
     def get_layer(self, idx):
         '''Retorna uma lista com os objetos da i-ésima camada'''
 
-        return self._data[idx]
+        for i, L in self._data:
+            if i == idx:
+                return L
+        else:
+            return []
 
     def update(self, dt):
         for obj in self.walk():
