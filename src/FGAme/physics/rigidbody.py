@@ -184,6 +184,14 @@ class RigidBody(Dynamic):
         return (self.xmax - self.xmin, self.ymax - self.ymin)
 
     @property
+    def width(self):
+        return self.xmax - self.xmin
+
+    @property
+    def height(self):
+        return self.ymax - self.ymin
+
+    @property
     def rect(self):
         x, y = self.xmin, self.ymin
         return (x, y, self.xmax - x, self.ymax - y)

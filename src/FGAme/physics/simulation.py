@@ -24,10 +24,10 @@ class Simulation(EventDispatcher):
     '''
 
     def __init__(self, gravity=None, damping=0, adamping=0,
-                 rest_coeff=1, sfriction=0, dfriction=0, stop_velocity=1e-6):
+                 rest_coeff=1, sfriction=0, dfriction=0, max_speed=None,
+                 bounds=None):
 
         super(Simulation, self).__init__()
-        self._dt = 0.0
         self._objects = []
         self._broad_collisions = []
         self._fine_collisions = []
@@ -41,7 +41,15 @@ class Simulation(EventDispatcher):
         self.rest_coeff = float(rest_coeff)
         self.sfriction = float(sfriction)
         self.dfriction = float(dfriction)
-        self.stop_velocity = float(stop_velocity)
+        self.max_speed = max_speed
+
+        # Limita mundo
+        self.bounds = bounds
+        self._out_of_bounds = set()
+
+        # Inicializa constantes de simulação
+        self._dt = 0.0
+        self.num_frames = 0
         self.time = 0
 
     ###########################################################################
@@ -140,13 +148,20 @@ class Simulation(EventDispatcher):
         self.trigger_frame_enter()
         self._dt = float(dt)
 
+        # Loop genérico
         self.broad_phase()
         self.fine_phase()
         self.update_accelerations()
         self.resolve_accelerations()
         self.resolve_collisions()
-
         self.time += self._dt
+        self.num_frames += 1
+
+        # Serviços esporáticos que não são realizados em todos os frames
+        if self.num_frames % 2 == 0:
+            self.find_out_of_bounds()
+        elif self.num_frames % 2 == 1:
+            self.enforce_max_speed()
 
     def broad_phase(self):
         '''Detecta todas as possíveis colisões utilizando um algoritmo
@@ -299,6 +314,68 @@ class Simulation(EventDispatcher):
         '''Retorna a soma da energia cinética de todos os objetos do mundo'''
 
         return sum(obj.kinetic() for obj in self.objects)
+
+    # Serviços esporáticos ####################################################
+    def enforce_max_speed(self):
+        '''Força que todos objetos tenham uma velocidade máxima'''
+
+        if self.max_speed is not None:
+            vel = self.max_speed
+            vel_sqr = self.max_speed ** 2
+
+            for obj in self._objects:
+                if obj._vel.norm_sqr() > vel_sqr:
+                    obj._vel *= vel / obj._vel.norm()
+
+    def find_out_of_bounds(self):
+        '''Emite o sinal de "out-of-bounds" para todos os objetos da
+        simulação que deixarem os limites estabelecidos'''
+
+        if self.bounds is not None:
+            xmin, xmax, ymin, ymax = self.bounds
+            out = self._out_of_bounds
+
+            for obj in self._objects:
+                x, y = obj._pos
+                is_out = True
+
+                if x > xmax and obj.xmin > xmax:
+                    direction = 0
+                elif y > ymax and obj.ymin > ymax:
+                    direction = 1
+                elif x < xmin and obj.xmax < xmin:
+                    direction = 2
+                elif y < ymin and obj.ymax < ymin:
+                    direction = 3
+                else:
+                    is_out = False
+
+                if is_out and obj not in out:
+                    out.add(obj)
+                    obj.trigger_out_of_bounds(direction)
+                else:
+                    out.discard(obj)
+
+    def burn(self, frames, dt=0.0):
+        '''Executa a simulação por um número específico de frames sem deixar
+        o tempo rodar'''
+
+        time = self.time
+        for _ in range(frames):
+            self.update(dt)
+            self.time = time
+
+    def remove_superpositions(self, num_iter=1):
+        '''Remove todas as superposições entre objetos dinâmicos'''
+
+        self._dt = 0.0
+        for _ in range(num_iter):
+            self.broad_phase()
+            self.fine_phase()
+
+            for col in self._fine_collisions:
+                col.adjust_overlap()
+
 
 if __name__ == '__main__':
     import doctest

@@ -240,6 +240,8 @@ class Dynamic(object):
 
     # Sinais
     collision = signal('collision', num_args=1)
+    frame_enter = signal('frame-enter')
+    out_of_bounds = signal('out-of-bounds', num_args=1)
 
     ###########################################################################
     #                            Controle de flags
@@ -281,6 +283,22 @@ class Dynamic(object):
         if isinstance(flag, str):
             flag = self._get_flag(flag)
         return bool(self.flags | flag)
+
+    ###########################################################################
+    #                    Controle de criação e destruição
+    ###########################################################################
+    def is_rogue(self):
+        '''Retorna True se o objeto não estiver associado a uma simulação'''
+
+        return getattr(self, 'simulation', None) is not None
+
+    def destroy(self):
+        '''Destrói o objeto físico'''
+
+        if not self.is_rogue():
+            self.simulation.remove(self)
+
+        # TODO: desaloca todos os sinais
 
     ###########################################################################
     #                        Propriedades físicas

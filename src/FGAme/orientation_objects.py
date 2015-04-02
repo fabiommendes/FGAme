@@ -43,11 +43,11 @@ class GlobalObject(object):
 
     @property
     def _shape(self):
-        return self._globals.screen_shape
+        return self._globals.window_shape
 
     @property
     def _origin(self):
-        return self._globals.screen_origin
+        return self._globals.window_origin
 
 
 class PosObject(GlobalObject):

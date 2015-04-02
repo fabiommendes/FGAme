@@ -13,9 +13,10 @@ class TextureManager(object):
         self._images = {}
         self._pillow = {}
         if path is None:
-            script_path = sys.modules['__main__'].__file__
-            base_path = os.path.split(script_path)[0]
-            path = os.path.join(base_path, 'images')
+            # __file__ do __main__ nem sempre está definido
+            #script_path = sys.modules['__main__'].__file__
+            #base_path = os.path.split(script_path)[0]
+            #path = os.path.join(base_path, 'images')
             # FIXME
             path = '/home/chips/'
         self._path = os.path.abspath(path)

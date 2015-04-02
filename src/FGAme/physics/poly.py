@@ -47,7 +47,7 @@ class Poly(RigidBody):
 
         # Movemos para a posição especificada caso _pos seja fornecido
         if pos is not None:
-            self._pos = pos_cm
+            self._pos.update(pos)
 
     def get_li_indexes(self):
         '''Retorna os índices referents às normais linearmente independentes

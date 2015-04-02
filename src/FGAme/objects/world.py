@@ -16,7 +16,8 @@ class World(EventDispatcher):
 
     def __init__(self, background=None,
                  gravity=None, damping=0, adamping=0,
-                 rest_coeff=1, sfriction=0, dfriction=0, stop_velocity=1e-6,
+                 rest_coeff=1, sfriction=0, dfriction=0,
+                 bounds=None, max_speed=None,
                  simulation=None):
 
         self.background = background
@@ -33,7 +34,8 @@ class World(EventDispatcher):
                 rest_coeff=rest_coeff,
                 sfriction=sfriction,
                 dfriction=dfriction,
-                stop_velocity=stop_velocity)
+                max_speed=max_speed,
+                bounds=bounds)
 
         self.is_paused = False
         super(World, self).__init__()

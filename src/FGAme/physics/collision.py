@@ -188,7 +188,7 @@ class Collision(object):
         '''Move objetos para encerrar a superposição.'''
 
         A, B = self.objects
-        mu = 3 * (A._invmass + B._invmass)
+        mu = (A._invmass + B._invmass)
         alpha = A._invmass / mu
         beta = B._invmass / mu
         A.move(-alpha * self.normal)
