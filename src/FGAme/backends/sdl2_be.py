@@ -1,12 +1,12 @@
-# from FGAme.backends.core import Canvas, InputListener
+from FGAme.backends.core import Canvas, InputListener
 # import pygame
-# import sdl2
-# import sdl2.ext
-# from sdl2.sdlgfx import *
-# from sdl2 import *
-# import string
-# from math import trunc
-# import ctypes      
+#import sdl2
+#import sdl2.ext
+#from sdl2.sdlgfx import *
+#from sdl2 import *
+import string
+from math import trunc
+import ctypes      
 
 class SDLCanvas(Canvas):
     '''Implementa a interface Screen, utilizando a biblioteca Pygame'''
@@ -15,11 +15,11 @@ class SDLCanvas(Canvas):
         import sdl2
         import sdl2.sdlgfx as gfx
         self._window = sdl2.SDL_CreateWindow(b"FGAme App",
-                              SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                              width, height, SDL_WINDOW_SHOWN)
+                              sld2.SDL_WINDOWPOS_CENTERED, sld2.SDL_WINDOWPOS_CENTERED,
+                              width, height, sld2.SDL_WINDOW_SHOWN)
         self._renderer = sdl2.SDL_CreateRenderer(self._window, -1,
-                                            SDL_RENDERER_ACCELERATED |
-                                            SDL_RENDERER_PRESENTVSYNC)
+                                            sld2.SDL_RENDERER_ACCELERATED |
+                                            sld2.SDL_RENDERER_PRESENTVSYNC)
         self._screen_rect = sdl2.SDL_Rect(x=0, y=0, w=width, h=height)
         R, G, B = self.background
         self._bg_color = (R << 24) + (G << 16) + (B << 8) + 255
@@ -74,7 +74,7 @@ class SDLCanvas(Canvas):
             raise RuntimeError('SDL error: %s' % msg)
 
     def clear_background(self, color=None):
-        SDL_RenderClear(self._renderer)
+        self.sdl2.SDL_RenderClear(self._renderer)
         if color is None:
             ret = boxColor(self._renderer, 0, self.height, self.width, 0, self._bg_color)
         else:
@@ -82,7 +82,7 @@ class SDLCanvas(Canvas):
             ret = boxRGBA(self._renderer, 0, self.height, self.width, 0, R, G, B, 255)
 
         if ret != 0:
-            msg = SDL_GetError()
+            msg = self.sdl2.SDL_GetError()
             raise RuntimeError('SDL error: %s' % msg)        
         
 
@@ -108,14 +108,14 @@ class SDL2Input(Input):
     #===========================================================================
 
     def query(self):
-        for event in sdl2.ext.get_events():
-            if event.type == SDL_QUIT:
+        for event in self.sdl2.ext.get_events():
+            if event.type == self.sld2.SDL_QUIT:
                 raise SystemExit
-            elif event.type == SDL_KEYDOWN:
+            elif event.type == self.sld2.SDL_KEYDOWN:
                 self.on_key_down(event.key.keysym.sym)
-            elif event.type == SDL_KEYUP:
+            elif event.type == self.sld2.SDL_KEYUP:
                 self.on_key_up(event.key.keysym.sym)
-            elif event.type == SDL_MOUSEMOTION:
+            elif event.type == self.sld2.SDL_MOUSEMOTION:
                 # TODO: converter para coordenadas locais em screen
                 #self.on_mouse_motion(event.pos)
                 pass
