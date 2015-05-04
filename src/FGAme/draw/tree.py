@@ -3,7 +3,15 @@
 
 class RenderTree(object):
 
-    '''Representa uma árvore de objetos que serão desenhados na tela'''
+    '''Representa uma árvore de objetos que serão desenhados na tela
+
+    Exemplos
+    --------
+
+    >>> tree = RenderTree()
+    >>>
+
+    '''
 
     is_tree = True
 
@@ -18,6 +26,7 @@ class RenderTree(object):
         for i, (layer_idx, data) in enumerate(list(self._data)):
             if layer == layer_idx:
                 data.append(obj)
+                break
             elif layer < layer_idx:
                 self._data.insert(i, (layer, [obj]))
                 break
@@ -41,7 +50,7 @@ class RenderTree(object):
                 for obj in L:
                     yield obj
 
-    def iter_layers(self, skip_empty=False):
+    def iter_layers(self, skip_empty=True):
         '''Itera sobre as camadas'''
 
         if skip_empty:
@@ -70,8 +79,21 @@ class RenderTree(object):
 
     def update(self, dt):
         for obj in self.walk():
-            obj.update(dt)
+            # obj.update(dt)
+            pass
 
+    def paint(self, screen):
+        for obj in self.walk():
+            obj.paint(screen)
+
+    def linearize(self, layer=0):
+        '''Retorna uma versão linearizada da árvore de renderização onde
+        todos os objetos são recolocados na mesma camada'''
+
+        data = (layer, list(self.walk()))
+        new = RenderTree(parent=self.parent)
+        new._data.append(data)
+        return new
 
 ###############################################################################
 #                     Grupos e composições de objetos
