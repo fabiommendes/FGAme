@@ -8,8 +8,6 @@ Alysson Raniere
 '''
 import operator
 
-__all__ = ['Array']
-
 
 class Affine(object):
 

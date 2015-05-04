@@ -2,7 +2,7 @@
 import itertools
 
 
-class Color(tuple):
+class Color(object):
 
     '''
     Objeto básico que representa uma cor.
@@ -43,8 +43,9 @@ class Color(tuple):
 
     '''
 
-    __slots__ = []
+    __slots__ = ['_red', '_green', '_blue', '_alpha']
     _CACHE = {}
+    _RANGE = (0, 1, 2, 3)
 
     def __new__(cls, *args):
         try:
@@ -63,7 +64,8 @@ class Color(tuple):
                 try:
                     return objs[args]
                 except KeyError:
-                    objs[args] = new = tuple.__new__(cls, args)
+                    objs[args] = new = object.__new__(cls)
+                    new._red, new._green, new._blue, new._alpha = args
                     return new
 
             else:
@@ -97,7 +99,38 @@ class Color(tuple):
 
     # Métodos mágicos --------------------------------------------------------
     def __repr__(self):
-        return 'Color%s' % tuple.__repr__(self)
+        return 'Color%s' % (tuple(self),)
+
+    def __len__(self):
+        return 4
+
+    def __iter__(self):
+        yield self._red
+        yield self._green
+        yield self._blue
+        yield self._alpha
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            if key == 0:
+                return self._red
+            elif key == 1:
+                return self._green
+            elif key == 2:
+                return self._blue
+            elif key == 3:
+                return self._alpha
+            elif key < 0:
+                key = len(self) - key
+                if key < 0:
+                    raise IndexError
+                return self[key]
+        else:
+            return tuple(self[i] for i in self._RANGE[key])
+        raise IndexError(key)
+
+    def __hash__(self):
+        return self._red ^ self._green ^ self._blue ^ self._alpha
 
 Color._CACHE.update({
     # Tons de cinza

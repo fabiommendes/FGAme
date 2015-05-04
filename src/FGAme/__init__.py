@@ -11,8 +11,7 @@ Este tutorial explica como utilizar a FGAme para a criação de jogos ou
 simulações de física simples. A FGAme é um motor de jogos com ênfase na
 simulação de física. Todos os objetos, portanto, possuem propriedades físicas
 bem definidas como massa, momento de inércia, velocidade, etc. A simulação da
-física é feita, em grande parte, de modo automático. Você verá o quanto é
-simples!
+física é feita, em grande parte, de modo automático.
 
 O primeiro passo é definir o palco que os objetos habitarão. Isto pode ser
 feito criando um objeto da classe World().
@@ -26,8 +25,8 @@ A partir daí, podemos criar objetos e inserí-los na simulação
 >>> world.add([obj1, obj2])
 
 Para modificar as propriedades físicas dos objetos basta modificar diretamente
-os atributos correspondentes. Para uma lista completa de atributos, consulte
-o módulo ?Objects.
+os atributos correspondentes. Uma lista completa de atributos pode ser
+encontrada no módulo `FGAme.objects`:module:.
 
 >>> obj1.mass = 10
 >>> obj2.mass = 20
@@ -36,7 +35,7 @@ o módulo ?Objects.
 
 As variáveis dinâmicas podem ser modificadas diretamente, mas sempre que
 possível, devemos utilizar os  métodos que realizam os deslocamentos relativos
-(ex.: .move(), .boost(), etc). Estes métodos são mais eficientes.
+(ex.: .move(), .boost(), etc). Estes métodos geralmente são mais eficientes.
 
 +----------+---------------+-------------------------------+---------+
 | Variável | Deslocamentos | Descrição                     | Unidade |
@@ -50,10 +49,10 @@ possível, devemos utilizar os  métodos que realizam os deslocamentos relativos
 | omega    | aboost        | Velocidade angular            | rad/s   |
 +----------+---------------+-------------------------------+---------+
 
-Aplicamos uma operação de `.move()` e movê-lo com relação à posição anterior.
-Veja como fica a posiição final do objeto.
+Aplicamos uma operação de `.move()` para movê-lo com relação à posição
+anterior. Veja como fica a posição final do objeto.
 
->>> obj1.move((150, 0)) # deslocamento com relação à posição inicial
+>>> obj1.move(150, 0) # deslocamento com relação à posição inicial
 >>> obj1.pos
 Vec2(300, 50)
 
@@ -96,8 +95,7 @@ necessário fazer as operações
 >>> obj2.omega *= 0
 
 De modo mais simples, podemos fazer todas as operações de uma vez utilizando os
-métodos `.make_static()` (ou kinematic/dynamic) para controlar as propriedades
-dinâmicas do objeto.
+métodos `.make_static()` (ou kinematic/dynamic).
 
 >>> obj2.make_static()
 
@@ -202,7 +200,7 @@ callback
 |             |           | 'middle' correspondendo a um dos 3 tipos de botão |
 |             |           | do mouse.                                         |
 |             |           |                                                   |
-|             |           | O callback recebe apeans a posição do ponteiro    |
+|             |           | O callback recebe a posição do ponteiro           |
 |             |           | como primeiro argumento.                          |
 +-------------+-----------+---------------------------------------------------+
 
@@ -211,13 +209,13 @@ Simulação simples
 
 Uma simulação de física pode ser criada facilmente adicionando objetos à uma
 instância da classe World(). O jeito mais recomendado, no entanto, é criar uma
-subclasse pois isto incentiva o código a ficar mais organizado. No exemplo
+subclasse pois isto incentiva a organização e encapsulamento. No exemplo
 abaixo, montamos um sistema "auto-gravitante" onde as duas massas estão presas
 entre si por molas.
 
 
->>> class Gravity(World):
-...     def __init__(self):
+>>> class GravityWorld(World):
+...     def populate(self):
 ...         # Chamamos o __init__ da classe pai
 ...         super(Gravity, self).__init__()
 ...
@@ -230,15 +228,15 @@ entre si por molas.
 ...
 ...         # Definimos a força de interação entre ambos
 ...         K = self.K = A.mass
-...         self.A.external_force = lambda t: -K * (A.pos - B.pos)
-...         self.B.external_force = lambda t: -K * (B.pos - A.pos)
+...         self.A.force = lambda t: -K * (A.pos - B.pos)
+...         self.B.force = lambda t: -K * (B.pos - A.pos)
 
 
 Agora que temos uma classe mundo definida, basta iniciá-la com o comando
 
 >>> if __name__ == '__main__':
-...     world = Gravity()
-...     world.run() # doctest: +SKIP
+...     world = GravityWorld()
+...     world.run()                                            # doctest: +SKIP
 
 Pronto! Agora você já sabe o básico para criar um jogo ou simulação
 simples utilizando a FGAme. Nas próximas seções vamos revisar com mais
@@ -249,25 +247,25 @@ organização de um motor de jogos orientado à física.
 Motores de jogos: uma introdução
 ================================
 
-Os pioneiros não tinham esse luxo: cada novo jogo implementado envolvia
-programar como escrever os pixels na tela, como interagir com os dispositivos
-de entrada do usuário, e todas estas operações básicas. Na medida que os
-computadores evoluíram, cada vez mais as tarefas comuns na implementação de
-jogos foram movidas para bibliotecas/frameworks especializados deixando os
-desenvolvedores muito mais focados nos aspectos criativos da construção do
-jogo.
+Os pioneiros não tinham luxos: cada novo jogo implementado envolvia programar
+como escrever os pixels na tela, como interagir com os dispositivos de entrada
+do usuário, e outras operações básicas. Na medida que os computadores
+evoluíram, cada vez mais as tarefas comuns na implementação de jogos foram
+movidas para bibliotecas/frameworks especializados deixando os desenvolvedores
+muito mais focados nos aspectos criativos.
 
-Um motor de jogo idealmente deve chegar neste ponto: o desenvolvedor só liga as
+Um motor de jogo idealmente deve chegar neste ponto: o desenvolvedor liga as
 peças e define a lógica do jogo, mas sem se preocupar com os detalhes mais
-baixos da programação. Por isto, motores de jogos modernos podem se tornar
+baixos da implementação. Por isto, motores de jogos modernos podem se tornar
 componentes extremamente sofisticados que chegam literalmente a possuir milhões
 de linhas de código.
 
 A FGAme, obviamente, é um projeto muito simples nesta escala e foi desenvolvido
-com o intuito muito mais pedagógico que comercial: os objetivos são ensinar
-conceitos de física para programadores e mostrar alguns princípios práticos de
-desenvolvimento de motores para jogos (especialmente jogos voltados para
-física).
+com o intuito muito mais pedagógico que comercial: os objetivos principais são
+ensinar conceitos de física para programadoresm, mostrar alguns princípios
+práticos de desenvolvimento de motores para jogos (especialmente jogos voltados
+para física) e servir como um motor de fácil utilização para a criação de jogos
+educativos.
 
 Começamos pincelando de forma geral o que um motor de jogos deve ser capaz de
 fazer e como isso normalmente se configura em termos de arquitetura de
@@ -283,8 +281,8 @@ outras formas de saída tais como audio, respostas por vibração, etc).
 De forma bem genérica, podemos pensar que a maioria dos jogos é implementada
 da seguinte maneira::
 
-    # Inicializa o estado do motor de jogos (configura hardware, lê arquivos
-    # de configuração, savegames, etc)
+    # Inicializa o estado do aplicativo (configura hardware, lê arquivos de
+    # configuração, savegames, etc)
     inicializa()
 
     while True:
@@ -303,9 +301,9 @@ da seguinte maneira::
 Vamos começar então com o mais básico possível, que é criar um "quase-jogo" que
 simplesmente desenha alguns objetos simples na tela. A FGAme pode utilizar
 vários métodos diferentes de renderização, mas por padrão, isto é feito com
-auxílio da biblioteca SDL. Entender o funcionamento da SDL é interessante pois
-vários jogos e motores de jogos são baseados nesta tecnologia e sua arquitetura
-é bastante convencional.
+auxílio do SDL no C via a biblioteca pygame. Entender o funcionamento da SDL é
+interessante pois vários jogos e motores de jogos são baseados nesta tecnologia
+e sua arquitetura é bastante convencional.
 
 #TODO: SDL
 
@@ -327,20 +325,20 @@ trata-se de uma tela de pixels. Ele possui vários métodos do tipo paint_* que
 permitem pintar figuras geométricas específicas. Por exemplo, podemos desenhar
 um círculo no meio da tela utilizando
 
->>> canvas.paint_circle(pos=(400, 300), radius=50, color='black')
+>>> canvas.paint_circle(radius=50, pos=(400, 300), color='black') # doctest: +SKIP
 
 Observe que as imagens não são atualizadas imediatamente. Isto ocorre porque a
 imagem é armazenada temporariamente na memória RAM e só é enviada para a tela
 quando exigimos esta operação explicitamente. Para isto, basta chamar o método
 flip() no fim da seção de desenho.
 
->>> canvas.flip()
+>>> canvas.flip()                                              # doctest: +SKIP
 
 Uma maneira conveniente de fazer isto, é utilizar o objeto canvas dentro de
 um bloco with(). Ao final do bloco, a função flip() será chamada
 automaticamente.
 
->>> with canvas:
+>>> with canvas:                                               # doctest: +SKIP
 ...     canvas.paint_circle(pos=(400, 300), radius=50, color='black')
 ...     canvas.paint_circle(pos=(400, 300), radius=30, color='white')
 
@@ -388,15 +386,14 @@ Loop principal
 '''
 
 from FGAme import mathutils as math
+from FGAme.mathutils import Vec2, Mat2, pi
 from FGAme import draw
-from FGAme import bench
 from FGAme.core import *
 from FGAme import physics
 from FGAme.physics import *
 from FGAme.objects import *
 from FGAme.app import *
 from FGAme.orientation_objects import *
-from FGAme.mathutils import Vec2, Matrix, pi
 
 if __name__ == '__main__':
     import doctest

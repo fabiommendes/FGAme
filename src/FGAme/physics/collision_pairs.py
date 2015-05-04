@@ -48,10 +48,11 @@ def get_collision(A, B):
     tB = type(B).__name__
     raise CollisionError('no collision defined for: (%s, %s)' % (tA, tB))
 
-
 ###############################################################################
 #                      Colisões entre objetos do mesmo tipo
 ###############################################################################
+
+
 @get_collision.dispatch(AABB, AABB)
 def collision_aabb(A, B):
     '''Retorna uma colisão com o objeto other considerando apenas a caixas

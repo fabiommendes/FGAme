@@ -36,7 +36,7 @@ class MainLoop(object):
 
         pass
 
-    def run(self, state, timeout=None, maxiter=None, throttle=True):
+    def run(self, state, timeout=None, maxiter=None, wait=True):
         # Assegura que o motor de jogos foi inicializado
         from FGAme.core import init
         init()
@@ -68,13 +68,13 @@ class MainLoop(object):
 
             # Espera até completar o frame
             t = gettime()
-            wait = self.dt - (t - t0)
-            t0 = t
-            if wait > 0 and throttle:
-                sleep(max(0, self.dt - (t - t0)))
+            wait_time = self.dt - (t - t0)
+            if wait_time > 0 and wait:
+                sleep(max(0, wait_time))
             else:
                 n_skip += 1
                 state.trigger('frame-skip', -wait)
+            t0 = t
 
             # Verifica que já ultrapassou o tempo de simulação
             if timeout is not None and t - sim_start >= timeout:

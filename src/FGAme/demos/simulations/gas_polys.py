@@ -8,7 +8,7 @@ from random import uniform
 # Constantes da simulação
 SPEED = 300
 SHAPE = (30, 30)
-NUM_POLYS = 100
+NUM_POLYS = 50
 
 # Inicializa o mundo
 world = World(gravity=50, dfriction=0)
@@ -24,4 +24,4 @@ for _ in range(NUM_POLYS):
 # Inicia a simulação
 import fasttrack
 with fasttrack.timeit('foo'):
-    world.run()
+    world.run(maxiter=60, wait=True)

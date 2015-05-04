@@ -2,8 +2,8 @@
 
 from FGAme.physics import RigidBody
 from FGAme.mathutils import aabb_bbox
-from FGAme.mathutils import Vec2, mVec2, RotMatrix, dot, cross
-from FGAme.mathutils import sin, cos, pi
+from FGAme.mathutils import Vec2, RotMat2
+from FGAme.mathutils import sin, pi
 from FGAme.mathutils import area, center_of_mass, ROG_sqr
 
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
@@ -64,7 +64,7 @@ class Poly(RigidBody):
         for idx, n in enumerate(normals):
             for n_other in LI:
                 # Produto vetorial nulo ==> dependência linear
-                if abs(cross(n, n_other)) < 1e-3:
+                if abs(n.cross(n_other)) < 1e-3:
                     break
             else:
                 # Executado se o loop "for" não terminar em um break
@@ -107,7 +107,7 @@ class Poly(RigidBody):
 
         n = self.get_normal
         P = self.vertices
-        return all(dot(pt - P[i], n(i)) <= 0 for i in range(self.num_sides))
+        return all((pt - P[i]).dot(n(i)) <= 0 for i in range(self.num_sides))
 
     ###########################################################################
     #                     Sobrescrita de métodos
@@ -122,7 +122,7 @@ class Poly(RigidBody):
         if self.theta == self._cache_theta:
             return self._cache_rvertices_last
         else:
-            R = RotMatrix(self.theta)
+            R = RotMat2(self.theta)
             vert = [R * v for v in self._vertices]
             xmin = min(v.x for v in vert)
             xmax = max(v.x for v in vert)

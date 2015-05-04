@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
-from mathtools import Vec2, dot
+from mathtools import Vec2
+from mathtools.shapes import Circle
 from math import sqrt
 
 __all__ = ['AABB',
@@ -219,7 +220,7 @@ class AABB(object):
         return (self.ymin, self.ymax)
 
     def shadow(self, norm):
-        coords = [dot(v, norm) for v in self.vertices]
+        coords = [v.dot(norm) for v in self.vertices]
         return min(coords), max(coords)
 
 ###############################################################################

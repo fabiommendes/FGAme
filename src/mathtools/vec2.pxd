@@ -1,10 +1,5 @@
 cimport cython
-cdef extern from "math.h":
-    double sin(double x)
-    double cos(double x)
-    double sqrt(double x)
-    int ctrunc "trunc"(double x)
-
+cimport mathfuncs as m
 
 @cython.freelist(8)
 cdef class Vec2:
@@ -18,4 +13,3 @@ cdef class Vec2:
 
 cdef class mVec2(Vec2):
     pass
-

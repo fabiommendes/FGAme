@@ -19,21 +19,19 @@ class Circle(object):
         s_center = '%.1f, %.1f' % self.center
         return 'Circle(%.1f, (%s))' % (self.radius, s_center)
 
-    #==========================================================================
-    # Cálculo de distâncias
-    #==========================================================================
-
+    # Cálculo de distâncias ###################################################
     def distance_center(self, other):
         '''Retorna a distância entre centros de dois círculos.'''
+
+        pass
 
     def distance_circle(self, other):
         '''Retorna a distância para um outro círculo. Zero se eles se
         interceptam'''
 
-    #==========================================================================
-    # Pontos de interceptação
-    #==========================================================================
+        pass
 
+    # Pontos de interceptação #################################################
     def intersects_circle(self, other):
         '''Retorna True se o círculo intercepta outro círculo ou False, caso
         contrário'''
@@ -42,10 +40,9 @@ class Circle(object):
         '''Retorna True se o ponto está na fronteira do círculo dada a margem
         de tolerância tol.'''
 
-    #==========================================================================
-    # Contêm ou não figuras
-    #==========================================================================
+        pass
 
+    # Contêm ou não figuras geométricas #######################################
     def contains_circle(self, other):
         '''Retorna True se o círculo intecepta outro círculo ou False, caso
         contrário'''

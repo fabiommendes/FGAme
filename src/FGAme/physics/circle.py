@@ -40,7 +40,7 @@ class CommonCircle(object):
 
     def rescale(self, scale, update_physics=False):
         self.cbb_radius *= scale
-        LinearRigidBody.rescale(scale, update_physics)
+        super(CommonCircle, self).rescale(scale, update_physics)
 
     # Caixa de contorno #######################################################
     @property

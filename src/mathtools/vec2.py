@@ -1,39 +1,11 @@
 # -*- coding: utf8 -*-
 
-import cython
-from math import sqrt as _sqrt, sin as _sin, cos as _cos, trunc
+import cython as C
+import mathtools as m
 from mathtools.base import auto_public
+from mathtools.util import pyinject
 
-__all__ = ['Vec2', 'mVec2', 'asvector', 'dot', 'cross']
-
-if not cython.compiled:
-    D = globals()
-    D['sqrt'] = _sqrt
-    D['sin'] = _sin
-    D['cos'] = _cos
-    D['ctrunc'] = trunc
-    del D
-
-
-def pyinject(globals):
-    def decorator(cls):
-        name = cls.__name__
-        if name.startswith('py'):
-            name = name[2:]
-        elif name.startswith('_py'):
-            name = name[3:]
-        old = globals[name]
-
-        if not cython.compiled:
-            for k, v in cls.__dict__.items():
-                if k in ['__module__', '__doc__', '__weakref__', '__dict__']:
-                    continue
-                if k == '__hash__' and v is None:
-                    continue
-                setattr(old, k, v)
-        return old
-
-    return decorator
+__all__ = ['Vec2', 'mVec2']
 
 
 ###############################################################################
@@ -71,7 +43,7 @@ class Vec2(object):
     Vec2(0.6, 0.8)
     '''
 
-    if not cython.compiled:
+    if not C.compiled:
         __slots__ = ['_x', '_y']
     else:
         __slots__ = []
@@ -92,7 +64,7 @@ class Vec2(object):
         return cls.from_coords(x, y)
 
     @staticmethod
-    @cython.locals(x='double', y='double', new='double')
+    @C.locals(x='double', y='double', new='double')
     def from_coords(x, y):
         '''Inicializa vetor a partir das coordenadas'''
 
@@ -103,7 +75,7 @@ class Vec2(object):
         new._y = y
         return new
 
-    @cython.locals(x='double', y='double', new='Vec2')
+    @C.locals(x='double', y='double', new='Vec2')
     def _from_coords(self, x, y):
         new = Vec2.__new__(Vec2, x, y)
         new._x = x
@@ -118,7 +90,7 @@ class Vec2(object):
     def norm(self):
         '''Retorna o módulo (norma) do vetor'''
 
-        return sqrt(self._x ** 2 + self._y ** 2)
+        return m.sqrt(self._x ** 2 + self._y ** 2)
 
     def norm_sqr(self):
         '''Retorna o módulo do vetor ao quadrado'''
@@ -132,46 +104,70 @@ class Vec2(object):
         return (self._from_coords(self._x / norm, self._y / norm)
                 if norm else self._from_coords(0, 0))
 
-    @cython.locals(theta='double', x='double', y='double',
-                   dx='double', dy='double', cos_t='double', sin_t='double')
+    @C.locals(theta='double', x='double', y='double',
+              dx='double', dy='double', cos_t='double', sin_t='double')
     def rotate(self, theta, axis=(0, 0)):
         '''Retorna um vetor rotacionado por um ângulo theta'''
 
         x, y = axis
         dx = self._x - x
         dy = self._y - y
-        cos_t, sin_t = cos(theta), sin(theta)
+        cos_t, sin_t = m.cos(theta), m.sin(theta)
         return self._from_coords(
             dx * cos_t - dy * sin_t + x,
             dx * sin_t + dy * cos_t + y)
 
+    @C.locals(x='double')
     def flip_x(self, x=0.0):
         '''Retorna uma cópia com a coordenada x espelhada em torno do ponto
         dado'''
 
         return self._from_coords(x - self._x, self._y)
 
+    @C.locals(y='double')
     def flip_y(self, y=0.0):
         '''Retorna uma cópia com a coordenada x espelhada em torno do ponto
         dado'''
 
         return self._from_coords(self._x, y - self._y)
 
-    @cython.locals(height='int')
+    @C.locals(height='int')
     def screen_coords(self, height=600):
         '''Converte o vetor para um sistema de coordenadas onde o eixo y aponta
         para baixo a partir do topo da tela. É necessário especificar a altura
         da tela para realizar a conversão. Retorna uma tupla com os valores
         truncados.'''
 
-        return ctrunc(self._x), height - ctrunc(self._y)
+        return m.trunc(self._x), height - m.trunc(self._y)
 
     def trunc(self):
         '''Retorna uma tupla com os valores das coordenadas x e y truncados'''
 
-        return ctrunc(self._x), ctrunc(self._y)
+        return m.trunc(self._x), m.trunc(self._y)
 
-    # Métodos mágicos --------------------------------------------------------
+    @C.locals(vec='Vec2', x='double', y='double')
+    def dot(self, other):
+        '''Retorna o resultado do produto escalar com outro vetor'''
+
+        try:
+            vec = other
+            return vec._x * self._x + vec._y * self._y
+        except (TypeError, AttributeError):
+            x, y = other
+            return self._x * x + self._y * y
+
+    @C.locals(vec='Vec2', x='double', y='double')
+    def cross(self, other):
+        '''Retorna o resultado da componente z do produto vetorial com outro
+        vetor'''
+        try:
+            vec = other
+            return self._y * vec._x - self._y * vec._x
+        except (TypeError, AttributeError):
+            x, y = other
+            return self._y * x - self._x * y
+
+    # Métodos mágicos #########################################################
     def __repr__(self):
         '''_x.__repr__() <==> repr(_x)'''
 
@@ -203,7 +199,11 @@ class Vec2(object):
         else:
             raise IndexError(i)
 
-    @cython.locals(A='Vec2', B='double')
+    def __hash__(self):
+        return hash(self._x) ^ hash(self._y)
+
+    # Operações aritiméticas ##################################################
+    @C.locals(A='Vec2', B='double')
     def __mul__(self, other):
         '''_x.__mul__(y) <==> _x * y'''
 
@@ -224,19 +224,19 @@ class Vec2(object):
 
         return self * other
 
-    @cython.locals(self='Vec2', other='double')
+    @C.locals(self='Vec2', other='double')
     def __div__(self, other):
         '''_x.__div__(y) <==> _x / y'''
 
         return self._from_coords(self._x / other, self._y / other)
 
-    @cython.locals(self='Vec2', other='double')
+    @C.locals(self='Vec2', other='double')
     def __truediv__(self, other):
         '''_x.__div__(y) <==> _x / y'''
 
         return self._from_coords(self._x / other, self._y / other)
 
-    @cython.locals(A='Vec2', B='Vec2', x='double', y='double')
+    @C.locals(A='Vec2', B='Vec2', x='double', y='double')
     def __add__(self, other):
         '''_x.__add__(y) <==> _x + y'''
 
@@ -258,7 +258,7 @@ class Vec2(object):
 
         return self + other
 
-    @cython.locals(A='Vec2', B='Vec2', x='double', y='double')
+    @C.locals(A='Vec2', B='Vec2', x='double', y='double')
     def __sub__(self, other):
         '''_x.__sub__(y) <==> _x - y'''
 
@@ -298,12 +298,12 @@ class Vec2(object):
     def __abs__(self):
         return self.norm()
 
-    @cython.locals(method='int', x='double', y='double')
+    @C.locals(method='int', x='double', y='double')
     def __richcmp__(self, other, method):
-        if method == 2:  # ==
+        if method == 2:    # igual (==)
             x, y = other
             return self._x == x and self._y == y
-        elif method == 3:  # !=
+        elif method == 3:  # diferente (!=)
             x, y = other
             return self._x != x or self._y != y
         else:
@@ -318,34 +318,6 @@ class Vec2(object):
         return self._y
 
 
-# Inject pure python code #####################################################
-if not cython.compiled:
-    @pyinject(globals())
-    class pyVec2:
-
-        def __init__(self, x_or_data, y=None):
-            if y is None:
-                x, y = x_or_data
-            else:
-                x = x_or_data
-            self._x = x + 0.0
-            self._y = y + 0.0
-
-        @staticmethod
-        def _from_coords(x, y):
-            tt = Vec2
-            new = tt.__new__(tt, x, y)
-            new._x = x + 0.0
-            new._y = y + 0.0
-            return new
-
-        def __eq__(self, other):
-            x, y = other
-            return self._x == x and self._y == y
-
-    auto_public(Vec2)
-
-
 ###############################################################################
 #                            Mutable Vector 2D
 ###############################################################################
@@ -355,7 +327,7 @@ class mVec2(Vec2):
 
     '''Como Vec2, mas com elementos mutáveis'''
 
-    @cython.locals(x='double', y='double', new='Vec2')
+    @C.locals(x='double', y='double', new='Vec2')
     def _from_coords(self, x, y):
         new = mVec2.__new__(mVec2, x, y)
         new._x = x
@@ -370,7 +342,7 @@ class mVec2(Vec2):
         else:
             raise IndexError
 
-    @cython.locals(x='double', y='double', vec='Vec2')
+    @C.locals(x='double', y='double', vec='Vec2')
     def __iadd__(self, other):
         '''_x.__iadd__(y) <==> _x += y'''
 
@@ -384,7 +356,7 @@ class mVec2(Vec2):
             self._y += y
         return self
 
-    @cython.locals(x='double', y='double', vec='Vec2')
+    @C.locals(x='double', y='double', vec='Vec2')
     def __isub__(self, other):
         '''_x.__isub__(y) <==> _x -= y'''
 
@@ -398,7 +370,7 @@ class mVec2(Vec2):
             self._y -= y
         return self
 
-    @cython.locals(other='double')
+    @C.locals(other='double')
     def __imul__(self, other):
         '''_x.__imul__(y) <==> _x *= y'''
 
@@ -406,7 +378,7 @@ class mVec2(Vec2):
         self._y *= other
         return self
 
-    @cython.locals(other='double')
+    @C.locals(other='double')
     def __idiv__(self, other):
         '''_x.__idiv__(y) <==> _x /= y'''
 
@@ -414,7 +386,7 @@ class mVec2(Vec2):
         self._y /= other
         return self
 
-    @cython.locals(other='double')
+    @C.locals(other='double')
     def __itruediv__(self, other):
         '''_x.__idiv__(y) <==> _x /= y'''
 
@@ -422,15 +394,15 @@ class mVec2(Vec2):
         self._y /= other
         return self
 
-    @cython.locals(theta='double', x='double', y='double',
-                   dx='double', dy='double', cos_t='double', sin_t='double')
+    @C.locals(theta='double', x='double', y='double',
+              dx='double', dy='double', cos_t='double', sin_t='double')
     def irotate(self, theta, axis=(0, 0)):
         '''Rotaciona o vetor *inplace*'''
 
         x, y = axis
         dx = self._x - x
         dy = self._y - y
-        cos_t, sin_t = cos(theta), sin(theta)
+        cos_t, sin_t = m.cos(theta), m.sin(theta)
         self._x = dx * cos_t - dy * sin_t + x
         self._y = dx * sin_t + dy * cos_t + y
 
@@ -470,9 +442,51 @@ class mVec2(Vec2):
     def y(self, value):
         self._y = value + 0.0
 
-if not cython.compiled:
+    def __hash__(self):
+        raise TypeError
+
+###############################################################################
+#               Código injetado para rodar no modo interpretado
+###############################################################################
+
+if not C.compiled:
     @pyinject(globals())
-    class pymVec2:
+    class Vec2Inject:
+
+        '''Implementa métodos que tem algum tipo de problema de performance
+        ou de semântica diferente entre Cython e o Python interpretado'''
+
+        def __init__(self, x_or_data, y=None):
+            if y is None:
+                x, y = x_or_data
+            else:
+                x = x_or_data
+            self._x = x + 0.0
+            self._y = y + 0.0
+
+        @staticmethod
+        def _from_coords(x, y):
+            tt = Vec2
+            new = tt.__new__(tt, x, y)
+            new._x = x + 0.0
+            new._y = y + 0.0
+            return new
+
+        def __mul__(self, other):
+            '''_x.__mul__(y) <==> _x * y'''
+
+            try:
+                other = float(other)
+            except TypeError:
+                return other.__rmul__(self)
+            return self._from_coords(self._x * other, self._y * other)
+
+        def __eq__(self, other):
+            x, y = other
+            return self._x == x and self._y == y
+
+    @pyinject(globals())
+    class mVec2Inject:
 
         @staticmethod
         def _from_coords(x, y):
@@ -482,79 +496,8 @@ if not cython.compiled:
             new._y = y + 0.0
             return new
 
+    auto_public(Vec2)
 
-###############################################################################
-#                 Useful linear algebra functions
-###############################################################################
-
-
-def asvector(v):
-    '''Retorna o objeto como uma instância da classe Vetor'''
-
-    if isinstance(v, Vec2):
-        return v
-    else:
-        return Vec2.from_seq(v)
-
-
-@cython.locals(A='Vec2', B='mVec2')
-def dot(v1, v2):
-    '''Calcula o produto escalar entre dois vetores
-
-    Exemplo
-    -------
-
-    >>> dot((1, 2), (3, 4))
-    11
-
-    >>> dot(Vec2(1, 2), Vec2(3, 4))
-    11.0
-    '''
-
-    try:
-        A = v1
-        B = v2
-        return A._x * B._x + A._y * B._y
-    except (AttributeError, TypeError):
-        return sum(x * y for (x, y) in zip(v1, v2))
-
-
-@cython.locals(A='Vec2', B='mVec2',
-               x1='double', x2='double', y1='double', y2='double')
-def cross(v1, v2):
-    '''Retorna a compontente z do produto vetorial de dois vetores
-    bidimensionais'''
-
-    try:
-        A = v1
-        B = v2
-        x1 = A._x
-        y1 = A._y
-        x2 = B._x
-        y2 = B._x
-    except (AttributeError, TypeError):
-        x1, y1 = v1
-        x2, y2 = v2
-    return x1 * y2 - x2 * y1
-
-if __name__ == '__main__' and not cython.compiled:
+if __name__ == '__main__' and not C.compiled:
     import doctest
     doctest.testmod()
-
-    import mathtools
-    import fasttrack
-    vec = getattr(mathtools, 'Vec2')
-
-    with fasttrack.timeit('foo'):
-        u = vec(1, 2)
-        v = vec(3, 4)
-        print(sum((u for _ in range(100000)), v))
-        print(2 * u)
-
-    with fasttrack.timeit('foo'):
-        u = Vec2(1, 2)
-        v = Vec2(3, 4)
-        print(sum((u for _ in range(100000)), v))
-
-    with fasttrack.timeit('foo'):
-        print(sum((1.0 for _ in range(100000)), 0.0))

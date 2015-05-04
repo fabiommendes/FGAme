@@ -24,19 +24,21 @@ Funções especiais para a criação de objetos
 
 '''
 
-from .flags import *
-from .dynamic_object import Dynamic
-from .particle import Particle
-from .rigidbody import RigidBody, LinearRigidBody
-from .aabb import AABB
-from .circle import Circle, Ball
-from .poly import Poly, RegularPoly, Rectangle
-from .forces import *
-from .collision import Collision
-from .collision_pairs import (get_collision, get_collision_generic,
-                              CollisionError)
-from .simulation import *
-from . import collision_pairs as collision
-from . import flags
+from FGAme.physics.flags import *
+from FGAme.physics.dynamic_object import Dynamic
+from FGAme.physics import flags
+from FGAme.physics.particle import Particle
+from FGAme.physics.rigidbody import RigidBody, LinearRigidBody
+from FGAme.physics.aabb import AABB
+from FGAme.physics.circle import Circle, Ball
+from FGAme.physics.poly import Poly, RegularPoly, Rectangle
+from FGAme.physics.collision import Collision
+from FGAme.physics.collision_pairs import (get_collision,
+                                           get_collision_generic,
+                                           CollisionError)
+from FGAme.physics import collision_pairs as collision
+from FGAme.physics.forces import *
+from FGAme.physics.simulation import *
+
 
 __all__ = ['Collision', 'get_collision', 'Simulation']

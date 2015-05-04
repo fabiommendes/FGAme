@@ -8,7 +8,7 @@ VERSION = '0.3.1-alpha-1'
 # Configure environment
 ##########################################################################
 setup_kwds = {}
-math_exts = ['linalg']
+math_exts = ['vec2', 'mat2']
 
 # Test if installation can compile extensions and configure them
 # Currently only cpython accepts extensions
@@ -74,7 +74,7 @@ Main features:
       packages=['FGAme', 'FGAme.app', 'FGAme.backends', 'FGAme.core',
                 'FGAme.demos', 'FGAme.demos.simulations', 'FGAme.demos.games',
                 'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.objects', 'FGAme.util',
-                'mathtools', 'mathtools.base', 'mathtools.pymath',
+                'mathtools', 'mathtools.base', 'mathtools.shapes',
                 ],
       license='GPL',
       requires=['pygame'],

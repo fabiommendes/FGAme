@@ -1,8 +1,7 @@
 # -*- coding: utf8 -*-
 
 from collections import MutableSequence
-from mathtools import Vec2, mVec2
-from mathtools.pymath import RotMatrix, Array
+from mathtools import Vec2, mVec2, RotMat2, Array
 
 __all__ = ['VecArray']
 
@@ -68,7 +67,7 @@ class VecArray(MutableSequence):
         '''Retorna um vetor rotacionado por um ângulo theta'''
 
         axis = Vec2(axis)
-        R = RotMatrix(theta)
+        R = RotMat2(theta)
         if axis is None:
             return VecArray([R * u for u in self._data])
         else:

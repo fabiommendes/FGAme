@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
-from mathtools.pymath import RotMatrix, VecArray, Vec2
-from mathtools.pymath import aabb_bbox, cross
+from mathtools import RotMat2, Vec2, VecArray
+from mathtools.shapes import *
 from math import sqrt, pi, sin
 
 
@@ -95,7 +95,7 @@ class RegularPoly(ConvexPoly):
 
     def __init__(self, N, length, theta=None, pos=None):
         alpha = pi / N
-        R = RotMatrix(2 * alpha)
+        R = RotMat2(2 * alpha)
         p = Vec2(length / (2 * sin(alpha)), 0)
         vertices = []
         for _ in range(N):
@@ -283,7 +283,7 @@ def convex_hull(points):
     # remove o último caso não faça uma volta na direção anti-horária
     L = []
     for p in points:
-        while len(L) >= 2 and cross(L[-1] - L[-2], p - L[-2]) <= 0:
+        while len(L) >= 2 and (L[-1] - L[-2]).cross(p - L[-2]) <= 0:
             L.pop()
         L.append(p)
 
@@ -291,7 +291,7 @@ def convex_hull(points):
     # Semelhante à anterior, mas itera sobre os pontos na ordem inversa
     U = []
     for p in reversed(points):
-        while len(U) >= 2 and cross(U[-1] - U[-2], p - U[-2]) <= 0:
+        while len(U) >= 2 and (U[-1] - U[-2]).cross(p - U[-2]) <= 0:
             U.pop()
         U.append(p)
 

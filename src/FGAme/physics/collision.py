@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.core import env
-from FGAme.mathutils import Vec2, cross, dot
+from FGAme.mathutils import Vec2
 from FGAme.util import lazy
 
 ###############################################################################
@@ -56,7 +56,7 @@ class Collision(object):
 
         n = self.normal
         tangent = Vec2(-n.y, n._x)
-        if dot(tangent, self.vrel_contact) > 0:
+        if tangent.dot(self.vrel_contact) > 0:
             tangent *= -1
         return tangent
 
@@ -96,17 +96,17 @@ class Collision(object):
 
         if A._invinertia or A.omega:
             R = pos - A._pos
-            J_denom += cross(R, n) ** 2 * A._invinertia
+            J_denom += R.cross(n) ** 2 * A._invinertia
 
         if B._invinertia or B.omega:
             R = pos - B._pos
-            J_denom += cross(R, n) ** 2 * B._invinertia
+            J_denom += R.cross(n) ** 2 * B._invinertia
 
         # Determina o impulso total
         if J_denom == 0.0:
             return 0.0
 
-        vrel_n = dot(self.vrel_contact, n)
+        vrel_n = self.vrel_contact.dot(n)
         if vrel_n > 0:
             return 0.0
 
@@ -120,7 +120,7 @@ class Collision(object):
         vrel = self.vrel_contact
 
         # Calcula o impulso tangente máximo
-        vrel_tan = -dot(vrel, self.tangent)
+        vrel_tan = -vrel.dot(self.tangent)
         Jtan_max = abs(self.mu * self.J_normal)
 
         # Limita a ação do impulso tangente
@@ -178,11 +178,11 @@ class Collision(object):
         if A._invmass:
             A.apply_impulse(-J)
         if A._invinertia:
-            A.apply_aimpulse(cross(pos - A._pos, -J))
+            A.apply_aimpulse((pos - A._pos).dot(-J))
         if B._invmass:
             B.apply_impulse(J)
         if B._invinertia:
-            B.apply_aimpulse(cross(pos - B._pos, J))
+            B.apply_aimpulse((pos - B._pos).cross(J))
 
     def adjust_overlap(self):
         '''Move objetos para encerrar a superposição.'''

@@ -1,10 +1,9 @@
 # -*- coding: utf8 -*-
-
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2, mVec2, asvector, dot, cross
+from FGAme.mathutils import Vec2, mVec2
 from FGAme.mathutils import sqrt, sin, cos
-from FGAme.physics import flags
 from FGAme.util import six
+from FGAme.physics import flags
 
 __all__ = ['Dynamic']
 
@@ -337,7 +336,7 @@ class Dynamic(object):
     def linearE(self):
         '''Energia cinética das variáveis lineares'''
 
-        return dot(self._vel, self._vel) / (2 * self._invmass)
+        return self._vel.dot(self._vel) / (2 * self._invmass)
 
     def angularE(self):
         '''Energia cinética das variáveis angulares'''
@@ -368,7 +367,7 @@ class Dynamic(object):
     def momentumL_origin(self):
         '''Momentum angular em torno da origem'''
 
-        return cross(self._pos, self.momentumP()) + self.momentumL()
+        return self._pos.cross(self.momentumP()) + self.momentumL()
 
     ###########################################################################
     #                        Propriedades Geométricas
@@ -444,9 +443,9 @@ class Dynamic(object):
 
         if pos is not None:
             if relative:
-                tau = cross(pos, force)
+                tau = pos.cross(force)
             else:
-                tau = cross(pos - self._pos, force)
+                tau = (pos - self._pos).cross(force)
             self.apply_torque(tau, dt)
 
     def apply_accel(self, a, dt):
@@ -472,7 +471,7 @@ class Dynamic(object):
 
         Em código Python
 
-        >>> self.move(self._vel * dt + a * (dt**2/2))           # doctest: +SKIP
+        >>> self.move(self.vel * dt + a * (dt**2/2))           # doctest: +SKIP
         >>> self.boost(a * dt)                                 # doctest: +SKIP
 
         Este método simples e intuitivo sofre com o efeito da "deriva de
@@ -514,7 +513,8 @@ class Dynamic(object):
         if a is None:
             a = self._accel
         else:
-            a = asvector(a)
+            if not isinstance(a, Vec2):
+                a = Vec2.from_seq(a)
 
         self.move(self._vel * dt + a * (dt ** 2 / 2.0))
         self.boost(a * dt)
