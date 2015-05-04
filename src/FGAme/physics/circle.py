@@ -38,18 +38,18 @@ class CommonCircle(object):
     def radius(self, value):
         self.cbb_radius = value
 
-    def scale(self, scale, update_physics=False):
+    def rescale(self, scale, update_physics=False):
         self.cbb_radius *= scale
-        LinearRigidBody.scale(scale, update_physics)
+        LinearRigidBody.rescale(scale, update_physics)
 
     # Caixa de contorno #######################################################
     @property
     def xmin(self):
-        return self._pos.x - self.cbb_radius
+        return self._pos._x - self.cbb_radius
 
     @property
     def xmax(self):
-        return self._pos.x + self.cbb_radius
+        return self._pos._x + self.cbb_radius
 
     @property
     def ymin(self):

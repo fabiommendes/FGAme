@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.core import env
-from FGAme.mathutils import Vector, cross, dot
+from FGAme.mathutils import Vec2, cross, dot
 from FGAme.util import lazy
 
 ###############################################################################
@@ -55,7 +55,7 @@ class Collision(object):
         '''Vetor unitário tangente à colisão'''
 
         n = self.normal
-        tangent = Vector(-n.y, n.x)
+        tangent = Vec2(-n.y, n._x)
         if dot(tangent, self.vrel_contact) > 0:
             tangent *= -1
         return tangent
@@ -76,11 +76,11 @@ class Collision(object):
 
         if A._invinertia or A.omega:
             x, y = pos - A._pos
-            vrel -= A.omega * Vector(-y, x)
+            vrel -= A.omega * Vec2(-y, x)
 
         if B._invinertia or B.omega:
             x, y = pos - B._pos
-            vrel += B.omega * Vector(-y, x)
+            vrel += B.omega * Vec2(-y, x)
 
         return vrel
 

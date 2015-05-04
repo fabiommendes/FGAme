@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector
+from FGAme.mathutils import Vec2
 from FGAme.draw import color_property
 
 ###############################################################################
@@ -25,10 +25,11 @@ class Screen(object):
     '''
     is_canvas = False
     background = color_property('background')
+    __slots__ = ['_direct', 'width', 'height', 'pos', 'zoom', '_background']
 
     def __init__(self, shape=(800, 600), pos=(0, 0), zoom=1, background=None):
         self.width, self.height = shape
-        self.pos = Vector(*pos)
+        self.pos = Vec2(*pos)
         self.zoom = zoom
         self.background = background
         self._direct = True
@@ -62,6 +63,7 @@ class Canvas(Screen):
     básicos como círculos, linhas, pontos, polígonos, etc.
     '''
     is_canvas = True
+    __slots__ = ['_drawing_funcs']
 
     def __init__(self, shape=(800, 600), pos=(0, 0), zoom=1, background=None):
         super(Canvas, self).__init__(shape, pos, zoom, background)
@@ -112,7 +114,7 @@ class Canvas(Screen):
         '''Pinta uma caixa de contorno alinhada aos eixos'''
 
         dx, dy = xmax - xmin, ymax - ymin
-        self.paint_rect((xmin, ymin), (dx, dy), color=color, solid=solid)
+        self.paint_rect((xmin, ymin, dx, dy), color=color, solid=solid)
 
     def paint_rect(self, rect, color='black'):
         '''Semelhante à paint_aabb(), mas utiliza uma tupla com
@@ -145,13 +147,10 @@ class Canvas(Screen):
 
         for obj in tree.walk():
             try:
-                method = 'draw_' + obj.canvas_primitive
-                func = getattr(self, method)
+                obj.draw(self)
             except AttributeError:
                 tt = type(obj).__name__
-                raise ValueError("don't know how to draw %s" % tt)
-            else:
-                func(obj)
+                raise ValueError("don't know how to draw %s object" % tt)
 
     def draw_circle(self, circle):
         '''Desenha um círculo utilizando as informações de geometria, cor e
@@ -161,10 +160,7 @@ class Canvas(Screen):
         draw_* adaptam automaticamente a renderização para os padrões de zoom e
         deslocamento da tela.'''
 
-        if self._direct:
-            self.paint_circle(circle.radius, circle.pos, circle.color, True)
-        else:
-            raise NotImplementedError
+        self.paint_circle(circle.radius, circle.pos, circle.color, True)
 
     def draw_aabb(self, aabb):
         '''Desenha um círculo utilizando as informações de geometria, cor e
@@ -174,10 +170,7 @@ class Canvas(Screen):
         draw_* adaptam automaticamente a renderização para os padrões de zoom e
         deslocamento da tela.'''
 
-        if self._direct:
-            self.paint_rect(aabb.rect, aabb.color, True)
-        else:
-            raise NotImplementedError
+        self.paint_rect(aabb.rect, aabb.color, True)
 
     def draw_poly(self, poly):
         '''Desenha um círculo utilizando as informações de geometria, cor e
@@ -187,10 +180,7 @@ class Canvas(Screen):
         draw_* adaptam automaticamente a renderização para os padrões de zoom e
         deslocamento da tela.'''
 
-        if self._direct:
-            self.paint_poly(poly.vertices, poly.color)
-        else:
-            raise NotImplementedError
+        self.paint_poly(poly.vertices, poly.color)
 
     def draw_image(self, image):
         if self._direct:

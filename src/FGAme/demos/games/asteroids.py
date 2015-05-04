@@ -73,30 +73,45 @@ class Asteroids(World):
         '''Executado a cada frame: testa todos os asteroids para ver se saíram
         da tela. Em caso positivo, eles são recolocados do lado oposto'''
 
+        self.asteroids.append(self.spaceship)
         for asteroid in self.asteroids:
             if asteroid.ymin > HEIGHT:
                 asteroid.move((0, -HEIGHT - asteroid.height))
+            elif asteroid.ymax < 0:
+                asteroid.move((0, HEIGHT + asteroid.height))
+            elif asteroid.xmin > WIDTH:
+                asteroid.move((-WIDTH - asteroid.width, 0))
+            elif asteroid.ymax < 0:
+                asteroid.move((WIDTH + asteroid.width, 0))
+        self.asteroids.pop()
 
     @listen('long-press', 'left')
     def ship_left(self):
-        self.spaceship.rotate(0.05)
+        self.spaceship.irotate(0.1)
+        # self.spaceship.aboost(0.5)
 
     @listen('long-press', 'right')
     def ship_right(self):
-        pass
+        self.spaceship.irotate(-0.1)
+        # self.spaceship.aboost(-0.5)
 
     @listen('long-press', 'up')
     def ship_front(self):
-        pass
+        ship = self.spaceship
+        u = (ship.vertices[2] - ship.pos).normalize()
+        self.spaceship.boost(u * 20)
 
     @listen('long-press', 'down')
     def ship_back(self):
-        pass
+        ship = self.spaceship
+        u = (ship.vertices[2] - ship.pos).normalize()
+        self.spaceship.boost(-10 * u)
 
     @listen('key-down', 'space')
     def on_shot(self):
-        vel = Vector(100, 0)
-        pos = self.spaceship.pos
+        ship = self.spaceship
+        pos = ship.vertices[2]
+        vel = 200 * (pos - ship.pos).normalize() + ship.vel
         Circle(2, pos=pos, vel=vel, color='white', world=self)
 
 

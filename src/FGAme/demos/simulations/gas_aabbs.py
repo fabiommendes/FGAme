@@ -16,8 +16,8 @@ world.set_bounds(width=10)
 
 # Preenche o mundo
 for _ in range(NUM_ABBS):
-    pos = Vector(uniform(30, 770), uniform(30, 570))
-    vel = Vector(uniform(-SPEED, SPEED), uniform(-SPEED, SPEED))
+    pos = Vec2(uniform(30, 770), uniform(30, 570))
+    vel = Vec2(uniform(-SPEED, SPEED), uniform(-SPEED, SPEED))
     aabb = AABB(shape=SHAPE, vel=vel, pos=pos, color=(200, 0, 0))
     world.add(aabb)
 

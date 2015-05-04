@@ -1,7 +1,8 @@
 # -*- coding: utf8 -*-
 
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vector, VectorM, asvector, dot, cross, sqrt
+from FGAme.mathutils import Vec2, mVec2, asvector, dot, cross
+from FGAme.mathutils import sqrt, sin, cos
 from FGAme.physics import flags
 from FGAme.util import six
 
@@ -14,8 +15,8 @@ __all__ = ['Dynamic']
 
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INF = float('inf')
-ORIGIN = Vector(0, 0)
-null_mvector = VectorM(0, 0)
+ORIGIN = Vec2(0, 0)
+null_mvector = mVec2(0, 0)
 
 
 def do_nothing(*args, **kwds):
@@ -193,13 +194,13 @@ class Dynamic(object):
         self.flags = 0
 
         # Variáveis de estado
-        self._pos = VectorM(*pos)
-        self._vel = VectorM(*vel)
+        self._pos = mVec2(*pos)
+        self._vel = mVec2(*vel)
         self.theta = float(theta)
         self.omega = float(omega)
 
         # Acelerações
-        self._accel = VectorM(0, 0)
+        self._accel = mVec2(0, 0)
         self.alpha = 0.0
 
         # Inércias
@@ -215,7 +216,7 @@ class Dynamic(object):
         if adamping is not None:
             self.flags |= flags.OWNS_ADAMPING
         if gravity is None:
-            self._gravity = VectorM(0, 0)
+            self._gravity = mVec2(0, 0)
         else:
             self.gravity = gravity
 
@@ -529,10 +530,10 @@ class Dynamic(object):
         if y is None:
             self.boost(impulse_or_x * self._invmass)
         else:
-            self.boost(Vector(impulse_or_x, y) * self._invmass)
+            self.boost(Vec2(impulse_or_x, y) * self._invmass)
 
     # Variáveis angulares #####################################################
-    def rotate(self, theta):
+    def irotate(self, theta):
         '''Rotaciona o objeto por um ângulo theta'''
 
         self.theta += theta
@@ -553,18 +554,26 @@ class Dynamic(object):
         if relative:
             if y is None:
                 x, y = pos_or_x
-                return self._vel + self.omega * Vector(-y, x)
+                return self._vel + self.omega * Vec2(-y, x)
             else:
-                return self._vel + self.omega * Vector(-y, pos_or_x)
+                return self._vel + self.omega * Vec2(-y, pos_or_x)
 
         else:
             if y is None:
                 x, y = pos_or_x - self._pos
-                return self._vel + self.omega * Vector(-y, x)
+                return self._vel + self.omega * Vec2(-y, x)
             else:
-                x = pos_or_x - self._pos.x
+                x = pos_or_x - self._pos._x
                 y = y - self._pos.y
-                return self._vel + self.omega * Vector(-y, x)
+                return self._vel + self.omega * Vec2(-y, x)
+
+    def orientation(self, theta=0.0):
+        '''Retorna um vetor unitário na direção em que o objeto está orientado.
+        Pode aplicar um ângulo adicional a este vetor fornecendo o parâmetro
+        theta.'''
+
+        theta += self.theta
+        return Vec2(cos(theta), sin(theta))
 
     def torque(self, t):
         '''Define uma torque externo análogo ao método .force()'''
@@ -590,7 +599,7 @@ class Dynamic(object):
         if alpha is None:
             alpha = self._alpha
         self.aboost(alpha * dt)
-        self.rotate(self.omega * dt + alpha * dt ** 2 / 2.)
+        self.irotate(self.omega * dt + alpha * dt ** 2 / 2.)
 
     def apply_aimpulse(self, itorque):
         '''Aplica um impulso angular ao objeto.'''
@@ -608,9 +617,9 @@ class Dynamic(object):
     @gravity.setter
     def gravity(self, value):
         try:
-            self._gravity = Vector(*value)
+            self._gravity = Vec2(*value)
         except TypeError:
-            self._gravity = Vector(0, -value)
+            self._gravity = Vec2(0, -value)
         self.flags |= flags.OWNS_GRAVITY
 
     @property
@@ -857,7 +866,7 @@ class Dynamic(object):
         self.make_kinematic_linear()
         if self._vel != ORIGIN:
             self._old_vel = self._vel
-            self._vel = VectorM(0, 0)
+            self._vel = mVec2(0, 0)
 
     def make_static_angular(self):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
@@ -885,7 +894,7 @@ def vec_property(slot):
                 vec = self.getter(obj, value)
                 vec.update(value)
             except AttributeError:
-                setter(obj, VectorM(*value))
+                setter(obj, mVec2(*value))
 
         def __get__(self, obj, cls):
             if obj is None:

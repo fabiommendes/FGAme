@@ -14,8 +14,8 @@ from random import uniform, randint
 class Gas(World):
 
     def __init__(self,
-                 gravity=300, friction=0.0, rest_coeff=0.95,
-                 num_balls=300, speed=200, radius=10,
+                 gravity=800, friction=0.0, rest_coeff=0.95,
+                 num_balls=80, speed=400, radius=10,
                  color='random'):
         '''Cria uma simulação de um gás de partículas confinado por um êmbolo
         com `num_balls` esferas de raio `radius` com velocidades no intervalo
@@ -30,8 +30,8 @@ class Gas(World):
         # Inicia bolas
         self.bolas = []
         for _ in range(num_balls):
-            pos = Vector(uniform(20, 780), uniform(20, 400))
-            vel = Vector(uniform(-speed, speed), uniform(-speed, speed))
+            pos = Vec2(uniform(20, 780), uniform(20, 400))
+            vel = Vec2(uniform(-speed, speed), uniform(-speed, speed))
             bola = Circle(radius=radius, vel=vel, pos=pos, mass=1)
             bola.color = self.get_color(color)
             self.bolas.append(bola)

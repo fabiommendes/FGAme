@@ -20,20 +20,26 @@ class HasVisualization(object):
         c = color or 'black'
         lc = line_color or 'black'
         lw = line_width
-        self._visualization = Shape.from_primitive(self, c, lc, lw)
+        if hasattr(self, 'draw'):
+            self._visualization = None
+        else:
+            self._visualization = Shape.from_primitive(self, c, lc, lw)
 
     # Desenhando objeto #######################################################
     @property
     def visualization(self):
-        return self._visualization
+        return self._visualization or self
 
     @property
     def color(self):
-        return self._visualization.color
+        try:
+            return self._color
+        except AttributeError:
+            return Color(0, 0, 0)
 
     @color.setter
     def color(self, value):
-        self._visualization.color = Color(value)
+        self._color = Color(value)
 
     @property
     def line_color(self):

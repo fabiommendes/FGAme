@@ -4,7 +4,7 @@ from FGAme.core import env
 import gc
 
 # gc.disable()
-gc.enable()
+# gc.enable()
 
 
 class MainLoop(object):
@@ -36,7 +36,7 @@ class MainLoop(object):
 
         pass
 
-    def run(self, state, timeout=None):
+    def run(self, state, timeout=None, maxiter=None, throttle=True):
         # Assegura que o motor de jogos foi inicializado
         from FGAme.core import init
         init()
@@ -49,9 +49,11 @@ class MainLoop(object):
         screen = env.canvas_object
         sim_start = gettime()
         screen.show()
-        N = 0
+        n_skip = 0
+        n_iter = 0
 
         while self._running:
+            n_iter += 1
             t0 = gettime()
 
             # Captura entrada do usuário e atualiza o estado (e física) de
@@ -68,16 +70,16 @@ class MainLoop(object):
             t = gettime()
             wait = self.dt - (t - t0)
             t0 = t
-            if wait > 0:
-                gc.collect()
+            if wait > 0 and throttle:
                 sleep(max(0, self.dt - (t - t0)))
             else:
-                N += 1
-                print(N / (t - sim_start))
+                n_skip += 1
                 state.trigger('frame-skip', -wait)
 
             # Verifica que já ultrapassou o tempo de simulação
-            if timeout is not None and t - sim_start > timeout:
+            if timeout is not None and t - sim_start >= timeout:
+                break
+            if maxiter is not None and n_iter >= maxiter:
                 break
 
     def stop(self):

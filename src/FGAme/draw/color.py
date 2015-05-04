@@ -1,4 +1,5 @@
 # -*-coding: utf8 -*-
+import itertools
 
 
 class Color(tuple):
@@ -45,41 +46,28 @@ class Color(tuple):
     __slots__ = []
     _CACHE = {}
 
-    def __new__(cls, color, *args):
-        if args:
-            args = (color,) + args
-        elif isinstance(color, str):
-            try:
-                return cls._CACHE[color]
-            except KeyError:
-                raise ValueError('unknown color name: %s' % color)
-        elif isinstance(color, Color):
-            return color
-        else:
-            args = tuple(color)
-
+    def __new__(cls, *args):
         try:
             return cls._CACHE[args]
         except KeyError:
+            objs = cls._CACHE
+            if len(args) == 1:
+                args = args[0]
+            if len(args) == 3:
+                try:
+                    return objs[args]
+                except KeyError:
+                    objs[args] = new = Color(*(args + (255,)))
+                    return new
             if len(args) == 4:
-                R, G, B, A = args
+                try:
+                    return objs[args]
+                except KeyError:
+                    objs[args] = new = tuple.__new__(cls, args)
+                    return new
+
             else:
-                R, G, B = args
-                A = 255
-
-            if isinstance(R, float):
-                R = int(255 * R)
-                G = int(255 * G)
-                B = int(255 * B)
-                A = int(255 * A)
-
-            data = (R, G, B, A)
-            try:
-                color = cls._CACHE[data]
-            except KeyError:
-                color = cls._CACHE[data] = tuple.__new__(cls, data)
-                cls._CACHE[args] = color
-            return color
+                del cls._CACHE[args]
 
     @property
     def rgba(self):
@@ -111,13 +99,16 @@ class Color(tuple):
     def __repr__(self):
         return 'Color%s' % tuple.__repr__(self)
 
-Color._CACHE.update(dict(
+Color._CACHE.update({
     # Tons de cinza
-    white=Color(255, 255, 255), black=Color(0, 0, 0),
+    ('white',): Color(255, 255, 255),
+    ('black',): Color(0, 0, 0),
 
     # Cores básicas
-    red=Color(255, 0, 0), green=Color(0, 255, 0), blue=Color(0, 0, 255)
-))
+    ('red',): Color(255, 0, 0),
+    ('green',): Color(0, 255, 0),
+    ('blue',): Color(0, 0, 255),
+})
 
 
 ###############################################################################

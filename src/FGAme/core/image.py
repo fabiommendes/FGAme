@@ -63,7 +63,7 @@ class TextureManager(object):
     def rescale(self, name_or_img, factor):
         pass
 
-    def rotate(self, name_or_img, factor):
+    def irotate(self, name_or_img, factor):
         pass
 
     def invert(self, name_or_img):

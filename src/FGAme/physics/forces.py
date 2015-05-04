@@ -5,7 +5,7 @@ Created on 19/11/2014
 @author: chips
 '''
 
-from FGAme.mathutils import Vector, VectorM
+from FGAme.mathutils import Vec2, mVec2
 
 
 class ForceProperty(object):
@@ -28,7 +28,7 @@ class ForceProperty(object):
     >>> obj = HasForce()
     >>> obj.force = lambda x: (0, x**2)
     >>> obj.force(2)
-    Vector(0, 4)
+    Vec2(0, 4)
 
     Também podemos definir a força utilizando um decorador se for mais
     conveniente
@@ -37,7 +37,7 @@ class ForceProperty(object):
     ... def force(x):
     ...     return (0, x**3)
     >>> obj.force(2)
-    Vector(0, 8)
+    Vec2(0, 8)
 
     O recurso mais importante, no entanto, é a composição de forças. Podemos
     definir uma composição de forças simplesmente adicionando ou subtraindo
@@ -45,13 +45,13 @@ class ForceProperty(object):
 
     >>> obj.force += lambda x: (0, x**2)
     >>> obj.force(2) # => 2**2 + 2**3
-    Vector(0, 12)
+    Vec2(0, 12)
 
     Outras operações algébricas também estão definidas
 
     >>> obj.force *= 2
     >>> obj.force(2)
-    Vector(0, 24)
+    Vec2(0, 24)
 
     Os decoradores também estão disponíveis para as operações de adição e
     subtração de forças.
@@ -60,7 +60,7 @@ class ForceProperty(object):
     ... def force(x):
     ...     return (0, x**4)
     >>> obj.force(2)
-    Vector(0, 40)
+    Vec2(0, 40)
 
     Notas
     -----
@@ -209,7 +209,7 @@ class ForcePropertyCtrl(object):
         '''Cria função que retorna a força como a soma de todas as forças em
         adds'''
 
-        F = VectorM(0, 0)
+        F = mVec2(0, 0)
         Fmul = F.__imul__  # usamos estas funções para evitar problemas de
         Fadd = F.__iadd__  # escopo no closure fa função fast_func
 
@@ -224,7 +224,7 @@ class ForcePropertyCtrl(object):
         '''Cria função que retorna a força como a soma de todas as constantes
         k e forças f para cada elemento (k, f) em combined'''
 
-        F = VectorM(0, 0)
+        F = mVec2(0, 0)
         Fmul = F.__imul__
         Fadd = F.__iadd__
 
@@ -249,9 +249,9 @@ class ForcePropertyCtrl(object):
         # Caso contrário, assume que o argumento é numérico e executa
         t = float(t)
         if self._fast is not None:
-            return Vector(*self._fast(t))
+            return Vec2(*self._fast(t))
         else:
-            return Vector(0, 0)
+            return Vec2(0, 0)
 
     def __iadd__(self, other):
         self.add(other)
@@ -300,9 +300,9 @@ class SingleForce(object):
     def __call__(self, t):
         return self._func_ready(t)
 
-    obj = property(lambda x: x._obj)
-    func = property(lambda x: x._func)
-    mode = property(lambda x: x._mode)
+    obj = property(lambda _x: _x._obj)
+    func = property(lambda _x: _x._func)
+    mode = property(lambda _x: _x._mode)
 
 
 class SingleConservativeForce(SingleForce):
@@ -330,7 +330,7 @@ class SingleConservativeForce(SingleForce):
 
         return self.U(self.obj._pos)
 
-    U = property(lambda x: x._U)
+    U = property(lambda _x: _x._U)
 
 
 class GravitySF(SingleConservativeForce):
@@ -347,7 +347,7 @@ class GravitySF(SingleConservativeForce):
         M = self._M = float(M)
         self._epsilon = float(epsilon)
         self._G = float(G)
-        r0 = self._r0 = Vector(*r0)
+        r0 = self._r0 = Vec2(*r0)
 
         def F(R):
             R = r0 - R
@@ -362,10 +362,10 @@ class GravitySF(SingleConservativeForce):
 
         super(GravitySF, self).__init__(obj, F, U)
 
-    G = property(lambda x: x._G)
-    M = property(lambda x: x._M)
-    epsilon = property(lambda x: x._epsilon)
-    r0 = property(lambda x: x._r0)
+    G = property(lambda _x: _x._G)
+    M = property(lambda _x: _x._M)
+    epsilon = property(lambda _x: _x._epsilon)
+    r0 = property(lambda _x: _x._r0)
 
 
 class SpringSF(SingleConservativeForce):
@@ -376,7 +376,7 @@ class SpringSF(SingleConservativeForce):
 
     def __init__(self, obj, k, r0=(0, 0)):
         kxy = 0
-        x0, y0 = self._r0 = Vector(*r0)
+        x0, y0 = self._r0 = Vec2(*r0)
 
         try:  # Caso isotrópico
             kx = ky = k = self._k = float(k)
@@ -391,17 +391,17 @@ class SpringSF(SingleConservativeForce):
         def F(R):
             Dx = x0 - R._x
             Dy = y0 - R._y
-            return Vector(kx * Dx + kxy * Dy, ky * Dy + kxy * Dx)
+            return Vec2(kx * Dx + kxy * Dy, ky * Dy + kxy * Dx)
 
         def U(R):
-            Dx = x0 - R.x
+            Dx = x0 - R._x
             Dy = y0 - R.y
             return (kx * Dx ** 2 + ky * Dy ** 2 + 2 * kxy * Dx * Dy) / 2
 
         super(SpringSF, self).__init__(obj, F, U)
 
-    k = property(lambda x: x._k)
-    r0 = property(lambda x: x._r0)
+    k = property(lambda _x: _x._k)
+    r0 = property(lambda _x: _x._r0)
 
 
 ###############################################################################
@@ -467,10 +467,10 @@ class PairForce(object):
             raise ValueError('invalid mode: : %r' % mode)
 
     # Atributos somente para leitura
-    A = property(lambda x: x._A)
-    B = property(lambda x: x._B)
-    func = property(lambda x: x._func)
-    mode = property(lambda x: x._mode)
+    A = property(lambda _x: _x._A)
+    B = property(lambda _x: _x._B)
+    func = property(lambda _x: _x._func)
+    mode = property(lambda _x: _x._mode)
 
     def force_A(self, t):
         '''Função que calcula a força sobre o objeto A no instante t'''
@@ -552,7 +552,7 @@ class PairConservativeForce(PairForce):
 
         return self.U(self.A._pos, self.B._pos)
 
-    U = property(lambda x: x._U)
+    U = property(lambda _x: _x._U)
 
 
 class SpringF(PairConservativeForce):
@@ -572,7 +572,7 @@ class SpringF(PairConservativeForce):
 
     def __init__(self, A, B, k, delta=(0, 0)):
         kxy = 0
-        dx, dy = delta = self._delta = Vector(*delta)
+        dx, dy = delta = self._delta = Vec2(*delta)
 
         try:  # Caso isotrópico
             kx = ky = k = self._k = float(k)
@@ -585,19 +585,19 @@ class SpringF(PairConservativeForce):
 
         # Define forças e potenciais
         def F(rA, rB):
-            Dx = rB.x - rA.x + dx
+            Dx = rB._x - rA._x + dx
             Dy = rB.y - rA.y + dy
-            return Vector(kx * Dx + kxy * Dy, +ky * Dy + kxy * Dx)
+            return Vec2(kx * Dx + kxy * Dy, +ky * Dy + kxy * Dx)
 
         def U(rA, rB):
-            Dx = rB.x - rA.x + dx
+            Dx = rB._x - rA._x + dx
             Dy = rB.y - rA.y + dy
             return (kx * Dx ** 2 + ky * Dy ** 2 + 2 * kxy * Dx * Dy) / 2
 
         super(SpringF, self).__init__(A, B, F, U)
 
-    k = property(lambda x: x._k)
-    delta = property(lambda x: x._delta)
+    k = property(lambda _x: _x._k)
+    delta = property(lambda _x: _x._delta)
 
 
 class GravityF(PairConservativeForce):
@@ -633,8 +633,8 @@ class GravityF(PairConservativeForce):
 
         super(GravityF, self).__init__(A, B, F, U)
 
-    G = property(lambda x: x._G)
-    epsilon = property(lambda x: x._epsilon)
+    G = property(lambda _x: _x._G)
+    epsilon = property(lambda _x: _x._epsilon)
 
 
 ###############################################################################

@@ -8,8 +8,6 @@ as partículas cessam o movimento.
 from FGAme import *
 from random import uniform, randint
 
-# Inicializa o mundo
-
 
 class Gas(World):
 
@@ -27,8 +25,8 @@ class Gas(World):
         # Inicia bolas
         self.bolas = []
         for _ in range(num_balls):
-            pos = Vector(uniform(20, 780), uniform(20, 400))
-            vel = Vector(uniform(-speed, speed), uniform(-speed, speed))
+            pos = Vec2(uniform(20, 780), uniform(20, 400))
+            vel = Vec2(uniform(-speed, speed), uniform(-speed, speed))
             bola = Circle(radius=radius, vel=vel, pos=pos, mass=1)
             bola.color = self.get_color(color)
             self.bolas.append(bola)
@@ -66,4 +64,7 @@ class Gas(World):
 # Inicia a simulação
 if __name__ == '__main__':
     game = Gas()
-    game.run()
+
+    import fasttrack
+    with fasttrack.timeit('run'):
+        game.run(maxiter=100, throttle=False)

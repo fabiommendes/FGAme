@@ -124,13 +124,13 @@ class World(EventDispatcher):
         return self._simulation.time
 
     # Laço principal ##########################################################
-    def run(self, timeout=None, real_time=True):
+    def run(self, timeout=None, real_time=True, **kwds):
         '''Roda a simulação de física durante o tempo 'timeout' especificado.
 
         O parâmetro `real_time` especifica se o tempo considerado consiste no
         tempo real ou no tempo de simulação.'''
 
-        conf.get_mainloop().run(self, timeout=timeout)
+        conf.get_mainloop().run(self, timeout=timeout, **kwds)
 
     def stop(self):
         '''Finaliza o laço principal de simulação'''

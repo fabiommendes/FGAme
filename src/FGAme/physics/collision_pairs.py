@@ -1,14 +1,14 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector, dot, area, center_of_mass, clip, pi
+from FGAme.mathutils import Vec2, dot, area, center_of_mass, clip, pi
 from FGAme.mathutils import shadow_x, shadow_y
 
 from FGAme.physics.collision import Collision
 from FGAme.physics import Circle, AABB, Poly, Rectangle
 from FGAme.util import multifunction
 
-u_x = Vector(1, 0)
-DEFAULT_DIRECTIONS = [u_x.rotated(n * pi / 12) for n in
+u_x = Vec2(1, 0)
+DEFAULT_DIRECTIONS = [u_x.rotate(n * pi / 12) for n in
                       [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11]]
 
 
@@ -26,7 +26,7 @@ def get_collision_generic(A, B):
     rB = B.cbb_radius
     delta = B._pos - A._pos
     if delta.norm() < rA + rB:
-        n = delta.normalized()
+        n = delta.normalize()
         D = rA + rB - delta.norm()
         pos = A._pos + (rA - D / 2) * n
         return Collision(A, B, pos=pos, normal=n, delta=D)
@@ -67,14 +67,14 @@ def collision_aabb(A, B):
     # Calcula ponto de colisão
     x_col = max(A.xmin, B.xmin) + shadowx / 2.
     y_col = max(A.ymin, B.ymin) + shadowy / 2.
-    pos_col = Vector(x_col, y_col)
+    pos_col = Vec2(x_col, y_col)
 
     # Define sinal dos vetores normais: colisões tipo PONG
     if shadowx > shadowy:
-        n = Vector(0, (1 if A.ymin < B.ymin else -1))
+        n = Vec2(0, (1 if A.ymin < B.ymin else -1))
         delta = shadowy
     else:
-        n = Vector((1 if A.xmin < B.xmin else -1), 0)
+        n = Vec2((1 if A.xmin < B.xmin else -1), 0)
         delta = shadowx
 
     return Collision(A, B, pos=pos_col, normal=n, delta=delta)
@@ -88,7 +88,7 @@ def collision_circle(A, B):
     rB = B.cbb_radius
     delta = B._pos - A._pos
     if delta.norm() < rA + rB:
-        n = delta.normalized()
+        n = delta.normalize()
         D = rA + rB - delta.norm()
         pos = A._pos + (rA - D / 2) * n
         return Collision(A, B, pos=pos, normal=n, delta=D)
@@ -167,13 +167,13 @@ def circle_aabb(A, B):
     # Calcula ponto de colisão
     x_col = max(A.xmin, B.xmin) + shadowx / 2.
     y_col = max(A.ymin, B.ymin) + shadowy / 2.
-    pos_col = Vector(x_col, y_col)
+    pos_col = Vec2(x_col, y_col)
 
     # Define sinal dos vetores normais: colisões tipo PONG
     if shadowx > shadowy:
-        n = Vector(0, (1 if A.ymin < B.ymin else -1))
+        n = Vec2(0, (1 if A.ymin < B.ymin else -1))
     else:
-        n = Vector((1 if A.xmin < B.xmin else -1), 0)
+        n = Vec2((1 if A.xmin < B.xmin else -1), 0)
 
     return Collision(A, B, pos=pos_col, normal=n)
 

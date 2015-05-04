@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector
+from FGAme.mathutils import Vec2
 from FGAme.physics import Dynamic
 
 __all__ = ['RigidBody', 'LinearRigidBody']
@@ -97,7 +97,7 @@ class RigidBody(Dynamic):
         self.omega = float(omega or 0)
         self.theta = 0.0
         if theta is not None:
-            self.rotate(theta)
+            self.irotate(theta)
         self._alpha = 0.0
 
     ###########################################################################
@@ -198,19 +198,19 @@ class RigidBody(Dynamic):
 
     @property
     def pos_sw(self):
-        return Vector(self.xmin, self.ymin)
+        return Vec2(self.xmin, self.ymin)
 
     @property
     def pos_se(self):
-        return Vector(self.xmax, self.ymin)
+        return Vec2(self.xmax, self.ymin)
 
     @property
     def pos_nw(self):
-        return Vector(self.xmin, self.ymax)
+        return Vec2(self.xmin, self.ymax)
 
     @property
     def pos_ne(self):
-        return Vector(self.xmax, self.ymax)
+        return Vec2(self.xmax, self.ymax)
 
 
 class LinearRigidBody(RigidBody):

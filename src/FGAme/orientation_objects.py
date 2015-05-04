@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.util import lazy
-from FGAme.mathutils import Vector
+from FGAme.mathutils import Vec2
 
 __all__ = ['pos', 'vel']
 
@@ -12,7 +12,7 @@ def _factory_pos_property(pos):
     def pos_prop(self):
         w, h = self._shape
         x0, y0 = self._origin
-        return Vector(x0 + a * w, y0 + b * h)
+        return Vec2(x0 + a * w, y0 + b * h)
 
     pos_prop.terms = (a, b)
 
@@ -25,7 +25,7 @@ def _factory_from_func(prop):
     def from_pos(self, x, y):
         w, h = self._shape
         x0, y0 = self._origin
-        return Vector(x0 + a * w + x, y0 + b * h + y)
+        return Vec2(x0 + a * w + x, y0 + b * h + y)
 
     return from_pos
 
@@ -62,16 +62,16 @@ class PosObject(GlobalObject):
     O objeto pos conhece as coordenadas de vários pontos de interesse na tela
 
     >>> pos.middle, pos.nw, pos.ne, pos.sw, pos.se
-    (Vector(400, 300), Vector(0, 600), Vector(800, 600), Vector(0, 0), Vector(800, 0))
+    (Vec2(400, 300), Vec2(0, 600), Vec2(800, 600), Vec2(0, 0), Vec2(800, 0))
 
     >>> pos.north, pos.south, pos.east, pos.west
-    (Vector(400, 600), Vector(400, 0), Vector(800, 300), Vector(0, 300))
+    (Vec2(400, 600), Vec2(400, 0), Vec2(800, 300), Vec2(0, 300))
 
     Também podemos especificar coordenadas relativas a partir de qualquer um
     destes pontos
 
     >>> pos.from_middle(100, 100), pos.from_ne(0, -100)
-    (Vector(500, 400), Vector(800, 500))
+    (Vec2(500, 400), Vec2(800, 500))
     '''
 
     middle, north, south, east, west = \

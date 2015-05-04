@@ -2,9 +2,9 @@
 
 from FGAme.physics import RigidBody
 from FGAme.mathutils import aabb_bbox
-from FGAme.mathutils import Vector, VectorM, RotMatrix, dot, cross
-from FGAme.mathutils import area, center_of_mass, ROG_sqr
+from FGAme.mathutils import Vec2, mVec2, RotMatrix, dot, cross
 from FGAme.mathutils import sin, cos, pi
+from FGAme.mathutils import area, center_of_mass, ROG_sqr
 
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
@@ -20,7 +20,7 @@ class Poly(RigidBody):
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None, **kwds):
 
-        vertices = [VectorM(*pt) for pt in vertices]
+        vertices = [Vec2(*pt) for pt in vertices]
         pos_cm = center_of_mass(vertices)
         vertices = [v - pos_cm for v in vertices]
         self._vertices = vertices
@@ -57,7 +57,7 @@ class Poly(RigidBody):
         involver testes de independencia linear relativamente caros.
         '''
 
-        normals = [self.get_normal(i).normalized()
+        normals = [self.get_normal(i).normalize()
                    for i in range(self.num_sides)]
         LI = []
         LI_idx = []
@@ -89,7 +89,7 @@ class Poly(RigidBody):
 
         points = self.vertices
         x, y = points[(i + 1) % self.num_sides] - points[i]
-        return Vector(y, -x).normalized()
+        return Vec2(y, -x).normalize()
 
     def get_normals(self):
         '''Retorna uma lista com as normais linearmente independentes.'''
@@ -98,7 +98,7 @@ class Poly(RigidBody):
             N = self.num_sides
             points = self.vertices
             segmentos = (points[(i + 1) % N] - points[i] for i in range(N))
-            return [Vector(y, -x).normalized() for (x, y) in segmentos]
+            return [Vec2(y, -x).normalize() for (x, y) in segmentos]
         else:
             return [self.get_normal(i) for i in self._normals_idxs]
 
@@ -155,11 +155,11 @@ class Poly(RigidBody):
 
     @property
     def xmin(self):
-        return self._pos.x + self._rbbox[0]
+        return self._pos._x + self._rbbox[0]
 
     @property
     def xmax(self):
-        return self._pos.x + self._rbbox[1]
+        return self._pos._x + self._rbbox[1]
 
     @property
     def ymin(self):
@@ -193,9 +193,9 @@ class RegularPoly(Poly):
         alpha = pi / N
         theta = 2 * alpha
         b = length / (2 * sin(alpha))
-        P0 = Vector(b, 0)
-        pos = Vector(*pos)
-        return [(P0.rotated(n * theta)) + pos for n in range(N)]
+        P0 = Vec2(b, 0)
+        pos = Vec2(*pos)
+        return [(P0.rotate(n * theta)) + pos for n in range(N)]
 
 
 class Rectangle(Poly):
@@ -218,9 +218,9 @@ class Rectangle(Poly):
 
         '''
 
-        bbox = aabb_bbox(bbox=bbox, rect=rect, shape=shape, pos=pos,
-                         xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
-        xmin, xmax, ymin, ymax = bbox
+        xmin, xmax, ymin, ymax = aabb_bbox(
+            xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax,
+            bbox=bbox, rect=rect, shape=shape, pos=pos)
 
         super(Rectangle, self).__init__(
             [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)],

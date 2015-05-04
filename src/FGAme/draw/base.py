@@ -12,7 +12,7 @@ class Drawable(object):
     __slots__ = []
 
     # Funções que modificam o objeto selecionado *inplace* ####################
-    def rotate(self, theta, axis=None):
+    def irotate(self, theta, axis=None):
         '''Rotaciona o objeto pelo ângulo dado. É possível fornecer um eixo
         opcional para realizar a rotação. Caso contrário, realiza a rotação
         em torno do centro.'''
@@ -48,12 +48,12 @@ class Drawable(object):
         new.scale(value)
         return new
 
-    def rotated(self, theta, axis=None):
+    def rotate(self, theta, axis=None):
         '''Retorna uma cópia do objeto rotacionada pelo ângulo fornecido em
         torno do eixo fornecido (ou o centro do objeto)'''
 
         new = self.copy()
-        new.rotate(theta, axis)
+        new.irotate(theta, axis)
         return new
 
     def moved(self, delta):
@@ -141,7 +141,7 @@ class Shape(Drawable):
     def draw(self, canvas):
         '''Desenha o objeto no objeto canvas fornecido'''
 
-        getattr(canvas, self.canvas_primitive)(self)
+        getattr(canvas, 'draw_' + self.canvas_primitive)(self)
 
 
 class Circle(Shape):
@@ -151,12 +151,20 @@ class Circle(Shape):
     __slots__ = []
     canvas_primitive = 'circle'
 
-    radius = delegate_property('radius')
-    pos = delegate_property('pos')
-
     def __init__(self, radius, pos=(0, 0), **kwds):
 
         super(Circle, self).__init__(m.Circle(radius, pos), **kwds)
+
+    def draw(self, canvas):
+        canvas.draw_circle(self)
+
+    @property
+    def radius(self):
+        return self.geometric.radius
+
+    @property
+    def pos(self):
+        return self.geometric.pos
 
 
 class AABB(Shape):
@@ -197,6 +205,9 @@ class AABB(Shape):
     def get_vertices(self, tol=1e-6):
         raise NotImplementedError
 
+    def draw(self, canvas):
+        canvas.draw_aabb(self)
+
 
 class Poly(Shape):
 
@@ -213,6 +224,9 @@ class Poly(Shape):
 
     def get_vertices(self, tol=1e-6):
         return self.geometric.vertices
+
+    def draw(self, canvas):
+        canvas.draw_poly(self)
 
 
 class Rectangle(Poly):
@@ -234,3 +248,6 @@ class Image(AABB):
         self._data = self.manager.get_image(name)
         shape = self.manager.get_shape(self._data)
         super(Image, self).__init__(pos=pos, shape=shape)
+
+    def draw(self, canvas):
+        self.draw_image(self)

@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-
+import cython
 from math import trunc
 import string
 import pygame
@@ -16,6 +16,9 @@ class PyGameCanvas(Canvas):
 
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
 
+    __slots__ = ['_screen']
+    _circle = pygame.draw.circle
+
     def show(self):
         self._screen = pygame.display.set_mode((self.width, self.height))
         super(PyGameCanvas, self).show()
@@ -24,30 +27,30 @@ class PyGameCanvas(Canvas):
         pygame.display.update()
 
     def _map_point(self, point):
-        x, y = point
-        X, Y = self.width, self.height
-        return (trunc(x), trunc(Y - y))
+        try:
+            return point.flip_y(self.height).trunc()
+        except AttributeError:
+            x, y = point
+            return (trunc(x), trunc(self.height - y))
 
-    def paint_circle(self, radius, pos, color='black', solid=True):
-        pos = self._map_point(pos)
-        color = Color(color)
-        pygame.draw.circle(self._screen, color, pos, trunc(radius))
+    @cython.locals(radius='double', x='int', y='int')
+    def paint_circle(self, radius, pos, color=Color(0, 0, 0), solid=True):
+        x, y = pos.trunc()
+        self._circle(self._screen, color, (x, self.height - y), int(radius))
 
-    def paint_poly(self, points, color='black', solid=True):
+    def paint_poly(self, points, color=Color(0, 0, 0), solid=True):
         points = [self._map_point(pt) for pt in points]
-        color = Color(color)
         pygame.draw.polygon(self._screen, color.rgb, points)
 
-    def paint_rect(self, rect, color='black', solid=True):
-        color = Color(color)
+    def paint_rect(self, rect, color=Color(0, 0, 0), solid=True):
         x, y, dx, dy = rect
         x, y = self._map_point((x, y + dy))
         pygame.draw.rect(self._screen, color, (x, y, dx, dy))
 
-    def paint_line(self, pt1, pt2, color='black', solid=True):
+    def paint_line(self, pt1, pt2, color=Color(0, 0, 0), solid=True):
         raise NotImplementedError
 
-    def paint_pixel(self, pos, color='black'):
+    def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)
         # TODO: talvez use pygame.display.get_surface() para obter a tela
         # correta

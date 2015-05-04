@@ -40,7 +40,7 @@ def all(size=None):
 def vector():
     '''Operações aritiméticas com vetores'''
 
-    v = FGAme.Vector(1.5, 1.5)
+    v = FGAme.Vec2(1.5, 1.5)
     for _ in range(BASE_SIZE * 1000):
         v = 2 * v - v
 
@@ -49,8 +49,8 @@ def vector():
 def ivector():
     '''Operações aritiméticas inplace com vetores'''
 
-    v = FGAme.Vector(1.5, 1.5)
-    v2 = FGAme.VectorM(1.5, 1.5)
+    v = FGAme.Vec2(1.5, 1.5)
+    v2 = FGAme.mVec2(1.5, 1.5)
     for _ in range(BASE_SIZE * 1000):
         v2 += v
 
@@ -59,8 +59,8 @@ def ivector():
 def vtuple():
     '''Operações aritiméticas vetores e tuplas'''
 
-    v = FGAme.Vector(1.5, 1.5)
-    v2 = FGAme.VectorM(1.5, 1.5)
+    v = FGAme.Vec2(1.5, 1.5)
+    v2 = FGAme.mVec2(1.5, 1.5)
     for _ in range(BASE_SIZE * 1000):
         v2 += (1, 1)
         v += (1, 1)
