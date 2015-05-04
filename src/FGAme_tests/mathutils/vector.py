@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vector, VectorM, pi
+from FGAme.mathutils import Vec2, mVec2, pi
 from FGAme.util import lazy
 from nose.tools import raises, assert_almost_equal, assert_almost_equals
 import nose
@@ -96,18 +96,18 @@ class Immutable(object):
 
     def test_rotated(self):
         v = self.vector(1, 2)
-        v_rot = v.rotated(pi / 2)
+        v_rot = v.rotate(pi / 2)
         v_res = self.vector(-2, 1)
         assert_almost_equal((v_rot - v_res).norm(), 0)
-        assert_almost_equal((v_rot.rotated(pi / 2) + v).norm(), 0)
-        assert_almost_equal(v.norm(), v.rotated(pi / 2).norm())
+        assert_almost_equal((v_rot.rotate(pi / 2) + v).norm(), 0)
+        assert_almost_equal(v.norm(), v.rotate(pi / 2).norm())
 
     def test_normalized(self):
         v = self.vector(1, 2)
-        n = v.normalized()
+        n = v.normalize()
 
-        assert_almost_equal(v.normalized().norm(), 1)
-        assert_almost_equals(n.x * v.x + n.y * v.y, v.norm())
+        assert_almost_equal(v.normalize().norm(), 1)
+        assert_almost_equals(n._x * v._x + n.y * v.y, v.norm())
 
     # Interface Python ########################################################
     def test_as_tuple(self):
@@ -139,7 +139,7 @@ class Mutable(Immutable):
 
     def test_set_coords(self):
         v = self.vector(1, 2)
-        v.x = 2
+        v._x = 2
         assert v == (2, 2)
 
     def test_setitem(self):
@@ -176,19 +176,19 @@ class Mutable(Immutable):
 
 
 class CVectorTest(Immutable, TestCase):
-    from FGAme.mathutils.cvector import Vector as vector
+    from FGAme.mathutils.cvector import Vec2 as vector
 
 
 class CVectorMTest(Mutable, TestCase):
-    from FGAme.mathutils.cvector import VectorM as vector
+    from FGAme.mathutils.cvector import mVec2 as vector
 
 
 class PyVectorTest(Immutable, TestCase):
-    from FGAme.mathutils.vector import Vector as vector
+    from FGAme.mathutils.vector import Vec2 as vector
 
 
 class PyVectorMTest(Mutable, TestCase):
-    from FGAme.mathutils.vector import VectorM as vector
+    from FGAme.mathutils.vector import mVec2 as vector
 
 
 if __name__ == '__main__':

@@ -39,13 +39,13 @@ class Pong(World):
         '''Move a raquete fornecida para cima'''
 
         if obj.ymax < 590:
-            obj.move(Vector(0, 10))
+            obj.move(Vec2(0, 10))
 
     def move_down(self, obj):
         '''Move a raquete fornecida para baixo'''
 
         if obj.ymin > 10:
-            obj.move(Vector(0, -10))
+            obj.move(Vec2(0, -10))
 
 if __name__ == '__main__':
     Pong().run()

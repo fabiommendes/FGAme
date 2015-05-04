@@ -8,6 +8,7 @@ VERSION = '0.3.1-alpha-1'
 # Configure environment
 ##########################################################################
 setup_kwds = {}
+math_exts = ['linalg']
 
 # Test if installation can compile extensions and configure them
 # Currently only cpython accepts extensions
@@ -15,23 +16,28 @@ try:
     from Cython.Distutils import build_ext
     from distutils.extension import Extension
     win_platforms = ['win32', 'cygwin']
+
+    extensions = []
+    extensions.append(Extension(
+        "FGAme.util.cmultidispatch",
+        ["src/FGAme/util/cmultidispatch.pyx"],
+        libraries=[],
+        include_dirs=['src/FGAme']))
+
+    for ext in math_exts:
+        ext = Extension(
+            "mathtools.%s" % ext,
+            ["src/mathtools/%s.py" % ext],
+            libraries=(
+                [] if sys.platform in win_platforms else ['m']),
+            include_dirs=['src/mathtools'])
+        extensions.append(ext)
+
     setup_kwds.update(
         cmdclass={
             "build_ext": build_ext},
-        ext_modules=[
-            Extension(
-                "FGAme.mathutils.cvector",
-                ["src/FGAme/mathutils/cvector.pyx"],
-                libraries=(
-                    [] if sys.platform in win_platforms else ['m']),
-                include_dirs=['src/FGAme']),
+        ext_modules=extensions)
 
-            Extension(
-                "FGAme.util.cmultidispatch",
-                ["src/FGAme/util/cmultidispatch.pyx"],
-                libraries=[],
-                include_dirs=['src/FGAme']),
-        ])
 except ImportError:
     # Ignore missing cython in alternative implementation
     if not (sys.platform.startswith('java') or sys.platform.startswith(
@@ -66,9 +72,10 @@ Main features:
       ],
       package_dir={'': 'src'},
       packages=['FGAme', 'FGAme.app', 'FGAme.backends', 'FGAme.core',
-                'FGAme.demos', 'FGAme.demos.simulations',
-                'FGAme.draw', 'FGAme.extra', 'FGAme.mathutils',
-                'FGAme.physics', 'FGAme.objects', 'FGAme.util'],
+                'FGAme.demos', 'FGAme.demos.simulations', 'FGAme.demos.games',
+                'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.objects', 'FGAme.util',
+                'mathtools', 'mathtools.base', 'mathtools.pymath',
+                ],
       license='GPL',
       requires=['pygame'],
       **setup_kwds

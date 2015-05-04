@@ -25,7 +25,7 @@ class Scenario:
     def boxes(self):
         height = 80
         width = 200
-        pos = Vector(650, 190)
+        pos = Vec2(650, 190)
         shape = (width, height)
         p = Rectangle(pos=pos, shape=shape, color=(158, 86, 38))
         yield p

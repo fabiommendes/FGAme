@@ -13,7 +13,7 @@ class Flappy(Poly):
         super(Flappy, self).__init__(
             [(0, 0), (40, 0), (20, 80)], color='red', **kwds)
         self.pos = (200, 300)
-        self.rotate(uniform(0, 2 * math.pi))
+        self.irotate(uniform(0, 2 * math.pi))
         self.inertia *= 10
         self.omega = uniform(-2, 2)
         self.receiving_input = True

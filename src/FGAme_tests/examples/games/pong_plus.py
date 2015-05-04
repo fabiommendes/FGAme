@@ -26,9 +26,9 @@ class Pong(World):
         pong.move((2 * W - 50, H - Y / 2))
         pong.listen('collision', self.pong_collision)
         pong.mass *= 5
-        pong.force = lambda t: -1000000 * Vector(pong.pos.x - self.pong_x, 0)
+        pong.force = lambda t: -1000000 * Vec2(pong.pos._x - self.pong_x, 0)
         pong.damping = 10
-        self.pong_x = self.pong.pos.x
+        self.pong_x = self.pong.pos._x
 
         # Cria a barra de tempo
         self.timebar = AABB(shape=(20, 20), pos=(2 * W - 10, 20),
@@ -106,7 +106,7 @@ class Pong(World):
         obj = RegularPoly(self.obstacle_sides, self.obstacle_size,
                           color=self.obstacle_color, density=1)
         obj.scale(uniform(0.75, 2))
-        obj.rotate(uniform(0, 2 * math.pi))
+        obj.irotate(uniform(0, 2 * math.pi))
         obj.inertia *= self.inertia_multiplier
         if not self.obstacle_dynamic:
             obj.make_static()
@@ -166,13 +166,13 @@ class Pong(World):
         V = self.ball.vel.norm()
         if V < self.max_ball_speed:
             V += 3
-            self.ball.vel = self.ball.vel.normalized() * V
+            self.ball.vel = self.ball.vel.normalize() * V
 
     def check_fail(self):
         '''Checa se o jogador perdeu e acrecenta um hitpoint, em caso
         positivo'''
 
-        if self.ball.pos.x > self.screen_width + 100:
+        if self.ball.pos._x > self.screen_width + 100:
             self.hit_increment()
             self.hit_increment()
             # self.remove(self.ball)
@@ -182,7 +182,7 @@ class Pong(World):
             self.add(self.ball)
 
         for i, obj in enumerate(self.obstacle):
-            if obj.pos.x > self.screen_width + 100:
+            if obj.pos._x > self.screen_width + 100:
                 self.hit_increment()
                 # self.remove(obj)
                 obj.move((200, 0))
@@ -210,12 +210,12 @@ class Pong(World):
             y_ball = self.ball.pos.y
             y_pong = self.pong.pos.y
             delta_y = y_ball - y_pong
-            delta_vel = Vector(0, delta_y * 10)
+            delta_vel = Vec2(0, delta_y * 10)
 
             # Edita a velocidade
             vel = self.ball.vel
             vel += delta_vel
-            if abs(vel.x) > abs(0.2 * vel.y):
+            if abs(vel._x) > abs(0.2 * vel.y):
                 vel *= self.ball.vel.norm() / vel.norm()
                 self.ball.vel = vel
 
