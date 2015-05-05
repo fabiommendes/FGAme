@@ -212,6 +212,10 @@ class RigidBody(Dynamic):
     def pos_ne(self):
         return Vec2(self.xmax, self.ymax)
 
+    @property
+    def shape_bb(self):
+        return self.aabb
+
 
 class LinearRigidBody(RigidBody):
 

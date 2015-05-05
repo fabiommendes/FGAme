@@ -1,6 +1,10 @@
 /build
 /doc/build
 *.pyc
+*.so
+*.c
+*.profile
+*.prof
 /dist/
 .anjuta
 .idea/

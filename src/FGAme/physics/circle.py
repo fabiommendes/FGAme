@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import pi, sqrt, Circle
+from FGAme.mathutils import pi, sqrt, Circle as _Circle
 from FGAme.physics import LinearRigidBody, RigidBody
 
 __all__ = ['Circle', 'Ball']
@@ -58,6 +58,10 @@ class CommonCircle(object):
     @property
     def ymax(self):
         return self._pos.y + self.cbb_radius
+
+    @property
+    def shape_bb(self):
+        return _Circle(self.cbb_radius, self.pos)
 
     def __repr__(self):
         tname = type(self).__name__

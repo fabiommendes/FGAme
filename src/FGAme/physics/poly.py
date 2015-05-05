@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.physics import RigidBody
-from FGAme.mathutils import aabb_bbox
+from FGAme.mathutils import aabb_bbox, Poly as _Poly
 from FGAme.mathutils import Vec2, RotMat2
 from FGAme.mathutils import sin, pi
 from FGAme.mathutils import area, center_of_mass, ROG_sqr
@@ -168,6 +168,10 @@ class Poly(RigidBody):
     @property
     def ymax(self):
         return self._pos.y + + self._rbbox[3]
+
+    @property
+    def shape_bb(self):
+        return _Poly(self.vertices)
 
 ###############################################################################
 #                         Especialização de polígonos
