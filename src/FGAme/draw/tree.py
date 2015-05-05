@@ -8,9 +8,18 @@ class RenderTree(object):
     Exemplos
     --------
 
-    >>> tree = RenderTree()
-    >>>
+    Inicializamos a árvore com alguns objetos. A string 'foo' foi colocado em
+    uma camada superior e portanto será renderizada por último
 
+    >>> tree = RenderTree()
+    >>> tree.add('foo', 1)
+    >>> tree.add('bar')
+    >>> tree.add('blaz')
+
+    Podemos navegar na árvore utilizando o iterador `walk()`
+
+    >>> list(tree.walk())
+    ['bar', 'blaz', 'foo']
     '''
 
     is_tree = True
@@ -39,7 +48,8 @@ class RenderTree(object):
     # Iteradores -------------------------------------------------------------
     def walk(self, reverse=False):
         '''Percorre sobre todos os objetos na ordem correta. Se reverse=True,
-        percorre os objetos na ordem contrária.'''
+        percorre os objetos na ordem contrária.
+        '''
 
         if reverse:
             for _, L in reversed(self._data):
@@ -51,7 +61,8 @@ class RenderTree(object):
                     yield obj
 
     def iter_layers(self, skip_empty=True):
-        '''Itera sobre as camadas'''
+        '''Itera sobre as camadas retornando a lista de objetos em cada
+        camada'''
 
         if skip_empty:
             for (_, L) in self._data:
@@ -78,11 +89,15 @@ class RenderTree(object):
             return []
 
     def update(self, dt):
+        '''Percorre todos os objetos na árvore invocando o método update()'''
+
         for obj in self.walk():
-            # obj.update(dt)
-            pass
+            obj.update(dt)
 
     def paint(self, screen):
+        '''Percorre todos os objetos na árvore invocando o método
+        `obj.paint(screen)`'''
+
         for obj in self.walk():
             obj.paint(screen)
 
@@ -99,3 +114,7 @@ class RenderTree(object):
 #                     Grupos e composições de objetos
 ###############################################################################
 # TODO: fundir com RenderTree e colocar RenderTree na hierarquia de drawable
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

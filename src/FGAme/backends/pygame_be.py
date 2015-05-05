@@ -7,7 +7,7 @@ import pygame.locals as pg
 from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION
 
 from FGAme.core import env, Canvas, Input, MainLoop
-from FGAme.draw import Color
+from FGAme.draw import Color, rgb
 
 pygame.init()
 
@@ -36,16 +36,17 @@ class PyGameCanvas(Canvas):
     @cython.locals(radius='double', x='int', y='int')
     def paint_circle(self, radius, pos, color=Color(0, 0, 0), solid=True):
         x, y = pos.trunc()
-        self._circle(self._screen, color, (x, self.height - y), int(radius))
+        self._circle(self._screen, rgb(color),
+                     (x, self.height - y), int(radius))
 
     def paint_poly(self, points, color=Color(0, 0, 0), solid=True):
         points = [self._map_point(pt) for pt in points]
-        pygame.draw.polygon(self._screen, color.rgb, points)
+        pygame.draw.polygon(self._screen, rgb(color), points)
 
     def paint_rect(self, rect, color=Color(0, 0, 0), solid=True):
         x, y, dx, dy = rect
         x, y = self._map_point((x, y + dy))
-        pygame.draw.rect(self._screen, color, (x, y, dx, dy))
+        pygame.draw.rect(self._screen, rgb(color), (x, y, dx, dy))
 
     def paint_line(self, pt1, pt2, color=Color(0, 0, 0), solid=True):
         raise NotImplementedError
@@ -55,7 +56,7 @@ class PyGameCanvas(Canvas):
         # TODO: talvez use pygame.display.get_surface() para obter a tela
         # correta
         # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
-        self._screen.set_at(x, y, Color(color))
+        self._screen.set_at(x, y, rgb(color))
 
     def paint_image(self, pos, image):
         x, y, dx, dy = image.get_rect()

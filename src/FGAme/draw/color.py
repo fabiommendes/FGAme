@@ -1,5 +1,4 @@
 # -*-coding: utf8 -*-
-import itertools
 
 
 class Color(object):
@@ -176,6 +175,24 @@ class color_property(property):
                 delattr(self, attr)
 
         super(color_property, self).__init__(fget, fset, fdel)
+
+
+def rgb(color):
+    '''Convert input in a tuple of (red, green, blue) colors'''
+
+    try:
+        return color.rgb
+    except AttributeError:
+        return Color(color or 'black').rgb
+
+
+def rgba(color):
+    '''Convert input in a tuple of (red, green, blue, alpha) components'''
+
+    try:
+        return color.rgba
+    except AttributeError:
+        return Color(color or 'black').rgba
 
 if __name__ == '__main__':
     import doctest

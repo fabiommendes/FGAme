@@ -12,7 +12,7 @@ NUM_POLYS = 50
 
 # Inicializa o mundo
 world = World(gravity=50, dfriction=0)
-world.set_bounds(width=10)
+world.add_bounds(width=10)
 
 # Preenche o mundo
 for _ in range(NUM_POLYS):
@@ -24,4 +24,4 @@ for _ in range(NUM_POLYS):
 # Inicia a simulação
 import fasttrack
 with fasttrack.timeit('foo'):
-    world.run(maxiter=60, wait=True)
+    world.run(timeout=5, wait=True)

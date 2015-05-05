@@ -393,7 +393,7 @@ from FGAme import physics
 from FGAme.physics import *
 from FGAme.objects import *
 from FGAme.app import *
-from FGAme.orientation_objects import *
+from FGAme.extra.orientation_objects import *
 
 if __name__ == '__main__':
     import doctest

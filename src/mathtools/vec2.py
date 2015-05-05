@@ -36,7 +36,8 @@ class Vec2(object):
     Além de algumas funções de conveniência para calcular o módulo,
     vetor unitário, etc.
 
-    >>> v.norm()
+    >>> v.norm(); abs(v)
+    5.0
     5.0
 
     >>> v.normalize()
@@ -147,7 +148,14 @@ class Vec2(object):
 
     @C.locals(vec='Vec2', x='double', y='double')
     def dot(self, other):
-        '''Retorna o resultado do produto escalar com outro vetor'''
+        '''Retorna o resultado do produto escalar com outro vetor
+
+        Exemplo
+        -------
+
+        >>> Vec2(1, 0).dot(Vec2(0, 1))
+        0.0
+        '''
 
         try:
             vec = other
@@ -159,13 +167,21 @@ class Vec2(object):
     @C.locals(vec='Vec2', x='double', y='double')
     def cross(self, other):
         '''Retorna o resultado da componente z do produto vetorial com outro
-        vetor'''
+        vetor
+
+        Exemplo
+        -------
+
+        >>> Vec2(1, 0).cross(Vec2(0, 1))
+        1.0
+        '''
+
         try:
             vec = other
-            return self._y * vec._x - self._y * vec._x
+            return self._x * vec._y - self._y * vec._x
         except (TypeError, AttributeError):
             x, y = other
-            return self._y * x - self._x * y
+            return self._x * y - self._y * x
 
     # Métodos mágicos #########################################################
     def __repr__(self):

@@ -20,7 +20,7 @@ class Gas(World):
         de +/-`speed`.'''
 
         super(Gas, self).__init__(gravity=gravity, dfriction=friction)
-        self.set_bounds(width=(10, 10, 10, -1000), delta=400)
+        self.add_bounds(width=(10, 10, 10, -1000), delta=400)
 
         # Inicia bolas
         self.bolas = []

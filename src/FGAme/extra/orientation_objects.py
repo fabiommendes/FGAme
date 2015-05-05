@@ -107,6 +107,7 @@ class VelObject(GlobalObject):
     def fair(self):
         return self._globals.speed_fair
 
+    # Velocidades aleatórias ##################################################
     def _random(self, scale, angle):
         pass
 
@@ -118,6 +119,30 @@ class VelObject(GlobalObject):
 
     def random_slow(self, angle=None):
         return self._random(self.slow, angle)
+
+# Velocidades em direções específicas #########################################
+_speeds = dict(
+    up=Vec2(0, 1),
+    down=Vec2(0, -1),
+    right=Vec2(1, 0),
+    left=Vec2(-1, 0),
+    ne=Vec2(1, 1).normalize(),
+    nw=Vec2(-1, 1).normalize(),
+    se=Vec2(1, -1).normalize(),
+    sw=Vec2(-1, -1).normalize(),
+)
+
+
+def speed_prop(name, scale, vec):
+    def prop(self):
+        return getattr(self, scale) * vec
+    prop.__name__ = name
+    return property(prop)
+
+for name, vec in _speeds.items():
+    setattr(VelObject, name, speed_prop(name, 'fair', vec))
+    setattr(VelObject, name, speed_prop('%s_fast' % name, 'fast', vec))
+    setattr(VelObject, name, speed_prop('%s_slow' % name, 'slow', vec))
 
 # Inicializa objetos
 vel = VelObject()

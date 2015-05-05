@@ -63,7 +63,7 @@ class MainLoop(object):
 
             # Desenha os objetos na tela
             screen.clear_background(state.background)
-            screen.draw_tree(state.get_render_tree())
+            state.get_render_tree().paint(screen)
             screen.flip()
 
             # Espera até completar o frame

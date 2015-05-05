@@ -31,6 +31,9 @@ class Simulation(EventDispatcher):
         self._objects = []
         self._broad_collisions = []
         self._fine_collisions = []
+        self._kinetic0 = None
+        self._potential0 = None
+        self._interaction0 = None
 
         # Inicia a gravidade e as constantes de força dissipativa
         self.gravity = gravity or (0, 0)
@@ -147,6 +150,10 @@ class Simulation(EventDispatcher):
 
         self.trigger_frame_enter()
         self._dt = float(dt)
+
+        # Inicializa energia
+        if self._kinetic0 is None:
+            self._init_energy0()
 
         # Loop genérico
         self.update_accelerations()
@@ -310,10 +317,46 @@ class Simulation(EventDispatcher):
             return col
 
     # Cálculo de parâmetros físicos ###########################################
-    def kinetic_energy(self):
-        '''Retorna a soma da energia cinética de todos os objetos do mundo'''
+    def kineticE(self):
+        '''Soma da energia cinética de todos os objetos do mundo'''
 
-        return sum(obj.kinetic() for obj in self.objects)
+        return sum(obj.kineticE() for obj in self._objects
+                   if (obj._invmass or obj._invinertia))
+
+    def potentialE(self):
+        '''Soma da energia potencial de todos os objetos do mundo devido à
+        gravidade'''
+
+        return sum(obj.potentialE() for obj in self._objects if obj._invmass)
+
+    def interactionE(self):
+        '''Soma da energia de interação entre todos os pares de partículas
+        (Não implementado)'''
+
+        return 0.0
+
+    def totalE(self):
+        '''Energia total do sistema de partículas (possivelmente excluindo
+        algumas interações entre partículas)'''
+
+        return self.potentialE() + self.kineticE() + self.interactionE()
+
+    def energy_ratio(self):
+        '''Retorna a razão entre a energia total e a energia inicial calculada
+        no início da simulação'''
+
+        if self._kinetic0 is None:
+            self._init_energy0()
+            return 1.0
+        sum_energies = self._kinetic0 + self._potential0 + self._interaction0
+        return self.totalE() / sum_energies
+
+    def _init_energy0(self):
+        '''Chamada para inicializar _kinetic0 e amigos'''
+
+        self._kinetic0 = self.kineticE()
+        self._potential0 = self.potentialE()
+        self._interaction0 = self.interactionE()
 
     # Serviços esporáticos ####################################################
     def enforce_max_speed(self):

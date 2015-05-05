@@ -18,38 +18,60 @@ class Collision(object):
 
     Subclasses de Collision devem implementar o método .resolve(dt) que resolve
     a colisão entre os objetos respeitando os vínculos de is_dynamic*.
+
+    Example
+    -------
+
+    Considere a colisão entre estas duas figuras geométricas
+
+    >>> from FGAme.physics import Rectangle
+    >>> A = Rectangle(rect=(0, 0, 1, 1), vel=(1, 0), mass=1)
+    >>> B = Rectangle(rect=(1, 1, 2, 1), mass=2)
+
+    A colisão se dá no ponto (1, 1) e escolhemos a normal para atuar na
+    direção x
+
+    >>> col = Collision(A, B,
+    ...                 pos=(1, 1),    # ponto de colisão
+    ...                 normal=(1, 0)) # normal da colisão
+
+    Com o objeto col, podemos calcular várias propriedades físicas, como por
+    exemplo as velocidades relativas, no ponto de colisão, o impulso escalar
+    e o vetorial, etc
+
+    >>> col.vrel_contact; col.J_normal
+    Vec2(-1, 0)
+    1.1904761904761905
+
+    Vemos os valores iniciais das grandezas físicas
+
+    >>> col.kineticE; col.momentumP; col.momentumL
+    0.5
+    Vec2(1, 0)
+    0.0
+
+
+    Resolvemos a colisão simplesmente evocando o método `resolve()` e depois
+    consultamos os valores finais das grandezas físicas
+
+    >>> col.resolve()
+    >>> col.kineticE; col.momentumP; col.momentumL
     '''
 
-    def __init__(self, A, B, world=None, **kwds):
+    def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
         self._A = A
         self._B = B
         self.objects = A, B
         self.world = world
         self.is_active = True
+        self.resolved = False
+        self.pos = None if pos is None else Vec2(pos)
+        self.normal = None if pos is None else Vec2(normal)
         self.__dict__.update(kwds)
 
     ###########################################################################
     #                 Propriedades calculadas sob demanda
     ###########################################################################
-    @lazy
-    def pos(self):
-        '''Posição (em coordenadas absolutas) do ponto de contato entre A e
-        B'''
-
-        raise NotImplementedError
-
-    @lazy
-    def delta(self):
-        '''Tamanho da superposição entre A e B'''
-
-        return 0
-
-    @lazy
-    def normal(self):
-        '''Vetor unitário normal à colisão. Normal sai do corpo A para o B.'''
-
-        raise NotImplementedError
-
     @lazy
     def tangent(self):
         '''Vetor unitário tangente à colisão'''
@@ -61,10 +83,16 @@ class Collision(object):
         return tangent
 
     @lazy
+    def delta(self):
+        '''Tamanho da superposição entre A e B'''
+
+        return 0
+
+    @lazy
     def vrel_cm(self):
         '''Velocidade relativa do centro de massa entre A e B'''
 
-        return self._B._vel - self._A._vel
+        return self._B.vel - self._A.vel
 
     @lazy
     def vrel_contact(self):
@@ -75,12 +103,12 @@ class Collision(object):
         vrel = self.vrel_cm.copy()
 
         if A._invinertia or A.omega:
-            x, y = pos - A._pos
-            vrel -= A.omega * Vec2(-y, x)
+            x, y = pos - A.pos
+            vrel -= Vec2(-y, x) * A.omega
 
         if B._invinertia or B.omega:
-            x, y = pos - B._pos
-            vrel += B.omega * Vec2(-y, x)
+            x, y = pos - B.pos
+            vrel += Vec2(-y, x) * B.omega
 
         return vrel
 
@@ -95,11 +123,11 @@ class Collision(object):
         J_denom = A._invmass + B._invmass
 
         if A._invinertia or A.omega:
-            R = pos - A._pos
+            R = pos - A.pos
             J_denom += R.cross(n) ** 2 * A._invinertia
 
         if B._invinertia or B.omega:
-            R = pos - B._pos
+            R = pos - B.pos
             J_denom += R.cross(n) ** 2 * B._invinertia
 
         # Determina o impulso total
@@ -155,6 +183,24 @@ class Collision(object):
     def e(self):
         return self.get_restitution_coeff()
 
+    @property
+    def pos_cm(self):
+        A, B = self.objects
+        return (A. mass * A.vel + B.mass * B.vel) / (A.mass + B.mass)
+
+    @property
+    def kineticE(self):
+        return self._A.kineticE() + self._B.kineticE()
+
+    @property
+    def momentumP(self):
+        return self._A.momentumP() + self._B.momentumP()
+
+    @property
+    def momentumL(self):
+        pos = self.pos_cm
+        return self._A.momentumL(pos) + self._B.momentumL(pos)
+
     ###########################################################################
     #                       Métodos da API de Collision
     ###########################################################################
@@ -166,7 +212,8 @@ class Collision(object):
         A, B = self.objects
 
         # Impulso nulo
-        if not self.J_normal:
+        if not self.J_normal or self.resolved:
+            self.resolved = True
             return None
 
         # Move objetos para evitar as superposições
@@ -178,11 +225,12 @@ class Collision(object):
         if A._invmass:
             A.apply_impulse(-J)
         if A._invinertia:
-            A.apply_aimpulse((pos - A._pos).dot(-J))
+            A.apply_aimpulse((pos - A.pos).cross(-J))
         if B._invmass:
             B.apply_impulse(J)
         if B._invinertia:
-            B.apply_aimpulse((pos - B._pos).cross(J))
+            B.apply_aimpulse((pos - B.pos).cross(J))
+        self.resolved = True
 
     def adjust_overlap(self):
         '''Move objetos para encerrar a superposição.'''
@@ -230,3 +278,7 @@ class Collision(object):
     @property
     def object_B(self):
         return self.objects[1]
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

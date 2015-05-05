@@ -67,7 +67,7 @@ class World(EventDispatcher):
             return
 
         # Adiciona na lista de renderização
-        self._render_tree.add(obj.visualization, layer)
+        self._render_tree.add(obj, layer)
         if isinstance(obj, Dynamic):
             self._simulation.add(obj)
 
@@ -119,8 +119,6 @@ class World(EventDispatcher):
         if self.is_paused:
             return
         self._simulation.update(dt)
-        self._render_tree.update(dt)
-
         return self._simulation.time
 
     # Laço principal ##########################################################
@@ -148,8 +146,13 @@ class World(EventDispatcher):
     ###########################################################################
     #                     Criação de objetos especiais
     ###########################################################################
-    def set_bounds(self, *args, **kwds):
-        '''Cria contorno'''
+    def add_bounds(self, *args, **kwds):
+        '''Cria um conjunto de AABB's que representa uma região fechada.
+
+        Parameters
+        ----------
+
+        '''
 
         # Processa argumentos
         hard = kwds.get('hard', True)
@@ -200,6 +203,41 @@ class World(EventDispatcher):
         self.add(right)
         self._bounds = (left, right, up, down)
         self._hard_bounds = hard
+
+    ###########################################################################
+    #                         Funções úteis
+    ###########################################################################
+    def register_energy_tracker(self, auto_connect=True, ratio=True):
+        '''Retorna uma função que rastreia a energia total do mundo a cada
+        frame e imprime sempre que houver mudança na energia total.
+
+        O comportamento padrão é imprimir a razão entre a energia inicial e a
+        atual. Caso ``ratio=False`` imprime o valor da energia em notação
+        científica.
+
+        A função resultante é conectada automaticamente ao evento
+        "frame-enter", a não ser que ``auto_conect=False``.
+        '''
+
+        E0 = []
+        last = [None]
+
+        if ratio:
+            def energy_tracker():
+                total = self._simulation.energy_ratio()
+                if (last[0] is None) or (abs(total - last[0]) > 1e-6):
+                    last[0] = total
+                    print('Energia total / energia inicial:', total)
+
+        else:
+            def energy_tracker():
+                raise NotImplementedError
+
+        if auto_connect:
+            self.listen('frame-enter', energy_tracker)
+
+        return energy_tracker
+
 
 if __name__ == '__main__':
     import doctest

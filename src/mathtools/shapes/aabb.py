@@ -1,7 +1,11 @@
 # -*- coding: utf8 -*-
+
+import cython as C
 from mathtools import Vec2
 from mathtools.shapes import Circle
-from math import sqrt
+from mathtools.util import pyinject
+if not C.compiled:
+    import mathtools.mathfuncs as m
 
 __all__ = ['AABB',
            'aabb_rect', 'aabb_bbox',
@@ -52,7 +56,10 @@ class AABB(object):
 
     '''
 
-    __slots__ = ['xmin', 'xmax', 'ymin', 'ymax']
+    if C.compiled:
+        __slots__ = []
+    else:
+        __slots__ = ['xmin', 'xmax', 'ymin', 'ymax']
 
     def __init__(self,
                  xmin=None, xmax=None, ymin=None, ymax=None,
@@ -63,6 +70,7 @@ class AABB(object):
         )
 
     @classmethod
+    @C.locals(xmax='double', xmin='double', ymax='double', ymin='double')
     def _constructor(cls, xmin, xmax, ymin, ymax):
         new = object.__new__(cls)
         new.xmin = xmin
@@ -76,6 +84,7 @@ class AABB(object):
         return (self.xmin, self.xmax, self.ymin, self.ymax)
 
     @property
+    @C.locals(width='double', height='double')
     def shape(self):
         width = self.xmax - self.xmin
         height = self.ymax - self.ymin
@@ -87,6 +96,7 @@ class AABB(object):
                 self.xmax - self.xmin, self.ymax - self.ymin)
 
     @property
+    @C.locals(x='double', y='double')
     def pos(self):
         x = (self.xmin + self.xmax) / 2
         y = (self.ymin + self.ymax) / 2
@@ -115,7 +125,7 @@ class AABB(object):
 
     @property
     def radius_cbb(self):
-        return sqrt(
+        return m.sqrt(
             (self.xmax - self.xmin) ** 2 + (self.ymax - self.ymin) ** 2) / 2
 
     @property
@@ -131,10 +141,17 @@ class AABB(object):
         data = '%.1f, %.1f, %.1f, %.1f' % self.bbox
         return 'AABB([%s])' % data
 
-    def __eq__(self, other):
+    def _eq(self, other):
         xmin, xmax, ymin, ymax = other
         return ((xmin == self.xmin) and (xmax == self.xmax)
                 and (ymin == self.ymin) and (ymax == self.ymax))
+
+    def __richcmp__(self, other, method):
+        if method == 2:
+            return self._eq(other)
+        elif method == 3:
+            return not self._eq(other)
+        raise
 
     def __iter__(self):
         yield self.xmin
@@ -157,7 +174,7 @@ class AABB(object):
         return self._constructor(self.xmin + dx, self.xmax + dx,
                                  self.ymin + dy, self.ymax + dy)
 
-    def irotate(self, theta):
+    def rotate(self, theta):
         '''Retorna o objeto rotacionado pelo ângulo fornecido'''
 
         raise ValueError('cannot irotate AABB')
@@ -222,6 +239,13 @@ class AABB(object):
     def shadow(self, norm):
         coords = [v.dot(norm) for v in self.vertices]
         return min(coords), max(coords)
+
+if not C.compiled:
+    @pyinject(globals())
+    class AABBInject:
+
+        def __eq__(self, other):
+            return self._eq(other)
 
 ###############################################################################
 # Extrai caixas de contorno a partir das entradas

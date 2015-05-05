@@ -2,8 +2,10 @@
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathutils import Vec2, mVec2
 from FGAme.mathutils import sqrt, sin, cos
+from FGAme import mathutils as shapes
 from FGAme.util import six
 from FGAme.physics import flags
+
 
 __all__ = ['Dynamic']
 
@@ -233,12 +235,36 @@ class Dynamic(object):
         tname = type(self).__name__
         pos = ', '.join('%.1f' % x for x in self._pos)
         vel = ', '.join('%.1f' % x for x in self._vel)
-        return '%s(_pos=(%s), _vel=(%s))' % (tname, pos, vel)
+        return '%s(pos=(%s), vel=(%s))' % (tname, pos, vel)
 
     # TODO: def __copy__(self): ?
     # TODO: def __getstate__(self): ?
 
-    # Sinais
+    ###########################################################################
+    #                      Propriedades geométricas
+    ###########################################################################
+    @property
+    def cbb(self):
+        '''Caixa de contorno circular que envolve o objeto'''
+
+        return shapes.Circle(self.cbb_radius, self.pos)
+
+    @property
+    def aabb(self):
+        '''Caixa de contorno alinhada aos eixos que envolve o objeto'''
+
+        return shapes.AABB(self.xmin, self.xmax, self.ymin, self.ymax)
+
+    @property
+    def shape_bb(self):
+        '''Retorna o formato da caixa de contorno que melhor envolve o objeto
+        (pode ser um círculo, AABB ou poĺígono)'''
+
+        return NotImplemented
+
+    ###########################################################################
+    #                                Sinais
+    ###########################################################################
     collision = signal('collision', num_args=1)
     frame_enter = signal('frame-enter')
     out_of_bounds = signal('out-of-bounds', num_args=1)
@@ -351,23 +377,33 @@ class Dynamic(object):
 
         return self.linearE() + self.angularE()
 
+    def potentialE(self):
+        '''Energia potencial associada à gravidade'''
+
+        return self.gravity.dot(self._pos) / self._invmass
+
+    def totalE(self):
+        '''Energia total do objeto'''
+
+        return self.kineticE() + self.potentialE()
+
     def momentumP(self):
         '''Momentum linear'''
 
         return self._vel / self._invmass
 
-    def momentumL(self):
-        '''Momentum angular em torno do centro de massa'''
+    def momentumL(self, pos=None):
+        '''Momentum angular em torno do ponto dado (usa o centro de massa
+        como padrão)'''
 
-        if self.omega:
-            return self.inertia * self.omega
+        if pos is None:
+            delta = 0.0
         else:
-            return 0.0
-
-    def momentumL_origin(self):
-        '''Momentum angular em torno da origem'''
-
-        return self._pos.cross(self.momentumP()) + self.momentumL()
+            delta = (self._pos - pos).cross(self._vel)
+        if self.omega:
+            return delta + self.inertia * self.omega
+        else:
+            return delta
 
     ###########################################################################
     #                        Propriedades Geométricas
@@ -527,13 +563,10 @@ class Dynamic(object):
         específico e também resolve a dinâmica angular.
         '''
 
-        if y is None:
-            self.boost(impulse_or_x * self._invmass)
-        else:
-            self.boost(Vec2(impulse_or_x, y) * self._invmass)
+        self.boost(Vec2(impulse_or_x, y) * self._invmass)
 
     # Variáveis angulares #####################################################
-    def irotate(self, theta):
+    def rotate(self, theta):
         '''Rotaciona o objeto por um ângulo theta'''
 
         self.theta += theta

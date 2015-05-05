@@ -11,7 +11,7 @@ class Pong(World):
 
     def __init__(self, **kwds):
         super(Pong, self).__init__()
-        self.set_bounds(width=(-300, 10))
+        self.add_bounds(width=(-300, 10))
 
         # Linha central
         self.add(draw.AABB(shape=(15, 550), pos=(400, 300),

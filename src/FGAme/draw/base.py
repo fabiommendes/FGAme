@@ -1,4 +1,9 @@
 # -*- coding: utf8 -*-
+# TODO: manter este modelo de renderização?
+#
+# Estamos reimplementando o método paint() nos objetos por questões de
+# eficiência. Talvez os objetos deste módulo virem obsoletos
+
 import copy
 from FGAme.draw import Color
 from FGAme import mathutils as m

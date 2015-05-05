@@ -11,43 +11,38 @@ from FGAme.util import lazy
 
 class HasVisualization(object):
     _is_mixin_ = True
-    _slots_ = ['_visualization']
+    _slots_ = ['_color', '_linecolor', '_linewidth']
 
     def _init_has_visualization(self,
                                 color='black',
-                                line_color='black', line_width=0.0):
+                                linecolor=None, linewidth=1):
 
-        c = color or 'black'
-        lc = line_color or 'black'
-        lw = line_width
-        if hasattr(self, 'draw'):
-            self._visualization = None
-        else:
-            self._visualization = Shape.from_primitive(self, c, lc, lw)
+        self._color = None if color is None else Color(color)
+        self._linecolor = None if linecolor is None else Color(linecolor)
+        self._linewwidth = linewidth
 
     # Desenhando objeto #######################################################
     @property
-    def visualization(self):
-        return self._visualization or self
-
-    @property
     def color(self):
-        try:
-            return self._color
-        except AttributeError:
-            return Color(0, 0, 0)
+        return self._color
 
     @color.setter
     def color(self, value):
-        self._color = Color(value)
+        if value is None:
+            self._color = None
+        else:
+            self._color = Color(value)
 
     @property
-    def line_color(self):
-        return self._visualization.line_color
+    def linecolor(self):
+        return self._linecolor
 
-    @line_color.setter
-    def line_color(self, value):
-        self._visualization.line_color = Color(value)
+    @linecolor.setter
+    def linecolor(self, value):
+        if value is None:
+            self._linecolor = None
+        else:
+            self._color = Color(value)
 
 
 @EventDispatcherMeta.decorate
@@ -107,6 +102,8 @@ class ObjectMixin(WorldObject, HasVisualization):
 
     def _init_mixin(self,
                     world=None,
-                    color=None):
-        self._init_has_visualization(color)
+                    color='black', linecolor=None, linewidth=1):
+
+        self._init_has_visualization(color=color,
+                                     linecolor=linecolor, linewidth=linewidth)
         self._init_world_object(world)

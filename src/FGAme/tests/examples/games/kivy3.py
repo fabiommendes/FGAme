@@ -1,31 +1,36 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+
 from FGAme import *
 from random import uniform
+
 import kivy
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.clock import Clock
-from kivy.properties import ListProperty
 from kivy.uix.floatlayout import FloatLayout
 
-#===============================================================================
+#=========================================================================
 # Cria o mundo
-#===============================================================================
+#=========================================================================
 rv = lambda: (uniform(-400, 400), uniform(-400, 400))
-rp = lambda: (uniform(-400, 400), uniform(-300, 300))
+rp = lambda: (uniform(0, 800), uniform(0, 600))
 world = World(background=(0, 0, 0))
-world.set_bounds(-400, 400, -300, 300)
+world.add_bounds(0, 800, 0, 600)
 c1 = Circle(30, vel=rv(), world=world, color='blue')
 c2 = Circle(20, vel=rv(), pos=rp(), world=world, color='red')
 c3 = Circle(50, vel=rv(), pos=rp(), world=world, color='white')
 c4 = Circle(30, vel=rv(), pos=rp(), world=world, color=(0, 255, 0))
 c5 = Circle(30, vel=rv(), pos=rp(), world=world, color=(255, 255, 0))
+circles = [c1, c2, c3, c4, c5]
 world.listen('key-down', 'space', world.stop)
-#world.run()
+# world.run()
 
-#===============================================================================
+
+from kivy.graphics import Color, Ellipse, Rectangle
+
+#=========================================================================
 # Cria a aplicação kivy
-#===============================================================================
+#=========================================================================
 kv = '''
 <WorldLayout>:
     FloatLayout:
@@ -37,21 +42,34 @@ kv = '''
 '''
 Builder.load_string(kv)
 
+
 class WorldLayout(FloatLayout):
 
+    def __init__(self):
+        self._instructions = {}
+        super(WorldLayout, self).__init__()
+
+        with self.canvas:
+            Color(0, 0, 0)
+            Rectangle(pos=(0, 0), size=(800, 600))
+
+            for c in circles:
+                r = 2 * c.radius
+                Color(*c.color.f_rgb)
+                kcircle = Ellipse(pos=c.pos_sw, size=(r, r))
+                self._instructions[c] = kcircle
 
     def update_world(self, dt):
         world.update(dt)
-        self.pos1 = list(c1.pos + [400 - 30, 300 - 30])
-        self.pos2 = list(c2.pos + [400 - 20, 300 - 20])
-        self.pos3 = list(c3.pos + [400 - 50, 300 - 50])
-        self.pos4 = list(c4.pos + [400 - 30, 300 - 30])
-        self.pos5 = list(c5.pos + [400 - 30, 300 - 30])
+        for c, kv in self._instructions.items():
+            kv.pos = c.pos_sw
 
     def animate(self):
         Clock.schedule_interval(self.update_world, 1. / 60)
 
+
 class RotationApp(App):
+
     def build(self):
         return WorldLayout()
 

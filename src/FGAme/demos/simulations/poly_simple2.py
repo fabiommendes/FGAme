@@ -19,6 +19,7 @@ obj3 = RegularPoly(N=3, length=100, pos=(600, 300), theta=pi / 4,
 obj3.make_static()
 
 # Cria bordas e insere objetos no mundo antes de iniciar a simulação
-world.set_bounds(width=10)
+world.register_energy_tracker()
+world.add_bounds(width=10)
 world.add([obj1, obj2, obj3])
 world.run()

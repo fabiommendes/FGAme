@@ -12,7 +12,7 @@ NUM_ABBS = 50
 
 # Inicializa o mundo
 world = World(gravity=50, dfriction=0)
-world.set_bounds(width=10)
+world.add_bounds(width=10)
 
 # Preenche o mundo
 for _ in range(NUM_ABBS):
