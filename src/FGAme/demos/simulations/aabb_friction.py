@@ -24,4 +24,4 @@ def pause():
 # Inicia a simulação
 world.add([A, B])
 world.listen('key-down', 'space', pause)
-world.run(timeout=5)
+world.run()

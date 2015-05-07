@@ -3,7 +3,7 @@ cimport mathfuncs as m
 
 @cython.freelist(8)
 cdef class Vec2:
-    cdef public double _x, _y
+    cdef readonly double x, y
 
     cpdef Vec2 _from_coords(Vec2 self, double x, double y)
     cpdef tuple as_tuple(self)
@@ -11,5 +11,5 @@ cdef class Vec2:
     cpdef double norm_sqr(self)
     cpdef Vec2 normalize(self)
 
-cdef class mVec2(Vec2):
-    pass
+cdef class VecSlot:
+    cdef public object getter, setter

@@ -45,11 +45,11 @@ class CommonCircle(object):
     # Caixa de contorno #######################################################
     @property
     def xmin(self):
-        return self._pos._x - self.cbb_radius
+        return self._pos.x - self.cbb_radius
 
     @property
     def xmax(self):
-        return self._pos._x + self.cbb_radius
+        return self._pos.x + self.cbb_radius
 
     @property
     def ymin(self):

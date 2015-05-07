@@ -1,6 +1,6 @@
 cimport cython
 cimport mathfuncs as m
-from vec2 cimport Vec2, mVec2
+from vec2 cimport Vec2
 
 @cython.freelist(8)
 cdef class Mat2:

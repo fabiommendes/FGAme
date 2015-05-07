@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2, mVec2
+from FGAme.mathutils import Vec2
 from FGAme.mathutils import sqrt, sin, cos
 from FGAme import mathutils as shapes
 from FGAme.util import six
@@ -17,7 +17,6 @@ __all__ = ['Dynamic']
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INF = float('inf')
 ORIGIN = Vec2(0, 0)
-null_mvector = mVec2(0, 0)
 
 
 def do_nothing(*args, **kwds):
@@ -195,13 +194,13 @@ class Dynamic(object):
         self.flags = 0
 
         # Variáveis de estado
-        self._pos = mVec2(*pos)
-        self._vel = mVec2(*vel)
+        self._pos = Vec2(*pos)
+        self._vel = Vec2(*vel)
         self.theta = float(theta)
         self.omega = float(omega)
 
         # Acelerações
-        self._accel = mVec2(0, 0)
+        self._accel = Vec2(0, 0)
         self.alpha = 0.0
 
         # Inércias
@@ -217,7 +216,7 @@ class Dynamic(object):
         if adamping is not None:
             self.flags |= flags.OWNS_ADAMPING
         if gravity is None:
-            self._gravity = mVec2(0, 0)
+            self._gravity = Vec2(0, 0)
         else:
             self.gravity = gravity
 
@@ -464,7 +463,7 @@ class Dynamic(object):
             if self.gravity is not None:
                 a += self._gravity
         elif self._gravity is not None:
-            a.update(self._gravity)
+            a += self._gravity
         else:
             a *= 0
 
@@ -596,7 +595,7 @@ class Dynamic(object):
                 x, y = pos_or_x - self._pos
                 return self._vel + self.omega * Vec2(-y, x)
             else:
-                x = pos_or_x - self._pos._x
+                x = pos_or_x - self._pos.x
                 y = y - self._pos.y
                 return self._vel + self.omega * Vec2(-y, x)
 
@@ -632,7 +631,7 @@ class Dynamic(object):
         if alpha is None:
             alpha = self._alpha
         self.aboost(alpha * dt)
-        self.irotate(self.omega * dt + alpha * dt ** 2 / 2.)
+        self.rotate(self.omega * dt + alpha * dt ** 2 / 2.)
 
     def apply_aimpulse(self, itorque):
         '''Aplica um impulso angular ao objeto.'''
@@ -899,7 +898,7 @@ class Dynamic(object):
         self.make_kinematic_linear()
         if self._vel != ORIGIN:
             self._old_vel = self._vel
-            self._vel = mVec2(0, 0)
+            self._vel = Vec2(0, 0)
 
     def make_static_angular(self):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
@@ -923,11 +922,9 @@ def vec_property(slot):
         __slots__ = []
 
         def __set__(self, obj, value):
-            try:
-                vec = self.getter(obj, value)
-                vec.update(value)
-            except AttributeError:
-                setter(obj, mVec2(*value))
+            if not isinstance(value, Vec2):
+                value = Vec2(value)
+            setter(obj, value)
 
         def __get__(self, obj, cls):
             if obj is None:

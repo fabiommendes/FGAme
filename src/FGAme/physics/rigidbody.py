@@ -97,7 +97,7 @@ class RigidBody(Dynamic):
         self.omega = float(omega or 0)
         self.theta = 0.0
         if theta is not None:
-            self.irotate(theta)
+            self.rotate(theta)
         self._alpha = 0.0
 
     ###########################################################################

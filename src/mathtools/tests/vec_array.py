@@ -108,7 +108,7 @@ class Immutable(object):
         n = v.normalize()
 
         assert_almost_equal(v.normalize().norm(), 1)
-        assert_almost_equals(n._x * v._x + n.y * v.y, v.norm())
+        assert_almost_equals(n.x * v.x + n.y * v.y, v.norm())
 
     # Interface Python ########################################################
     def test_as_tuple(self):
@@ -140,7 +140,7 @@ class Mutable(Immutable):
 
     def test_set_coords(self):
         v = self.vector(1, 2)
-        v._x = 2
+        v.x = 2
         assert v == (2, 2)
 
     def test_setitem(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from collections import MutableSequence
-from mathtools import Vec2, mVec2, RotMat2, Array
+from mathtools import Vec2, RotMat2, Array
 
 __all__ = ['VecArray']
 
@@ -39,7 +39,7 @@ class VecArray(MutableSequence):
         Array([0, 1, 1])
         '''
 
-        self._data = list(mVec2(x) for x in data)
+        self._data = list(Vec2(x) for x in data)
 
     def _new(self, data):
         return self.__class__(data)
@@ -114,7 +114,7 @@ class VecArray(MutableSequence):
         del self._data[i]
 
     def insert(self, idx, value):
-        self._data.insert(idx, mVec2(value))
+        self._data.insert(idx, Vec2(value))
 
     # Operações matemáticas ###################################################
     def __mul__(self, other):
@@ -169,8 +169,8 @@ class VecArray(MutableSequence):
         return all(u == other for u in self._data)
 
     @property
-    def _x(self):
-        return Array([u._x for u in self._data])
+    def x(self):
+        return Array([u.x for u in self._data])
 
     @property
     def y(self):

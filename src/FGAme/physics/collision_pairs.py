@@ -3,7 +3,7 @@
 from FGAme.mathutils import Vec2, dot, area, center_of_mass, clip, pi
 from FGAme.mathutils import shadow_x, shadow_y
 
-from FGAme.physics.collision import Collision
+from FGAme.physics.collision import FineCollision
 from FGAme.physics import Circle, AABB, Poly, Rectangle
 from FGAme.util import multifunction
 
@@ -29,7 +29,7 @@ def get_collision_generic(A, B):
         n = delta.normalize()
         D = rA + rB - delta.norm()
         pos = A._pos + (rA - D / 2) * n
-        return Collision(A, B, pos=pos, normal=n, delta=D)
+        return FineCollision(A, B, pos=pos, normal=n, delta=D)
     else:
         return None
 
@@ -78,7 +78,7 @@ def collision_aabb(A, B):
         n = Vec2((1 if A.xmin < B.xmin else -1), 0)
         delta = shadowx
 
-    return Collision(A, B, pos=pos_col, normal=n, delta=delta)
+    return FineCollision(A, B, pos=pos_col, normal=n, delta=delta)
 
 
 @get_collision.dispatch(Circle, Circle)
@@ -92,7 +92,7 @@ def collision_circle(A, B):
         n = delta.normalize()
         D = rA + rB - delta.norm()
         pos = A._pos + (rA - D / 2) * n
-        return Collision(A, B, pos=pos, normal=n, delta=D)
+        return FineCollision(A, B, pos=pos, normal=n, delta=D)
     else:
         return None
 
@@ -140,7 +140,7 @@ def collision_poly(A, B, directions=None):
     if area(clipped) == 0:
         return None
     col_pt = center_of_mass(clipped)
-    return Collision(A, B, pos=col_pt, normal=norm, delta=min_shadow)
+    return FineCollision(A, B, pos=col_pt, normal=norm, delta=min_shadow)
 
 
 ###############################################################################
@@ -176,7 +176,7 @@ def circle_aabb(A, B):
     else:
         n = Vec2((1 if A.xmin < B.xmin else -1), 0)
 
-    return Collision(A, B, pos=pos_col, normal=n)
+    return FineCollision(A, B, pos=pos_col, normal=n)
 
 
 @get_collision.dispatch(Poly, AABB)

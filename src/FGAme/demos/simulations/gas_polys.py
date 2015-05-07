@@ -24,4 +24,4 @@ for _ in range(NUM_POLYS):
 # Inicia a simulação
 import fasttrack
 with fasttrack.timeit('foo'):
-    world.run(timeout=5, wait=True)
+    world.run()

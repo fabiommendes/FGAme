@@ -56,7 +56,7 @@ def dot(v1, v2):
     try:
         A = v1
         B = v2
-        return A._x * B._x + A._y * B._y
+        return A.x * B.x + A.y * B.y
     except (AttributeError, TypeError):
         return sum(x * y for (x, y) in zip(v1, v2))
 
@@ -70,10 +70,10 @@ def cross(v1, v2):
     try:
         A = v1
         B = v2
-        x1 = A._x
-        y1 = A._y
-        x2 = B._x
-        y2 = B._x
+        x1 = A.x
+        y1 = A.y
+        x2 = B.x
+        y2 = B.x
     except (AttributeError, TypeError):
         x1, y1 = v1
         x2, y2 = v2

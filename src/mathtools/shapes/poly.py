@@ -196,14 +196,14 @@ def ROG_sqr(L, axis=None):
     # Usa o teorema dos eixos paralelos para determinar o momento em torno
     # do centro de massa
     cm = center_of_mass(L)
-    ROG2_cm = ROG2_orig - (cm._x ** 2 + cm.y ** 2)
+    ROG2_cm = ROG2_orig - (cm.x ** 2 + cm.y ** 2)
     if axis is None:
         return ROG2_cm
     else:
         # Usa o teorema dos eixos paralelos novamente para deslocar para o
         # outro eixo
         D = (cm - axis)
-        return ROG2_cm + (D._x ** 2 + D.y ** 2)
+        return ROG2_cm + (D.x ** 2 + D.y ** 2)
 
 
 def clip(poly1, poly2):
@@ -212,16 +212,16 @@ def clip(poly1, poly2):
     def inside(pt):
         '''Retorna verdadeiro se o ponto estiver dentro do polígono 2'''
         pt_rel = pt - r0
-        return T._x * pt_rel.y >= T.y * pt_rel._x
+        return T.x * pt_rel.y >= T.y * pt_rel.x
 
     def intercept_point():
         '''Retorna o ponto de intercepção entre os segmentos formados por
         r1-r0 e v1-v0'''
 
-        A = r0._x * r1.y - r0.y * r1._x
-        B = v0._x * v1.y - v0.y * v1._x
-        C = 1.0 / (T._x * T_.y - T.y * T_._x)
-        return Vec2((-A * T_._x + B * T._x) * C, (-A * T_.y + B * T.y) * C)
+        A = r0.x * r1.y - r0.y * r1.x
+        B = v0.x * v1.y - v0.y * v1.x
+        C = 1.0 / (T.x * T_.y - T.y * T_.x)
+        return Vec2((-A * T_.x + B * T.x) * C, (-A * T_.y + B * T.y) * C)
 
     out = list(poly1)
     r0 = poly2[-1]

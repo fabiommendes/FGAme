@@ -67,4 +67,4 @@ if __name__ == '__main__':
 
     import fasttrack
     with fasttrack.timeit('run'):
-        game.run(maxiter=100, throttle=False)
+        game.run()

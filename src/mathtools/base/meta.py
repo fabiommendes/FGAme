@@ -195,6 +195,9 @@ class Attribute(object):
         return {'abc_required': self.abc_required, }
 
 
+import Box2
+
+
 if __name__ == '__main__':
     from FGAme import Vec2
 

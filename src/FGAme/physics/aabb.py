@@ -79,24 +79,24 @@ class AABB(LinearRigidBody):
     # Torna as os limites da AABB modificáveis ################################
     @property
     def xmin(self):
-        return self._pos._x - self._delta_x
+        return self._pos.x - self._delta_x
 
     @xmin.setter
     def xmin(self, value):
         xmin = float(value)
         xmax = self.xmax
-        self._pos._x = (xmax + xmin) / 2
+        self._pos.x = (xmax + xmin) / 2
         self._delta_x = (xmax - xmin) / 2
 
     @property
     def xmax(self):
-        return self._pos._x + self._delta_x
+        return self._pos.x + self._delta_x
 
     @xmax.setter
     def xmax(self, value):
         xmin = self.xmin
         xmax = float(value)
-        self._pos._x = (xmax + xmin) / 2
+        self._pos.x = (xmax + xmin) / 2
         self._delta_x = (xmax - xmin) / 2
 
     @property

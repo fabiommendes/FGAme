@@ -5,7 +5,7 @@ import mathtools as m
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
-__all__ = ['Vec2', 'mVec2']
+__all__ = ['Vec2', 'VecSlot']
 
 
 ###############################################################################
@@ -14,6 +14,11 @@ __all__ = ['Vec2', 'mVec2']
 class Vec2(object):
 
     '''Representa um vetor bidimensional.
+
+    Objetos do tipo `Vec2()` são imutáveis. Algumas implementações podem
+    proteger explicitamente os atributos do vetor, enquanto outras não. É
+    responsabilidade do usuário não tentar nenhum tipo de manipulação direta
+    das coordenadas x e y do vetor.
 
     Exemplo
     -------
@@ -45,7 +50,7 @@ class Vec2(object):
     '''
 
     if not C.compiled:
-        __slots__ = ['_x', '_y']
+        __slots__ = ['x', 'y']
     else:
         __slots__ = []
 
@@ -54,8 +59,8 @@ class Vec2(object):
             x, y = x_or_data
         else:
             x = x_or_data
-        self._x = x
-        self._y = y
+        self.x = x
+        self.y = y
 
     @classmethod
     def from_seq(cls, data):
@@ -72,37 +77,37 @@ class Vec2(object):
         # Um pouco mais rápido que chamar Vec2(x, y) diretamente.
         # Evita um pouco da lógica dentro do método __init__
         new = Vec2.__new__(Vec2, x, y)
-        new._x = x
-        new._y = y
+        new.x = x
+        new.y = y
         return new
 
     @C.locals(x='double', y='double', new='Vec2')
     def _from_coords(self, x, y):
         new = Vec2.__new__(Vec2, x, y)
-        new._x = x
-        new._y = y
+        new.x = x
+        new.y = y
         return new
 
     def as_tuple(self):
         '''Retorna a representação do vetor como uma tupla'''
 
-        return (self._x, self._y)
+        return (self.x, self.y)
 
     def norm(self):
         '''Retorna o módulo (norma) do vetor'''
 
-        return m.sqrt(self._x ** 2 + self._y ** 2)
+        return m.sqrt(self.x ** 2 + self.y ** 2)
 
     def norm_sqr(self):
         '''Retorna o módulo do vetor ao quadrado'''
 
-        return self._x ** 2 + self._y ** 2
+        return self.x ** 2 + self.y ** 2
 
     def normalize(self):
         '''Retorna um vetor unitário'''
 
         norm = self.norm()
-        return (self._from_coords(self._x / norm, self._y / norm)
+        return (self._from_coords(self.x / norm, self.y / norm)
                 if norm else self._from_coords(0, 0))
 
     @C.locals(theta='double', x='double', y='double',
@@ -111,8 +116,8 @@ class Vec2(object):
         '''Retorna um vetor rotacionado por um ângulo theta'''
 
         x, y = axis
-        dx = self._x - x
-        dy = self._y - y
+        dx = self.x - x
+        dy = self.y - y
         cos_t, sin_t = m.cos(theta), m.sin(theta)
         return self._from_coords(
             dx * cos_t - dy * sin_t + x,
@@ -123,14 +128,14 @@ class Vec2(object):
         '''Retorna uma cópia com a coordenada x espelhada em torno do ponto
         dado'''
 
-        return self._from_coords(x - self._x, self._y)
+        return self._from_coords(x - self.x, self.y)
 
     @C.locals(y='double')
     def flip_y(self, y=0.0):
         '''Retorna uma cópia com a coordenada x espelhada em torno do ponto
         dado'''
 
-        return self._from_coords(self._x, y - self._y)
+        return self._from_coords(self.x, y - self.y)
 
     @C.locals(height='int')
     def screen_coords(self, height=600):
@@ -139,12 +144,12 @@ class Vec2(object):
         da tela para realizar a conversão. Retorna uma tupla com os valores
         truncados.'''
 
-        return m.trunc(self._x), height - m.trunc(self._y)
+        return m.trunc(self.x), height - m.trunc(self.y)
 
     def trunc(self):
         '''Retorna uma tupla com os valores das coordenadas x e y truncados'''
 
-        return m.trunc(self._x), m.trunc(self._y)
+        return m.trunc(self.x), m.trunc(self.y)
 
     @C.locals(vec='Vec2', x='double', y='double')
     def dot(self, other):
@@ -159,10 +164,10 @@ class Vec2(object):
 
         try:
             vec = other
-            return vec._x * self._x + vec._y * self._y
+            return vec.x * self.x + vec.y * self.y
         except (TypeError, AttributeError):
             x, y = other
-            return self._x * x + self._y * y
+            return self.x * x + self.y * y
 
     @C.locals(vec='Vec2', x='double', y='double')
     def cross(self, other):
@@ -178,14 +183,14 @@ class Vec2(object):
 
         try:
             vec = other
-            return self._x * vec._y - self._y * vec._x
+            return self.x * vec.y - self.y * vec.x
         except (TypeError, AttributeError):
             x, y = other
-            return self._x * y - self._y * x
+            return self.x * y - self.y * x
 
     # Métodos mágicos #########################################################
     def __repr__(self):
-        '''_x.__repr__() <==> repr(_x)'''
+        '''x.__repr__() <==> repr(x)'''
 
         x, y = self
         x = str(x) if x != int(x) else str(int(x))
@@ -194,7 +199,7 @@ class Vec2(object):
         return '%s(%s, %s)' % (tname, x, y)
 
     def __str__(self):
-        '''_x.__str__() <==> str(_x)'''
+        '''x.__str__() <==> str(x)'''
 
         return repr(self)
 
@@ -202,26 +207,26 @@ class Vec2(object):
         return 2
 
     def __iter__(self):
-        yield self._x
-        yield self._y
+        yield self.x
+        yield self.y
 
     def __getitem__(self, i):
-        '''_x.__getitem__(i) <==> _x[i]'''
+        '''x.__getitem__(i) <==> x[i]'''
 
         if i == 0:
-            return self._x
+            return self.x
         elif i == 1:
-            return self._y
+            return self.y
         else:
             raise IndexError(i)
 
     def __hash__(self):
-        return hash(self._x) ^ hash(self._y)
+        return hash(self.x) ^ hash(self.y)
 
     # Operações aritiméticas ##################################################
     @C.locals(A='Vec2', B='double')
     def __mul__(self, other):
-        '''_x.__mul__(y) <==> _x * y'''
+        '''x.__mul__(y) <==> x * y'''
 
         try:
             A = self
@@ -233,33 +238,33 @@ class Vec2(object):
             except TypeError:
                 return other.__rmul__(self)
 
-        return A._from_coords(A._x * B, A._y * B)
+        return A._from_coords(A.x * B, A.y * B)
 
     def __rmul__(self, other):
-        '''_x.__rmul__(y) <==> y * _x'''
+        '''x.__rmul__(y) <==> y * x'''
 
         return self * other
 
     @C.locals(self='Vec2', other='double')
     def __div__(self, other):
-        '''_x.__div__(y) <==> _x / y'''
+        '''x.__div__(y) <==> x / y'''
 
-        return self._from_coords(self._x / other, self._y / other)
+        return self._from_coords(self.x / other, self.y / other)
 
     @C.locals(self='Vec2', other='double')
     def __truediv__(self, other):
-        '''_x.__div__(y) <==> _x / y'''
+        '''x.__div__(y) <==> x / y'''
 
-        return self._from_coords(self._x / other, self._y / other)
+        return self._from_coords(self.x / other, self.y / other)
 
     @C.locals(A='Vec2', B='Vec2', x='double', y='double')
     def __add__(self, other):
-        '''_x.__add__(y) <==> _x + y'''
+        '''x.__add__(y) <==> x + y'''
 
         try:
             A = self
             B = other
-            return A._from_coords(A._x + B._x, A._y + B._y)
+            return A._from_coords(A.x + B.x, A.y + B.y)
         except (TypeError, AttributeError):
             try:
                 A = self
@@ -267,46 +272,46 @@ class Vec2(object):
             except TypeError:
                 A = other
                 x, y = self
-            return A._from_coords(A._x + x, A._y + y)
+            return A._from_coords(A.x + x, A.y + y)
 
     def __radd__(self, other):
-        '''_x.__radd__(y) <==> y + _x'''
+        '''x.__radd__(y) <==> y + x'''
 
         return self + other
 
     @C.locals(A='Vec2', B='Vec2', x='double', y='double')
     def __sub__(self, other):
-        '''_x.__sub__(y) <==> _x - y'''
+        '''x.__sub__(y) <==> x - y'''
 
         try:
             A = self
             B = other
-            return A._from_coords(A._x - B._x, A._y - B._y)
+            return A._from_coords(A.x - B.x, A.y - B.y)
         except (TypeError, AttributeError):
             try:
                 A = self
                 x, y = other
-                return A._from_coords(A._x - x, A._y - y)
+                return A._from_coords(A.x - x, A.y - y)
             except TypeError:
                 B = other
                 x, y = self
-                return B._from_coords(x - B._x, y - B._y)
+                return B._from_coords(x - B.x, y - B.y)
 
     def __rsub__(self, other):
-        '''_x.__rsub__(y) <==> y - _x'''
+        '''x.__rsub__(y) <==> y - x'''
         try:
-            return self._from_coords(other._x - self._x, other._y - self._y)
+            return self._from_coords(other.x - self.x, other.y - self.y)
         except AttributeError:
             x, y = other
-            return self._from_coords(x - self._x, y - self._y)
+            return self._from_coords(x - self.x, y - self.y)
 
     def __neg__(self):
-        '''_x.__neg() <==> -_x'''
+        '''x.__neg() <==> -x'''
 
-        return self._from_coords(-self._x, -self._y)
+        return self._from_coords(-self.x, -self.y)
 
     def __nonzero__(self):
-        if (self._x == 0) and (self._y == 0):
+        if (self.x == 0) and (self.y == 0):
             return False
         else:
             return True
@@ -318,148 +323,115 @@ class Vec2(object):
     def __richcmp__(self, other, method):
         if method == 2:    # igual (==)
             x, y = other
-            return self._x == x and self._y == y
+            return self.x == x and self.y == y
         elif method == 3:  # diferente (!=)
             x, y = other
-            return self._x != x or self._y != y
+            return self.x != x or self.y != y
         else:
             raise TypeError('invalid rich comparison: %s' % method)
 
-    @property
-    def x(self):
-        return self._x
+    # Ganchos para implementações mutáveis ####################################
+    def _setx(self, x):
+        self.x = x
 
-    @property
-    def y(self):
-        return self._y
+    def _sety(self, y):
+        self.y = y
 
+    def _setxy(self, x, y):
+        self.x = x
+        self.y = y
 
-###############################################################################
-#                            Mutable Vector 2D
-###############################################################################
-
-
-class mVec2(Vec2):
-
-    '''Como Vec2, mas com elementos mutáveis'''
-
-    @C.locals(x='double', y='double', new='Vec2')
-    def _from_coords(self, x, y):
-        new = mVec2.__new__(mVec2, x, y)
-        new._x = x
-        new._y = y
-        return new
-
-    def __setitem__(self, i, value):
+    def _setitem(self, i, value):
         if i == 0:
-            self._x = value + 0.0
+            self.x = value + 0.0
         elif i == 1:
-            self._y = value + 0.0
+            self.y = value + 0.0
         else:
             raise IndexError
 
     @C.locals(x='double', y='double', vec='Vec2')
-    def __iadd__(self, other):
-        '''_x.__iadd__(y) <==> _x += y'''
+    def _iadd(self, other):
+        '''x.__iadd__(y) <==> x += y'''
 
         try:
             vec = other
-            self._x += vec._x
-            self._y += vec._y
+            self.x += vec.x
+            self.y += vec.y
         except TypeError:
             x, y = other
-            self._x += x
-            self._y += y
+            self.x += x
+            self.y += y
         return self
 
     @C.locals(x='double', y='double', vec='Vec2')
-    def __isub__(self, other):
-        '''_x.__isub__(y) <==> _x -= y'''
+    def _isub(self, other):
+        '''x.__isub__(y) <==> x -= y'''
 
         try:
             vec = other
-            self._x -= vec._x
-            self._y -= vec._y
+            self.x -= vec.x
+            self.y -= vec.y
         except TypeError:
             x, y = other
-            self._x -= x
-            self._y -= y
+            self.x -= x
+            self.y -= y
         return self
 
     @C.locals(other='double')
-    def __imul__(self, other):
-        '''_x.__imul__(y) <==> _x *= y'''
+    def _imul(self, other):
+        '''x.__imul__(y) <==> x *= y'''
 
-        self._x *= other
-        self._y *= other
+        self.x *= other
+        self.y *= other
         return self
 
     @C.locals(other='double')
-    def __idiv__(self, other):
-        '''_x.__idiv__(y) <==> _x /= y'''
+    def _idiv(self, other):
+        '''x.__idiv__(y) <==> x /= y'''
 
-        self._x /= other
-        self._y /= other
+        self.x /= other
+        self.y /= other
         return self
 
     @C.locals(other='double')
-    def __itruediv__(self, other):
-        '''_x.__idiv__(y) <==> _x /= y'''
+    def _itruediv(self, other):
+        '''x.__idiv__(y) <==> x /= y'''
 
-        self._x /= other
-        self._y /= other
+        self.x /= other
+        self.y /= other
         return self
 
     @C.locals(theta='double', x='double', y='double',
               dx='double', dy='double', cos_t='double', sin_t='double')
-    def irotate(self, theta, axis=(0, 0)):
+    def _irotate(self, theta, axis=(0, 0)):
         '''Rotaciona o vetor *inplace*'''
 
         x, y = axis
-        dx = self._x - x
-        dy = self._y - y
+        dx = self.x - x
+        dy = self.y - y
         cos_t, sin_t = m.cos(theta), m.sin(theta)
-        self._x = dx * cos_t - dy * sin_t + x
-        self._y = dx * sin_t + dy * cos_t + y
+        self.x = dx * cos_t - dy * sin_t + x
+        self.y = dx * sin_t + dy * cos_t + y
 
-    def inormalize(self):
+    def _inormalize(self):
         '''Normaliza o vetor *inplace*'''
 
         self /= self.norm()
 
-    def update(self, other, y=None):
+    def _update(self, other, y=None):
         '''Copia as coordenadas x, y do objeto other'''
 
         if y is None:
             x, y = other
         else:
             x = other
-        self._x = x + 0.0
-        self._y = y + 0.0
+        self.x = x + 0.0
+        self.y = y + 0.0
 
-    def copy(self):
+    def _copy(self):
         '''Retorna uma cópia de si mesmo'''
 
-        return self._from_coords(self._x, self._y)
-
-    @property
-    def x(self):
-        return self._x
-
-    @property
-    def y(self):
-        return self._y
-
-    @x.setter
-    def x(self, value):
-        self._x = value + 0.0
-
-    @y.setter
-    def y(self, value):
-        self._y = value + 0.0
-
-    def __hash__(self):
-        raise TypeError
+        return self._from_coords(self.x, self.y)
 
 ###############################################################################
 #               Código injetado para rodar no modo interpretado
@@ -477,42 +449,67 @@ if not C.compiled:
                 x, y = x_or_data
             else:
                 x = x_or_data
-            self._x = x + 0.0
-            self._y = y + 0.0
+            self.x = x + 0.0
+            self.y = y + 0.0
 
         @staticmethod
         def _from_coords(x, y):
             tt = Vec2
             new = tt.__new__(tt, x, y)
-            new._x = x + 0.0
-            new._y = y + 0.0
+            new.x = x + 0.0
+            new.y = y + 0.0
             return new
 
         def __mul__(self, other):
-            '''_x.__mul__(y) <==> _x * y'''
+            '''x.__mul__(y) <==> x * y'''
 
             try:
                 other = float(other)
             except TypeError:
                 return other.__rmul__(self)
-            return self._from_coords(self._x * other, self._y * other)
+            return self._from_coords(self.x * other, self.y * other)
 
         def __eq__(self, other):
             x, y = other
-            return self._x == x and self._y == y
-
-    @pyinject(globals())
-    class mVec2Inject:
-
-        @staticmethod
-        def _from_coords(x, y):
-            tt = mVec2
-            new = tt.__new__(tt, x, y)
-            new._x = x + 0.0
-            new._y = y + 0.0
-            return new
+            return self.x == x and self.y == y
 
     auto_public(Vec2)
+
+
+###############################################################################
+#                         Propriedades vetoriais
+###############################################################################
+class VecSlot(object):
+    if C.compiled:
+        __slots__ = []
+    else:
+        __slots__ = ['getter', 'setter']
+
+    def __init__(self, slot):
+        self.setter = slot.__set__
+        self.getter = slot.__get__
+
+    def __get__(self, obj, tt):
+        return self.getter(obj, tt)
+
+    def __set__(self, obj, value):
+        if not isinstance(value, Vec2):
+            value = Vec2.from_seq(value)
+        self.setter(obj, value)
+
+    def update_class(self, tt=None, *args):
+        '''Update all enumerated slots/descriptors in class to be VecSlots'''
+
+        if tt is None:
+            def decorator(tt):
+                self.update_class(tt, *args)
+                return tt
+            return decorator
+
+        for sname in args:
+            slot = getattr(tt, sname)
+            setattr(tt, sname, VecSlot(slot))
+
 
 if __name__ == '__main__' and not C.compiled:
     import doctest

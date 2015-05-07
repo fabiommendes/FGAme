@@ -155,11 +155,11 @@ class Poly(RigidBody):
 
     @property
     def xmin(self):
-        return self._pos._x + self._rbbox[0]
+        return self._pos.x + self._rbbox[0]
 
     @property
     def xmax(self):
-        return self._pos._x + self._rbbox[1]
+        return self._pos.x + self._rbbox[1]
 
     @property
     def ymin(self):

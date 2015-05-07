@@ -1,7 +1,31 @@
 # -*- coding: utf8 -*-
-from FGAme.core import env
 from FGAme.mathutils import Vec2
 from FGAme.util import lazy
+
+
+class Contact(object):
+
+    '''Representa algum contato ou conexão entre dois objetos'''
+
+
+class Collision(Contact):
+    pass
+
+
+class CoarseCollision(Contact):
+
+    '''Representa um par de objetos que as caixas de contorno grosseiras
+    estão em colisão'''
+
+
+class CBBCollision(CoarseCollision):
+
+    '''Representa um par de objetos que possuem as'''
+
+
+class AABBCollision(CoarseCollision):
+
+    ''''''
 
 ###############################################################################
 #                         Classe Colisão
@@ -12,11 +36,11 @@ from FGAme.util import lazy
 ###############################################################################
 
 
-class Collision(object):
+class FineCollision(Collision):
 
     '''Representa a colisão entre dois objetos.
 
-    Subclasses de Collision devem implementar o método .resolve(dt) que resolve
+    Subclasses de FineCollision devem implementar o método .resolve(dt) que resolve
     a colisão entre os objetos respeitando os vínculos de is_dynamic*.
 
     Example
@@ -31,7 +55,7 @@ class Collision(object):
     A colisão se dá no ponto (1, 1) e escolhemos a normal para atuar na
     direção x
 
-    >>> col = Collision(A, B,
+    >>> col = FineCollision(A, B,
     ...                 pos=(1, 1),    # ponto de colisão
     ...                 normal=(1, 0)) # normal da colisão
 
@@ -77,7 +101,7 @@ class Collision(object):
         '''Vetor unitário tangente à colisão'''
 
         n = self.normal
-        tangent = Vec2(-n.y, n._x)
+        tangent = Vec2(-n.y, n.x)
         if tangent.dot(self.vrel_contact) > 0:
             tangent *= -1
         return tangent
@@ -100,7 +124,7 @@ class Collision(object):
 
         A, B = self.objects
         pos = self.pos
-        vrel = self.vrel_cm.copy()
+        vrel = self.vrel_cm
 
         if A._invinertia or A.omega:
             x, y = pos - A.pos
@@ -202,7 +226,7 @@ class Collision(object):
         return self._A.momentumL(pos) + self._B.momentumL(pos)
 
     ###########################################################################
-    #                       Métodos da API de Collision
+    #                       Métodos da API de FineCollision
     ###########################################################################
 
     def resolve(self, dt=0):
@@ -256,9 +280,9 @@ class Collision(object):
         '''Retorna uma colisão com o papel dos objetos A e B trocados'''
 
         A, B = self.objects
-        return Collision(B, A,
-                         pos=self.pos, normal=-self.normal,
-                         world=self.world)
+        return FineCollision(B, A,
+                             pos=self.pos, normal=-self.normal,
+                             world=self.world)
 
     def other(self, obj):
         '''Se for chamada com o objeto A, retorna o objeto B e vice-versa'''

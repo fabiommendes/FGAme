@@ -180,14 +180,14 @@ class Simulation(EventDispatcher):
 
         objects = self._objects
         col_idx = 0
-        objects.sort(key=lambda obj: obj._pos._x - obj.cbb_radius)
+        objects.sort(key=lambda obj: obj._pos.x - obj.cbb_radius)
         self._broad_collisions[:] = []
 
         # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
         # salva o resultado na lista broad collisions
         for i, A in enumerate(objects):
             A_radius = A.cbb_radius
-            A_right = A._pos._x + A_radius
+            A_right = A._pos.x + A_radius
             A_dynamic = A.is_dynamic()
 
             for j in range(i + 1, len(objects)):
@@ -195,7 +195,7 @@ class Simulation(EventDispatcher):
                 B_radius = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
-                B_left = B._pos._x - B_radius
+                B_left = B._pos.x - B_radius
                 if B_left > A_right:
                     break
 
@@ -264,7 +264,7 @@ class Simulation(EventDispatcher):
         for obj in self._objects:
             if obj._invmass:
                 obj.apply_accel(None, dt)
-            elif obj._vel._x or obj._vel.y:
+            elif obj._vel.x or obj._vel.y:
                 obj.move(obj._vel * dt)
 
             if obj._invinertia:
