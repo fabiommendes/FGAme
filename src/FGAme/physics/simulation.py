@@ -66,6 +66,11 @@ class Simulation(EventDispatcher):
 
     frame_enter = signal('frame-enter')
     collision = signal('collision', num_args=1)
+    object_add = signal('object-add', num_args=1)
+    object_remove = signal('object-remove', num_args=1)
+    gravity_change = signal('gravity-change', num_args=2)
+    damping_change = signal('damping-change', num_args=2)
+    adamping_change = signal('adamping-change', num_args=2)
 
     ###########################################################################
     #                             Propriedades
@@ -77,6 +82,7 @@ class Simulation(EventDispatcher):
 
     @gravity.setter
     def gravity(self, value):
+        old = getattr(self, '_gravity', Vec2(0, 0))
         try:
             gravity = self._gravity = Vec2(*value)
         except TypeError:
@@ -85,6 +91,7 @@ class Simulation(EventDispatcher):
         for obj in self:
             if not obj.owns_gravity:
                 obj._gravity = gravity
+        self.trigger('gravity-change', old, self._gravity)
 
     @property
     def damping(self):
@@ -92,11 +99,13 @@ class Simulation(EventDispatcher):
 
     @damping.setter
     def damping(self, value):
+        old = getattr(self, '_damping', 0)
         value = self._damping = float(value)
 
         for obj in self._objects:
             if not obj.owns_damping:
                 obj._damping = value
+        self.trigger('damping-change', old, self._damping)
 
     @property
     def adamping(self):
@@ -104,15 +113,18 @@ class Simulation(EventDispatcher):
 
     @adamping.setter
     def adamping(self, value):
+        old = getattr(self, '_damping', 0)
         value = self._adamping = float(value)
 
         for obj in self._objects:
             if not obj.owns_adamping:
                 obj._adamping = value
+        self.trigger('damping-change', old, self._damping)
 
     ###########################################################################
     #                   Gerenciamento de objetos e colisões
     ###########################################################################
+
     def add(self, obj):
         '''Adiciona um novo objeto ao mundo.
 
@@ -133,13 +145,27 @@ class Simulation(EventDispatcher):
                 obj._damping = self.damping
             if not obj.owns_adamping:
                 obj._adamping = self.adamping
+            self.trigger('object-add', obj)
 
     def remove(self, obj):
-        '''Descarta um objeto da simulação'''
+        '''Remove um objeto da simulação. Produz um ValueError() caso o objeto
+        não esteja presente na simulação.'''
 
         try:
-            del self._objects[self._objects.index(obj)]
+            idx = self._objects.index(obj)
         except IndexError:
+            raise ValueError('object not present')
+        else:
+            del self._objects[idx]
+            self.trigger('object-remove', obj)
+            obj.destroy()
+
+    def discard(self, obj):
+        '''Descarta um objeto da simulação.'''
+
+        try:
+            self.remove(obj)
+        except ValueError:
             pass
 
     ###########################################################################
@@ -214,6 +240,7 @@ class Simulation(EventDispatcher):
     def fine_phase(self):
         '''Escaneia a lista de colisões grosseiras e detecta quais delas
         realmente aconteceram'''
+
         # Detecta colisões e atualiza as listas internas de colisões de
         # cada objeto
         self._fine_collisions[:] = []
@@ -263,14 +290,14 @@ class Simulation(EventDispatcher):
         dt = self._dt
         for obj in self._objects:
             if obj._invmass:
-                obj.apply_accel(None, dt)
+                obj.update_linear(dt)
             elif obj._vel.x or obj._vel.y:
                 obj.move(obj._vel * dt)
 
             if obj._invinertia:
-                obj.apply_alpha(None, dt)
+                obj.update_angular(dt)
             elif obj.omega:
-                obj.irotate(obj.omega * dt)
+                obj.rotate(obj.omega * dt)
 
     def resolve_collisions(self):
         '''Resolve as colisões'''
