@@ -20,7 +20,7 @@ class Circle(ObjectMixin, physics.Circle):
         if self._linecolor is not None:
             screen.paint_circle(self.radius, self.pos,
                                 self._linecolor,
-                                self._linewwidth)
+                                self._linewidth)
 
 
 class Ball(ObjectMixin, physics.Ball):

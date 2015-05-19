@@ -106,7 +106,7 @@ class Pong(World):
         obj = RegularPoly(self.obstacle_sides, self.obstacle_size,
                           color=self.obstacle_color, density=1)
         obj.scale(uniform(0.75, 2))
-        obj.irotate(uniform(0, 2 * math.pi))
+        obj.rotate(uniform(0, 2 * math.pi))
         obj.inertia *= self.inertia_multiplier
         if not self.obstacle_dynamic:
             obj.make_static()

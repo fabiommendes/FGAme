@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathutils import Vec2
-from FGAme.mathutils import sqrt, sin, cos
+from FGAme.mathutils import sqrt, sin, cos, null2D
 from FGAme import mathutils as shapes
 from FGAme.util import six
 from FGAme.physics import flags
@@ -219,6 +219,9 @@ class Dynamic(object):
             self._gravity = Vec2(0, 0)
         else:
             self.gravity = gravity
+
+        # Controle de is_sleep
+        self.is_sleep = False
 
     ###########################################################################
     #                            Serviços Python
@@ -456,16 +459,16 @@ class Dynamic(object):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
         e ao amortecimento'''
 
-        a = self._accel
         if self._damping:
-            a.update(self._vel)
+            a = self._vel
             a *= -self._damping
             if self.gravity is not None:
                 a += self._gravity
         elif self._gravity is not None:
-            a += self._gravity
+            a = self._gravity
         else:
-            a *= 0
+            a = null2D
+        self._accel = a
 
     def apply_force(self, force, dt, pos=None, relative=False):
         '''Aplica uma força linear durante um intervalo de tempo dt'''
@@ -476,7 +479,7 @@ class Dynamic(object):
         else:
             self.apply_accel(force * self._invmass, dt)
 
-        if pos is not None:
+        if pos is not None and self._invinertia:
             if relative:
                 tau = pos.cross(force)
             else:
@@ -545,12 +548,7 @@ class Dynamic(object):
         '''
 
         # TODO: reimplementar algoritmo correto
-        if a is None:
-            a = self._accel
-        else:
-            if not isinstance(a, Vec2):
-                a = Vec2.from_seq(a)
-
+        a = Vec2.from_seq(a)
         self.move(self._vel * dt + a * (dt ** 2 / 2.0))
         self.boost(a * dt)
 
@@ -563,6 +561,16 @@ class Dynamic(object):
         '''
 
         self.boost(Vec2(impulse_or_x, y) * self._invmass)
+
+    def update_linear(self, dt):
+        '''Aplica aceleração linear acumulada pelo objeto ao longo do frame'''
+
+        self.apply_accel(self._accel, dt)
+
+    def update_angular(self, dt):
+        '''Aplica aceleração angular acumulada pelo objeto ao longo do frame'''
+
+        self.apply_alpha(self._alpha, dt)
 
     # Variáveis angulares #####################################################
     def rotate(self, theta):

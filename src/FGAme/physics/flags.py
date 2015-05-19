@@ -1,4 +1,6 @@
 class _FlagBits:
+    is_sleep = 1
+    is_ground = 5
     has_inertia = 2
     has_linear = 3
     has_angular = 4
@@ -19,6 +21,8 @@ class _FlagBits:
 #         print(k.upper(), '=', 1 << v)
 # del k, v
 
+IS_GROUND = 2 ** 5
+IS_SLEEP = 2 ** 1
 HAS_VISUALIZATION = 65536
 OWNS_GRAVITY = 1024
 HAS_LINEAR = 8

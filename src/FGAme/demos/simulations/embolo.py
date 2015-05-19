@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 '''
-Este exemplo mostra um gás de esferas rígidas em contato com um êmbulo sujeito a
-uma força viscosa. A energia é dissipada no movimento do êmbolo e aos poucos
+Este exemplo mostra um gás de esferas rígidas em contato com um êmbulo sujeito
+a uma força viscosa. A energia é dissipada no movimento do êmbolo e aos poucos
 as partículas cessam o movimento.
 '''
 
@@ -12,7 +12,7 @@ from random import uniform, randint
 class Gas(World):
 
     def __init__(self,
-                 gravity=50, friction=0.0,
+                 gravity=5, friction=0.0,
                  num_balls=100, speed=200, radius=10,
                  color='random'):
         '''Cria uma simulação de um gás de partículas confinado por um êmbolo

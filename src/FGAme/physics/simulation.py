@@ -4,6 +4,8 @@ from FGAme.mathutils import Vec2
 from FGAme.physics import get_collision, get_collision_generic, CollisionError
 from FGAme.physics import flags
 from FGAme.core import EventDispatcher, signal
+from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB
+from FGAme.draw import Color
 
 ###############################################################################
 #                                Simulação
@@ -11,6 +13,8 @@ from FGAme.core import EventDispatcher, signal
 # Coordena todos os objetos com uma física definida e resolve a interação
 # entre eles
 ###############################################################################
+SLEEP_LINEAR_VELOCITY = 12
+SLEEP_ANGULAR_VELOCITY = 0.1
 
 
 class Simulation(EventDispatcher):
@@ -25,11 +29,11 @@ class Simulation(EventDispatcher):
 
     def __init__(self, gravity=None, damping=0, adamping=0,
                  rest_coeff=1, sfriction=0, dfriction=0, max_speed=None,
-                 bounds=None):
+                 bounds=None, broad_phase=None):
 
         super(Simulation, self).__init__()
         self._objects = []
-        self._broad_collisions = []
+        self._broad_phase = normalize_broad_phase(broad_phase)
         self._fine_collisions = []
         self._kinetic0 = None
         self._potential0 = None
@@ -204,38 +208,7 @@ class Simulation(EventDispatcher):
         salva todas os pares de possíveis objetos em colisão numa lista
         interna.'''
 
-        objects = self._objects
-        col_idx = 0
-        objects.sort(key=lambda obj: obj._pos.x - obj.cbb_radius)
-        self._broad_collisions[:] = []
-
-        # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
-        # salva o resultado na lista broad collisions
-        for i, A in enumerate(objects):
-            A_radius = A.cbb_radius
-            A_right = A._pos.x + A_radius
-            A_dynamic = A.is_dynamic()
-
-            for j in range(i + 1, len(objects)):
-                B = objects[j]
-                B_radius = B.cbb_radius
-
-                # Procura na lista enquanto xmin de B for menor que xmax de A
-                B_left = B._pos.x - B_radius
-                if B_left > A_right:
-                    break
-
-                # Não detecta colisão entre dois objetos estáticos/cinemáticos
-                if not A_dynamic and not B.is_dynamic():
-                    continue
-
-                # Testa a colisão entre os círculos de contorno
-                if (A._pos - B._pos).norm() > A_radius + B_radius:
-                    continue
-
-                # Adiciona à lista de colisões grosseiras
-                col_idx += 1
-                self._broad_collisions.append((A, B))
+        self._broad_phase.update(self._objects)
 
     def fine_phase(self):
         '''Escaneia a lista de colisões grosseiras e detecta quais delas
@@ -245,7 +218,7 @@ class Simulation(EventDispatcher):
         # cada objeto
         self._fine_collisions[:] = []
 
-        for A, B in self._broad_collisions:
+        for A, B in self._broad_phase:
             col = self.get_fine_collision(A, B)
 
             if col is not None:
@@ -266,6 +239,9 @@ class Simulation(EventDispatcher):
 
         # Acumula as forças e acelerações
         for obj in self._objects:
+            if obj.is_sleep:
+                continue
+
             if obj._invmass:
                 obj.init_accel()
                 if obj.force is not None:
@@ -289,6 +265,9 @@ class Simulation(EventDispatcher):
 
         dt = self._dt
         for obj in self._objects:
+            if obj.is_sleep:
+                continue
+
             if obj._invmass:
                 obj.update_linear(dt)
             elif obj._vel.x or obj._vel.y:
@@ -308,6 +287,25 @@ class Simulation(EventDispatcher):
             B.trigger('collision', col)
             if col.is_active:
                 col.resolve()
+
+                if (A.is_static() or B.is_static()):
+                    if B.is_static():
+                        if (A.vel.norm() <= SLEEP_LINEAR_VELOCITY and
+                                abs(A.omega) <= SLEEP_ANGULAR_VELOCITY):
+                            A.is_sleep = True
+                            A._color = Color(100, 100, 100)
+                        else:
+                            A.is_sleep = False
+                            A._color = Color(0, 0, 0)
+
+                    if A.is_static():
+                        if (B.vel.norm() <= SLEEP_LINEAR_VELOCITY and
+                                abs(B.omega) <= SLEEP_ANGULAR_VELOCITY):
+                            B.is_sleep = True
+                            B._color = Color(100, 100, 100)
+                        else:
+                            B.is_sleep = False
+                            B._color = Color(0, 0, 0)
 
     def get_fine_collision(self, A, B):
         '''Retorna a colisão entre os objetos A e B depois que a colisão AABB
@@ -446,6 +444,22 @@ class Simulation(EventDispatcher):
             for col in self._fine_collisions:
                 col.adjust_overlap()
 
+
+###############################################################################
+#                              Funções auxiliares
+###############################################################################
+def normalize_broad_phase(broad_phase):
+    '''Escolhe o parâmetro correto na inicialização do broad-phase'''
+
+    if broad_phase is None:
+        broad_phase = BroadPhaseCBB()
+    elif isinstance(broad_phase, BroadPhase):
+        pass
+    elif isinstance(broad_phase, type) and issubclass(broad_phase, BroadPhase):
+        broad_phase = broad_phase()
+    else:
+        raise TypeError('invalid broad phase')
+    return broad_phase
 
 if __name__ == '__main__':
     import doctest

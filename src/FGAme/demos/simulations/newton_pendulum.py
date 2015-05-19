@@ -13,8 +13,8 @@ world.add_bounds(width=10)
 
 stacks = []
 stacks.append('aabbs')
-# stacks.append('circles')
-# stacks.append('rects')
+stacks.append('circles')
+stacks.append('rects')
 
 
 # Cria pilha de AABBs
@@ -49,8 +49,8 @@ if 'rects' in stacks:
                         shape=(40, 40), color='red', vel=(200, 0)))
 
 
-world.add(Circle(10, pos=(30, 30), vel=(300, 400)))
-world.add(Circle(10, pos=(30, 30), vel=(400, 300)))
+#world.add(Circle(10, pos=(30, 30), vel=(300, 400)))
+#world.add(Circle(10, pos=(30, 30), vel=(400, 300)))
 
 # Registra energias
 world.register_energy_tracker()

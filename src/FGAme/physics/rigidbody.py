@@ -6,7 +6,7 @@ from FGAme.physics import Dynamic
 __all__ = ['RigidBody', 'LinearRigidBody']
 
 INF = float('inf')
-INERTIA_SCALE = 0.1
+INERTIA_SCALE = 0.3
 
 
 class RigidBody(Dynamic):

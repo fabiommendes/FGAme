@@ -15,7 +15,7 @@ stacks.append('polys')
 
 
 # Cria mundo com coeficiente de atrito global não-nulo
-world = World(dfriction=0.5, gravity=200, rest_coeff=0.9, adamping=0.1)
+world = World(dfriction=0.5, gravity=200, rest_coeff=0.8, adamping=0.1)
 world.add_bounds(width=10)
 
 # Cria pilha de AABBs
@@ -24,7 +24,8 @@ if 'aabbs' in stacks:
     B = AABB(pos=(125, 150), shape=(50, 50))
     C = AABB(pos=(125, 250), shape=(70, 50))
     D = AABB(pos=(125, 300), shape=(100, 20))
-    world.add([A, B, C, D])
+    aabbs = [B, C, D]
+    world.add([A, B])
 
 # Cria pilha de Retângulos
 if 'rects' in stacks:
@@ -58,6 +59,11 @@ if 'polys' in stacks:
         o1 = RegularPoly(3, 20, pos=(550 + i * 12, 550 - i * 15))
         o2 = Rectangle(shape=(12, 12), pos=(550 + i * 10, 200 + i * 10))
         world.add([o1, o2])
+
+
+@world.listen('frame-enter')
+def show_vels():
+    print('1) %.1f, 2) %.1f, 3) %.1f' % tuple(obj.vel.y for obj in aabbs))
 
 
 # Inicia a simulação

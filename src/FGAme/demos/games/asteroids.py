@@ -45,6 +45,7 @@ class Asteroids(World):
         vertices = [(0, 0), (20, 0), (10, 30)]
         self.spaceship = Poly(vertices, color='red', pos=pos.middle)
         self.add(self.spaceship)
+        self.spaceship.listen('collision', self.on_ship_collision)
 
     def new_asteroid(self,
                      radius,
@@ -65,47 +66,52 @@ class Asteroids(World):
         vel = (g(0, mean_speed), g(0, mean_speed))
 
         # Cria um polígono
-        Poly(points, vel=vel, pos=pos, color=color, **kwds)
-        return Poly(points, vel=vel, pos=pos, color=color, **kwds)
+        res = Poly(points, vel=vel, pos=pos, color=color, **kwds)
+        res.is_asteroid = True
+        return res
 
-    @listen('frame-enter')
+    @listen("frame-enter")
     def force_bounds(self):
         '''Executado a cada frame: testa todos os asteroids para ver se saíram
         da tela. Em caso positivo, eles são recolocados do lado oposto'''
 
         self.asteroids.append(self.spaceship)
         for asteroid in self.asteroids:
+            # Parede de cima
             if asteroid.ymin > HEIGHT:
                 asteroid.move((0, -HEIGHT - asteroid.height))
+
+            # Parede de baixo
             elif asteroid.ymax < 0:
                 asteroid.move((0, HEIGHT + asteroid.height))
+
+            # Parede da direita
             elif asteroid.xmin > WIDTH:
                 asteroid.move((-WIDTH - asteroid.width, 0))
-            elif asteroid.ymax < 0:
+
+            # Parede da esquerda
+            elif asteroid.xmax < 0:
                 asteroid.move((WIDTH + asteroid.width, 0))
+
         self.asteroids.pop()
 
-    @listen('long-press', 'left')
-    def ship_left(self):
-        self.spaceship.irotate(0.1)
-        # self.spaceship.aboost(0.5)
+        # Cria viscosidade para a nave
+        ship = self.spaceship
+        ship.aboost(-0.01 * ship.omega)
+        ship.boost(-0.01 * ship.vel)
 
-    @listen('long-press', 'right')
-    def ship_right(self):
-        self.spaceship.irotate(-0.1)
-        # self.spaceship.aboost(-0.5)
+    @listen('long-press', 'right', -0.1)
+    @listen('long-press', 'left', 0.1)
+    def ship_rotate(self, dtheta):
+        ship = self.spaceship
+        ship.aboost(dtheta)
 
-    @listen('long-press', 'up')
-    def ship_front(self):
+    @listen('long-press', 'down', -10)
+    @listen('long-press', 'up', 20)
+    def ship_front(self, desc):
         ship = self.spaceship
         u = (ship.vertices[2] - ship.pos).normalize()
-        self.spaceship.boost(u * 20)
-
-    @listen('long-press', 'down')
-    def ship_back(self):
-        ship = self.spaceship
-        u = (ship.vertices[2] - ship.pos).normalize()
-        self.spaceship.boost(-10 * u)
+        self.spaceship.boost(u * desc)
 
     @listen('key-down', 'space')
     def on_shot(self):
@@ -113,6 +119,12 @@ class Asteroids(World):
         pos = ship.vertices[2]
         vel = 200 * (pos - ship.pos).normalize() + ship.vel
         Circle(2, pos=pos, vel=vel, color='white', world=self)
+
+    @listen('collision')
+    def on_ship_collision(self, col):
+        other = col.other(self.spaceship)
+        print(other)
+        other.color = 'red'
 
 
 if __name__ == '__main__':

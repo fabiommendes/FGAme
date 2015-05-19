@@ -53,7 +53,7 @@ scene = Scenario()
 # Cria triângulo
 L = 40
 h = 10 * sqrt(12)
-tri = RegularPoly(3, L, color=(200, 0, 0), density=10)
+tri = RegularPoly(3, L, color=(200, 0, 0), density=50)
 tri.move((65, 250 + L))
 tri.boost((250, 250))
 tri.aboost(-5)
@@ -63,7 +63,7 @@ tri.aboost(-5)
 world = World(background=(0, 204, 255),
               gravity=300,
               dfriction=0.3,
-              rest_coeff=0.7)
+              rest_coeff=0.5)
 for obj in scene.get_objects():
     world.add(obj)
 world.add(tri)

@@ -5,7 +5,7 @@ import mathtools as m
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
-__all__ = ['Vec2', 'VecSlot']
+__all__ = ['Vec2', 'VecSlot', 'null2D']
 
 
 ###############################################################################
@@ -48,7 +48,6 @@ class Vec2(object):
     >>> v.normalize()
     Vec2(0.6, 0.8)
     '''
-
     if not C.compiled:
         __slots__ = ['x', 'y']
     else:
@@ -66,6 +65,9 @@ class Vec2(object):
     def from_seq(cls, data):
         '''Inicializa vetor a partir de uma sequência com as coordenadas x e
         y'''
+
+        if data.__class__ is Vec2:
+            return data
         x, y = data
         return cls.from_coords(x, y)
 
@@ -433,6 +435,10 @@ class Vec2(object):
 
         return self._from_coords(self.x, self.y)
 
+    __dict__ = {}
+
+null2D = Vec2(0, 0)
+
 ###############################################################################
 #               Código injetado para rodar no modo interpretado
 ###############################################################################
@@ -475,10 +481,11 @@ if not C.compiled:
 
     auto_public(Vec2)
 
-
 ###############################################################################
 #                         Propriedades vetoriais
 ###############################################################################
+
+
 class VecSlot(object):
     if C.compiled:
         __slots__ = []

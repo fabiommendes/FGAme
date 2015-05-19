@@ -1,31 +1,146 @@
 # -*- coding: utf8 -*-
 from FGAme.mathutils import Vec2
 from FGAme.util import lazy
+from math import exp
 
 
-class Contact(object):
+###############################################################################
+#                 Pontos de Contato/Manifolds
+###############################################################################
 
-    '''Representa algum contato ou conexão entre dois objetos'''
+
+class ContactPoint(Vec2):
+
+    '''Representa um ponto de contato com um certo nível de penetração'''
+
+    __slots__ = ['depth']
+
+    def __init__(self, x, y, depth):
+        super(Vec2, self).__init__(x, y)
+        self.depth = depth
 
 
-class Collision(Contact):
+class BaseContactManifold(object):
+
+    '''Classe mãe para ContactManifold e SimpleContactManifold'''
+
+    def __iter__(self):
+        return iter(self.points)
+
+
+class ContactManifold(BaseContactManifold):
+
+    '''Representa uma lista de pontos de contato associados a uma única
+    normal.'''
+
+    __slots__ = ['normal', 'points']
+
+    def __init__(self, normal, points):
+        self.normal = normal.normalized()
+        self.points = list(points)
+
+
+class SimpleContactManifold(BaseContactManifold):
+
+    '''Representa um contato simples com apenas um ponto'''
+
+    __slots__ = ['normal', 'point']
+
+    def __init__(self, normal, point):
+        self.normal = normal
+        self.point = point
+
+    @property
+    def points(self):
+        return [self.point]
+
+    def __iter__(self):
+        yield self.point
+
+
+###############################################################################
+#                           Contatos abstratos
+###############################################################################
+
+class Link(object):
+
+    '''Representa alguma ligação/conexão entre dois objetos'''
+
+    __slots__ = ('A', 'B')
+
+    def __init__(self, A, B):
+        self.A = A
+        self.B = B
+
+    def _constructor(self, A, B):
+        '''Cria um novo objeto tipo Link a partir dos dois objetos
+        fornecidos'''
+
+        return type(self)(A, B)
+
+    def __hash__(self):
+        return id(self)
+
+    def __iter__(self):
+        yield self.A
+        yield self.B
+
+    def swapped(self):
+        '''Retorna uma colisão com o papel dos objetos A e B trocados'''
+
+        A, B = self.objects
+        return self._constructor(B, A)
+
+    def other(self, obj):
+        '''Se for chamada com o objeto A, retorna o objeto B e vice-versa'''
+
+        A, B = self.objects
+        if obj is A:
+            return B
+        elif obj is B:
+            return A
+        else:
+            raise ValueError('object does not participate in the connection')
+
+    def isvalid(self):
+        '''Retorna True caso o contato ainda seja válido ou False caso já tenha
+        sido desfeito.'''
+
+        raise NotImplementedError
+
+    def update(self):
+        '''Recalcula todas as propriedades que modem ser modificadas de um
+        frame para o outro'''
+
+        raise NotImplementedError
+
+
+class BroadContact(Link):
+
+    '''Representa um contato na Broad phase'''
+
+    def get_collision(self):
+        '''Retorna o objecto de collisão associado ao contato. Caso não haja
+        colisão, retorna None'''
+
+        raise NotImplementedError
+
+
+class CBBContact(BroadContact):
+
+    '''Representa um par de objetos com caixas de contorno circulares que
+    se sobrepõem'''
+
     pass
 
 
-class CoarseCollision(Contact):
+class AABBContact(BroadContact):
 
-    '''Representa um par de objetos que as caixas de contorno grosseiras
-    estão em colisão'''
+    '''Representa um par de objetos com caixas de contorno alinhadas ao eixo
+    que se sobrepõem'''
 
+    pass
 
-class CBBCollision(CoarseCollision):
-
-    '''Representa um par de objetos que possuem as'''
-
-
-class AABBCollision(CoarseCollision):
-
-    ''''''
 
 ###############################################################################
 #                         Classe Colisão
@@ -36,11 +151,11 @@ class AABBCollision(CoarseCollision):
 ###############################################################################
 
 
-class FineCollision(Collision):
+class Collision(Link):
 
     '''Representa a colisão entre dois objetos.
 
-    Subclasses de FineCollision devem implementar o método .resolve(dt) que resolve
+    Subclasses de Collision devem implementar o método .resolve(dt) que resolve
     a colisão entre os objetos respeitando os vínculos de is_dynamic*.
 
     Example
@@ -55,7 +170,7 @@ class FineCollision(Collision):
     A colisão se dá no ponto (1, 1) e escolhemos a normal para atuar na
     direção x
 
-    >>> col = FineCollision(A, B,
+    >>> col = Collision(A, B,
     ...                 pos=(1, 1),    # ponto de colisão
     ...                 normal=(1, 0)) # normal da colisão
 
@@ -226,7 +341,7 @@ class FineCollision(Collision):
         return self._A.momentumL(pos) + self._B.momentumL(pos)
 
     ###########################################################################
-    #                       Métodos da API de FineCollision
+    #                       Métodos da API de Collision
     ###########################################################################
 
     def resolve(self, dt=0):
@@ -260,9 +375,24 @@ class FineCollision(Collision):
         '''Move objetos para encerrar a superposição.'''
 
         A, B = self.objects
-        mu = (A._invmass + B._invmass)
-        alpha = A._invmass / mu
-        beta = B._invmass / mu
+
+        # Condição de Baumgarte
+        #delta = self.delta / 10
+        # if A._invmass:
+        #    A.boost(-self.normal * exp(delta))
+        # if B._invmass:
+        #    B.boost(self.normal * exp(delta))
+
+        # Move uma fração de delta
+        delta = 0.75 * self.delta
+        Ainvmass = min(A._invmass, (not A.is_sleep) * A._invmass)
+        Binvmass = min(B._invmass, (not B.is_sleep) * B._invmass)
+        mu = (Ainvmass + Binvmass)
+
+        if mu == 0:
+            return
+        alpha = delta * Ainvmass / mu
+        beta = delta * Binvmass / mu
         A.move(-alpha * self.normal)
         B.move(beta * self.normal)
 
@@ -276,32 +406,12 @@ class FineCollision(Collision):
 
         return self.world.dfriction if self.world is not None else 0
 
-    def swapped(self):
-        '''Retorna uma colisão com o papel dos objetos A e B trocados'''
 
-        A, B = self.objects
-        return FineCollision(B, A,
-                             pos=self.pos, normal=-self.normal,
-                             world=self.world)
+class CollisionGroup(object):
 
-    def other(self, obj):
-        '''Se for chamada com o objeto A, retorna o objeto B e vice-versa'''
+    def __init__(self, collisions):
+        pass
 
-        A, B = self.objects
-        if obj is A:
-            return B
-        elif obj is B:
-            return A
-        else:
-            raise ValueError('object does not participate in the collision')
-
-    @property
-    def object_A(self):
-        return self.objects[0]
-
-    @property
-    def object_B(self):
-        return self.objects[1]
 
 if __name__ == '__main__':
     import doctest
