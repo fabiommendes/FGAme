@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+from mathtools import dot, Vec2
+
+
 class Circle(object):
 
     '''Representa um círculo com raio e centro dados.
@@ -13,11 +16,30 @@ class Circle(object):
 
     def __init__(self, radius, pos=(0, 0)):
         self.radius = radius
-        self.pos = pos
+        self.pos = Vec2(*pos)
 
     def __repr__(self):
         s_center = '%.1f, %.1f' % self.center
         return 'Circle(%.1f, (%s))' % (self.radius, s_center)
+
+    # Métodos utilizado pelo SAT ##############################################
+    def directions(self, n):
+        '''Retorna a lista de direções exaustivas para o teste do SAT
+        associadas ao objeto.
+
+        A rigor esta lista é infinita para um círculo. Retornamos uma lista
+        vazia de forma que somente as direções do outro objeto serão
+        consideradas'''
+
+        return []
+
+    def shadow(self, n):
+        '''Retorna as coordenadas da sombra na direção n dada.
+        Assume n normalizado.'''
+
+        p0 = dot(self.pos, n)
+        r = self.radius
+        return (p0 - r, p0 + r)
 
     # Cálculo de distâncias ###################################################
     def distance_center(self, other):

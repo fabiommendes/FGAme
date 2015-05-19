@@ -1,4 +1,5 @@
 # Figuras geométricas
+from .base import *
 from .circle import *
 from .aabb import *
 from .poly import *

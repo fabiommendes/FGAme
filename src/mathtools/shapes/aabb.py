@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 import cython as C
-from mathtools import Vec2
+from mathtools import Vec2, dot
 from mathtools.shapes import Circle
 from mathtools.util import pyinject
 if not C.compiled:
@@ -10,6 +10,9 @@ if not C.compiled:
 __all__ = ['AABB',
            'aabb_rect', 'aabb_bbox',
            'aabb_pshape', 'aabb_shape', 'aabb_center']
+
+dir_x = Vec2(1, 0)
+dir_y = Vec2(0, 1)
 
 
 class AABB(object):
@@ -161,6 +164,24 @@ class AABB(object):
 
     def __len__(self):
         return 4
+
+    # Métodos utilizado pelo SAT ##############################################
+    def directions(self, n):
+        '''Retorna a lista de direções exaustivas para o teste do SAT
+        associadas ao objeto.
+
+        A rigor esta lista é infinita para um círculo. Retornamos uma lista
+        vazia de forma que somente as direções do outro objeto serão
+        consideradas'''
+
+        return [dir_x, dir_y]
+
+    def shadow(self, n):
+        '''Retorna as coordenadas da sombra na direção n dada.
+        Assume n normalizado.'''
+
+        points = [dot(n, p) for p in self.vertices]
+        return min(points), max(points)
 
     # Transformações geométricas ##############################################
     def move(self, delta_or_dx, dy=None):

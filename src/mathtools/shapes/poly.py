@@ -24,6 +24,27 @@ class Poly(VecArray):
 
         return self._data[i % len(self._data)]
 
+    # Métodos utilizado pelo SAT ##############################################
+    def directions(self, n):
+        '''Retorna a lista de direções exaustivas para o teste do SAT
+        associadas ao objeto.'''
+
+        out = []
+        p0 = self._data[-1]
+        for p in self._data:
+            x, y = p - p0
+            p0 = p
+            out.append(Vec2(-y, x))
+        return out
+
+    def shadow(self, n):
+        '''Retorna as coordenadas da sombra na direção n dada.
+        Assume n normalizado.'''
+
+        r = self.radius
+        center_pos = dot(self.pos, n)
+        return (center_pos - r, center_pos + r)
+
     # Propriedades do polígono ################################################
     def is_simple(self):
         pass
