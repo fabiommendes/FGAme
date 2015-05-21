@@ -34,7 +34,7 @@ class Scenario:
             shapeX, shapeY = shape
             height *= 0.75
             width *= 2. / 3
-            deltay = shapeY / 2. + height / 2.
+            deltay = shapeY / 2. + height / 2. - 1
             deltax = uniform(-shapeX / 6., shapeX / 6.)
             pos = pos + (deltax, deltay)
             shape = (width, height)
@@ -63,7 +63,7 @@ tri.aboost(-5)
 world = World(background=(0, 204, 255),
               gravity=300,
               dfriction=0.3,
-              rest_coeff=0.5)
+              restitution=0.5)
 for obj in scene.get_objects():
     world.add(obj)
 world.add(tri)

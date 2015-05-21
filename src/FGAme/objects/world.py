@@ -16,7 +16,7 @@ class World(EventDispatcher):
 
     def __init__(self, background=None,
                  gravity=None, damping=0, adamping=0,
-                 rest_coeff=1, sfriction=0, dfriction=0,
+                 restitution=1, sfriction=0, dfriction=0,
                  bounds=None, max_speed=None,
                  simulation=None):
 
@@ -31,7 +31,7 @@ class World(EventDispatcher):
                 gravity=gravity,
                 damping=damping,
                 adamping=adamping,
-                rest_coeff=rest_coeff,
+                restitution=restitution,
                 sfriction=sfriction,
                 dfriction=dfriction,
                 max_speed=max_speed,

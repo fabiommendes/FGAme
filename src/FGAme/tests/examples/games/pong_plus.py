@@ -8,7 +8,7 @@ class Pong(World):
     def __init__(self, **kwds):
         # Inicializa o mundo
         H, W = self.screen_height / 2, self.screen_width / 2
-        super(Pong, self).__init__(rest_coeff=0.9, gravity=self.gravity)
+        super(Pong, self).__init__(restitution=0.9, gravity=self.gravity)
         self.add_bounds(10, 3 * W, 10, 2 * H - 10, delta=400)
         self.listen('frame-enter', self.check_fail)
         self.listen('frame-enter', self.update_time)

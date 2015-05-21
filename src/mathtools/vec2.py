@@ -58,8 +58,8 @@ class Vec2(object):
             x, y = x_or_data
         else:
             x = x_or_data
-        self.x = x
-        self.y = y
+        self.x = x + 0.0
+        self.y = y + 0.0
 
     @classmethod
     def from_seq(cls, data):

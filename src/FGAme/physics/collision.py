@@ -198,8 +198,7 @@ class Collision(Link):
     '''
 
     def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
-        self._A = A
-        self._B = B
+        super(Collision, self).__init__(A, B)
         self.objects = A, B
         self.world = world
         self.is_active = True
@@ -231,7 +230,7 @@ class Collision(Link):
     def vrel_cm(self):
         '''Velocidade relativa do centro de massa entre A e B'''
 
-        return self._B.vel - self._A.vel
+        return self.B.vel - self.A.vel
 
     @lazy
     def vrel_contact(self):
@@ -374,32 +373,29 @@ class Collision(Link):
     def adjust_overlap(self):
         '''Move objetos para encerrar a superposição.'''
 
+        # Estabilização de Baumgarte
         A, B = self.objects
 
-        # Condição de Baumgarte
-        #delta = self.delta / 10
-        # if A._invmass:
-        #    A.boost(-self.normal * exp(delta))
-        # if B._invmass:
-        #    B.boost(self.normal * exp(delta))
-
         # Move uma fração de delta
-        delta = 0.75 * self.delta
+        delta = 0.5 * self.delta
         Ainvmass = min(A._invmass, (not A.is_sleep) * A._invmass)
         Binvmass = min(B._invmass, (not B.is_sleep) * B._invmass)
         mu = (Ainvmass + Binvmass)
-
         if mu == 0:
             return
+
         alpha = delta * Ainvmass / mu
         beta = delta * Binvmass / mu
-        A.move(-alpha * self.normal)
-        B.move(beta * self.normal)
+        delta = 0.5
+        if alpha > delta:
+            A._e_vel += 0.3 * 60 * (-alpha * self.normal)
+        if beta > delta:
+            B._e_vel += 0.3 * 60 * (beta * self.normal)
 
     def get_restitution_coeff(self):
         '''Retorna o coeficiente de restituição entre os dois objetos'''
 
-        return self.world.rest_coeff if self.world is not None else 1
+        return self.world.restitution if self.world is not None else 1
 
     def get_friction_coeff(self):
         '''Retorna o coeficiente de restituição entre os dois objetos'''

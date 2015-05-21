@@ -180,7 +180,7 @@ class Dynamic(object):
     __slots__ = [
         'flags', 'cbb_radius',
         '_pos', '_vel', '_accel', 'theta', 'omega', 'alpha',
-        '_invmass', '_invinertia'
+        '_invmass', '_invinertia', '_e_vel', '_e_omega',
     ]
 
     def __init__(self, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
@@ -196,6 +196,8 @@ class Dynamic(object):
         # Variáveis de estado
         self._pos = Vec2(*pos)
         self._vel = Vec2(*vel)
+        self._e_vel = Vec2(0, 0)
+        self._e_omega = 0.0
         self.theta = float(theta)
         self.omega = float(omega)
 
@@ -442,7 +444,7 @@ class Dynamic(object):
         if y is None:
             self._vel += delta_or_x
         else:
-            self._vel += (delta_or_x, y)
+            self._vel += Vec2(delta_or_x, y)
 
     # Resposta a forças, impulsos e atualização da física #####################
     def force(self, t):
