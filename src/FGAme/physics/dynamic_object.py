@@ -216,11 +216,13 @@ class Body(object):
         '_invmass', '_invinertia', '_e_vel', '_e_omega', '_world',
     ]
 
+    DEFAULT_FLAG = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
+
     def __init__(self, pos=nullvec2, vel=nullvec2, theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
                  restitution=None, sfriction=None, dfriction=None,
-                 world=None, flags=0):
+                 baseshape=None, world=None, flags=DEFAULT_FLAG):
 
         EventDispatcher.__init__(self)
 
@@ -238,6 +240,8 @@ class Body(object):
         self._alpha = 0.0
 
         # Harmoniza massa, inércia e densidade ################################
+        self._baseshape = self._shape = baseshape
+        self._aabb = getattr(baseshape, 'aabb', None)
         if density is not None:
             density = float(density)
             if mass is None:
@@ -1117,6 +1121,13 @@ class Body(object):
         if self._omega != 0:
             self._old_omega = self._omega
             self._omega = 0.0
+
+    ###########################################################################
+    # Erros e miscelânea
+    ###########################################################################
+    def _raise_cannot_rotate_error(self):
+        raise ValueError('Cannot change angular variables with disabled '
+                         '`can_rotate` flag')
 
 
 def vec_property(slot):

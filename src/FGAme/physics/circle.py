@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import pi, sqrt, Circle as _Circle
+from FGAme.mathutils import pi, sqrt, nullvec2, Circle as _Circle
 from FGAme.physics import Body
 
 __all__ = ['Circle']
@@ -20,6 +20,8 @@ class Circle(Body):
 
     >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
     >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
+    >>> c2.area()
+    314.1592653589793
     '''
 
     __slots__ = []
@@ -28,26 +30,9 @@ class Circle(Body):
                  mass=None, density=None, **kwds):
 
         self.cbb_radius = float(radius)
-        super(Circle, self).__init__(pos, vel, mass=mass, density=density,
-                                     **kwds)
-
-    def area(self):
-        '''Retorna a área do círculo'''
-
-        return pi * self.cbb_radius ** 2
-
-    def ROG_sqr(self):
-        '''Retorna o raio de giração do círculo ao quadrado'''
-
-        return self.cbb_radius ** 2 / 2
-
-    def ROG(self):
-        '''Retorna o raio de giração do círculo'''
-
-        return self.cbb_radius / sqrt(2)
-
-    def primitive(self):
-        return Circle(radius=self.radius, pos=self._pos)
+        super(Circle, self).__init__(
+            pos, vel, mass=mass, density=density,
+            baseshape=_Circle(self.cbb_radius, nullvec2), ** kwds)
 
     @property
     def radius(self):
@@ -77,10 +62,6 @@ class Circle(Body):
     @property
     def ymax(self):
         return self._pos.y + self.cbb_radius
-
-    @property
-    def shape_bb(self):
-        return _Circle(self.cbb_radius, self.pos)
 
     def __repr__(self):
         tname = type(self).__name__

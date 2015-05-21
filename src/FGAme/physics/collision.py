@@ -204,6 +204,8 @@ class Collision(Link):
         self.world = world
         self.is_active = True
         self.resolved = False
+        if pos is None:
+            raise ValueError(A, B)
         self.pos = None if pos is None else Vec2(pos)
         self.normal = None if pos is None else Vec2(normal)
         self.__dict__.update(kwds)

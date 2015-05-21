@@ -18,7 +18,9 @@ class Circle(ObjectMixin, physics.Circle):
 
     def paint(self, screen):
         if self._color is not None:
-            screen.paint_circle(self.radius, self.pos, self._color)
+            #color = self.color.setred(int(self.omega) % 255)
+            color = self._color
+            screen.paint_circle(self.radius, self.pos, color)
         if self._linecolor is not None:
             screen.paint_circle(self.radius, self.pos,
                                 self._linecolor,

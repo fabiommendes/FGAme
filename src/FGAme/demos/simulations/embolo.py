@@ -64,7 +64,9 @@ class Gas(World):
 # Inicia a simulação
 if __name__ == '__main__':
     game = Gas()
+    dt = 1 / 60.
+    for _ in range(100):
+        print(_)
+        game.update(dt)
 
-    import fasttrack
-    with fasttrack.timeit('run'):
-        game.run()
+    game.run()
