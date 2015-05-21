@@ -311,9 +311,9 @@ class Simulation(EventDispatcher):
                 continue
 
             if obj._invmass:
-                obj.boost(obj.accel * dt)
+                obj.boost(obj._accel * dt)
             if obj._invinertia:
-                obj.aboost(obj.alpha * dt)
+                obj.aboost(obj._alpha * dt)
 
             obj._e_vel = Vec2(0, 0)
             obj._e_omega = 0.0

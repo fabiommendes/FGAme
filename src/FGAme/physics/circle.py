@@ -1,16 +1,35 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import pi, sqrt, Circle as _Circle
-from FGAme.physics import Body, LinearRigidBody
+from FGAme.physics import Body
 
-__all__ = ['Circle', 'Ball']
+__all__ = ['Circle']
 
 
-class CommonCircle(object):
+class Circle(Body):
 
-    '''Classe Mix-in com definições comuns ao círculo'''
+    '''Define um círculo e implementa a detecção de colisão comparando a
+    distância entre os centros com a soma dos raios.
 
-    _is_mixin_ = True
+
+    Examples
+    --------
+
+    Os círculos devem ser inicializados fornecendo o raio e opcionalmente a
+    posição, velocidade e massa ou densidade.
+
+    >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
+    >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
+    '''
+
+    __slots__ = []
+
+    def __init__(self, radius, pos=(0, 0), vel=(0, 0),
+                 mass=None, density=None, **kwds):
+
+        self.cbb_radius = float(radius)
+        super(Circle, self).__init__(pos, vel, mass=mass, density=density,
+                                     **kwds)
 
     def area(self):
         '''Retorna a área do círculo'''
@@ -69,53 +88,6 @@ class CommonCircle(object):
         pos = ', '.join('%.1f' % x for x in self._pos)
         return '%s(_pos=(%s), _vel=(%s), radius=%.1f)' % (
             tname, pos, vel, self.radius)
-
-
-class Circle(CommonCircle, LinearRigidBody):
-
-    '''Define um círculo e implementa a detecção de colisão comparando a
-    distância entre os centros com a soma dos raios.
-
-    Objetos da classe Circle não realizam rotações. Caso deseje esta
-    propriedade, utilize Ball.
-
-
-    Examples
-    --------
-
-    Os círculos devem ser inicializados fornecendo o raio e opcionalmente a
-    posição, velocidade e massa ou densidade.
-
-    >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
-    >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
-    '''
-
-    __slots__ = ['_radius']
-
-    def __init__(self, radius, pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None, **kwds):
-
-        self.cbb_radius = float(radius)
-        super(Circle, self).__init__(pos, vel, mass=mass, density=density,
-                                     **kwds)
-
-
-class Ball(CommonCircle, Body):
-
-    '''Define um círculo e implementa a detecção de colisão comparando a
-    distância entre os centros com a soma dos raios.
-
-    Objetos da classe Ball são capazes de realizar rotações.'''
-
-    __slots__ = ['_radius']
-
-    def __init__(self, radius, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=None, density=None, inertia=None, **kwds):
-
-        self.cbb_radius = float(radius)
-        super(Ball, self).__init__(pos, vel, theta, omega,
-                                   mass=mass, density=density, inertia=inertia,
-                                   **kwds)
 
 
 if __name__ == '__main__':

@@ -96,7 +96,28 @@ class Color(object):
         c = self
         return (c[0] << 16) + (c[1] << 8) + c[2]
 
-    # Métodos mágicos --------------------------------------------------------
+    # Transformações simples de cores #########################################
+    def setred(self, value):
+        '''Retorna cor com novo valor para a componente vermelha'''
+
+        return Color(value, self._green, self._blue, self._alpha)
+
+    def setgreen(self, value):
+        '''Retorna cor com novo valor para a componente verde'''
+
+        return Color(self._red, value, self._blue, self._alpha)
+
+    def setblue(self, value):
+        '''Retorna cor com novo valor para a componente azul'''
+
+        return Color(self._red, self._green, blue, self._alpha)
+
+    def setalpha(self, value):
+        '''Retorna cor com novo valor para a componente alpha'''
+
+        return Color(self._red, self._green, self._blue, value)
+
+    # Métodos mágicos #########################################################
     def __repr__(self):
         return 'Color%s' % (tuple(self),)
 

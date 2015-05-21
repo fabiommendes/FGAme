@@ -119,10 +119,10 @@ class Poly(Body):
 
     @property
     def _rvertices(self):
-        if self.theta == self._cache_theta:
+        if self._theta == self._cache_theta:
             return self._cache_rvertices_last
         else:
-            R = RotMat2(self.theta)
+            R = RotMat2(self._theta)
             vert = [R * v for v in self._vertices]
             xmin = min(v.x for v in vert)
             xmax = max(v.x for v in vert)
@@ -131,14 +131,14 @@ class Poly(Body):
             bbox = (xmin, xmax, ymin, ymax)
 
             self._cache_rvertices_last = vert
-            self._cache_theta = self.theta
+            self._cache_theta = self._theta
             self._cache_rbbox_last = bbox
 
             return vert
 
     @property
     def _rbbox(self):
-        if self.theta == self._cache_theta:
+        if self._theta == self._cache_theta:
             return self._cache_rbbox_last
         else:
             self._rvertices

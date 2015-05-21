@@ -8,7 +8,9 @@ class AABB(ObjectMixin, physics.AABB):
     _init_physics = physics.AABB.__init__
 
     def paint(self, screen):
-        screen.paint_rect(self.rect, self.color)
+        color = self.color.setred(int(self.theta) % 256)
+        screen.paint_rect(self.rect, color)
+        #screen.paint_rect(self.rect, self.color)
 
 
 class Circle(ObjectMixin, physics.Circle):
@@ -21,13 +23,6 @@ class Circle(ObjectMixin, physics.Circle):
             screen.paint_circle(self.radius, self.pos,
                                 self._linecolor,
                                 self._linewidth)
-
-
-class Ball(ObjectMixin, physics.Ball):
-    _init_physics = physics.Ball.__init__
-
-    def paint(self, screen):
-        screen.paint_circle(self.radius, self.pos, self.color)
 
 
 class Poly(ObjectMixin, physics.Poly):

@@ -192,9 +192,9 @@ class Body(object):
 
     ::
         **Variáveis dinâmicas**
-    theta
+    _theta
         Ângulo da rotação em torno do eixo saindo do centro de massa do objeto
-    omega
+    _omega
         Velocidade angular de rotação
 
     ::
@@ -212,7 +212,7 @@ class Body(object):
 
     __slots__ = [
         'flags', 'cbb_radius', '_baseshape', '_shape', '_aabb',
-        '_pos', '_vel', '_accel', 'theta', 'omega', 'alpha',
+        '_pos', '_vel', '_accel', '_theta', '_omega', '_alpha',
         '_invmass', '_invinertia', '_e_vel', '_e_omega', '_world',
     ]
 
@@ -232,10 +232,10 @@ class Body(object):
         self._vel = Vec2(vel)
         self._e_vel = nullvec2
         self._e_omega = 0.0
-        self.theta = float(theta)
-        self.omega = float(omega)
+        self._theta = float(theta)
+        self._omega = float(omega)
         self._accel = nullvec2
-        self.alpha = 0.0
+        self._alpha = 0.0
 
         # Harmoniza massa, inércia e densidade ################################
         if density is not None:
@@ -336,7 +336,7 @@ class Body(object):
         físico, ex.: Circle, AABB, Poly, etc'''
 
         if self.flags & flags.is_dirty:
-            self._shape = self._shape_base.move(self.pos).rotate(self.theta)
+            self._shape = self._shape_base.move(self.pos).rotate(self._theta)
             self.flags &= flags.not_dirty
         return self._shape
 
@@ -479,6 +479,31 @@ class Body(object):
         # TODO: desaloca todos os sinais
 
     ###########################################################################
+    #                          Estado dinâmico
+    ###########################################################################
+    @property
+    def omega(self):
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if self.flags & flags.can_rotate:
+            self._omega = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
+
+    @property
+    def theta(self):
+        return self._theta
+
+    @theta.setter
+    def theta(self, value):
+        if self.flags & flags.can_rotate:
+            self._theta = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
+
+    ###########################################################################
     #                        Propriedades físicas
     ###########################################################################
 
@@ -515,12 +540,15 @@ class Body(object):
     def inertia(self, value):
         value = float(value)
 
-        if value <= 0:
-            raise ValueError('inertia cannot be null or negative')
-        elif value != INF:
-            self._invinertia = 1.0 / value
+        if self.flags & flags.can_rotate:
+            if value <= 0:
+                raise ValueError('inertia cannot be null or negative')
+            elif value != INF:
+                self._invinertia = 1.0 / value
+            else:
+                self._invinertia = 0.0
         else:
-            self._invinertia = 0.0
+            self._raise_cannot_rotate_error()
 
     @property
     def density(self):
@@ -545,8 +573,8 @@ class Body(object):
     def angularE(self):
         '''Energia cinética das variáveis angulares'''
 
-        if self.omega:
-            return self.omega ** 2 / (2 * self._invinertia)
+        if self._omega:
+            return self._omega ** 2 / (2 * self._invinertia)
         else:
             return 0
 
@@ -578,8 +606,8 @@ class Body(object):
             delta = 0.0
         else:
             delta = (self._pos - pos).cross(self._vel)
-        if self.omega:
-            return delta + self.inertia * self.omega
+        if self._omega:
+            return delta + self.inertia * self._omega
         else:
             return delta
 
@@ -744,16 +772,16 @@ class Body(object):
 
     # Variáveis angulares #####################################################
     def rotate(self, theta):
-        '''Rotaciona o objeto por um ângulo theta'''
+        '''Rotaciona o objeto por um ângulo _theta'''
 
-        self.theta += theta
+        self._theta += theta
         if theta != 0.0:
             self.flags |= flags.is_dirty
 
     def aboost(self, delta):
         '''Adiciona um valor delta à velocidade ângular'''
 
-        self.omega += delta
+        self._omega += delta
 
     def vpoint(self, pos_or_x, y=None, relative=False):
         '''Retorna a velocidade linear de um ponto em _pos preso rigidamente ao
@@ -766,25 +794,25 @@ class Body(object):
         if relative:
             if y is None:
                 x, y = pos_or_x
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
             else:
-                return self._vel + self.omega * Vec2(-y, pos_or_x)
+                return self._vel + self._omega * Vec2(-y, pos_or_x)
 
         else:
             if y is None:
                 x, y = pos_or_x - self._pos
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
             else:
                 x = pos_or_x - self._pos.x
                 y = y - self._pos.y
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
 
     def orientation(self, theta=0.0):
         '''Retorna um vetor unitário na direção em que o objeto está orientado.
         Pode aplicar um ângulo adicional a este vetor fornecendo o parâmetro
-        theta.'''
+        _theta.'''
 
-        theta += self.theta
+        theta += self._theta
         return Vec2(cos(theta), sin(theta))
 
     def torque(self, t):
@@ -796,7 +824,7 @@ class Body(object):
         '''Inicializa o vetor de aceleração angular com os valores devido ao
         amortecimento'''
 
-        self._alpha = - self._adamping * self.omega
+        self._alpha = - self._adamping * self._omega
 
     def apply_torque(self, torque, dt):
         '''Aplica um torque durante um intervalo de tempo dt.'''
@@ -811,7 +839,7 @@ class Body(object):
         if alpha is None:
             alpha = self._alpha
         self.aboost(alpha * dt)
-        self.rotate(self.omega * dt + alpha * dt ** 2 / 2.)
+        self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
 
     def apply_aimpulse(self, itorque):
         '''Aplica um impulso angular ao objeto.'''
@@ -949,8 +977,8 @@ class Body(object):
                 self.inertia = inertia
 
             # Resgata a velocidade
-            if self.omega == 0:
-                self.omega = self._getp('old_omega', 0)
+            if self._omega == 0:
+                self._omega = self._getp('old_omega', 0)
 
         self._clearp('old_inertia', 'old_omega')
 
@@ -1052,7 +1080,7 @@ class Body(object):
     def is_static_angular(self):
         '''Verifica se o objeto é dinâmico nas variáveis angulares'''
 
-        return self.is_kinematic_angular() and self.omega == 0
+        return self.is_kinematic_angular() and self._omega == 0
 
     def make_static(self, what=None):
         '''Define a massa e/ou inércia como infinito.
@@ -1086,9 +1114,9 @@ class Body(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_angular()
-        if self.omega != 0:
-            self._old_omega = self.omega
-            self.omega = 0.0
+        if self._omega != 0:
+            self._old_omega = self._omega
+            self._omega = 0.0
 
 
 def vec_property(slot):
@@ -1148,24 +1176,6 @@ class LinearRigidBody(Body):
         if float(value) != INF:
             raise ValueError('LinearObjects have infinite inertia, '
                              'got %r' % value)
-
-    @property
-    def omega(self):
-        return 0.0
-
-    @omega.setter
-    def omega(self, value):
-        if value:
-            raise ValueError('LinearObjects have null angular velocity')
-
-    @property
-    def theta(self):
-        return 0.0
-
-    @theta.setter
-    def theta(self, value):
-        if value:
-            raise ValueError('LinearObjects have fixed orientation')
 
 
 if __name__ == '__main__':
