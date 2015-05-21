@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import RigidBody
+from FGAme.physics import Body
 from FGAme.mathutils import aabb_bbox, Poly as _Poly
 from FGAme.mathutils import Vec2, RotMat2
 from FGAme.mathutils import sin, pi
@@ -9,7 +9,7 @@ from FGAme.mathutils import area, center_of_mass, ROG_sqr
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
 
-class Poly(RigidBody):
+class Poly(Body):
 
     '''Define um polígono arbitrário de N lados.'''
 

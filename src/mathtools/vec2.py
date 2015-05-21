@@ -5,7 +5,7 @@ import mathtools as m
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
-__all__ = ['Vec2', 'VecSlot', 'null2D']
+__all__ = ['Vec2', 'VecSlot', 'nullvec2']
 
 
 ###############################################################################
@@ -189,6 +189,11 @@ class Vec2(object):
         except (TypeError, AttributeError):
             x, y = other
             return self.x * y - self.y * x
+
+    def null(self):
+        '''Retorna o vetor nulo'''
+
+        return nullvec2
 
     # Métodos mágicos #########################################################
     def __repr__(self):
@@ -437,7 +442,7 @@ class Vec2(object):
 
     __dict__ = {}
 
-null2D = Vec2(0, 0)
+nullvec2 = Vec2(0, 0)
 
 ###############################################################################
 #               Código injetado para rodar no modo interpretado

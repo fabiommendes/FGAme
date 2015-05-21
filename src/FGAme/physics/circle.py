@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import pi, sqrt, Circle as _Circle
-from FGAme.physics import LinearRigidBody, RigidBody
+from FGAme.physics import Body, LinearRigidBody
 
 __all__ = ['Circle', 'Ball']
 
@@ -100,7 +100,7 @@ class Circle(CommonCircle, LinearRigidBody):
                                      **kwds)
 
 
-class Ball(CommonCircle, RigidBody):
+class Ball(CommonCircle, Body):
 
     '''Define um círculo e implementa a detecção de colisão comparando a
     distância entre os centros com a soma dos raios.

@@ -1,8 +1,9 @@
 # -*- coding: utf8 -*-
 
+from mathtools import shadow_y
 from FGAme.physics import CBBContact, AABBContact
 from FGAme.physics import get_collision, get_collision_generic, CollisionError
-from mathtools import shadow_y
+from FGAme.physics.flags import BodyFlags
 
 
 class AbstractCollisionPhase(object):
@@ -77,6 +78,7 @@ class BroadPhaseAABB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
+        IS_SLEEP = BodyFlags.is_sleep
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.xmin)
         self._data[:] = []
@@ -98,7 +100,7 @@ class BroadPhaseAABB(BroadPhase):
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
                 if not A_dynamic and not B.is_dynamic():
                     continue
-                if A.is_sleep and B.is_sleep:
+                if A.flags & B.flags & IS_SLEEP:
                     continue
 
                 # Testa a colisão entre as AABBs
@@ -118,6 +120,7 @@ class BroadPhaseCBB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
+        IS_SLEEP = BodyFlags.is_sleep
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
         self._data[:] = []
@@ -141,7 +144,7 @@ class BroadPhaseCBB(BroadPhase):
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
                 if not A_dynamic and not B.is_dynamic():
                     continue
-                if A.is_sleep and B.is_sleep:
+                if A.flags & B.flags & IS_SLEEP:
                     continue
 
                 # Testa a colisão entre os círculos de contorno
@@ -151,6 +154,51 @@ class BroadPhaseCBB(BroadPhase):
                 # Adiciona à lista de colisões grosseiras
                 col_idx += 1
                 self._data.append(CBBContact(A, B))
+
+
+class BroadPhaseMixed(BroadPhase):
+
+    '''Implementa a broad-phase detectando todos os pares de CBBs que estão
+    em contato no frame'''
+
+    __slots__ = []
+
+    def update(self, L):
+        IS_SLEEP = BodyFlags.is_sleep
+        col_idx = 0
+        objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
+        self._data[:] = []
+
+        # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
+        # salva o resultado na lista broad collisions
+        for i, A in enumerate(objects):
+            A_radius = A.cbb_radius
+            A_right = A.pos.x + A_radius
+            A_dynamic = A.is_dynamic()
+
+            for j in range(i + 1, len(objects)):
+                B = objects[j]
+                B_radius = B.cbb_radius
+
+                # Procura na lista enquanto xmin de B for menor que xmax de A
+                B_left = B._pos.x - B_radius
+                if B_left > A_right:
+                    break
+
+                # Não detecta colisão entre dois objetos estáticos/cinemáticos
+                if not A_dynamic and not B.is_dynamic():
+                    continue
+                if A.flags & B.flags & IS_SLEEP:
+                    continue
+
+                # Testa a colisão entre os círculos de contorno
+                if (A.pos - B.pos).norm() > A_radius + B_radius:
+                    continue
+
+                # Adiciona à lista de colisões grosseiras
+                col_idx += 1
+                if has_overlap(A.aabb, B.aabb):
+                    self._data.append(AABBContact(A, B))
 
 
 ###############################################################################

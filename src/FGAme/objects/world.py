@@ -5,7 +5,7 @@ from FGAme.physics import Simulation
 from FGAme.core import EventDispatcher, signal, conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
-from FGAme.physics import Dynamic
+from FGAme.physics import Body
 
 
 class World(EventDispatcher):
@@ -68,7 +68,7 @@ class World(EventDispatcher):
 
         # Adiciona na lista de renderização
         self._render_tree.add(obj, layer)
-        if isinstance(obj, Dynamic):
+        if isinstance(obj, Body):
             self._simulation.add(obj)
 
     def remove(self, obj):

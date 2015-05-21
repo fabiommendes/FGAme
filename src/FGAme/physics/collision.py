@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.mathutils import Vec2
+from FGAme.physics.flags import BodyFlags
 from FGAme.util import lazy
 from math import exp
 
@@ -378,8 +379,14 @@ class Collision(Link):
 
         # Move uma fração de delta
         delta = 0.5 * self.delta
-        Ainvmass = min(A._invmass, (not A.is_sleep) * A._invmass)
-        Binvmass = min(B._invmass, (not B.is_sleep) * B._invmass)
+        Ainvmass = min(
+            A._invmass,
+            (not A.flags & BodyFlags.is_sleep) *
+            A._invmass)
+        Binvmass = min(
+            B._invmass,
+            (not B.flags & BodyFlags.is_sleep) *
+            B._invmass)
         mu = (Ainvmass + Binvmass)
         if mu == 0:
             return
