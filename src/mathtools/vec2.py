@@ -2,6 +2,7 @@
 
 import cython as C
 import mathtools as m
+import math
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
@@ -95,10 +96,26 @@ class Vec2(object):
 
         return (self.x, self.y)
 
-    def norm(self):
+    def is_null(self):
+        '''
+        Verifica se o vetor é nulo
+
+        Exemplo
+        --------
+        >>> Vec2.is_null(Vec2(0,0))
+        True
+        '''
+
+        if self == Vec2(0,0):
+            return True
+        else:
+            return False
+
+    def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
         return m.sqrt(self.x ** 2 + self.y ** 2)
+    
 
     def norm_sqr(self):
         '''Retorna o módulo do vetor ao quadrado'''
