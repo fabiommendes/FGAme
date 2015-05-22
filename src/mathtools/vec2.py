@@ -156,6 +156,22 @@ class Vec2(object):
         else:
             return False
 
+    def polar(self):
+        '''Retorna o vetor com suas coordenadas polares em forma de tupla
+
+        Exemplo
+        --------
+        >>> Vec2.polar(Vec2(1,0))
+        (1.0, pi/2)
+        '''
+        radius = self.norm()
+        x_unit = Vec2(1,0)
+        angle = self.angle(x_axis_unit)
+
+        polar = (radius, angle)
+
+        return polar
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
