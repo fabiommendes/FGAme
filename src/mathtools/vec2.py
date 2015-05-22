@@ -111,6 +111,20 @@ class Vec2(object):
         else:
             return False
 
+    def distance_to(self, v2):
+        '''Retorna a distância entre dois vetores
+
+        Exemplo
+        --------
+
+        >>> Vec2.distance_to(Vec2(0,5), Vec2(0,0))
+        5.0
+        '''
+
+        distance = math.sqrt((v2.x - self.x) ** 2 + (v2.y - self.y) ** 2)
+
+        return distance
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
