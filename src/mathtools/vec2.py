@@ -125,6 +125,16 @@ class Vec2(object):
 
         return distance
 
+    def angle(self, v2):
+        '''Retorna o ângulo entre dois vetores em radianos
+
+        Exemplo
+        --------
+        >>> Vec2.angle(Vec2(5,0),Vec2(0,5))
+        pi/2
+        '''
+        return math.acos((self.dot(v2))/(self.norm()*v2.norm()))
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
