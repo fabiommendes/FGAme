@@ -135,6 +135,27 @@ class Vec2(object):
         '''
         return math.acos((self.dot(v2))/(self.norm()*v2.norm()))
 
+    def almost_equals(self , v2):
+        '''Verifica se o vetor é quase igual a outro
+
+        Exemplo:
+        ---------
+        >>> Vec2.almost_equals(Vec2(3.00001 , 4.00001) , Vec2(3,4))
+        True
+        '''
+        delta_angle = 1/1000
+        delta_norm = 1/1000
+
+        # Faz o teste primeiramente com o angulo entre os dois vetores
+        if ( self.angle(v2) < delta_angle ):
+            # Testa o tamanho dos vetores com base no delta
+            if (self.norm() <= v2.norm() + delta_norm and self.norm() >= v2.norm() - delta_norm):
+                return True
+            else:
+                return False 
+        else:
+            return False
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
