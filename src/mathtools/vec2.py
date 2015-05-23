@@ -96,45 +96,6 @@ class Vec2(object):
 
         return (self.x, self.y)
 
-    def is_null(self):
-        '''
-        Verifica se o vetor é nulo
-
-        Exemplo
-        --------
-        >>> Vec2.is_null(Vec2(0,0))
-        True
-        '''
-
-        if self == Vec2(0,0):
-            return True
-        else:
-            return False
-
-    def distance_to(self, v2):
-        '''Retorna a distância entre dois vetores
-
-        Exemplo
-        --------
-
-        >>> Vec2.distance_to(Vec2(0,5), Vec2(0,0))
-        5.0
-        '''
-
-        distance = math.sqrt((v2.x - self.x) ** 2 + (v2.y - self.y) ** 2)
-
-        return distance
-
-    def angle(self, v2):
-        '''Retorna o ângulo entre dois vetores em radianos
-
-        Exemplo
-        --------
-        >>> Vec2.angle(Vec2(5,0),Vec2(0,5))
-        pi/2
-        '''
-        return math.acos((self.dot(v2))/(self.norm()*v2.norm()))
-
     def almost_equals(self , v2):
         '''Verifica se o vetor é quase igual a outro
 
@@ -156,17 +117,56 @@ class Vec2(object):
         else:
             return False
 
+
+    def distance_to(self, v2):
+        '''Retorna a distância entre dois vetores
+
+        Exemplo
+        --------
+
+        >>> Vec2.distance_to(Vec2(0,5), Vec2(0,0))
+        5.0
+        '''
+
+        distance = m.sqrt((v2.x - self.x) ** 2 + (v2.y - self.y) ** 2)
+
+        return distance
+
+    def angle(self, v2):
+        '''Retorna o ângulo entre dois vetores em radianos
+
+        Exemplo
+        --------
+        >>> Vec2.angle(Vec2(5,0),Vec2(0,5))
+        1.5707963267948966
+        '''
+        return m.acos((self.dot(v2))/(self.norm()*v2.norm()))
+
+    def is_null(self):
+        '''Verifica se o vetor é nulo
+
+        Exemplo
+        --------
+        >>> Vec2.is_null(Vec2(0,0))
+        True
+        '''
+
+        if self == Vec2(0,0):
+            return True
+        else:
+            return False
+
     def polar(self):
         '''Retorna o vetor com suas coordenadas polares em forma de tupla
 
         Exemplo
         --------
         >>> Vec2.polar(Vec2(1,0))
-        (1.0, pi/2)
+        (1.0, 0.0)
         '''
         radius = self.norm()
         x_unit = Vec2(1,0)
-        angle = self.angle(x_axis_unit)
+        angle = self.angle(x_unit)
 
         polar = (radius, angle)
 
