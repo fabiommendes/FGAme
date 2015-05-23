@@ -2,7 +2,7 @@
 
 import cython as C
 import mathtools as m
-import math
+import decimal
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
@@ -171,6 +171,57 @@ class Vec2(object):
         polar = (radius, angle)
 
         return polar
+
+    def reflect(self, v2):
+        '''Retorna o vetor refletido por outro vetor
+
+        Exemplo
+        --------
+        >>> v = Vec2(3,4)
+        >>> v2 = Vec2(1,0)
+        >>> v.reflect(v2)
+        Vec2(3, -4)
+        ''' 
+        # confere se algum dos vetores é nulo
+        if ( v2.is_null() or self.is_null() ):
+
+            return self
+        else:
+
+            angle = self.angle(v2)
+
+            if ( v2.x < 0 ):
+                reflect = self.rotate(2*angle)
+            else:
+                reflect = self.rotate(-2*angle)
+
+            reflect.x = round(reflect.x,4)
+            reflect.y = round(reflect.y,4)
+
+            return reflect
+
+    def lerp(self, v2 , range_lerp):
+        '''Retorna um vetor com tamanho máximo baseado no vetor resultante da
+        diferença entre dois vetores, sendo que o range_lerp assume valores
+        entre 0 e 1.
+
+        Exemplo
+        --------
+        >>> v = Vec2(1,0)
+        >>> v1 = Vec2(0,1)
+        >>> v.lerp(v1, 0)
+        Vec2(1, 0)
+        '''
+
+        if range_lerp > 1 or range_lerp < 0:
+
+            lerp = self
+        else:
+            subtraction_vectors = v2 - self
+
+            lerp = subtraction_vectors * range_lerp + self
+
+        return lerp
 
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
