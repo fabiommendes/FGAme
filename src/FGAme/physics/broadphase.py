@@ -1,12 +1,13 @@
 # -*- coding: utf8 -*-
 
 from mathtools import shadow_y
+from collections import MutableSequence
 from FGAme.physics import CBBContact, AABBContact
 from FGAme.physics import get_collision, get_collision_generic, CollisionError
 from FGAme.physics.flags import BodyFlags
 
 
-class AbstractCollisionPhase(object):
+class AbstractCollisionPhase(MutableSequence):
 
     '''Base para BroadPhase e NarrowPhase'''
 
@@ -16,10 +17,6 @@ class AbstractCollisionPhase(object):
         self.world = world
         self._data = []
         self._data.extend(data)
-
-    def __iter__(self):
-        for p in self._data:
-            yield p
 
     def __call__(self, objects):
         self.update(objects)
@@ -44,6 +41,41 @@ class AbstractCollisionPhase(object):
             objs.add(B)
         return iter(objs)
 
+    # MutableSequence interface ###############################################
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        for p in self._data:
+            yield p
+
+    def __getitem__(self, i):
+        return self._data[i]
+
+    def __setitem__(self, i, value):
+        self._data[i] = value
+
+    def __delitem__(self, i, value):
+        del self._data[i]
+
+    def pop(self, idx=None):
+        if idx is None:
+            return self._data.pop()
+        else:
+            return self._data.pop(idx)
+
+    def insert(self, idx, value):
+        self._data.insert(idx, value)
+
+    def append(self, value):
+        self._data.append(value)
+
+    def remove(self, value):
+        self._data.remove(value)
+
+    def sort(self, *args, **kwds):
+        self._data.sort(*args, **kwds)
+
 ###############################################################################
 #                               Broad phase
 ###############################################################################
@@ -64,6 +96,17 @@ class BroadPhase(AbstractCollisionPhase):
 
     __slots__ = []
 
+    def get_collide_filter(self):
+        '''Retorna uma função que aceita ou rejeita colisões entre dois objetos
+        baseada na máscara de bits de ambos'''
+
+        try:
+            return self.world.can_collide
+        except AttributeError:
+            def can_collide(A, B):
+                return True
+            return can_collide
+
     def pairs(self):
         '''Retorna a lista de pares encontradas por update'''
 
@@ -78,7 +121,8 @@ class BroadPhaseAABB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        IS_SLEEP = BodyFlags.is_sleep
+        IS_SLEEP = BodyFlags.is_sleeping
+        can_collide = self.get_collide_filter()
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.xmin)
         self._data[:] = []
@@ -91,6 +135,8 @@ class BroadPhaseAABB(BroadPhase):
 
             for j in range(i + 1, len(objects)):
                 B = objects[j]
+                if not can_collide(A, B):
+                    continue
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
                 B_left = B.xmin
@@ -120,39 +166,32 @@ class BroadPhaseCBB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        IS_SLEEP = BodyFlags.is_sleep
-        col_idx = 0
-        objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
+        can_collide = self.get_collide_filter()
+        L = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
+        N = len(L)
         self._data[:] = []
 
         # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
         # salva o resultado na lista broad collisions
-        for i, A in enumerate(objects):
-            A_radius = A.cbb_radius
-            A_right = A.pos.x + A_radius
-            A_dynamic = A.is_dynamic()
+        for i, A in enumerate(L):
+            rA = A.cbb_radius
+            Amax = A.pos.x + rA
 
-            for j in range(i + 1, len(objects)):
-                B = objects[j]
-                B_radius = B.cbb_radius
+            for j in range(i + 1, N):
+                B = L[j]
+                if not can_collide(A, B):
+                    continue
+                rB = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
-                B_left = B._pos.x - B_radius
-                if B_left > A_right:
+                if B._pos.x - rB > Amax:
                     break
 
-                # Não detecta colisão entre dois objetos estáticos/cinemáticos
-                if not A_dynamic and not B.is_dynamic():
-                    continue
-                if A.flags & B.flags & IS_SLEEP:
-                    continue
-
                 # Testa a colisão entre os círculos de contorno
-                if (A.pos - B.pos).norm() > A_radius + B_radius:
+                if (A.pos - B.pos).norm() > rA + rB:
                     continue
 
                 # Adiciona à lista de colisões grosseiras
-                col_idx += 1
                 self._data.append(CBBContact(A, B))
 
 
@@ -164,7 +203,8 @@ class BroadPhaseMixed(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        IS_SLEEP = BodyFlags.is_sleep
+        IS_SLEEP = BodyFlags.is_sleeping
+        can_collide = self.get_collide_filter()
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
         self._data[:] = []
@@ -178,6 +218,9 @@ class BroadPhaseMixed(BroadPhase):
 
             for j in range(i + 1, len(objects)):
                 B = objects[j]
+                if not can_collide(A, B):
+                    continue
+
                 B_radius = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
@@ -219,9 +262,13 @@ class NarrowPhase(AbstractCollisionPhase):
         self._data = cols = []
 
         for A, B in broad_cols:
+            if A._invmass > B._invmass:
+                A, B = B, A
             col = self.get_collision(A, B)
 
             if col is not None:
+                A.add_contact(col)
+                B.add_contact(col)
                 col.world = self.world
                 cols.append(col)
 

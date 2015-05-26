@@ -13,7 +13,7 @@ class Flappy(Poly):
         super(Flappy, self).__init__(
             [(0, 0), (40, 0), (20, 80)], color='red', **kwds)
         self.pos = (200, 300)
-        self.irotate(uniform(0, 2 * math.pi))
+        self.rotate(uniform(0, 2 * math.pi))
         self.inertia *= 10
         self.omega = uniform(-2, 2)
         self.receiving_input = True
@@ -49,8 +49,7 @@ class Game(World):
         self.N = N = 4
         self.obstacles = []
         for i in range(N):
-            self.new_obstacle((800 / N) * (i + 1) + 400)
-        self.listen('frame-enter', self.detect_exit)
+            self.new_obstacle((850 / N) * (i + 1) + 400)
 
         # Adiciona o chão e teto
         self.floor = AABB(bbox=(0, 800, -300, 10), mass='inf', world=self)
@@ -71,16 +70,17 @@ class Game(World):
                      mass='inf', vel=(-speed, 0), world=self)
         self.obstacles.append([lower, upper])
 
+    @listen('frame-enter')
     def detect_exit(self):
         '''Detecta se um obstáculo saiu da tela e insere um novo em caso
         afirmativo'''
 
         L = self.obstacles
-        if L[0][0].xmax < -400:
+        if L[0][0].xmax < 0:
             self.remove(L[0][0])
             self.remove(L[0][1])
             del L[0]
-            new_x = L[-1][0].xmin + 800 / self.N
+            new_x = L[-1][0].xmin + 850 / self.N
             self.new_obstacle(new_x)
 
         if self.flappy.xmax < -400:
@@ -99,8 +99,8 @@ class GameOver(World):
         from FGAme.extra.letters import add_word
 
         super(GameOver, self).__init__(background=(255, 0, 0), gravity=10)
-        Poly.rect(shape=(600, 100), pos=(0, -200), theta=math.pi / 9,
-                  centered=True, world=self, mass='inf', color=(255, 0, 0))
+        Rectangle(shape=(600, 100), pos=(0, -200),
+                  theta=math.pi / 9, world=self, mass='inf', color=(255, 0, 0))
         letters = add_word('game over', self, scale=5, pos=(-220, 50))
         for l in letters:
             l.inertia *= 20
@@ -109,7 +109,9 @@ class GameOver(World):
 
     def reinit(self):
         self.stop()
-        Flappy().run()
+        Game().run()
 
 if __name__ == '__main__':
-    Game().run()
+    game = Game()
+    print(game._simulation._objects)
+    game.run()

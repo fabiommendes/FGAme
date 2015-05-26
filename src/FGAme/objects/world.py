@@ -58,6 +58,12 @@ class World(EventDispatcher):
         >>> obj = AABB(-10, 10, -10, 10)
         >>> world = World()
         >>> world.add(obj, layer=1)
+        >>> obj in world
+        True
+
+        Os objetos podem ser removidos com o método remove()
+
+        >>> world.remove(obj)
         '''
 
         # Verifica se trata-se de uma lista de objetos
@@ -74,12 +80,12 @@ class World(EventDispatcher):
     def remove(self, obj):
         '''Descarta um objeto do mundo'''
 
-        if getattr(obj, 'is_drawable', False):
-            drawable = obj.visualization
-            self._render_tree.remove(obj)
+        self._render_tree.remove(obj)
+        if isinstance(obj, Body):
             self._simulation.remove(obj)
-        else:
-            self._render_tree.remove(obj)
+
+    def __contains__(self, obj):
+        return obj in self._render_tree or obj in self._simulation
 
     # Controle de eventos #####################################################
     # Delegações
@@ -197,10 +203,8 @@ class World(EventDispatcher):
         right = maker(bbox=(xmax, xmax + delta, ymin, ymax))
         for box in [up, down, left, right]:
             box.make_static()
-        self.add(down)
-        self.add(up)
-        self.add(left)
-        self.add(right)
+            assert box._invmass == 0.0
+        self.add([up, down, left, right])
         self._bounds = (left, right, up, down)
         self._hard_bounds = hard
 
@@ -219,7 +223,6 @@ class World(EventDispatcher):
         "frame-enter", a não ser que ``auto_conect=False``.
         '''
 
-        E0 = []
         last = [None]
 
         if ratio:

@@ -67,7 +67,7 @@ class Circle(Body):
         tname = type(self).__name__
         vel = ', '.join('%.1f' % x for x in self._vel)
         pos = ', '.join('%.1f' % x for x in self._pos)
-        return '%s(_pos=(%s), _vel=(%s), radius=%.1f)' % (
+        return '%s(pos=(%s), vel=(%s), radius=%.1f)' % (
             tname, pos, vel, self.radius)
 
 

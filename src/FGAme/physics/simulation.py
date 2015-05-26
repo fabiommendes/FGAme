@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+from collections import defaultdict
 from FGAme.mathutils import Vec2, nullvec2
 from FGAme.physics.flags import BodyFlags
 from FGAme.core import EventDispatcher, signal
@@ -28,21 +29,28 @@ class Simulation(EventDispatcher):
 
     def __init__(self, gravity=None, damping=0, adamping=0,
                  restitution=1, sfriction=0, dfriction=0, max_speed=None,
-                 bounds=None, broad_phase=None):
+                 bounds=None, broad_phase=None, niter=400, beta=0.0):
 
         super(Simulation, self).__init__()
+
+        # Listas de objetos e vínculos
         self._objects = []
         self._constraints = []
         self._contacts = []
         self._inactive = []
 
-        self.broad_phase = normalize_broad_phase(broad_phase)
+        # Parâmetros do solver
+        self.niter = niter
+        self.beta = beta
+
+        # Define algortimos
+        self.broad_phase = normalize_broad_phase(broad_phase, self)
         self.narrow_phase = NarrowPhase(world=self)
+
+        # Inicia parâmetros físicos
         self._kinetic0 = None
         self._potential0 = None
         self._interaction0 = None
-
-        # Inicia parâmetros físicos
         self._gravity = nullvec2
         self._damping = self._adamping = self._sfriction = self._dfriction = 0
         self._restitution = 1
@@ -59,7 +67,6 @@ class Simulation(EventDispatcher):
         self._out_of_bounds = set()
 
         # Inicializa constantes de simulação
-        self._dt = 0.0
         self.num_steps = 0
         self.time = 0
 
@@ -72,6 +79,9 @@ class Simulation(EventDispatcher):
     def __contains__(self, obj):
         return obj in self._objects
 
+    ###########################################################################
+    #                               Sinais
+    ###########################################################################
     frame_enter = signal('frame-enter')
     collision = signal('collision', num_args=1)
     object_add = signal('object-add', num_args=1)
@@ -86,7 +96,6 @@ class Simulation(EventDispatcher):
     ###########################################################################
     #                       Propriedades físicas
     ###########################################################################
-
     @property
     def gravity(self):
         return self._gravity
@@ -183,7 +192,6 @@ class Simulation(EventDispatcher):
     ###########################################################################
     #                   Gerenciamento de objetos e colisões
     ###########################################################################
-
     def add(self, obj):
         '''Adiciona um novo objeto ao mundo.
 
@@ -200,6 +208,7 @@ class Simulation(EventDispatcher):
 
         if obj not in self._objects:
             self._objects.append(obj)
+            obj._world = self
 
             oflags = obj.flags
             if not oflags & flags.owns_gravity:
@@ -244,20 +253,20 @@ class Simulation(EventDispatcher):
         '''Rotina principal da simulação de física.'''
 
         self.trigger_frame_enter()
-        self._dt = float(dt)
+        self._dt = dt = float(dt)
 
         # Inicializa energia
         if self._kinetic0 is None:
             self._init_energy0()
 
         # Loop genérico
-        self.accumulate_accelerations()
-        self.resolve_velocities()
-        self.resolve_constraints()  # Colisão é um tipo de vínculo!
-        self.resolve_positions()
+        self.accumulate_accelerations(dt)
+        self.resolve_velocities(dt)
+        self.resolve_constraints(dt)  # Colisão é um tipo de vínculo!
+        self.resolve_positions(dt)
 
         # Incrementa tempo e contador
-        self.time += self._dt
+        self.time += dt
         self.num_steps += 1
 
         # Serviços esporáticos que não são realizados em todos os frames
@@ -266,16 +275,15 @@ class Simulation(EventDispatcher):
         elif self.num_steps % 2 == 1:
             self.enforce_max_speed()
 
-    def accumulate_accelerations(self):
+    def accumulate_accelerations(self, dt):
         '''Atualiza o vetor interno que mede as acelerações lineares e
         angulares de cada objeto.
 
         Para tanto, usa informação tanto de forças globais quanto dos atributos
         *force* e *torque* de cada objeto.'''
 
-        IS_SLEEP = BodyFlags.is_sleep
+        IS_SLEEP = BodyFlags.is_sleeping
         t = self.time
-        dt = self._dt
 
         # Acumula as forças e acelerações
         for obj in self._objects:
@@ -300,12 +308,11 @@ class Simulation(EventDispatcher):
             #    obj.init_alpha()
             #    obj.apply_alpha(self._alpha, dt)
 
-    def resolve_velocities(self):
+    def resolve_velocities(self, dt):
         '''Calcula as novas velocidades em função das acelerações acumuladas no
         passo accumulate_accelerations'''
 
-        IS_SLEEP = BodyFlags.is_sleep
-        dt = self._dt
+        IS_SLEEP = BodyFlags.is_sleeping
         for obj in self._objects:
             if obj.flags & IS_SLEEP:
                 continue
@@ -315,63 +322,82 @@ class Simulation(EventDispatcher):
             if obj._invinertia:
                 obj.aboost(obj._alpha * dt)
 
-            obj._e_vel = Vec2(0, 0)
+            obj._e_vel = nullvec2
             obj._e_omega = 0.0
 
-    def resolve_positions(self):
+    def resolve_positions(self, dt):
         '''Resolve as posições a partir das velocidades'''
 
-        IS_SLEEP = BodyFlags.is_sleep
-        dt = self._dt
+        IS_SLEEP = BodyFlags.is_sleeping
         for obj in self._objects:
             if obj.flags & IS_SLEEP:
                 continue
             obj.move((obj.vel + obj._e_vel) * dt)
             obj.rotate((obj.omega + obj._e_omega) * dt)
 
-    def resolve_constraints(self):
-        '''pass'''
+    def resolve_constraints(self, dt):
+        '''Resolve todos os vínculos utilizando o algoritmo de impulsos
+        sequenciais'''
 
-        # Colisões
         broad_cols = self.broad_phase(self._objects)
         narrow_cols = self.narrow_phase(broad_cols)
-        self.resolve_collisions(narrow_cols)
-        objs = sorted(narrow_cols.objects(), key=lambda obj: obj.xmin)
-        for _ in range(2):
-            broad_cols = self.broad_phase(objs)
-            narrow_cols = self.narrow_phase(broad_cols)
-            self.resolve_collisions(narrow_cols)
+        nonsimple = self._nonsimple = []
+        simple = self._simple = []
 
-    def resolve_collisions(self, collisions):
-        '''Resolve as colisões'''
-
-        for col in collisions:
-            A, B = col.objects
-            A.trigger('collision', col)
-            B.trigger('collision', col)
-            if col.is_active:
+        # TODO: emite sinal pré-collision
+        for col in narrow_cols:
+            if col.is_simple():
+                col.init()
                 col.resolve()
+                simple.append(col)
+            else:
+                col.init()
+                nonsimple.append(col)
 
-                continue
-                A_static = A.is_static() or A.is_sleep
-                B_static = B.is_static() or B.is_sleep
+        for _ in range(self.niter):
+            for col in nonsimple:
+                col.step()
+        for col in nonsimple:
+            col.finalize()
 
-                if A_static or A_static:
-                    if B_static and not A.is_static():
-                        if (A.vel.norm() <= SLEEP_LINEAR_VELOCITY and
-                                abs(A.omega) <= SLEEP_ANGULAR_VELOCITY):
-                            A.is_sleep = True
-                            A.vel *= 0
-                        else:
-                            A.is_sleep = False
+        # TODO: emite sinal pós-collision
 
-                    if A_static and not B.is_static():
-                        if (B.vel.norm() <= SLEEP_LINEAR_VELOCITY and
-                                abs(B.omega) <= SLEEP_ANGULAR_VELOCITY):
-                            B.vel *= 0
-                            B.is_sleep = True
-                        else:
-                            B.is_sleep = False
+        # Estabiliza contatos usando a estabilização de baumgarte
+        beta = self.beta
+        for col in narrow_cols:
+            col.baumgarte_adjust(beta)
+
+    def get_islands(self, contacts):
+        '''Retorna a lista de grupos de colisão fechados no gráfico de
+        colisões'''
+
+        contacts = set(contacts)
+        groups = defaultdict(list)
+        while contacts:
+            A, B = C = contacts.pop()
+            gA = groups[A]
+            gB = groups[B]
+            if gA is not gB:
+                gA.extend(gB)
+                groups[B] = gA
+            gA.append(C)
+        return list(groups.values())
+
+    def can_collide(self, A, B):
+        '''Retorna True se A e B podem colidir'''
+
+        flags = BodyFlags
+
+        # TODO: talvez fazer uma única consulta ao A.flags e B.flags...
+        if ((not A._invmass or A.flags & flags.is_sleeping) and
+                (not B._invmass or B.flags & flags.is_sleeping)):
+            return False
+        elif A._col_layer != B._col_layer:
+            return False
+        elif A._col_group_mask & B._col_group_mask:
+            return False
+
+        return True
 
     # Cálculo de parâmetros físicos ###########################################
     def kineticE(self):
@@ -415,7 +441,9 @@ class Simulation(EventDispatcher):
         self._potential0 = self.potentialE()
         self._interaction0 = self.interactionE()
 
-    # Serviços esporáticos ####################################################
+    ###########################################################################
+    #                     Serviços esporáticos
+    ###########################################################################
     def enforce_max_speed(self):
         '''Força que todos objetos tenham uma velocidade máxima'''
 
@@ -480,17 +508,20 @@ class Simulation(EventDispatcher):
 ###############################################################################
 #                              Funções auxiliares
 ###############################################################################
-def normalize_broad_phase(broad_phase):
+def normalize_broad_phase(broad_phase, world):
     '''Escolhe o parâmetro correto na inicialização do broad-phase'''
 
     if broad_phase is None:
-        broad_phase = BroadPhaseCBB()
+        broad_phase = BroadPhaseCBB(world=world)
     elif isinstance(broad_phase, BroadPhase):
-        pass
+        if broad_phase.world not in [None, world]:
+            raise ValueError('BroadPhase object has a world attatched')
+        else:
+            broad_phase.world = world
     elif isinstance(broad_phase, type) and issubclass(broad_phase, BroadPhase):
-        broad_phase = broad_phase()
+        broad_phase = broad_phase(world=world)
     else:
-        raise TypeError('invalid broad phase')
+        raise TypeError('invalid broad phase object')
     return broad_phase
 
 if __name__ == '__main__':

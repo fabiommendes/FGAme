@@ -15,7 +15,7 @@ stacks.append('polys')
 
 
 # Cria mundo com coeficiente de atrito global não-nulo
-world = World(dfriction=0.5, gravity=200, restitution=0.8, adamping=0.1)
+world = World(dfriction=0.5, gravity=500, restitution=0.7, adamping=0.1)
 world.add_bounds(width=10)
 
 # Cria pilha de AABBs

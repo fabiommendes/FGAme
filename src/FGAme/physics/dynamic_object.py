@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2, sin, cos, nullvec2, Circle
+from FGAme.mathutils import Vec2, sin, cos, sqrt, nullvec2, Circle
 from FGAme.util import six
 from FGAme.physics.flags import BodyFlags as flags
 
@@ -13,8 +13,6 @@ __all__ = ['Body', 'LinearRigidBody']
 ###############################################################################
 
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
-INF = float('inf')
-ORIGIN = Vec2(0, 0)
 INF = float('inf')
 INERTIA_SCALE = 0.3
 
@@ -214,16 +212,19 @@ class Body(object):
         'flags', 'cbb_radius', '_baseshape', '_shape', '_aabb',
         '_pos', '_vel', '_accel', '_theta', '_omega', '_alpha',
         '_invmass', '_invinertia', '_e_vel', '_e_omega', '_world',
+        '_col_layer', '_col_group_mask',
     ]
 
-    DEFAULT_FLAG = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
+    DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
     def __init__(self, pos=nullvec2, vel=nullvec2, theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
                  restitution=None, sfriction=None, dfriction=None,
-                 baseshape=None, world=None, flags=DEFAULT_FLAG):
+                 baseshape=None, world=None, col_layer=0, col_group=0,
+                 flags=DEFAULT_FLAGS):
 
+        self._world = world
         EventDispatcher.__init__(self)
 
         # Flags de objeto
@@ -276,9 +277,10 @@ class Body(object):
         self._density = float(density)
 
         # Controle de parâmetros físicos locais ###############################
-        self._damping = self._adamping = self._sfriction = self._friction = 0.0
-        self._restitution = 1.0
         self._gravity = nullvec2
+        self._damping = self._adamping = 0.0
+        self._sfriction = self._dfriction = 0.0
+        self._restitution = 1.0
         if damping is not None:
             self.damping = damping
         if adamping is not None:
@@ -292,10 +294,33 @@ class Body(object):
         if sfriction is not None:
             self.dfriction = dfriction
 
+        # Vínculos e contatos #################################################
+        self._contacts = []
+        self._joints = []
+
+        # Filtros de colisões #################################################
+        # Colide se objetos estão em groupos diferentes (exceto os que estão
+        # no grupo 0) e no mesmo layer
+        self._col_layer = int(col_layer)
+        if col_group:
+            if isinstance(col_group, int):
+                self._col_group_mask = 1 << (col_group - 1)
+            else:
+                mask = 0
+                for n in col_group:
+                    mask |= 1 << (n - 1)
+                self._col_group_mask = mask
+        else:
+            self._col_group_mask = 0
+        # TODO: fundir col_layer com col_group_mask no mesmo inteiro?
+        # (talvez 50 bits para grupos e 10 ==> 1024 layers diferentes)
+        # Do jeito que está, podemos utilizar strings como identificadores
+        # de layers (mas não para grupos). A classe mundo poderia fazer um
+        # mapa entre strings > números nos dois casos.
+
         # Presença em mundo ###################################################
-        self._world = None
         if world is not None:
-            world.add(self)
+            self._world.add(self)
 
     ###########################################################################
     #                            Serviços Python
@@ -339,7 +364,7 @@ class Body(object):
         '''Retorna um objeto que representa o formato geométrico do corpo
         físico, ex.: Circle, AABB, Poly, etc'''
 
-        if self.flags & flags.is_dirty:
+        if self.flags & flags.dirty_any:
             self._shape = self._shape_base.move(self.pos).rotate(self._theta)
             self.flags &= flags.not_dirty
         return self._shape
@@ -347,19 +372,19 @@ class Body(object):
     # Propriedades da caixa de contorno #######################################
     @property
     def xmin(self):
-        return self._xmin
+        raise NotImplementedError
 
     @property
     def xmax(self):
-        return self._xmax
+        raise NotImplementedError
 
     @property
     def ymin(self):
-        return self._ymin
+        raise NotImplementedError
 
     @property
     def ymax(self):
-        return self._ymax
+        raise NotImplementedError
 
     @property
     def bbox(self):
@@ -401,6 +426,29 @@ class Body(object):
     @property
     def shape_bb(self):
         return self.aabb
+
+    ###########################################################################
+    #                          Contatos e vínculos
+    ###########################################################################
+    def add_contact(self, contact):
+        '''Registra um contato à lista de contatos do objeto'''
+
+        L = self._contacts
+        invmass = contact.A._invmass
+        for i, C in enumerate(L):
+            if invmass < C.A._invmass:
+                L.insert(i, C)
+                break
+        else:
+            L.append(contact)
+
+    def remove_contact(self, contact):
+        '''Remove um contato da lista de contatos do objeto'''
+
+        try:
+            self._contacts.remove(contact)
+        except ValueError:
+            pass
 
     ###########################################################################
     #                                Sinais
@@ -478,7 +526,8 @@ class Body(object):
         '''Destrói o objeto físico'''
 
         if not self.is_rogue():
-            self.world.remove(self)
+            if self in self.world:
+                self.world.remove(self)
 
         # TODO: desaloca todos os sinais
 
@@ -520,6 +569,7 @@ class Body(object):
 
     @mass.setter
     def mass(self, value):
+        print('changing mass to value', value)
         value = float(value)
 
         if value <= 0:
@@ -572,15 +622,18 @@ class Body(object):
     def linearE(self):
         '''Energia cinética das variáveis lineares'''
 
-        return self._vel.dot(self._vel) / (2 * self._invmass)
+        if self._invmass:
+            return self._vel.norm_sqr() / (2 * self._invmass)
+        else:
+            return 0.0
 
     def angularE(self):
         '''Energia cinética das variáveis angulares'''
 
-        if self._omega:
+        if self._invinertia:
             return self._omega ** 2 / (2 * self._invinertia)
         else:
-            return 0
+            return 0.0
 
     def kineticE(self):
         '''Energia cinética total'''
@@ -590,7 +643,7 @@ class Body(object):
     def potentialE(self):
         '''Energia potencial associada à gravidade'''
 
-        return self.gravity.dot(self._pos) / self._invmass
+        return -self.gravity.dot(self._pos) / self._invmass
 
     def totalE(self):
         '''Energia total do objeto'''
@@ -609,9 +662,9 @@ class Body(object):
         if pos is None:
             delta = 0.0
         else:
-            delta = (self._pos - pos).cross(self._vel)
-        if self._omega:
-            return delta + self.inertia * self._omega
+            delta = (self._pos - pos).cross(self._vel) / self._invmass
+        if self._invinertia:
+            return delta + self._omega / self._invinertia
         else:
             return delta
 
@@ -631,7 +684,7 @@ class Body(object):
     def ROG(self):
         '''Retorna o raio de giração'''
 
-        return self._baseshape.ROG()
+        return sqrt(self.ROG_sqr())
 
     ###########################################################################
     #                      Aplicação de forças e torques
@@ -646,7 +699,7 @@ class Body(object):
         else:
             self._pos += (delta_or_x, y)
 
-        self.flags |= flags.is_dirty
+        self.flags |= flags.dirty_any
 
     def boost(self, delta_or_x, y=None):
         '''Adiciona um valor vetorial delta à velocidade linear'''
@@ -665,7 +718,7 @@ class Body(object):
         "monkey patching" do Python
         '''
 
-        return ORIGIN
+        return nullvec2
 
     def init_accel(self):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
@@ -780,7 +833,7 @@ class Body(object):
 
         self._theta += theta
         if theta != 0.0:
-            self.flags |= flags.is_dirty
+            self.flags |= flags.dirty_any
 
     def aboost(self, delta):
         '''Adiciona um valor delta à velocidade ângular'''
@@ -882,7 +935,34 @@ class Body(object):
     @adamping.setter
     def adamping(self, value):
         self._adamping = float(value)
-        self.flags |= flags.OWNS_ADAMPING
+        self.flags |= flags.owns_adamping
+
+    @property
+    def restitution(self):
+        return self._restitution
+
+    @restitution.setter
+    def restitution(self, value):
+        self._restitution = float(value)
+        self.flags |= flags.owns_restitution
+
+    @property
+    def dfriction(self):
+        return self._dfriction
+
+    @dfriction.setter
+    def dfriction(self, value):
+        self._dfriction = float(value)
+        self.flags |= flags.owns_dfriction
+
+    @property
+    def sfriction(self):
+        return self._sfriction
+
+    @sfriction.setter
+    def sfriction(self, value):
+        self._sfriction = float(value)
+        self.flags |= flags.owns_sfriction
 
     @property
     def owns_gravity(self):
@@ -896,10 +976,24 @@ class Body(object):
     def owns_adamping(self):
         return bool(self.flags & flags.owns_adamping)
 
+    @property
+    def owns_restitution(self):
+        return bool(self.flags & flags.owns_restitution)
+
+    @property
+    def owns_dfriction(self):
+        return bool(self.flags & flags.owns_dfriction)
+
+    @property
+    def owns_sfriction(self):
+        return bool(self.flags & flags.owns_sfriction)
+
     ###########################################################################
     #               Manipulação/consulta do estado dinâmico
     ###########################################################################
-
+    # Simplificar e usar apenas a massa e a flag can_rotate como quesito de
+    # teste.
+    # FIXME: Alterar as flags nas funções make_*
     def is_dynamic(self, what=None):
         '''Retorna True se o objeto for dinâmico ou nas variáveis lineares ou
         nas angulares. Um objeto é considerado dinâmico nas variáveis lineares
@@ -962,8 +1056,8 @@ class Body(object):
                 self.mass = mass
 
             # Resgata a velocidade
-            if self._vel == ORIGIN:
-                self._vel = self._getp('old_vel', ORIGIN)
+            if self._vel == nullvec2:
+                self._vel = self._getp('old_vel', nullvec2)
 
         self._clearp('old_mass', 'old_vel')
 
@@ -1079,7 +1173,7 @@ class Body(object):
     def is_static_linear(self):
         '''Verifica se o objeto é dinâmico nas variáveis lineares'''
 
-        return self.is_kinematic_linear() and self._vel == ORIGIN
+        return self.is_kinematic_linear() and self._vel == nullvec2
 
     def is_static_angular(self):
         '''Verifica se o objeto é dinâmico nas variáveis angulares'''
@@ -1108,7 +1202,7 @@ class Body(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_linear()
-        if self._vel != ORIGIN:
+        if self._vel != nullvec2:
             self._old_vel = self._vel
             self._vel = Vec2(0, 0)
 
@@ -1170,13 +1264,15 @@ class LinearRigidBody(Body):
     '''
 
     __slots__ = []
+    DEFAULT_FLAGS = Body.DEFAULT_FLAGS & (flags.full ^ flags.can_rotate)
 
     def __init__(self, pos=(0, 0), vel=(0, 0),
                  mass=None, density=None, **kwds):
 
         super(LinearRigidBody, self).__init__(pos, vel, 0.0, 0.0,
                                               mass=mass, density=density,
-                                              inertia='inf', **kwds)
+                                              inertia='inf',
+                                              flags=self.DEFAULT_FLAGS, **kwds)
 
     @property
     def inertia(self):

@@ -10,7 +10,8 @@ class _BodyFlagsBase:
     is_dynamic = 1 << next(N)
     is_kinematic = 1 << next(N)
     is_static = 1 << next(N)
-    is_sleep = 1 << next(N)
+    is_sensor = 1 << next(N)
+    is_sleeping = 1 << next(N)
     can_rotate = 1 << next(N)
     can_sleep = 1 << next(N)
 
@@ -73,7 +74,7 @@ class BodyFlags(_BodyFlagsBase):
     not_dynamic = f.full ^ f.is_dynamic
     not_kinematic = f.full ^ f.is_kinematic
     not_static = f.full ^ f.is_static
-    not_sleep = f.full ^ f.is_sleep
+    not_sleep = f.full ^ f.is_sleeping
 #     can_rotate = 1 << next(N)
 #     can_sleep = 1 << next(N)
 #
@@ -99,8 +100,8 @@ class BodyFlags(_BodyFlagsBase):
 #     has_visualization = 1 << next(N)
 
     # Flags compostas #########################################################
-    is_dirty = f.dirty_aabb | f.dirty_shape
-    not_dirty = f.full ^ is_dirty
+    dirty_any = f.dirty_aabb | f.dirty_shape
+    not_dirty = f.full ^ dirty_any
 
 
 del BodyFlags.f, count

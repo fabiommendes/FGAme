@@ -12,10 +12,10 @@ from random import uniform, randint
 class Gas(World):
 
     def __init__(self,
-                 gravity=5, friction=0.0,
-                 num_balls=100, speed=200, radius=10,
+                 gravity=200, friction=0.0, restitution=0.9,
+                 num_balls=200, speed=200, radius=10,
                  color='random'):
-        '''Cria uma simulação de um gás de partículas confinado por um êmbolo
+        '''Cria uma simulação de um gás de wpartículas confinado por um êmbolo
         com `num_balls` esferas de raio `radius` com velocidades no intervalo
         de +/-`speed`.'''
 
@@ -43,30 +43,34 @@ class Gas(World):
         else:
             return color
 
-    @listen('long-press', 'up')
+    @listen('long-press', 'q')
     def energy_up(self):
         '''Aumenta a energia de todas as partículas'''
 
         for bola in self.bolas:
-            bola.vel *= 1.01
+            bola.vel += 1 * bola.vel.normalize()
 
-    @listen('long-press', 'down')
+    @listen('long-press', 'a')
     def energy_down(self):
         '''Diminui a energia de todas as partículas'''
 
         for bola in self.bolas:
-            bola.vel *= 0.99
+            bola.vel *= 0.98
 
     @listen('key-down', 'space')
     def toggle_pause(self):
         super(Gas, self).toggle_pause()
 
+    @listen('long-press', 'up', Vec2(0, 9))
+    @listen('long-press', 'down', Vec2(0, -2))
+    @listen('long-press', 'left', Vec2(-4, 0))
+    @listen('long-press', 'right', Vec2(4, 0))
+    def boost(self, vec):
+        for bola in self.bolas:
+            bola.vel += vec
+            bola.vel *= 0.99
+
 # Inicia a simulação
 if __name__ == '__main__':
     game = Gas()
-    dt = 1 / 60.
-    for _ in range(100):
-        print(_)
-        game.update(dt)
-
     game.run()

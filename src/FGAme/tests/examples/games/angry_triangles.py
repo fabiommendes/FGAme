@@ -55,15 +55,16 @@ L = 40
 h = 10 * sqrt(12)
 tri = RegularPoly(3, L, color=(200, 0, 0), density=50)
 tri.move((65, 250 + L))
-tri.boost((250, 250))
+tri.boost((350, 350))
 tri.aboost(-5)
 # tri.is_dynamic_angular = False
 
 # Inicializa o mundo
 world = World(background=(0, 204, 255),
-              gravity=300,
+              gravity=500,
               dfriction=0.3,
-              restitution=0.5)
+              sfriction=0.5,
+              restitution=0.7)
 for obj in scene.get_objects():
     world.add(obj)
 world.add(tri)

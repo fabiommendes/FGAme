@@ -28,10 +28,10 @@ class PyGameCanvas(Canvas):
 
     def _map_point(self, point):
         try:
-            return point.flip_y(self.height).trunc()
+            return point.flip_y(self.height).round()
         except AttributeError:
             x, y = point
-            return (trunc(x), trunc(self.height - y))
+            return (round(x), round(self.height - y))
 
     @cython.locals(radius='double', x='int', y='int')
     def paint_circle(self, radius, pos, color=Color(0, 0, 0), solid=True):

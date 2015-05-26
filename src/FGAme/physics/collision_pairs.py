@@ -179,18 +179,16 @@ def circle_aabb(A, B):
     return Collision(A, B, pos=pos_col, normal=n)
 
 
+@get_collision.dispatch(AABB, Circle)
+def aabb_circle(A, B):
+    return circle_aabb(B, A)
+
+
 @get_collision.dispatch(Poly, AABB)
 def poly_aabb(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
-    if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
-        return None
-
-    B_poly = Rectangle(bbox=B.bbox, density=B.density)
-    col = collision_poly(A, B_poly)
-    if col is not None:
-        col.objects = (A, B)
-        return col
+    return aabb_poly(B, A)
 
 
 @get_collision.dispatch(AABB, Poly)
@@ -200,8 +198,8 @@ def aabb_poly(A, B):
     if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
         return None
 
-    A_poly = Rectangle(bbox=A.bbox, density=A.density)
+    A_poly = Rectangle(bbox=A.bbox)
     col = collision_poly(A_poly, B)
     if col is not None:
-        col.objects = (A, B)
+        col.A = A
         return col
