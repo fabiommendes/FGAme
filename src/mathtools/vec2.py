@@ -266,6 +266,30 @@ class Vec2(object):
 
         return dot*other/module_square
 
+    def clamp(self, minimum, maximum):
+        '''Retorna um vetor na mesma direção com o módulo baseado entre os valores
+        minimo e máximo.Se for menor que o máximo, retorna um vetor com módulo igual ao 
+        mínimo , se for maior que o máximo, retorna um vetor com módulo igual ao
+        máximo.
+
+        Exemplo
+        --------
+        >>> v = Vec2(3,4)
+        >>> v.clamp(7,9)
+        Vec2(4.2, 5.6)
+        '''
+
+        if self.norm() < maximum:
+            distance_min_max = minimum/self.norm()
+        else:
+            distance_min_max = maximum/self.norm()
+        
+        self = self * distance_min_max
+        self.x = round(self.x, 8)
+        self.y = round(self.y, 8)
+
+        return self
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
