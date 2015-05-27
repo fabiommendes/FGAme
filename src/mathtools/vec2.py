@@ -240,13 +240,10 @@ class Vec2(object):
         '''
 
         if ( inverse == False ):
-            perpendicular = self.rotate(m.pi/2)
+            perpendicular = Vec2(-self.y,self.x)
 
         else:
-            perpendicular = self.rotate(-m.pi/2)
-
-        perpendicular.x = round(perpendicular.x, 7)
-        perpendicular.y = round(perpendicular.y, 7)
+            perpendicular = Vec2(self.y,-self.x)
 
         return perpendicular
 
