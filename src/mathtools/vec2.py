@@ -250,6 +250,22 @@ class Vec2(object):
 
         return perpendicular
 
+    def project(self, other):
+        '''Retorna um vetor que é a projeção do mesmo na direção do segundo vetor
+
+        Exemplo
+        --------
+        >>> v = Vec2(3,4)
+        >>> other = Vec2(1,0)
+        >>> v.project(other)
+        Vec2(3, 0)
+        '''
+
+        dot = self.dot(other)
+        module_square = other.norm_sqr()
+
+        return dot*other/module_square
+
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
 
