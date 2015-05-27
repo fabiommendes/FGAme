@@ -96,21 +96,21 @@ class Vec2(object):
 
         return (self.x, self.y)
 
-    def almost_equals(self , v2):
+    def almost_equals(self , other, delta_angle = 1/1000 , delta_norm = 1/1000):
         '''Verifica se o vetor é quase igual a outro
 
         Exemplo:
         ---------
-        >>> Vec2.almost_equals(Vec2(3.00001 , 4.00001) , Vec2(3,4))
+        >>> v = Vec2(3,4)
+        >>> other = Vec2(3.00001, 4.00001)
+        >>> v.almost_equals(other)
         True
         '''
-        delta_angle = 1/1000
-        delta_norm = 1/1000
 
         # Faz o teste primeiramente com o angulo entre os dois vetores
-        if ( self.angle(v2) < delta_angle ):
+        if ( self.angle(other) < delta_angle ):
             # Testa o tamanho dos vetores com base no delta
-            if (self.norm() <= v2.norm() + delta_norm and self.norm() >= v2.norm() - delta_norm):
+            if (self.norm() <= other.norm() + delta_norm and self.norm() >= other.norm() - delta_norm):
                 return True
             else:
                 return False 
@@ -118,36 +118,40 @@ class Vec2(object):
             return False
 
 
-    def distance_to(self, v2):
+    def distance_to(self, other):
         '''Retorna a distância entre dois vetores
 
         Exemplo
         --------
-
-        >>> Vec2.distance_to(Vec2(0,5), Vec2(0,0))
+        >>> v = Vec2(0,5)
+        >>> other = Vec2(0,0)
+        >>> v.distance_to(other)
         5.0
         '''
 
-        distance = m.sqrt((v2.x - self.x) ** 2 + (v2.y - self.y) ** 2)
+        distance = m.sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
         return distance
 
-    def angle(self, v2):
+    def angle(self, other):
         '''Retorna o ângulo entre dois vetores em radianos
 
         Exemplo
         --------
-        >>> Vec2.angle(Vec2(5,0),Vec2(0,5))
+        >>> v = Vec2(5,0)
+        >>> other = Vec2(0,5)
+        >>> v.angle(other)
         1.5707963267948966
         '''
-        return m.acos((self.dot(v2))/(self.norm()*v2.norm()))
+        return m.acos((self.dot(other))/(self.norm()*other.norm()))
 
     def is_null(self):
         '''Verifica se o vetor é nulo
 
         Exemplo
         --------
-        >>> Vec2.is_null(Vec2(0,0))
+        >>> v = Vec2(0,0)
+        >>> v.is_null()
         True
         '''
 
@@ -161,7 +165,8 @@ class Vec2(object):
 
         Exemplo
         --------
-        >>> Vec2.polar(Vec2(1,0))
+        >>> v = Vec2(1,0)
+        >>> v.polar()
         (1.0, 0.0)
         '''
         radius = self.norm()
@@ -172,25 +177,25 @@ class Vec2(object):
 
         return polar
 
-    def reflect(self, v2):
+    def reflect(self, other):
         '''Retorna o vetor refletido por outro vetor
 
         Exemplo
         --------
         >>> v = Vec2(3,4)
-        >>> v2 = Vec2(1,0)
-        >>> v.reflect(v2)
+        >>> other = Vec2(1,0)
+        >>> v.reflect(other)
         Vec2(3, -4)
         ''' 
         # confere se algum dos vetores é nulo
-        if ( v2.is_null() or self.is_null() ):
+        if ( other.is_null() or self.is_null() ):
 
             return self
         else:
 
-            angle = self.angle(v2)
+            angle = self.angle(other)
 
-            if ( v2.x < 0 ):
+            if ( other.x < 0 ):
                 reflect = self.rotate(2*angle)
             else:
                 reflect = self.rotate(-2*angle)
@@ -200,7 +205,7 @@ class Vec2(object):
 
             return reflect
 
-    def lerp(self, v2 , range_lerp):
+    def lerp(self, other , range_lerp):
         '''Retorna um vetor com tamanho máximo baseado no vetor resultante da
         diferença entre dois vetores, sendo que o range_lerp assume valores
         entre 0 e 1.
@@ -217,11 +222,33 @@ class Vec2(object):
 
             lerp = self
         else:
-            subtraction_vectors = v2 - self
+            subtraction_vectors = other - self
 
             lerp = subtraction_vectors * range_lerp + self
 
         return lerp
+
+    def perpendicular(self , inverse = False):
+        '''Retorna um vetor 2d perpendicular a ele, sendo que a convenção do
+        parametro inverse é o sentido anti-horário
+
+        Exemplo
+        --------
+        >>> v = Vec2(1,0)
+        >>> v.perpendicular(True)
+        Vec2(0, -1)
+        '''
+
+        if ( inverse == False ):
+            perpendicular = self.rotate(m.pi/2)
+
+        else:
+            perpendicular = self.rotate(-m.pi/2)
+
+        perpendicular.x = round(perpendicular.x, 7)
+        perpendicular.y = round(perpendicular.y, 7)
+
+        return perpendicular
 
     def norm(self): 
         '''Retorna o módulo (norma) do vetor'''
