@@ -14,7 +14,7 @@ from random import uniform, randint
 class Gas(World):
 
     def __init__(self,
-                 gravity=100, friction=0.0, rest_coeff=0.95,
+                 gravity=100, friction=0.0, restitution=0.95,
                  num_balls=80, speed=200, radius=10,
                  color='random'):
         '''Cria uma simulação de um gás de partículas confinado por um êmbolo
@@ -22,7 +22,7 @@ class Gas(World):
         de +/-`speed`.'''
 
         super(Gas, self).__init__(gravity=gravity, dfriction=friction,
-                                  rest_coeff=rest_coeff)
+                                  restitution=restitution)
         AABB(0, 30, 30, 800, world=self, mass='inf')
         AABB(770, 800, 30, 800, world=self, mass='inf')
         AABB(0, 800, 0, 30, world=self, mass='inf')

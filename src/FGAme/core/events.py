@@ -829,10 +829,16 @@ class EventDispatcherMeta(type):
         '''
 
         ev_type._init_events = EventDispatcher.__init__
-        ev_type._listen = EventDispatcher.listen
-        ev_type._trigger = EventDispatcher.trigger
+        ev_type.listen = EventDispatcher.listen
+        ev_type.trigger = EventDispatcher.trigger
 
         # TODO: implementar @EventDispatcherMeta.decorate
+        name = ev_type.__name__
+        bases = ev_type.__bases__
+        ns = dict(ev_type.__dict__)
+        ns = cls._populate_namespace(name, bases, ns)
+        for k, v in ns.items():
+            setattr(ev_type, k, v)
         return ev_type
 
 

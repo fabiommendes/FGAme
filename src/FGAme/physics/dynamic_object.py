@@ -1,13 +1,11 @@
 # -*- coding: utf8 -*-
 from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2
-from FGAme.mathutils import sqrt, sin, cos, null2D
-from FGAme import mathutils as shapes
+from FGAme.mathutils import Vec2, sin, cos, sqrt, nullvec2, Circle
 from FGAme.util import six
-from FGAme.physics import flags
+from FGAme.physics.flags import BodyFlags as flags
 
 
-__all__ = ['Dynamic']
+__all__ = ['Body', 'LinearRigidBody']
 
 
 ###############################################################################
@@ -16,7 +14,7 @@ __all__ = ['Dynamic']
 
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INF = float('inf')
-ORIGIN = Vec2(0, 0)
+INERTIA_SCALE = 0.3
 
 
 def do_nothing(*args, **kwds):
@@ -31,7 +29,7 @@ def raises_method(ex=NOT_IMPLEMENTED):
 ###############################################################################
 #          Classes Base --- todos objetos físicos derivam delas
 ###############################################################################
-Dynamic = None
+Body = None
 
 
 class PhysElementMeta(EventDispatcherMeta):
@@ -107,7 +105,7 @@ class PhysElementMeta(EventDispatcherMeta):
         if not has_slots:
             del ns['__slots__']
         else:
-            if Dynamic is None:
+            if Body is None:
                 ns['__slots__'].append('__dict__')
         new = type.__new__(cls, name, true_bases, ns)
 
@@ -137,7 +135,7 @@ class PhysElementMeta(EventDispatcherMeta):
 
 
 @six.add_metaclass(PhysElementMeta)
-class Dynamic(object):
+class Body(object):
 
     '''Classe mãe de todos objetos com propriedades dinâmicas.
 
@@ -161,7 +159,7 @@ class Dynamic(object):
         Aceleração acumulada recalculada em cada frame
 
     ::
-     **Forças locais**
+         **Forças locais**
 
     gravity
         Valor da aceleração da gravidade aplicada ao objeto
@@ -175,53 +173,154 @@ class Dynamic(object):
         Caso verdadeiro, aplica as acelerações de gravidade, damping/adamping
         no objeto mesmo se ele for estático
 
+    ::
+        **Propriedades físicas do objeto**
+    inertia
+        Momento de inércia do objeto com relação ao eixo z no centro de massa.
+        Calculado automaticamente a partir da geometria e densidade do objeto.
+        Caso seja infinito, o objeto não responderá a torques.
+    ROG, ROG_sqr
+        Raio de giração e o quadrado do raio de giração. Utilizado para
+        calcular o momento de inércia: $I = M R^2$, onde I é o momento de
+        inércia, M a massa e R o raio de giração.
+    density
+        Densidade de massa: massa / área
+    area
+        Área que o objeto ocupa
+
+    ::
+        **Variáveis dinâmicas**
+    _theta
+        Ângulo da rotação em torno do eixo saindo do centro de massa do objeto
+    _omega
+        Velocidade angular de rotação
+
+    ::
+        **Caixa de contorno**
+    xmin, xmax, ymin, ymax
+        Limites da caixa de contorno alinhada aos eixos que envolve o objeto
+    bbox
+        Uma tupla com (xmin, xmax, ymin, ymax)
+    shape
+        Uma tupla (Lx, Ly) com a forma caixa de contorno nos eixos x e y.
+    rect
+        Uma tupla com (xmin, ymin, Lx, Ly)
+
     '''
 
     __slots__ = [
-        'flags', 'cbb_radius',
-        '_pos', '_vel', '_accel', 'theta', 'omega', 'alpha',
-        '_invmass', '_invinertia'
+        'flags', 'cbb_radius', '_baseshape', '_shape', '_aabb',
+        '_pos', '_vel', '_accel', '_theta', '_omega', '_alpha',
+        '_invmass', '_invinertia', '_e_vel', '_e_omega', '_world',
+        '_col_layer', '_col_group_mask',
     ]
 
-    def __init__(self, pos=(0, 0), vel=(0, 0), theta=0.0, omega=0.0,
-                 mass=1.0, inertia=1.0,
-                 gravity=None, damping=None, adamping=None,
-                 owns_gravity=None, owns_damping=None, owns_adamping=None):
+    DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
+    def __init__(self, pos=nullvec2, vel=nullvec2, theta=0.0, omega=0.0,
+                 mass=None, density=None, inertia=None,
+                 gravity=None, damping=None, adamping=None,
+                 restitution=None, sfriction=None, dfriction=None,
+                 baseshape=None, world=None, col_layer=0, col_group=0,
+                 flags=DEFAULT_FLAGS):
+
+        self._world = world
         EventDispatcher.__init__(self)
 
         # Flags de objeto
-        self.flags = 0
+        self.flags = flags
 
-        # Variáveis de estado
-        self._pos = Vec2(*pos)
-        self._vel = Vec2(*vel)
-        self.theta = float(theta)
-        self.omega = float(omega)
+        # Variáveis de estado #################################################
+        self._pos = Vec2(pos)
+        self._vel = Vec2(vel)
+        self._e_vel = nullvec2
+        self._e_omega = 0.0
+        self._theta = float(theta)
+        self._omega = float(omega)
+        self._accel = nullvec2
+        self._alpha = 0.0
 
-        # Acelerações
-        self._accel = Vec2(0, 0)
-        self.alpha = 0.0
+        # Harmoniza massa, inércia e densidade ################################
+        self._baseshape = self._shape = baseshape
+        self._aabb = getattr(baseshape, 'aabb', None)
+        if density is not None:
+            density = float(density)
+            if mass is None:
+                mass = density * self.area()
+            else:
+                mass = float(mass)
+            if inertia is None:
+                inertia = density * \
+                    self.area() * self.ROG_sqr() / INERTIA_SCALE
+            else:
+                inertia = float(inertia)
 
-        # Inércias
-        self._invmass = self._invinertia = 1.0
-        self.mass = mass
-        self.inertia = inertia
+        elif mass is not None:
+            mass = float(mass)
+            density = mass / self.area()
+            if inertia is None:
+                inertia = mass * self.ROG_sqr() / INERTIA_SCALE
+            else:
+                inertia = float(inertia)
 
-        # Controle de gravidade/damping/adamping locais
-        self._damping = float(damping or 0.0)
-        self._adamping = float(adamping or 0.0)
-        if damping is not None:
-            self.flags |= flags.OWNS_DAMPING
-        if adamping is not None:
-            self.flags |= flags.OWNS_ADAMPING
-        if gravity is None:
-            self._gravity = Vec2(0, 0)
         else:
-            self.gravity = gravity
+            density = 1.0
+            mass = density * self.area()
+            if inertia is None:
+                inertia = density * \
+                    self.area() * self.ROG_sqr() / INERTIA_SCALE
+            else:
+                inertia = float(inertia)
 
-        # Controle de is_sleep
-        self.is_sleep = False
+        self._invmass = 1.0 / mass
+        self._invinertia = 1.0 / inertia
+        self._density = float(density)
+
+        # Controle de parâmetros físicos locais ###############################
+        self._gravity = nullvec2
+        self._damping = self._adamping = 0.0
+        self._sfriction = self._dfriction = 0.0
+        self._restitution = 1.0
+        if damping is not None:
+            self.damping = damping
+        if adamping is not None:
+            self.adamping = adamping
+        if gravity is not None:
+            self.gravity = gravity
+        if restitution is not None:
+            self.restitution = restitution
+        if sfriction is not None:
+            self.sfriction = sfriction
+        if sfriction is not None:
+            self.dfriction = dfriction
+
+        # Vínculos e contatos #################################################
+        self._contacts = []
+        self._joints = []
+
+        # Filtros de colisões #################################################
+        # Colide se objetos estão em groupos diferentes (exceto os que estão
+        # no grupo 0) e no mesmo layer
+        self._col_layer = int(col_layer)
+        if col_group:
+            if isinstance(col_group, int):
+                self._col_group_mask = 1 << (col_group - 1)
+            else:
+                mask = 0
+                for n in col_group:
+                    mask |= 1 << (n - 1)
+                self._col_group_mask = mask
+        else:
+            self._col_group_mask = 0
+        # TODO: fundir col_layer com col_group_mask no mesmo inteiro?
+        # (talvez 50 bits para grupos e 10 ==> 1024 layers diferentes)
+        # Do jeito que está, podemos utilizar strings como identificadores
+        # de layers (mas não para grupos). A classe mundo poderia fazer um
+        # mapa entre strings > números nos dois casos.
+
+        # Presença em mundo ###################################################
+        if world is not None:
+            self._world.add(self)
 
     ###########################################################################
     #                            Serviços Python
@@ -249,20 +348,107 @@ class Dynamic(object):
     def cbb(self):
         '''Caixa de contorno circular que envolve o objeto'''
 
-        return shapes.Circle(self.cbb_radius, self.pos)
+        return Circle(self.cbb_radius, self.pos)
 
     @property
     def aabb(self):
         '''Caixa de contorno alinhada aos eixos que envolve o objeto'''
 
-        return shapes.AABB(self.xmin, self.xmax, self.ymin, self.ymax)
+        if self.flags & flags.dirty_aabb:
+            self._aabb = self._shape.aabb()
+            self.flags &= flags.not_dirty_aabb
+        return self._aabb
+
+    @property
+    def shape(self):
+        '''Retorna um objeto que representa o formato geométrico do corpo
+        físico, ex.: Circle, AABB, Poly, etc'''
+
+        if self.flags & flags.dirty_any:
+            self._shape = self._shape_base.move(self.pos).rotate(self._theta)
+            self.flags &= flags.not_dirty
+        return self._shape
+
+    # Propriedades da caixa de contorno #######################################
+    @property
+    def xmin(self):
+        raise NotImplementedError
+
+    @property
+    def xmax(self):
+        raise NotImplementedError
+
+    @property
+    def ymin(self):
+        raise NotImplementedError
+
+    @property
+    def ymax(self):
+        raise NotImplementedError
+
+    @property
+    def bbox(self):
+        return (self.xmin, self.xmax, self.ymin, self.ymax)
+
+    @property
+    def shape(self):
+        return (self.xmax - self.xmin, self.ymax - self.ymin)
+
+    @property
+    def width(self):
+        return self.xmax - self.xmin
+
+    @property
+    def height(self):
+        return self.ymax - self.ymin
+
+    @property
+    def rect(self):
+        x, y = self.xmin, self.ymin
+        return (x, y, self.xmax - x, self.ymax - y)
+
+    @property
+    def pos_sw(self):
+        return Vec2(self.xmin, self.ymin)
+
+    @property
+    def pos_se(self):
+        return Vec2(self.xmax, self.ymin)
+
+    @property
+    def pos_nw(self):
+        return Vec2(self.xmin, self.ymax)
+
+    @property
+    def pos_ne(self):
+        return Vec2(self.xmax, self.ymax)
 
     @property
     def shape_bb(self):
-        '''Retorna o formato da caixa de contorno que melhor envolve o objeto
-        (pode ser um círculo, AABB ou poĺígono)'''
+        return self.aabb
 
-        return NotImplemented
+    ###########################################################################
+    #                          Contatos e vínculos
+    ###########################################################################
+    def add_contact(self, contact):
+        '''Registra um contato à lista de contatos do objeto'''
+
+        L = self._contacts
+        invmass = contact.A._invmass
+        for i, C in enumerate(L):
+            if invmass < C.A._invmass:
+                L.insert(i, C)
+                break
+        else:
+            L.append(contact)
+
+    def remove_contact(self, contact):
+        '''Remove um contato da lista de contatos do objeto'''
+
+        try:
+            self._contacts.remove(contact)
+        except ValueError:
+            pass
 
     ###########################################################################
     #                                Sinais
@@ -313,20 +499,62 @@ class Dynamic(object):
         return bool(self.flags | flag)
 
     ###########################################################################
-    #                    Controle de criação e destruição
+    #        Controle de criação e destruição e interação com o mundo
     ###########################################################################
+    @property
+    def world(self):
+        if self._world is None:
+            raise ValueError('trying to access rogue object')
+        else:
+            return self._world
+
+    def set_active(self, value):
+        '''Determina o estado ativo do objeto'''
+
+        if value:
+            self.flags &= flags.not_active
+        else:
+            self.world.set_active(self)
+            self.flags |= flags.is_active
+
     def is_rogue(self):
         '''Retorna True se o objeto não estiver associado a uma simulação'''
 
-        return getattr(self, 'simulation', None) is not None
+        return self.world is None
 
     def destroy(self):
         '''Destrói o objeto físico'''
 
         if not self.is_rogue():
-            self.simulation.remove(self)
+            if self in self.world:
+                self.world.remove(self)
 
         # TODO: desaloca todos os sinais
+
+    ###########################################################################
+    #                          Estado dinâmico
+    ###########################################################################
+    @property
+    def omega(self):
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if self.flags & flags.can_rotate:
+            self._omega = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
+
+    @property
+    def theta(self):
+        return self._theta
+
+    @theta.setter
+    def theta(self, value):
+        if self.flags & flags.can_rotate:
+            self._theta = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
 
     ###########################################################################
     #                        Propriedades físicas
@@ -341,38 +569,71 @@ class Dynamic(object):
 
     @mass.setter
     def mass(self, value):
+        print('changing mass to value', value)
         value = float(value)
+
         if value <= 0:
             raise ValueError('mass cannot be null or negative')
-        self._invmass = 1.0 / value
+        elif value != INF:
+            self._density = value / self.area()
+            if self._invinertia:
+                inertia = value * self.ROG_sqr()
+                self._invinertia = 1.0 / inertia
+            self._invmass = 1.0 / value
+        else:
+            self._invmass = 0.0
 
     @property
     def inertia(self):
         try:
             return 1.0 / self._invinertia
         except ZeroDivisionError:
-            return float('inf')
+            return INF
 
     @inertia.setter
     def inertia(self, value):
         value = float(value)
-        if value <= 0:
-            raise ValueError('inertia cannot be null or negative')
-        self._invinertia = 1.0 / value
+
+        if self.flags & flags.can_rotate:
+            if value <= 0:
+                raise ValueError('inertia cannot be null or negative')
+            elif value != INF:
+                self._invinertia = 1.0 / value
+            else:
+                self._invinertia = 0.0
+        else:
+            self._raise_cannot_rotate_error()
+
+    @property
+    def density(self):
+        return self._density
+
+    @density.setter
+    def density(self, value):
+        rho = float(value)
+        self._density = rho
+        if self._invmass:
+            self._invmass = 1.0 / (self.area() * rho)
+        if self._invinertia:
+            self._invinertia = INERTIA_SCALE / \
+                (self.area() * rho * self.ROG_sqr())
 
     # Grandezas físicas derivadas
     def linearE(self):
         '''Energia cinética das variáveis lineares'''
 
-        return self._vel.dot(self._vel) / (2 * self._invmass)
+        if self._invmass:
+            return self._vel.norm_sqr() / (2 * self._invmass)
+        else:
+            return 0.0
 
     def angularE(self):
         '''Energia cinética das variáveis angulares'''
 
-        if self.omega:
-            return self.omega ** 2 / (2 * self._invinertia)
+        if self._invinertia:
+            return self._omega ** 2 / (2 * self._invinertia)
         else:
-            return 0
+            return 0.0
 
     def kineticE(self):
         '''Energia cinética total'''
@@ -382,7 +643,7 @@ class Dynamic(object):
     def potentialE(self):
         '''Energia potencial associada à gravidade'''
 
-        return self.gravity.dot(self._pos) / self._invmass
+        return -self.gravity.dot(self._pos) / self._invmass
 
     def totalE(self):
         '''Energia total do objeto'''
@@ -401,9 +662,9 @@ class Dynamic(object):
         if pos is None:
             delta = 0.0
         else:
-            delta = (self._pos - pos).cross(self._vel)
-        if self.omega:
-            return delta + self.inertia * self.omega
+            delta = (self._pos - pos).cross(self._vel) / self._invmass
+        if self._invinertia:
+            return delta + self._omega / self._invinertia
         else:
             return delta
 
@@ -413,12 +674,12 @@ class Dynamic(object):
     def area(self):
         '''Retorna a área do objeto'''
 
-        raise NotImplementedError('must be implemented in child classes')
+        return self._baseshape.area()
 
     def ROG_sqr(self):
         '''Retorna o raio de giração ao quadrado'''
 
-        raise NotImplementedError('must be implemented in child classes')
+        return self._baseshape.ROG_sqr()
 
     def ROG(self):
         '''Retorna o raio de giração'''
@@ -432,9 +693,13 @@ class Dynamic(object):
         '''Move o objeto por vetor de deslocamento delta'''
 
         if y is None:
+            if delta_or_x is nullvec2:
+                return
             self._pos += delta_or_x
         else:
             self._pos += (delta_or_x, y)
+
+        self.flags |= flags.dirty_any
 
     def boost(self, delta_or_x, y=None):
         '''Adiciona um valor vetorial delta à velocidade linear'''
@@ -442,7 +707,7 @@ class Dynamic(object):
         if y is None:
             self._vel += delta_or_x
         else:
-            self._vel += (delta_or_x, y)
+            self._vel += Vec2(delta_or_x, y)
 
     # Resposta a forças, impulsos e atualização da física #####################
     def force(self, t):
@@ -453,7 +718,7 @@ class Dynamic(object):
         "monkey patching" do Python
         '''
 
-        return ORIGIN
+        return nullvec2
 
     def init_accel(self):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
@@ -467,7 +732,7 @@ class Dynamic(object):
         elif self._gravity is not None:
             a = self._gravity
         else:
-            a = null2D
+            a = nullvec2
         self._accel = a
 
     def apply_force(self, force, dt, pos=None, relative=False):
@@ -562,26 +827,18 @@ class Dynamic(object):
 
         self.boost(Vec2(impulse_or_x, y) * self._invmass)
 
-    def update_linear(self, dt):
-        '''Aplica aceleração linear acumulada pelo objeto ao longo do frame'''
-
-        self.apply_accel(self._accel, dt)
-
-    def update_angular(self, dt):
-        '''Aplica aceleração angular acumulada pelo objeto ao longo do frame'''
-
-        self.apply_alpha(self._alpha, dt)
-
     # Variáveis angulares #####################################################
     def rotate(self, theta):
-        '''Rotaciona o objeto por um ângulo theta'''
+        '''Rotaciona o objeto por um ângulo _theta'''
 
-        self.theta += theta
+        self._theta += theta
+        if theta != 0.0:
+            self.flags |= flags.dirty_any
 
     def aboost(self, delta):
         '''Adiciona um valor delta à velocidade ângular'''
 
-        self.omega += delta
+        self._omega += delta
 
     def vpoint(self, pos_or_x, y=None, relative=False):
         '''Retorna a velocidade linear de um ponto em _pos preso rigidamente ao
@@ -594,25 +851,25 @@ class Dynamic(object):
         if relative:
             if y is None:
                 x, y = pos_or_x
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
             else:
-                return self._vel + self.omega * Vec2(-y, pos_or_x)
+                return self._vel + self._omega * Vec2(-y, pos_or_x)
 
         else:
             if y is None:
                 x, y = pos_or_x - self._pos
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
             else:
                 x = pos_or_x - self._pos.x
                 y = y - self._pos.y
-                return self._vel + self.omega * Vec2(-y, x)
+                return self._vel + self._omega * Vec2(-y, x)
 
     def orientation(self, theta=0.0):
         '''Retorna um vetor unitário na direção em que o objeto está orientado.
         Pode aplicar um ângulo adicional a este vetor fornecendo o parâmetro
-        theta.'''
+        _theta.'''
 
-        theta += self.theta
+        theta += self._theta
         return Vec2(cos(theta), sin(theta))
 
     def torque(self, t):
@@ -624,7 +881,7 @@ class Dynamic(object):
         '''Inicializa o vetor de aceleração angular com os valores devido ao
         amortecimento'''
 
-        self._alpha = - self._adamping * self.omega
+        self._alpha = - self._adamping * self._omega
 
     def apply_torque(self, torque, dt):
         '''Aplica um torque durante um intervalo de tempo dt.'''
@@ -639,7 +896,7 @@ class Dynamic(object):
         if alpha is None:
             alpha = self._alpha
         self.aboost(alpha * dt)
-        self.rotate(self.omega * dt + alpha * dt ** 2 / 2.)
+        self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
 
     def apply_aimpulse(self, itorque):
         '''Aplica um impulso angular ao objeto.'''
@@ -660,7 +917,7 @@ class Dynamic(object):
             self._gravity = Vec2(*value)
         except TypeError:
             self._gravity = Vec2(0, -value)
-        self.flags |= flags.OWNS_GRAVITY
+        self.flags |= flags.owns_gravity
 
     @property
     def damping(self):
@@ -669,7 +926,7 @@ class Dynamic(object):
     @damping.setter
     def damping(self, value):
         self._damping = float(value)
-        self.flags |= flags.OWNS_DAMPING
+        self.flags |= flags.owns_damping
 
     @property
     def adamping(self):
@@ -678,24 +935,65 @@ class Dynamic(object):
     @adamping.setter
     def adamping(self, value):
         self._adamping = float(value)
-        self.flags |= flags.OWNS_ADAMPING
+        self.flags |= flags.owns_adamping
+
+    @property
+    def restitution(self):
+        return self._restitution
+
+    @restitution.setter
+    def restitution(self, value):
+        self._restitution = float(value)
+        self.flags |= flags.owns_restitution
+
+    @property
+    def dfriction(self):
+        return self._dfriction
+
+    @dfriction.setter
+    def dfriction(self, value):
+        self._dfriction = float(value)
+        self.flags |= flags.owns_dfriction
+
+    @property
+    def sfriction(self):
+        return self._sfriction
+
+    @sfriction.setter
+    def sfriction(self, value):
+        self._sfriction = float(value)
+        self.flags |= flags.owns_sfriction
 
     @property
     def owns_gravity(self):
-        return bool(self.flags & flags.OWNS_GRAVITY)
+        return bool(self.flags & flags.owns_gravity)
 
     @property
     def owns_damping(self):
-        return bool(self.flags & flags.OWNS_DAMPING)
+        return bool(self.flags & flags.owns_damping)
 
     @property
     def owns_adamping(self):
-        return bool(self.flags & flags.OWNS_ADAMPING)
+        return bool(self.flags & flags.owns_adamping)
+
+    @property
+    def owns_restitution(self):
+        return bool(self.flags & flags.owns_restitution)
+
+    @property
+    def owns_dfriction(self):
+        return bool(self.flags & flags.owns_dfriction)
+
+    @property
+    def owns_sfriction(self):
+        return bool(self.flags & flags.owns_sfriction)
 
     ###########################################################################
     #               Manipulação/consulta do estado dinâmico
     ###########################################################################
-
+    # Simplificar e usar apenas a massa e a flag can_rotate como quesito de
+    # teste.
+    # FIXME: Alterar as flags nas funções make_*
     def is_dynamic(self, what=None):
         '''Retorna True se o objeto for dinâmico ou nas variáveis lineares ou
         nas angulares. Um objeto é considerado dinâmico nas variáveis lineares
@@ -758,8 +1056,8 @@ class Dynamic(object):
                 self.mass = mass
 
             # Resgata a velocidade
-            if self._vel == ORIGIN:
-                self._vel = self._getp('old_vel', ORIGIN)
+            if self._vel == nullvec2:
+                self._vel = self._getp('old_vel', nullvec2)
 
         self._clearp('old_mass', 'old_vel')
 
@@ -777,8 +1075,8 @@ class Dynamic(object):
                 self.inertia = inertia
 
             # Resgata a velocidade
-            if self.omega == 0:
-                self.omega = self._getp('old_omega', 0)
+            if self._omega == 0:
+                self._omega = self._getp('old_omega', 0)
 
         self._clearp('old_inertia', 'old_omega')
 
@@ -875,12 +1173,12 @@ class Dynamic(object):
     def is_static_linear(self):
         '''Verifica se o objeto é dinâmico nas variáveis lineares'''
 
-        return self.is_kinematic_linear() and self._vel == ORIGIN
+        return self.is_kinematic_linear() and self._vel == nullvec2
 
     def is_static_angular(self):
         '''Verifica se o objeto é dinâmico nas variáveis angulares'''
 
-        return self.is_kinematic_angular() and self.omega == 0
+        return self.is_kinematic_angular() and self._omega == 0
 
     def make_static(self, what=None):
         '''Define a massa e/ou inércia como infinito.
@@ -904,7 +1202,7 @@ class Dynamic(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_linear()
-        if self._vel != ORIGIN:
+        if self._vel != nullvec2:
             self._old_vel = self._vel
             self._vel = Vec2(0, 0)
 
@@ -914,9 +1212,16 @@ class Dynamic(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_angular()
-        if self.omega != 0:
-            self._old_omega = self.omega
-            self.omega = 0.0
+        if self._omega != 0:
+            self._old_omega = self._omega
+            self._omega = 0.0
+
+    ###########################################################################
+    # Erros e miscelânea
+    ###########################################################################
+    def _raise_cannot_rotate_error(self):
+        raise ValueError('Cannot change angular variables with disabled '
+                         '`can_rotate` flag')
 
 
 def vec_property(slot):
@@ -942,9 +1247,42 @@ def vec_property(slot):
 
     return VecProperty()
 
-Dynamic.pos = vec_property(Dynamic._pos)
-Dynamic.vel = vec_property(Dynamic._vel)
-Dynamic.accel = vec_property(Dynamic._accel)
+Body.pos = vec_property(Body._pos)
+Body.vel = vec_property(Body._vel)
+Body.accel = vec_property(Body._accel)
+
+###############################################################################
+# Linear rigid bodies
+###############################################################################
+# TODO: remover esta classe e se basear no comportamento da flag can_rotate
+
+
+class LinearRigidBody(Body):
+
+    '''
+    Classe que implementa corpos rígidos sem dinâmica angular.
+    '''
+
+    __slots__ = []
+    DEFAULT_FLAGS = Body.DEFAULT_FLAGS & (flags.full ^ flags.can_rotate)
+
+    def __init__(self, pos=(0, 0), vel=(0, 0),
+                 mass=None, density=None, **kwds):
+
+        super(LinearRigidBody, self).__init__(pos, vel, 0.0, 0.0,
+                                              mass=mass, density=density,
+                                              inertia='inf',
+                                              flags=self.DEFAULT_FLAGS, **kwds)
+
+    @property
+    def inertia(self):
+        return INF
+
+    @inertia.setter
+    def inertia(self, value):
+        if float(value) != INF:
+            raise ValueError('LinearObjects have infinite inertia, '
+                             'got %r' % value)
 
 
 if __name__ == '__main__':

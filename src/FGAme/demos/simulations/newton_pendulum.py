@@ -38,7 +38,7 @@ if 'circles' in stacks:
     world.add(Circle(20, pos=(50, H - 50), color='red', vel=(200, 0)))
     H -= dH
 
-# Cria pilha de triângulos
+# Cria pilha de retangulos
 if 'rects' in stacks:
     world.add(Rectangle(pos=(50, H), shape=(40, 40), color='red',
                         vel=(200, 0)))

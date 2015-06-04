@@ -20,6 +20,12 @@ class RenderTree(object):
 
     >>> list(tree.walk())
     ['bar', 'blaz', 'foo']
+
+    O método remove() permite remover objetos
+
+    >>> tree.remove('bar');
+    >>> 'bar' in tree, 'foo' in tree
+    (False, True)
     '''
 
     is_tree = True
@@ -28,6 +34,14 @@ class RenderTree(object):
         self._data = []
         self.parent = None
 
+    # Métodos mágicos #########################################################
+    def __contains__(self, obj):
+        return any(obj in L for _, L in self._data)
+
+    def __iter__(self):
+        return self.walk()
+
+    # Controle de objetos #####################################################
     def add(self, obj, layer=0):
         '''Adiciona um objeto ou um galho (outro elemento de RenderTree) na
         camada especificada'''
@@ -41,6 +55,16 @@ class RenderTree(object):
                 break
         else:
             self._data.append((layer, [obj]))
+
+    def remove(self, obj):
+        '''Remove um objeto da árvore de renderização'''
+
+        for _, L in self._data:
+            if obj in L:
+                L.remove(obj)
+                break
+        else:
+            raise ValueError('object %r not in RenderTree' % obj)
 
     # TODO: Mover objetos entre Layers ou modifica a ordem do objeto dentro de
     # um layer

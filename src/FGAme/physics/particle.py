@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import Dynamic
+from FGAme.physics import Body
 
 __all__ = ['Particle']
 
@@ -15,7 +15,7 @@ __all__ = ['Particle']
 ###############################################################################
 
 
-class Particle(Dynamic):
+class Particle(Body):
 
     '''Define uma partícula.
 

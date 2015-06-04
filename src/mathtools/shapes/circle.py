@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from mathtools import dot, Vec2
+from mathtools import dot, Vec2, pi
 
 
 class Circle(object):
@@ -21,6 +21,15 @@ class Circle(object):
     def __repr__(self):
         s_center = '%.1f, %.1f' % self.center
         return 'Circle(%.1f, (%s))' % (self.radius, s_center)
+
+    def area(self):
+        return pi * self.radius * self.radius
+
+    def ROG_sqr(self):
+        return self.radius * self.radius / 2
+
+    def ROG(self):
+        return self.radius / sqrt(2)
 
     # Métodos utilizado pelo SAT ##############################################
     def directions(self, n):

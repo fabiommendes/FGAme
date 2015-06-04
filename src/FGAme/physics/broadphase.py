@@ -1,22 +1,116 @@
 # -*- coding: utf8 -*-
-from FGAme.physics import CBBContact, AABBContact
+
 from mathtools import shadow_y
+from collections import MutableSequence
+from FGAme.physics import CBBContact, AABBContact
+from FGAme.physics import get_collision, get_collision_generic, CollisionError
+from FGAme.physics.flags import BodyFlags
 
 
-class BroadPhase(object):
+class AbstractCollisionPhase(MutableSequence):
 
-    '''Controla a broad-phase do loop de detecção de colisões de uma
-    simulação.'''
+    '''Base para BroadPhase e NarrowPhase'''
 
-    def __init__(self):
-        self.pairs = []
+    __slots__ = ['world', '_data']
+
+    def __init__(self, data=[], world=None):
+        self.world = world
+        self._data = []
+        self._data.extend(data)
+
+    def __call__(self, objects):
+        self.update(objects)
+        return self
+
+    def __repr__(self):
+        tname = type(self).__name__
+        return '%s(%r)' % (tname, self._data)
 
     def update(self, objects):
-        pass
+        '''Atualiza a lista de pares utilizando a lista de objetos dada.'''
+
+        raise NotImplementedError
+
+    def objects(self):
+        '''Iterador sobre a lista com todos os objetos obtidos na fase de
+        colisão'''
+
+        objs = set()
+        for A, B in self._data:
+            objs.add(A)
+            objs.add(B)
+        return iter(objs)
+
+    # MutableSequence interface ###############################################
+    def __len__(self):
+        return len(self._data)
 
     def __iter__(self):
-        for p in self.pairs:
+        for p in self._data:
             yield p
+
+    def __getitem__(self, i):
+        return self._data[i]
+
+    def __setitem__(self, i, value):
+        self._data[i] = value
+
+    def __delitem__(self, i, value):
+        del self._data[i]
+
+    def pop(self, idx=None):
+        if idx is None:
+            return self._data.pop()
+        else:
+            return self._data.pop(idx)
+
+    def insert(self, idx, value):
+        self._data.insert(idx, value)
+
+    def append(self, value):
+        self._data.append(value)
+
+    def remove(self, value):
+        self._data.remove(value)
+
+    def sort(self, *args, **kwds):
+        self._data.sort(*args, **kwds)
+
+###############################################################################
+#                               Broad phase
+###############################################################################
+
+
+class BroadPhase(AbstractCollisionPhase):
+
+    '''Controla a broad-phase do loop de detecção de colisões de uma
+    simulação.
+
+    Um objeto do tipo BroadPhase possui uma interface simples que define dois
+    métodos:
+
+        bf.update(L) -> executa algoritmo em lista de objetos L
+        iter(bf)     -> itera sobre todos os pares gerados no passo anterior
+
+    '''
+
+    __slots__ = []
+
+    def get_collide_filter(self):
+        '''Retorna uma função que aceita ou rejeita colisões entre dois objetos
+        baseada na máscara de bits de ambos'''
+
+        try:
+            return self.world.can_collide
+        except AttributeError:
+            def can_collide(A, B):
+                return True
+            return can_collide
+
+    def pairs(self):
+        '''Retorna a lista de pares encontradas por update'''
+
+        return list(self._data)
 
 
 class BroadPhaseAABB(BroadPhase):
@@ -24,10 +118,14 @@ class BroadPhaseAABB(BroadPhase):
     '''Implementa a broad-phase detectando todos os pares de AABBs que estão
     em contato no frame'''
 
-    def update(self, objects):
+    __slots__ = []
+
+    def update(self, L):
+        IS_SLEEP = BodyFlags.is_sleeping
+        can_collide = self.get_collide_filter()
         col_idx = 0
-        objects.sort(key=lambda obj: obj.pos.x - obj.cbb_radius)
-        self.pairs[:] = []
+        objects = sorted(L, key=lambda obj: obj.xmin)
+        self._data[:] = []
 
         # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
         # salva o resultado na lista broad collisions
@@ -37,6 +135,8 @@ class BroadPhaseAABB(BroadPhase):
 
             for j in range(i + 1, len(objects)):
                 B = objects[j]
+                if not can_collide(A, B):
+                    continue
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
                 B_left = B.xmin
@@ -46,7 +146,7 @@ class BroadPhaseAABB(BroadPhase):
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
                 if not A_dynamic and not B.is_dynamic():
                     continue
-                if A.is_sleep and B.is_sleep:
+                if A.flags & B.flags & IS_SLEEP:
                     continue
 
                 # Testa a colisão entre as AABBs
@@ -55,7 +155,7 @@ class BroadPhaseAABB(BroadPhase):
 
                 # Adiciona à lista de colisões grosseiras
                 col_idx += 1
-                self.pairs.append(AABBContact(A, B))
+                self._data.append(AABBContact(A, B))
 
 
 class BroadPhaseCBB(BroadPhase):
@@ -63,10 +163,51 @@ class BroadPhaseCBB(BroadPhase):
     '''Implementa a broad-phase detectando todos os pares de CBBs que estão
     em contato no frame'''
 
-    def update(self, objects):
+    __slots__ = []
+
+    def update(self, L):
+        can_collide = self.get_collide_filter()
+        L = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
+        N = len(L)
+        self._data[:] = []
+
+        # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
+        # salva o resultado na lista broad collisions
+        for i, A in enumerate(L):
+            rA = A.cbb_radius
+            Amax = A.pos.x + rA
+
+            for j in range(i + 1, N):
+                B = L[j]
+                if not can_collide(A, B):
+                    continue
+                rB = B.cbb_radius
+
+                # Procura na lista enquanto xmin de B for menor que xmax de A
+                if B._pos.x - rB > Amax:
+                    break
+
+                # Testa a colisão entre os círculos de contorno
+                if (A.pos - B.pos).norm() > rA + rB:
+                    continue
+
+                # Adiciona à lista de colisões grosseiras
+                self._data.append(CBBContact(A, B))
+
+
+class BroadPhaseMixed(BroadPhase):
+
+    '''Implementa a broad-phase detectando todos os pares de CBBs que estão
+    em contato no frame'''
+
+    __slots__ = []
+
+    def update(self, L):
+        IS_SLEEP = BodyFlags.is_sleeping
+        can_collide = self.get_collide_filter()
         col_idx = 0
-        objects.sort(key=lambda obj: obj.pos.x - obj.cbb_radius)
-        self.pairs[:] = []
+        objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
+        self._data[:] = []
 
         # Os objetos estão ordenados. Este loop detecta as colisões da CBB e
         # salva o resultado na lista broad collisions
@@ -77,6 +218,9 @@ class BroadPhaseCBB(BroadPhase):
 
             for j in range(i + 1, len(objects)):
                 B = objects[j]
+                if not can_collide(A, B):
+                    continue
+
                 B_radius = B.cbb_radius
 
                 # Procura na lista enquanto xmin de B for menor que xmax de A
@@ -87,7 +231,7 @@ class BroadPhaseCBB(BroadPhase):
                 # Não detecta colisão entre dois objetos estáticos/cinemáticos
                 if not A_dynamic and not B.is_dynamic():
                     continue
-                if A.is_sleep and B.is_sleep:
+                if A.flags & B.flags & IS_SLEEP:
                     continue
 
                 # Testa a colisão entre os círculos de contorno
@@ -96,4 +240,82 @@ class BroadPhaseCBB(BroadPhase):
 
                 # Adiciona à lista de colisões grosseiras
                 col_idx += 1
-                self.pairs.append(CBBContact(A, B))
+                if has_overlap(A.aabb, B.aabb):
+                    self._data.append(AABBContact(A, B))
+
+
+###############################################################################
+#                               Narrow phase
+###############################################################################
+class NarrowPhase(AbstractCollisionPhase):
+
+    '''Implementa a fase fina da detecção de colisão'''
+
+    __slots__ = []
+
+    def update(self, broad_cols):
+        '''Escaneia a lista de colisões grosseiras e detecta quais delas
+        realmente aconteceram'''
+
+        # Detecta colisões e atualiza as listas internas de colisões de
+        # cada objeto
+        self._data = cols = []
+
+        for A, B in broad_cols:
+            if A._invmass > B._invmass:
+                A, B = B, A
+            col = self.get_collision(A, B)
+
+            if col is not None:
+                A.add_contact(col)
+                B.add_contact(col)
+                col.world = self.world
+                cols.append(col)
+
+    def get_collision(self, A, B):
+        '''Retorna a colisão entre os objetos A e B depois que a colisão AABB
+        foi detectada'''
+
+        try:
+            return get_collision(A, B)
+        except CollisionError:
+            pass
+
+        # Colisão não definida. Primeiro tenta a colisão simétrica e registra
+        # o resultado caso bem sucedido. Caso a colisão simétrica também não
+        # seja implementada, define a colisão como uma aabb
+        try:
+            col = get_collision(B, A)
+            if col is None:
+                return
+            col.normal *= -1
+        except CollisionError:
+            get_collision[type(A), type(B)] = get_collision_generic
+            get_collision[type(B), type(A)] = get_collision_generic
+            return get_collision_generic(A, B)
+        else:
+            direct = get_collision.get_implementation(type(B), type(A))
+
+            def inverse(A, B):
+                '''Automatically created collision for A, B from the supported
+                collision B, A'''
+                col = direct(B, A)
+                if col is not None:
+                    return col.swapped()
+
+            get_collision[type(A), type(B)] = inverse
+            return col
+
+    def get_groups(self, cols=None):
+        '''Retorna uma lista com todos os grupos de colisões fechados'''
+
+        if cols is None:
+            cols = self
+
+        meta_cols = BroadPhaseAABB(cols)
+        print(meta_cols)
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

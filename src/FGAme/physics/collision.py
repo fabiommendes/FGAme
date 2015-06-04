@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
-from FGAme.mathutils import Vec2
+from FGAme.mathutils import Vec2, nullvec2
+from FGAme.physics.flags import BodyFlags
 from FGAme.util import lazy
 from math import exp
 
@@ -62,7 +63,7 @@ class SimpleContactManifold(BaseContactManifold):
 #                           Contatos abstratos
 ###############################################################################
 
-class Link(object):
+class Pair(object):
 
     '''Representa alguma ligação/conexão entre dois objetos'''
 
@@ -73,17 +74,10 @@ class Link(object):
         self.B = B
 
     def _constructor(self, A, B):
-        '''Cria um novo objeto tipo Link a partir dos dois objetos
+        '''Cria um novo objeto tipo Pair a partir dos dois objetos
         fornecidos'''
 
         return type(self)(A, B)
-
-    def __hash__(self):
-        return id(self)
-
-    def __iter__(self):
-        yield self.A
-        yield self.B
 
     def swapped(self):
         '''Retorna uma colisão com o papel dos objetos A e B trocados'''
@@ -114,8 +108,35 @@ class Link(object):
 
         raise NotImplementedError
 
+    # __magic__ ###############################################################
+    def __eq__(self, other):
+        return self is other
 
-class BroadContact(Link):
+    def __getitem__(self, i):
+        if i == 0:
+            return self.A
+        elif i == 1:
+            return self.B
+        else:
+            raise IndexError(i)
+
+    def __hash__(self):
+        return id(self)
+
+    def __iter__(self):
+        yield self.A
+        yield self.B
+
+    def __getattr_(self, attr):
+        if not attr.startswith('get_'):
+            value = getattr(self, 'get_' + attr)()
+            setattr(self, value)
+            return value
+        else:
+            raise AttributeError(attr)
+
+
+class BroadContact(Pair):
 
     '''Representa um contato na Broad phase'''
 
@@ -151,7 +172,7 @@ class AABBContact(BroadContact):
 ###############################################################################
 
 
-class Collision(Link):
+class Collision(Pair):
 
     '''Representa a colisão entre dois objetos.
 
@@ -161,250 +182,310 @@ class Collision(Link):
     Example
     -------
 
-    Considere a colisão entre estas duas figuras geométricas
+    Considere a colisão unidimensional entre dois círculos
 
-    >>> from FGAme.physics import Rectangle
-    >>> A = Rectangle(rect=(0, 0, 1, 1), vel=(1, 0), mass=1)
-    >>> B = Rectangle(rect=(1, 1, 2, 1), mass=2)
+    >>> from FGAme.physics import Circle, flags
+    >>> A = Circle(1, pos=(0, 1), mass=1, vel=(1, 0))
+    >>> B = Circle(1, pos=(2, 1), mass=1)
 
-    A colisão se dá no ponto (1, 1) e escolhemos a normal para atuar na
-    direção x
+    A colisão unidimensional de dois objetos de mesma massa simplesmente troca
+    as velocidades. Antes disso, no entanto, é necessário passar os parâmetros
+    de colisão para que se possa calcular os resultados.
 
     >>> col = Collision(A, B,
     ...                 pos=(1, 1),    # ponto de colisão
     ...                 normal=(1, 0)) # normal da colisão
 
-    Com o objeto col, podemos calcular várias propriedades físicas, como por
-    exemplo as velocidades relativas, no ponto de colisão, o impulso escalar
-    e o vetorial, etc
+    Podemos investigar as propriedades físicas da colisão e verificar que as
+    leis de conservação são preservadas
 
-    >>> col.vrel_contact; col.J_normal
-    Vec2(-1, 0)
-    1.1904761904761905
-
-    Vemos os valores iniciais das grandezas físicas
-
-    >>> col.kineticE; col.momentumP; col.momentumL
+    >>> col.kineticE(); col.momentumP(); col.momentumL()
     0.5
     Vec2(1, 0)
-    0.0
+    -1.0
 
-
-    Resolvemos a colisão simplesmente evocando o método `resolve()` e depois
-    consultamos os valores finais das grandezas físicas
+    Podemos resolver a colisão utilizando ou o método step() ou o resolve(). O
+    segundo é chamado apenas uma vez e já aciona os sinais de colisão. O método
+    step() é utilizado em resoluções iterativas com vários objetos colidindo
+    simultaneamente.
 
     >>> col.resolve()
-    >>> col.kineticE; col.momentumP; col.momentumL
-    '''
 
-    def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
-        self._A = A
-        self._B = B
+    Agora investigamos os valores finais e vemos que as leis de conservação
+    foram satisfeitas.
+
+    >>> col.kineticE(); col.momentumP(); col.momentumL()
+    0.5
+    Vec2(1, 0)
+    -1.0
+
+    Investigando as propriedades, verificamos que de fato a velocidade dos dois
+    objetos foi invertida
+
+    >>> A.vel; B.vel
+    Vec2(0, 0)
+    Vec2(1, 0)
+
+
+    Suponha agora que a colisão não se deu no ponto selecionado anteriormente.
+
+    >>> A.vel, B.vel = B.vel, A.vel
+    >>> col = Collision(A, B,
+    ...                 pos=(0, 0),    # ponto de colisão
+    ...                 normal=(1, 0)) # normal da colisão
+
+    Esta posição induz a uma velocidade de rotação e transferência de energia
+    de movimento linear para angular.
+
+    >>> col.resolve()
+    >>> A.linearE() + B.linearE(), A.angularE() + B.angularE()
+    (0.265625, 0.234375)
+
+    As leis de conservação continuam sendo satisfeitas
+    >>> col.kineticE(); col.momentumP(); col.momentumL()
+    0.5
+    Vec2(1, 0)
+    -1.0
+    '''
+    min_vel_bias = 1.0
+
+    def __init__(self, A, B, world=None, pos=None, normal=None, delta=0.0):
+        super(Collision, self).__init__(A, B)
         self.objects = A, B
         self.world = world
         self.is_active = True
         self.resolved = False
-        self.pos = None if pos is None else Vec2(pos)
-        self.normal = None if pos is None else Vec2(normal)
-        self.__dict__.update(kwds)
+        self.vrel = nullvec2
+        if pos is None:
+            raise ValueError(A, B)
+        self.pos = Vec2(pos)
+        self.normal = Vec2(normal)
+        self.delta = delta
+        self.Jn = 0.0
+        self.vel_bias = 0.0
+        self.init()
+
+        # Certifica se normal foi bem escolhida
+        if (self.rA.dot(self.normal) < 0):
+            self.__init__(self.A, self.B, world=world, pos=pos, normal=-normal,
+                          delta=delta)
 
     ###########################################################################
     #                 Propriedades calculadas sob demanda
     ###########################################################################
-    @lazy
-    def tangent(self):
-        '''Vetor unitário tangente à colisão'''
+    def init(self):
+        '''Calcula propriedades da colisão'''
 
+        A, B = self.A, self.B
+        n = self.normal
+        P = self.pos
+
+        # Coeficiente de atrito e restituição
+        self.mu = self.get_friction_coeff()
+        self.e = self.get_restitution()
+
+        # Pontos de contato
+        self.rA = rA = P - A.pos
+        self.rB = rB = P - B.pos
+        self.rA_ortho = Vec2(-rA.y, rA.x)
+        self.rB_ortho = Vec2(-rB.y, rB.x)
+
+        # Massa efetiva
+        eff_invmass = A._invmass + B._invmass
+
+        if A._invinertia:
+            eff_invmass += rA.cross(n) ** 2 * A._invinertia
+
+        if B._invinertia:
+            eff_invmass += rB.cross(n) ** 2 * B._invinertia
+
+        self.effmass = 1.0 / eff_invmass
+
+        # Viés na velocidade relativa para definir o coeficiente de restituição
+        vrel = ((B.vel + B.omega * self.rB_ortho)
+                - (A.vel + A.omega * self.rA_ortho))
+        vrel_normal = vrel.dot(n)
+        if -vrel_normal > self.min_vel_bias:
+            self.vel_bias = -self.e * vrel_normal
+
+    def step(self):
+        A, B = self.A, self.B
+        n = self.normal
+
+        # Velocidade de contato relativa
+        self.vrel = vrel = ((B.vel + B.omega * self.rB_ortho)
+                            - (A.vel + A.omega * self.rA_ortho))
+        vrel_normal = vrel.dot(n)
+
+        # Impulso normal calculado no passo
+        deltaJ = -self.effmass * (vrel_normal - self.vel_bias)
+        self.Jn += deltaJ
+        self.apply_impulse(deltaJ)
+
+    def apply_impulse(self, J):
+        # Aplica incremento no impulso
+        if J != 0:
+            A, B = self.A, self.B
+            Jvec = J * self.normal
+            if A._invmass:
+                A.apply_impulse(-Jvec)
+                if A._invinertia:
+                    A.apply_aimpulse(Jvec.cross(self.rA))
+            if B._invmass:
+                B.apply_impulse(Jvec)
+                if B._invinertia:
+                    B.apply_aimpulse(-Jvec.cross(self.rB))
+
+    def apply_tangent(self, J):
+        # Aplica incremento no impulso
+        if J <= 0:
+            return
+
+        A, B = self.A, self.B
+        vrel = self.vrel
+        tangent = self.get_tangent()
+
+        # Calcula o impulso tangente máximo
+        vrel_tan = -vrel.dot(tangent)
+        Jtan_max = abs(self.mu * J)
+
+        # Limita a ação do impulso tangente
+        if A._invmass and B._invmass:
+            J = min(
+                [Jtan_max, vrel_tan / A._invmass, vrel_tan / B._invmass])
+        elif A._invmass:
+            J = min([Jtan_max, vrel_tan / A._invmass])
+        elif B._invmass:
+            J = min([Jtan_max, vrel_tan / B._invmass])
+        else:
+            J = 0.0
+
+        Jvec = J * tangent
+        if A._invmass:
+            A.apply_impulse(-Jvec)
+            if A._invinertia:
+                A.apply_aimpulse(Jvec.cross(self.rA))
+        if B._invmass:
+            B.apply_impulse(Jvec)
+            if B._invinertia:
+                B.apply_aimpulse(-Jvec.cross(self.rB))
+
+    def finalize(self):
+        if self.Jn < 0:
+            self.apply_impulse(-self.Jn)
+        self.apply_tangent(self.Jn)
+
+    def get_tangent(self):
+        # Vetor unitário tangente à colisão
         n = self.normal
         tangent = Vec2(-n.y, n.x)
-        if tangent.dot(self.vrel_contact) > 0:
+        if tangent.dot(self.vrel) > 0:
             tangent *= -1
         return tangent
 
-    @lazy
-    def delta(self):
-        '''Tamanho da superposição entre A e B'''
-
-        return 0
-
-    @lazy
-    def vrel_cm(self):
-        '''Velocidade relativa do centro de massa entre A e B'''
-
-        return self._B.vel - self._A.vel
-
-    @lazy
-    def vrel_contact(self):
-        '''Velocidade relativa entre o ponto de contato provável de A com B'''
-
-        A, B = self.objects
-        pos = self.pos
-        vrel = self.vrel_cm
-
-        if A._invinertia or A.omega:
-            x, y = pos - A.pos
-            vrel -= Vec2(-y, x) * A.omega
-
-        if B._invinertia or B.omega:
-            x, y = pos - B.pos
-            vrel += Vec2(-y, x) * B.omega
-
-        return vrel
-
-    @lazy
-    def J_normal(self):
-        '''Valor absoluto do impulso normal antes de considerar o efeito do
-        atrito no cálculo da componente tangencial'''
-
-        A, B = self.objects
-        pos = self.pos
-        n = self.normal
-        J_denom = A._invmass + B._invmass
-
-        if A._invinertia or A.omega:
-            R = pos - A.pos
-            J_denom += R.cross(n) ** 2 * A._invinertia
-
-        if B._invinertia or B.omega:
-            R = pos - B.pos
-            J_denom += R.cross(n) ** 2 * B._invinertia
-
-        # Determina o impulso total
-        if J_denom == 0.0:
-            return 0.0
-
-        vrel_n = self.vrel_contact.dot(n)
-        if vrel_n > 0:
-            return 0.0
-
-        return -(1 + self.e) * vrel_n / J_denom
-
-    @lazy
-    def J_tangent(self):
-        '''Retorna o módulo da componente tangencial do atrito'''
-
-        A, B = self.objects
-        vrel = self.vrel_contact
-
-        # Calcula o impulso tangente máximo
-        vrel_tan = -vrel.dot(self.tangent)
-        Jtan_max = abs(self.mu * self.J_normal)
-
-        # Limita a ação do impulso tangente
-        A_can_move = A._invmass or A._invinertia
-        B_can_move = B._invmass or B._invinertia
-
-        # Calcula o tangente dependendo do estado dinâmico de cada objeto
-        if A_can_move and B_can_move:
-            return min([Jtan_max, vrel_tan * A.mass, vrel_tan * B.mass])
-        elif A_can_move:
-            return min([Jtan_max, vrel_tan * A.mass])
-        elif B_can_move:
-            return min([Jtan_max, vrel_tan * B.mass])
-        else:
-            return 0.0
-
-    @lazy
-    def J_vec(self):
-        '''Retorna o impulso vetorial contemplando tanto a componente
-        tangencial quanto a normal'''
-
-        if self.mu:
-            return self.J_normal * self.normal + self.J_tangent * self.tangent
-        else:
-            return self.J_normal * self.normal
-
-    @lazy
-    def mu(self):
-        return self.get_friction_coeff()
-
-    @lazy
-    def e(self):
-        return self.get_restitution_coeff()
-
     @property
     def pos_cm(self):
-        A, B = self.objects
-        return (A. mass * A.vel + B.mass * B.vel) / (A.mass + B.mass)
+        A, B = self
+        return (A. mass * A.pos + B.mass * B.pos) / (A.mass + B.mass)
 
-    @property
     def kineticE(self):
-        return self._A.kineticE() + self._B.kineticE()
+        return self.A.kineticE() + self.B.kineticE()
 
-    @property
     def momentumP(self):
-        return self._A.momentumP() + self._B.momentumP()
+        return self.A.momentumP() + self.B.momentumP()
 
-    @property
     def momentumL(self):
-        pos = self.pos_cm
-        return self._A.momentumL(pos) + self._B.momentumL(pos)
+        pos = (0, 0)
+        return self.A.momentumL(pos) + self.B.momentumL(pos)
 
     ###########################################################################
     #                       Métodos da API de Collision
     ###########################################################################
+    def is_simple(self):
+        '''Retorna True se o contato for o único contato de ambos os objetos
+        envolvidos'''
 
-    def resolve(self, dt=0):
+        return (len(self.A._contacts) <= 1) and (len(self.B._contacts) <= 1)
+
+    def resolve(self, dt=0, trigger=True, clear=True):
         '''Resolve a colisão entre A e B, distribuindo os impulsos de acordo
         com as propriedades can_move* do objeto'''
 
-        A, B = self.objects
+        A, B = self
 
         # Impulso nulo
-        if not self.J_normal or self.resolved:
+        if self.resolved:
             self.resolved = True
-            return None
+        else:
+            # Resolve as colisões
+            self.step()
+            self.finalize()
+            self.resolved = True
 
-        # Move objetos para evitar as superposições
-        self.adjust_overlap()
+            # Dispara sinais?
+            if trigger:
+                A.trigger_collision(self)
+                B.trigger_collision(self)
+            if clear:
+                A.remove_contact(self)
+                B.remove_contact(self)
 
-        # Resolve as colisões
-        J = self.J_vec
-        pos = self.pos
-        if A._invmass:
-            A.apply_impulse(-J)
-        if A._invinertia:
-            A.apply_aimpulse((pos - A.pos).cross(-J))
-        if B._invmass:
-            B.apply_impulse(J)
-        if B._invinertia:
-            B.apply_aimpulse((pos - B.pos).cross(J))
-        self.resolved = True
+    def remove_overlap(self, beta=1.0):
+        '''Remove a superposição entre os objetos movendo cada objeto por uma
+        fração inversamente proporcional às respectivas massas'''
 
-    def adjust_overlap(self):
-        '''Move objetos para encerrar a superposição.'''
+        normal = self.normal
+        A, B = self
+        a = A._invmass
+        b = B._invmass
+        beta /= a + b
+        A.move((-beta * a) * normal)
+        B.move((beta * b) * normal)
 
-        A, B = self.objects
+    def baumgarte(self, beta, dt, mindelta=0.3):
+        delta = self.delta
+        if delta > mindelta:
+            A, B = self
+            a = A._invmass
+            b = B._invmass
+            beta *= delta / (a + b) / dt
+            a *= beta
+            b *= beta
+            A._e_vel -= a * self.normal
+            B._e_vel += b * self.normal
 
-        # Condição de Baumgarte
-        #delta = self.delta / 10
-        # if A._invmass:
-        #    A.boost(-self.normal * exp(delta))
-        # if B._invmass:
-        #    B.boost(self.normal * exp(delta))
+    def baumgarte_adjust(self, beta, mindelta=0.3):
+        delta = self.delta
+        if delta > mindelta:
+            A, B = self
+            a = A._invmass
+            b = B._invmass
+            beta *= delta / (a + b)
+            a *= beta
+            b *= beta
+            A.move(-a * self.normal)
+            B.move(b * self.normal)
 
-        # Move uma fração de delta
-        delta = 0.75 * self.delta
-        Ainvmass = min(A._invmass, (not A.is_sleep) * A._invmass)
-        Binvmass = min(B._invmass, (not B.is_sleep) * B._invmass)
-        mu = (Ainvmass + Binvmass)
-
-        if mu == 0:
-            return
-        alpha = delta * Ainvmass / mu
-        beta = delta * Binvmass / mu
-        A.move(-alpha * self.normal)
-        B.move(beta * self.normal)
-
-    def get_restitution_coeff(self):
+    def get_restitution(self):
         '''Retorna o coeficiente de restituição entre os dois objetos'''
 
-        return self.world.rest_coeff if self.world is not None else 1
+        return (self.A.restitution * self.B.restitution) ** 0.5
 
     def get_friction_coeff(self):
         '''Retorna o coeficiente de restituição entre os dois objetos'''
 
-        return self.world.dfriction if self.world is not None else 0
+        return (self.A.dfriction * self.B.dfriction) ** 0.5
+
+
+class ContactOrdered(Collision):
+
+    '''Um objeto de contato em que o primeiro objeto é sempre mais pesado que
+    o segundo'''
+
+    def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
+        if A._invmass > B._invmass:
+            B, A = A, B
+        super(ContactOrdered, self).__init__(A, B, world, pos, normal, **kwds)
 
 
 class CollisionGroup(object):

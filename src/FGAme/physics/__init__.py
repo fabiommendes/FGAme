@@ -25,12 +25,11 @@ Funções especiais para a criação de objetos
 '''
 
 from FGAme.physics.flags import *
-from FGAme.physics.dynamic_object import Dynamic
+from FGAme.physics.dynamic_object import Body, LinearRigidBody
 from FGAme.physics import flags
 from FGAme.physics.particle import Particle
-from FGAme.physics.rigidbody import RigidBody, LinearRigidBody
 from FGAme.physics.aabb import AABB
-from FGAme.physics.circle import Circle, Ball
+from FGAme.physics.circle import Circle
 from FGAme.physics.poly import Poly, RegularPoly, Rectangle
 from FGAme.physics.collision import Collision, CBBContact, AABBContact
 from FGAme.physics.collision_pairs import (get_collision,

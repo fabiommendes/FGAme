@@ -2,6 +2,7 @@
 
 from FGAme import physics
 from FGAme.objects.mixins import ObjectMixin
+from FGAme.draw import color
 
 
 class AABB(ObjectMixin, physics.AABB):
@@ -9,6 +10,7 @@ class AABB(ObjectMixin, physics.AABB):
 
     def paint(self, screen):
         screen.paint_rect(self.rect, self.color)
+        self._debug(screen)
 
 
 class Circle(ObjectMixin, physics.Circle):
@@ -16,18 +18,14 @@ class Circle(ObjectMixin, physics.Circle):
 
     def paint(self, screen):
         if self._color is not None:
-            screen.paint_circle(self.radius, self.pos, self._color)
+            #color = self.color.setred(int(self.omega) % 255)
+            color = self._color
+            screen.paint_circle(self.radius, self.pos, color)
         if self._linecolor is not None:
             screen.paint_circle(self.radius, self.pos,
                                 self._linecolor,
                                 self._linewidth)
-
-
-class Ball(ObjectMixin, physics.Ball):
-    _init_physics = physics.Ball.__init__
-
-    def paint(self, screen):
-        screen.paint_circle(self.radius, self.pos, self.color)
+        self._debug(screen)
 
 
 class Poly(ObjectMixin, physics.Poly):
@@ -35,6 +33,7 @@ class Poly(ObjectMixin, physics.Poly):
 
     def paint(self, screen):
         screen.paint_poly(self.vertices, self.color)
+        self._debug(screen)
 
 
 class Rectangle(ObjectMixin, Poly, physics.Rectangle):

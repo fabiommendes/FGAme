@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.physics import LinearRigidBody
-from FGAme.mathutils import aabb_bbox, AABB, sqrt
+from FGAme.mathutils import aabb_bbox, sqrt, AABB as _AABB
 
 __all__ = ['AABB']
 
@@ -67,14 +67,17 @@ class AABB(LinearRigidBody):
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
         self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
-        super(AABB, self).__init__(pos, vel,
-                                   mass=mass, density=density, **kwds)
+        aabb = _AABB(xmin, xmax, ymin, ymax)
+        super(AABB, self).__init__(pos, vel, mass=mass, density=density,
+                                   baseshape=aabb, **kwds)
 
     def __repr__(self):
         tname = type(self).__name__
+        if not self._invmass:
+            tname += '*'
         vel = ', '.join('%.1f' % x for x in self._vel)
         data = ', '.join('%.1f' % x for x in self.bbox)
-        return '%s(bbox=[%s], _vel=(%s))' % (tname, data, vel)
+        return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
 
     # Torna as os limites da AABB modificáveis ################################
     @property
@@ -123,12 +126,12 @@ class AABB(LinearRigidBody):
 
     # Propriedades geométricas ################################################
     def area(self):
-        return (self.xmax - self.xmin) * (self.ymax - self.ymin)
+        return 4 * self._delta_x * self._delta_y
 
     def ROG_sqr(self):
-        a = (self.xmax - self.xmin)
-        b = (self.ymax - self.ymin)
-        return (a ** 2 + b ** 2) / 12
+        a = self._delta_x
+        b = self._delta_y
+        return (a ** 2 + b ** 2) / 3
 
     def primitive(self):
         return AABB(bbox=self.bbox)

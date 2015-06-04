@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import RigidBody
+from FGAme.physics import Body
 from FGAme.mathutils import aabb_bbox, Poly as _Poly
 from FGAme.mathutils import Vec2, RotMat2
 from FGAme.mathutils import sin, pi
@@ -9,7 +9,7 @@ from FGAme.mathutils import area, center_of_mass, ROG_sqr
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
 
-class Poly(RigidBody):
+class Poly(Body):
 
     '''Define um polígono arbitrário de N lados.'''
 
@@ -119,10 +119,10 @@ class Poly(RigidBody):
 
     @property
     def _rvertices(self):
-        if self.theta == self._cache_theta:
+        if self._theta == self._cache_theta:
             return self._cache_rvertices_last
         else:
-            R = RotMat2(self.theta)
+            R = RotMat2(self._theta)
             vert = [R * v for v in self._vertices]
             xmin = min(v.x for v in vert)
             xmax = max(v.x for v in vert)
@@ -131,14 +131,14 @@ class Poly(RigidBody):
             bbox = (xmin, xmax, ymin, ymax)
 
             self._cache_rvertices_last = vert
-            self._cache_theta = self.theta
+            self._cache_theta = self._theta
             self._cache_rbbox_last = bbox
 
             return vert
 
     @property
     def _rbbox(self):
-        if self.theta == self._cache_theta:
+        if self._theta == self._cache_theta:
             return self._cache_rbbox_last
         else:
             self._rvertices

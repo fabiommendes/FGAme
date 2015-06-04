@@ -4,9 +4,10 @@ Created on 22/03/2015
 @author: chips
 '''
 
-from FGAme.core import EventDispatcherMeta, signal
+from FGAme.core import EventDispatcherMeta, signal, conf
 from FGAme.draw import Color, Shape
 from FGAme.util import lazy
+DEBUG = False
 
 
 class HasVisualization(object):
@@ -44,11 +45,18 @@ class HasVisualization(object):
         else:
             self._color = Color(value)
 
+    def _debug(self, screen):
+        if DEBUG:
+            self.paint_contact_points(screen)
+
+    def paint_contact_points(self, screen):
+        for col in self._contacts:
+            screen.paint_circle(2, col.pos, Color('black'))
+
 
 @EventDispatcherMeta.decorate
-class HasInputEvents(object):
-    _is_mixin_ = True
-    _slots_ = ['_input']
+class ObjectMixin(HasVisualization):
+    _mixin_args = set(['color', 'line_color'])
 
     long_press = signal('long-press', 'key', delegate_to='_input')
     key_up = signal('key-up', 'key', delegate_to='_input')
@@ -57,33 +65,8 @@ class HasInputEvents(object):
     mouse_click = signal('mouse-click', 'button', delegate_to='_input')
 
     @lazy
-    def input(self):
-        self.input = self.world._simulation.input
-        return self.input
-
-
-@EventDispatcherMeta.decorate
-class HasEvents(object):
-    _is_mixin_ = True
-
-    # Eventos privados
-    frame_enter = signal('frame-enter')
-    collision = signal('collision', num_args=1)
-
-
-class WorldObject(object):
-    _is_mixin_ = True
-    _slots_ = ['_world']
-
-    def _init_world_object(self, world=None):
-        if world is not None:
-            world.add(self)
-
-
-class ObjectMixin(WorldObject, HasVisualization):
-    _mixin_args = set([
-        'world', 'color', 'line_color',
-    ])
+    def _input(self):
+        return conf.get_input()
 
     def __init__(self, *args, **kwds):
         mixin_kwds = self._extract_mixin_kwargs(kwds)
@@ -106,4 +89,3 @@ class ObjectMixin(WorldObject, HasVisualization):
 
         self._init_has_visualization(color=color,
                                      linecolor=linecolor, linewidth=linewidth)
-        self._init_world_object(world)
