@@ -93,7 +93,12 @@ class World(EventDispatcher):
     key_up = signal('key-up', 'key', delegate_to='_input')
     key_down = signal('key-down', 'key', delegate_to='_input')
     mouse_motion = signal('mouse-motion', delegate_to='_input')
-    mouse_click = signal('mouse-click', 'button', delegate_to='_input')
+    mouse_button_up = \
+        signal('mouse-button-up', 'button', delegate_to='_input')
+    mouse_button_down = \
+        signal('mouse-button-down', 'button', delegate_to='_input')
+    mouse_long_press = \
+        signal('mouse-long-press', 'button', delegate_to='_input')
 
     # Eventos privados
     frame_enter = signal('frame-enter')

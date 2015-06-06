@@ -4,7 +4,7 @@ from math import trunc
 import string
 import pygame
 import pygame.locals as pg
-from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION
+from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN
 
 from FGAme.core import env, Canvas, Input, MainLoop
 from FGAme.draw import Color, rgb
@@ -90,25 +90,39 @@ class PyGameInput(Input):
             D[c] = getattr(pg, 'K_' + c)
 
         self._key_conversions = {v: k for (k, v) in D.items()}
+        self._mouse_conversions = {1: 'left', 2: 'middle', 3: 'right',
+                                   4: 'wheel-up', 5: 'wheel-down'}
 
     # Laço principal de escuta de eventos #####################################
     def query(self):
-        D = self._key_conversions
+        key_get = self._key_conversions.get
+        mouse_button_get = self._mouse_conversions.get
         window_height = env.window_height
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 raise SystemExit
             elif event.type == KEYDOWN:
-                self.process_key_down(D.get(event.key))
+                self.process_key_down(key_get(event.key))
             elif event.type == KEYUP:
-                self.process_key_up(D.get(event.key))
+                self.process_key_up(key_get(event.key))
             elif event.type == MOUSEMOTION:
                 x, y = event.pos
                 y = window_height - y
                 self.process_mouse_motion((x, y))
+            elif event.type == MOUSEBUTTONUP:
+                x, y = event.pos
+                y = window_height - y
+                button = mouse_button_get(event.button)
+                self.process_mouse_button_up(button, (x, y))
+            elif event.type == MOUSEBUTTONDOWN:
+                x, y = event.pos
+                y = window_height - y
+                button = mouse_button_get(event.button)
+                self.process_mouse_button_down(button, (x, y))
 
         self.process_long_press()
+        self.process_mouse_longpress()
 
 
 class PyGameMainLoop(MainLoop):
