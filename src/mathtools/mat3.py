@@ -4,6 +4,7 @@ import cython as C
 import mathfuncs as m
 from base import auto_public
 from util import pyinject
+from exceptions import DoesNotHaveInverseMatrixError
 if not C.compiled:
 # TODO: REMOVER QUANDO V3 FOR IMPLEMENTADO
 #    from mathtools.vec3 import Vec3
@@ -19,8 +20,7 @@ if not C.compiled:
 
 class Mat3(object):
     '''
-        Implementa uma matriz tridimensional e operações básicas de 
-        álgebra linear
+        Implementa uma matriz tridimensional e operações básicas de álgebra linear
 
     Example
     -------
@@ -29,7 +29,7 @@ class Mat3(object):
     >>> M = Mat3([ [1,2,3],
     ...            [4,5,6],
     ...            [7,8,9]])
-    
+
     Podemos também utilizar classes especializadas, como por exemplo a `RotMat3`
     , que cria uma matriz de rotação de tridimensional
 
@@ -37,10 +37,11 @@ class Mat3(object):
     |-1  -0  0|
     | 0  -1  0|
     | 0   0  1|
-    
+
     Os objetos da classe Mat3 implementam as operações algebricas básicas
     TODO: fazer testes para operações basicas de matriz mat3
-    
+
+
 
     '''
     __slots__ = ['_data']
@@ -67,29 +68,28 @@ class Mat3(object):
     @classmethod
     def from_flat(cls,data):
         '''Constroi matriz a partir de dados linearizados'''
-        return cls.from_flat(data,restype=cls)
-    
+        return cls._from_flat(data, restype=cls)
+
     @classmethod
-    def _from_flat(cls,data,restype=None):
-        it = iter(data) 
+    def _from_flat(cls,data, restype=None):
         new = object.__new__(restype or cls)
-    
-        for element in new._data:
-            element = next(it)+0.0
-        
+        new._data = list()
+        for element in data:
+            new._data.append(element)
+
         return new
-        
+
 
     # Métodos de apresentação da informação da matriz ##################
-    
+
     def aslist(self):
         '''Retorna a matrix como uma lista de listas'''
         a,b,c,d,e,f,g,h,i = self.flat()
         return [[a,b,c],[d,e,f],[g,h,i]]
-    
+
     def flat(self):
-        '''Itera sobre todos os elementos da matriz, primeiro os 
-           elementos da primeira linha, depois o da segunda e 
+        '''Itera sobre todos os elementos da matriz, primeiro os
+           elementos da primeira linha, depois o da segunda e
            por último o da terceira linha.'''
         for element in self._data:
             yield(element)
@@ -114,7 +114,7 @@ class Mat3(object):
     def det(self):
         '''Retorna o determinante da matriz
         >>> M = Mat3([[1,2,3],[4,5,6],[7,8,9]])
-        >>> M.det() 
+        >>> M.det()
         0
         '''
         a,b,c,d,e,f,g,h,i = self.flat()
@@ -125,42 +125,42 @@ class Mat3(object):
         d5 = - (a * f * h)
         d6 = - (b * d * i)
         return d1 + d2 + d3 + d4 + d5 + d6
-        
+
     def trace(self):
-        '''  retornar o traco da matriz 
+        '''  retornar o traco da matriz
         >>> M = Mat3([[1,2,3],
         ...           [4,5,6],
         ...           [7,8,9]])
-        >>> M.trace() 
+        >>> M.trace()
         15
         '''
         return self._data[0]+self._data[4]+self._data[8]
 
     def diag(self):
         '''Retorna uma lista com os valores na diagonal principal da matriz
-    
+
         >>> M = Mat3([[1,2,3],
         ...           [4,5,6],
         ...           [7,8,9]])
-        >>> M.diag() 
+        >>> M.diag()
         [1, 5, 9]
         '''
-        return [self._data[0],self._data[4],self._data[8]] 
+        return [self._data[0],self._data[4],self._data[8]]
 
     def eig(self):
-        '''Retorna uma tupla com a lista de autovalores e a matriz dos 
+        '''Retorna uma tupla com a lista de autovalores e a matriz dos
         autovetores'''
         #TODO: Vec3
         pass
-    
+
     def eigval(self):
         '''Retorna uma tupla com os autovalores da matriz
 
         '''
         #TODO:
         pass
-        
-        
+
+
     def eigvec(self, transpose=False):
         '''Retorna uma lista com os autovetores normalizados da matriz.
 
@@ -195,11 +195,20 @@ class Mat3(object):
 
     def inv(self):
         '''Retorna a inversa da matriz'''
-        
-        det  = self.det()
+
+        if self.det() == 0:
+            raise DoesNotHaveInverseMatrixError(
+                'Matrix does not have an inverse matrix')
+
         a,b,c,d,e,f,g,h,i = self.flat()
-        #TODO: tentar grassman
-        return det
+
+        multiplying_factor = 1 / (self.det())
+        inv = [[((e * i) - (f * h)), ((c * h) - (b * i)), ((b * f) - (c * e))],
+               [((f * g) - (d * i)), ((a * i) - (c * g)), ((c * d) - (a * f))],
+               [((d * h) - (e * g)), ((b * g) - (a * h)), ((a * e) - (b * d))]]
+        return self._from_lists_(inv) * multiplying_factor
+
+
 
     # Sobrescrita de operadores #################################
     def _fmt_number(self,x):
@@ -209,7 +218,7 @@ class Mat3(object):
     def __repr__(self):
         '''x.__repr__(): <==> repr(x)'''
         l  = []
-        for element in self.flat(): 
+        for element in self.flat():
              l.append(element)
 
         a, b, c, d, e, f, g, h, i = map(self._fmt_number, l)
@@ -221,7 +230,7 @@ class Mat3(object):
         l2 = '|%s  %s  %s|' % (d.rjust(n), e.rjust(m), f.rjust(o))
         l3 = '|%s  %s  %s|' % (g.rjust(n), h.rjust(m), i.rjust(o))
         return '%s\n%s\n%s' % (l1, l2,l3)
-        
+
     def __str__(self):
        '''x.__str__() <==> str(x)'''
        return repr(self)
@@ -247,16 +256,30 @@ class Mat3(object):
         '''
         return self._data[idx[0]*3+idx[1]]
 
+    def _matrix_mult_matrix(self, other):
+        a,b,c,d,e,f,g,h,i = self.flat()
+        j,k,l,m,n,o,p,q,r = self.flat()
+
+        line1 = [(a*j) + (b*m) + (c*p), (a*k) + (b*n) + (c*q), (a*l) + (b*o) + (c*r)]
+        line2 = [(d*j) + (e*m) + (f*p), (d*k) + (e*n) + (f*q), (d*l) + (e*o) + (f*r)]
+        line3 = [(g*j) + (h*m) + (i*p), (g*k) + (h*n) + (i*q), (g*l) + (h*o) + (i*r)]
+
+        return self._from_lists_([line1, line2, line3])
+
     # Operações matemáticas###############
     def __mul__(self,other):
         '''x.__mul__(y) <==> x * y'''
-        #TODO:
-        pass
-        
+
+        if isinstance(other, Mat3):
+            return self._matrix_mult_matrix(other)
+        elif isinstance(other, number):
+            return self._from_flat(x * other for x in self.flat())
 
     def __rmult__(self,other):
-        #TODO:
-        pass 
+        if isinstance(other, Mat3):
+            return self._matrix_mult_matrix(other)
+        elif isinstance(other, number):
+            return self._from_flat(x * other for x in self.flat())
 
     def __div__(self, other):
         '''x.__div__(y) <==> x / y'''
@@ -278,19 +301,19 @@ class Mat3(object):
         '''x.__radd__(y) <==> y + x'''
         return self + other
 
-    def __sub__(self,other):    
+    def __sub__(self,other):
         '''x.__sub__(y) <==> x - y'''
         return self._from_flat(x - y for (x,y) in
                                zip(self.flat(),other.flat()))
 
     def __rsub__(self,other):
         '''x.__rsub__(y) <==> y - x '''
-        return self._from_flat(y - x for (x,y) in 
+        return self._from_flat(y - x for (x,y) in
                                zip(self.flat(),other.flat()))
 
     def __neg__(self):
         '''x.__neg__() <==> -x'''
-        return self._from_flat(-x for x in self.flat())    
+        return self._from_flat(-x for x in self.flat())
 
     def __nonzero__(self):
         return any(self.flat())
@@ -313,7 +336,7 @@ class mMat3(Mat3):
         '''Rotaciona a matriz *inplace*'''
         R = RotMat3(theta)
         self._data = (R * self * R.transpose())._data
-    
+
     def itranspose(self):
         '''Transpõe a matriz *inplace*'''
         self._data[0],self._data[1],self._data[2] = self._data[0],self._data[3],self._data[6]
@@ -330,7 +353,7 @@ class RotMat3(Mat3):
     def __init__(self,theta):
         self._theta = float(theta)
         self._transposed = None
-        
+
         C = m.cos(theta)
         S = m.sin(theta)
         M = [[C,-S,0],[S,C,0],[0,0,1]]
