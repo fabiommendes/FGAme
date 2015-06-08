@@ -39,8 +39,6 @@ class Mat3(object):
     | 0   0  1|
 
     Os objetos da classe Mat3 implementam as operações algebricas básicas
-    TODO: fazer testes para operações basicas de matriz mat3
-
 
 
     '''
@@ -188,13 +186,30 @@ class Mat3(object):
         return self._from_lists_(M)
 
 
-    def rotate(self):
-        '''Retorna uma matriz rotacionada pro um ângulo theta'''
+    def rotate(self, theta):
+        '''Retorna uma matriz rotacionada pro um ângulo theta
+        >>> M = Mat3([[1,2,3],
+        ...           [4,5,6],
+        ...           [7,8,9]])
+        >>> M.rotate(45)
+        |-0.598   0.801  0|
+        |-0.801  -0.598  0|
+        |     0       0  1|
+
+        '''
         R = RotMat3(theta)
         return R * self * R.transpose()
 
     def inv(self):
-        '''Retorna a inversa da matriz'''
+        '''Retorna a inversa da matriz
+        >>> M = Mat3([[1,2,3],
+        ...           [0,1,4],
+        ...           [5,6,0]])
+        >>> M.inv()
+        |-24   18   5|
+        | 20  -15  -4|
+        | -5    4   1|
+        '''
 
         if self.det() == 0:
             raise DoesNotHaveInverseMatrixError(
@@ -266,6 +281,14 @@ class Mat3(object):
 
         return self._from_lists_([line1, line2, line3])
 
+    def _matrix_mult_vector(self, other):
+        x, y, z = other
+        a, b, c, d, e, f, g, h, i = self.flat()
+
+        result = [a*x + d*y + g*z, b*x + e*y + h*z, c*x + f*y + i*z]
+        # TODO: trocar para retornar vec3
+        return result
+
     # Operações matemáticas###############
     def __mul__(self,other):
         '''x.__mul__(y) <==> x * y'''
@@ -274,12 +297,16 @@ class Mat3(object):
             return self._matrix_mult_matrix(other)
         elif isinstance(other, number):
             return self._from_flat(x * other for x in self.flat())
+        elif isinstance(other, list):
+            return self._matrix_mult_vector(other)
 
-    def __rmult__(self,other):
+    def __rmul__(self,other):
         if isinstance(other, Mat3):
             return self._matrix_mult_matrix(other)
         elif isinstance(other, number):
             return self._from_flat(x * other for x in self.flat())
+        elif isinstance(other, list):
+            return self._matrix_mult_vector(other)
 
     def __div__(self, other):
         '''x.__div__(y) <==> x / y'''
@@ -356,14 +383,14 @@ class RotMat3(Mat3):
 
         C = m.cos(theta)
         S = m.sin(theta)
-        M = [[C,-S,0],[S,C,0],[0,0,1]]
+        M = [[C, - S, 0], [S, C, 0], [0, 0, 1]]
         super(RotMat3,self).__init__(M)
 
     def rotate(self,theta):
         return RotMat3(self._theta + theta)
 
     def transpose(self):
-        if self._transposed in None:
+        if self._transposed is None:
             self._transposed = super(RotMat3,self).transpose()
         return self._transposed
 
