@@ -4,7 +4,7 @@ import cython as C
 import mathfuncs as m
 from base import auto_public
 from util import pyinject
-from exceptions import DoesNotHaveInverseMatrixError
+from exceptions import DoesNotHaveInverseMatrixError, InvalidAxisError
 if not C.compiled:
     from vec3 import Vec3
 __all__ = ['Mat3','RotMat3','mMat3']
@@ -29,7 +29,7 @@ class Mat3(object):
     Podemos também utilizar classes especializadas, como por exemplo a `RotMat3`
     , que cria uma matriz de rotação de tridimensional
 
-    >>> R = RotMat3(3.1415); R
+    >>> R = RotMat3(3.1415, 'z'); R
     |-1  -0  0|
     | 0  -1  0|
     | 0   0  1|
@@ -184,18 +184,18 @@ class Mat3(object):
         return self._from_lists_(M)
 
 
-    def rotate(self, theta):
+    def rotate(self, theta, axis):
         '''Retorna uma matriz rotacionada pro um ângulo theta
         >>> M = Mat3([[1,2,3],
         ...           [4,5,6],
         ...           [7,8,9]])
-        >>> M.rotate(45)
+        >>> M.rotate(45, 'z')
         |-0.598   0.801  0|
         |-0.801  -0.598  0|
         |     0       0  1|
 
         '''
-        R = RotMat3(theta)
+        R = RotMat3(theta, axis)
         return R * self * R.transpose()
 
     def inv(self):
@@ -374,13 +374,24 @@ class RotMat3(Mat3):
     '''
     __slots__ = ['_theta','_transposed']
 
-    def __init__(self,theta):
+    def __init__(self,theta, axis):
         self._theta = float(theta)
         self._transposed = None
 
-        C = m.cos(theta)
-        S = m.sin(theta)
-        M = [[C, - S, 0], [S, C, 0], [0, 0, 1]]
+        self.C = m.cos(theta)
+        self.S = m.sin(theta)
+
+        if isinstance(axis, str) and axis == 'x':
+            M = [[1, 0, 0], [0, C, - S], [0, S, C]]
+        elif isinstance(axis, str) and axis == 'y':
+            M = [[C, 0, S], [0, 1, 0], [- S, 0, C]]
+        elif isinstance(axis, str) and axis == 'z':
+            M = [[C, - S, 0], [S, C, 0], [0, 0, 1]]
+        # elif isinstance(axis, Vec3):
+        #     M = self._rotate_by_vector_axis(axis)
+        else:
+            raise InvalidAxisError("Eixo '" + axis + "' invalido.")
+
         super(RotMat3,self).__init__(M)
 
     def rotate(self,theta):
@@ -397,6 +408,23 @@ class RotMat3(Mat3):
     @property
     def theta(self):
         return self._theta
+
+    def _rotate_by_vector_axis(self, vector):
+        a, b, c = vector.as_tuple()
+
+        line1 = [(self.C + (1 - self.C) * (a ** 2)),
+                 (((1 - self.C) * a * b) + (self.S * c)),
+                 (((1 - self.C) * a * c) - (self.S * b))]
+        line2 = [(((1 - self.C) * b * a) - (self.S * c)),
+                 (self.C + ((1 - self.C) * (b ** 2))),
+                 (((1 - self.C) * b * c) + (self.S * a))]
+        line3 = [(((1 - self.C) * c * a) + (self.S * b)),
+                 (((1 - self.C) * c * b) - (self.S * a)),
+                 (self.C + ((1 - self.C) * (c ** 2)))]
+
+        M = [line1, line2, line3]
+        return M
+
 
 if __name__ == '__main__':
     import doctest
