@@ -1,10 +1,10 @@
 # -*- coding: utf8 -*-
 
 import cython as C
-import mathfuncs as m
-from base import auto_public
-from util import pyinject
-from exceptions import DoesNotHaveInverseMatrixError
+import mathtools.mathfuncs as m
+from mathtools.base import auto_public
+from mathtools.util import pyinject
+from mathtools.exceptions import DoesNotHaveInverseMatrixError
 if not C.compiled:
 # TODO: REMOVER QUANDO V3 FOR IMPLEMENTADO
 #    from mathtools.vec3 import Vec3
