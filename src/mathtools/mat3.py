@@ -1,22 +1,18 @@
 # -*- coding: utf8 -*-
 
 import cython as C
-import mathtools.mathfuncs as m
-from mathtools.base import auto_public
-from mathtools.util import pyinject
-from mathtools.exceptions import DoesNotHaveInverseMatrixError
+import mathfuncs as m
+from base import auto_public
+from util import pyinject
+from exceptions import DoesNotHaveInverseMatrixError
 if not C.compiled:
-# TODO: REMOVER QUANDO V3 FOR IMPLEMENTADO
-#    from mathtools.vec3 import Vec3
+    from vec3 import Vec3
+__all__ = ['Mat3','RotMat3','mMat3']
 
- __all__ = ['Mat3','RotMat3','mMat3']
-
- number = (float,int)
+number = (float,int)
 
 
-######
-#   Matriz 3 x 3
-######
+#######################   Matriz 3 x 3  #################################
 
 class Mat3(object):
     '''
@@ -37,11 +33,8 @@ class Mat3(object):
     |-1  -0  0|
     | 0  -1  0|
     | 0   0  1|
-
-    Os objetos da classe Mat3 implementam as operações algebricas básicas
-
-
     '''
+
     __slots__ = ['_data']
 
     def __init__(self,obj):
@@ -93,20 +86,26 @@ class Mat3(object):
             yield(element)
 
     def colvecs(self):
-        '''Retorna uma lista com os vecores coluna da matriz.'''
-        # TODO: descomentar quando implementado o vec3
-        #   return [Vec3(self._a,self._d,self._g),
-        #           Vec3(sefl._b,self._e,self._h),
-        #           Vec3(self._c,self._f,self_i)]
-        pass
+        '''Retorna uma lista com os vetores coluna da matriz.
+        >>> M = Mat3([ [1,2,3],
+        ...            [4,5,6],
+        ...            [7,8,9]])
+        >>> M.colvecs()
+        [Vec3(1, 4, 7), Vec3(2, 5, 8), Vec3(3, 6, 9)]
+        '''
+        a,b,c,d,e,f,g,h,i = self.flat()
+        return [Vec3(a,d,g),Vec3(b,e,h),Vec3(c,f,i)]
 
     def rowvecs(self):
-        '''Retorna uma lista com os vetores das linhas da matriz.'''
-        #TODO:   descomentar quando for implementado o vec3
-        # return [Vec3(self._a, self._b, self._c),
-        #         Vec3(self._d, self._e, self._f),
-        #         Vec3(self._g, self._h, self._i)]
-        pass
+        '''Retorna uma lista com os vetores das linhas da matriz.
+        >>> M = Mat3([ [1,2,3],
+        ...            [4,5,6],
+        ...            [7,8,9]])
+        >>> M.rowvecs()
+        [Vec3(1, 2, 3), Vec3(4, 5, 6), Vec3(7, 8, 9)]
+        '''
+        a,b,c,d,e,f,g,h,i = self.flat()
+        return [Vec3(a,b,c),Vec3(d,e,f),Vec3(g,h,i)]
 
     # Métodos para cálculo de propriedades lineares da matriz ###########
     def det(self):
@@ -153,7 +152,6 @@ class Mat3(object):
 
     def eigval(self):
         '''Retorna uma tupla com os autovalores da matriz
-
         '''
         #TODO:
         pass
@@ -255,10 +253,9 @@ class Mat3(object):
 
     def __iter__(self):
         it = self.flat()
-    # TODO:   ESPERANDO VETOR 3
-    #    yield Vec3(next(it),next(it),next(it))
-    #    yield Vec3(next(it),next(it),next(it))
-    #    yield Vec3(next(it),next(it),next(it))
+        yield Vec3(next(it),next(it),next(it))
+        yield Vec3(next(it),next(it),next(it))
+        yield Vec3(next(it),next(it),next(it))
 
     def __getitem__(self,idx):
         '''x.__getitem__(i) <==> x[i]
