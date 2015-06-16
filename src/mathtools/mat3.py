@@ -33,6 +33,38 @@ class Mat3(object):
     |-1  -0  0|
     | 0  -1  0|
     | 0   0  1|
+
+    Os objetos da classe Mat3 são implementam as operações algébricas básicas
+
+    >>> M + 2 * R
+    |-1  2   3|
+    | 4  3   6|
+    | 7  8  11|
+
+    As multiplicações são como definidas em álgebra linear
+    >>> M * M
+    | 30   36   42|
+    | 66   81   96|
+    |102  126  150|
+
+    Onde multiplicação por vetores também é aceita
+    >>> v = Vec3([1,2,3])
+    >>> v * M
+    Vec3(30, 36, 42)
+
+    >>> M * v
+    Vec3(14, 32, 50)
+
+    Além disto, temos operações como cálculo da inversa, determinante, etc
+
+    >>> M = Mat3([[1,2,3],
+    ...           [0,1,4],
+    ...           [5,6,0]])
+    >>> M.inv() * M
+    |1  0  0|
+    |0  1  0|
+    |0  0  1|
+
     '''
 
     __slots__ = ['_data']
@@ -190,10 +222,9 @@ class Mat3(object):
         ...           [4,5,6],
         ...           [7,8,9]])
         >>> M.rotate(45, 'z')
-        |-0.598   0.801  0|
-        |-0.801  -0.598  0|
-        |     0       0  1|
-
+        | 1.214  -4.132  -3.529|
+        |-2.132   4.786   5.705|
+        | -3.13  10.159       9|
         '''
         R = RotMat3(theta, axis)
         return R * self * R.transpose()
@@ -268,9 +299,9 @@ class Mat3(object):
         '''
         return self._data[idx[0]*3+idx[1]]
 
-    def _matrix_mult_matrix(self, other):
+    def _matrix_a_mult_matrix_b(self, other):
         a,b,c,d,e,f,g,h,i = self.flat()
-        j,k,l,m,n,o,p,q,r = self.flat()
+        j,k,l,m,n,o,p,q,r = other.flat()
 
         line1 = [(a*j) + (b*m) + (c*p), (a*k) + (b*n) + (c*q), (a*l) + (b*o) + (c*r)]
         line2 = [(d*j) + (e*m) + (f*p), (d*k) + (e*n) + (f*q), (d*l) + (e*o) + (f*r)]
@@ -278,32 +309,52 @@ class Mat3(object):
 
         return self._from_lists_([line1, line2, line3])
 
+    def _matrix_b_mult_matrix_a(self, other):
+        a,b,c,d,e,f,g,h,i = self.flat()
+        j,k,l,m,n,o,p,q,r = other.flat()
+
+        line1 = [(a*j) + (d*k) + (g*l), (b*j) + (e*k) + (h*l), (c*j) + (f*k) + (i*l)]
+        line2 = [(a*m) + (d*n) + (g*o), (b*m) + (e*n) + (h*o), (c*m) + (f*n) + (i*o)]
+        line3 = [(a*p) + (d*q) + (g*r), (b*p) + (e*q) + (h*r), (c*p) + (f*q) + (i*r)]
+
+        return self._from_lists_([line1, line2, line3])
+
     def _matrix_mult_vector(self, other):
         x, y, z = other
         a, b, c, d, e, f, g, h, i = self.flat()
 
+        result = [a*x + b*y + c*z, d*x + e*y + f*z, g*x + h*y + i*z]
+        return Vec3(result)
+
+    def _vector_mult_matrix(self, other):
+        x, y, z = other
+        a, b, c, d, e, f, g, h, i = self.flat()
+
         result = [a*x + d*y + g*z, b*x + e*y + h*z, c*x + f*y + i*z]
-        # TODO: trocar para retornar vec3
-        return result
+        return Vec3(result)
 
     # Operações matemáticas###############
     def __mul__(self,other):
         '''x.__mul__(y) <==> x * y'''
 
         if isinstance(other, Mat3):
-            return self._matrix_mult_matrix(other)
+            return self._matrix_a_mult_matrix_b(other)
         elif isinstance(other, number):
             return self._from_flat(x * other for x in self.flat())
         elif isinstance(other, list):
             return self._matrix_mult_vector(other)
+        elif isinstance(other, Vec3):
+            return self._matrix_mult_vector(other.as_tuple())
 
     def __rmul__(self,other):
         if isinstance(other, Mat3):
-            return self._matrix_mult_matrix(other)
+            return self._matrix_b_mult_matrix_a(other)
         elif isinstance(other, number):
             return self._from_flat(x * other for x in self.flat())
         elif isinstance(other, list):
-            return self._matrix_mult_vector(other)
+            return self._vector_mult_matrix(other)
+        elif isinstance(other, Vec3):
+            return self._vector_mult_matrix(other.as_tuple())
 
     def __div__(self, other):
         '''x.__div__(y) <==> x / y'''
@@ -378,8 +429,8 @@ class RotMat3(Mat3):
         self._theta = float(theta)
         self._transposed = None
 
-        self.C = m.cos(theta)
-        self.S = m.sin(theta)
+        C = m.cos(theta)
+        S = m.sin(theta)
 
         if isinstance(axis, str) and axis == 'x':
             M = [[1, 0, 0], [0, C, - S], [0, S, C]]
@@ -387,8 +438,8 @@ class RotMat3(Mat3):
             M = [[C, 0, S], [0, 1, 0], [- S, 0, C]]
         elif isinstance(axis, str) and axis == 'z':
             M = [[C, - S, 0], [S, C, 0], [0, 0, 1]]
-        # elif isinstance(axis, Vec3):
-        #     M = self._rotate_by_vector_axis(axis)
+        elif isinstance(axis, Vec3):
+            M = self._rotate_by_vector_axis(theta, axis)
         else:
             raise InvalidAxisError("Eixo '" + axis + "' invalido.")
 
@@ -409,18 +460,20 @@ class RotMat3(Mat3):
     def theta(self):
         return self._theta
 
-    def _rotate_by_vector_axis(self, vector):
+    def _rotate_by_vector_axis(self,theta, vector):
         a, b, c = vector.as_tuple()
+        C = m.cos(theta)
+        S = m.sin(theta)
 
-        line1 = [(self.C + (1 - self.C) * (a ** 2)),
-                 (((1 - self.C) * a * b) + (self.S * c)),
-                 (((1 - self.C) * a * c) - (self.S * b))]
-        line2 = [(((1 - self.C) * b * a) - (self.S * c)),
-                 (self.C + ((1 - self.C) * (b ** 2))),
-                 (((1 - self.C) * b * c) + (self.S * a))]
-        line3 = [(((1 - self.C) * c * a) + (self.S * b)),
-                 (((1 - self.C) * c * b) - (self.S * a)),
-                 (self.C + ((1 - self.C) * (c ** 2)))]
+        line1 = [(C + (1 - C) * (a ** 2)),
+                 (((1 - C) * a * b) + (S * c)),
+                 (((1 - C) * a * c) - (S * b))]
+        line2 = [(((1 - C) * b * a) - (S * c)),
+                 (C + ((1 - C) * (b ** 2))),
+                 (((1 - C) * b * c) + (S * a))]
+        line3 = [(((1 - C) * c * a) + (S * b)),
+                 (((1 - C) * c * b) - (S * a)),
+                 (C + ((1 - C) * (c ** 2)))]
 
         M = [line1, line2, line3]
         return M
