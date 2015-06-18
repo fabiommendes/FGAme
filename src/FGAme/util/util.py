@@ -1,4 +1,7 @@
 # -*- coding: utf8 -*-
+import types
+
+__all__ = ['lazy', 'delegate_to', 'autodoc']
 
 
 class lazy(object):
@@ -74,6 +77,30 @@ class delegate_to(property):
             super(delegate_to, self).__init__(fget)
         else:
             super(delegate_to, self).__init__(fget, fset, fdel)
+
+
+def autodoc(cls):
+    '''Decorador de classe que insere automaticamente as strings de
+    documentação nos métodos não-documentados de uma classe utilizando a
+    string da classe mãe'''
+
+    func_t = types.FunctionType
+
+    for attr, value in vars(cls).items():
+        if isinstance(value, func_t) and not value.__doc__:
+            for sub in cls.mro():
+                try:
+                    doc = getattr(sub, attr).__doc__
+                except AttributeError:
+                    doc = None
+                    break
+                if doc:
+                    break
+
+            value.__doc__ = doc
+
+    return cls
+
 
 if __name__ == '__main__':
     import doctest

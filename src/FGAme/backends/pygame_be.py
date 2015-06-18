@@ -1,4 +1,5 @@
 # -*- coding: utf8 -*-
+
 import cython
 from math import trunc
 import string
@@ -8,10 +9,12 @@ from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION, MOUSEBUTTONUP, MOUS
 
 from FGAme.core import env, Canvas, Input, MainLoop
 from FGAme.draw import Color, rgb
+from FGAme.util import autodoc
 
 pygame.init()
 
 
+@autodoc
 class PyGameCanvas(Canvas):
 
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
@@ -84,9 +87,13 @@ class PyGameInput(Input):
 
     def __init__(self):
         super(PyGameInput, self).__init__()
-        D = dict(up=pg.K_UP, down=pg.K_DOWN, left=pg.K_LEFT, right=pg.K_RIGHT,
-                 space=pg.K_SPACE,
-                 )
+        D = dict(
+            up=pg.K_UP,
+            down=pg.K_DOWN,
+            left=pg.K_LEFT,
+            right=pg.K_RIGHT,
+            space=pg.K_SPACE,
+        )
         D['return'] = pg.K_RETURN
 
         # Adiciona as letras e números
