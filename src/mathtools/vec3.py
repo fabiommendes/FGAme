@@ -2,10 +2,8 @@
 
 import cython as C
 import mathtools as m
-import decimal
 from mathtools.base import auto_public
 from mathtools.util import pyinject
-from mathtools.vec2 import Vec2
 
 __all__ = ['Vec3', 'VecSlot', 'nullvec3']
 
@@ -27,13 +25,14 @@ class Vec3(object):
 
     Criamos um vetor chamando a classe com as componentes como argumento.
 
-    >>> v = Vec3(2, 3, 4); print(v)
+    >>> v = Vec3(2, 3, 4); v
     Vec3(2, 3, 4)
 
     Os métodos de listas funcionam para objetos do tipo Vec3:
 
-    >>> v[0], v[1], v[2], len(v)
-    (2.0, 3.0, 4.0, 3)
+    >>> v[0], v[1], v[2]; len(v)
+    (2.0, 3.0, 4.0)
+    3
 
     Objetos do tipo Vec3 também aceitam operações matemáticas
 
@@ -42,11 +41,11 @@ class Vec3(object):
 
     Além de algumas funções de conveniência para calcular o módulo,
     vetor unitário, etc.
+
     >>> v.norm()
     5.385164807134504
-
     >>> v.normalize()
-    Vec3(0.371390676354, 0.557086014531, 0.742781352708)
+    Vec3(0.37, 0.56, 0.74)
 
     '''
 
@@ -100,7 +99,7 @@ class Vec3(object):
 
         return (self.x, self.y, self.z)
 
-    def almost_equals(self , other, delta = 0.0001):
+    def almost_equals(self, other, delta=0.0001):
         '''Verifica se o vetor é quase igual a outro
 
         Exemplo:
@@ -115,7 +114,13 @@ class Vec3(object):
         '''
 
         # Faz o teste primeiramente com o angulo entre os dois vetores
-        if abs(self.x - other.x) <= delta and abs(self.y - other.y) <= delta and abs(self.z - other.z) <= delta:
+        if abs(
+                self.x -
+                other.x) <= delta and abs(
+                self.y -
+                other.y) <= delta and abs(
+                self.z -
+                other.z) <= delta:
             return True
         else:
             return False
@@ -131,7 +136,8 @@ class Vec3(object):
         1.0
         '''
 
-        distance = m.sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2 + (other.z - self.z) ** 2)
+        distance = m.sqrt(
+            (other.x - self.x) ** 2 + (other.y - self.y) ** 2 + (other.z - self.z) ** 2)
 
         return distance
 
@@ -145,7 +151,7 @@ class Vec3(object):
         >>> v.angle(other)
         1.5707963267948966
         '''
-        return m.acos((self.dot(other))/(self.norm()*other.norm()))
+        return m.acos((self.dot(other)) / (self.norm() * other.norm()))
 
     def is_null(self):
         '''Verifica se o vetor é nulo
@@ -157,7 +163,7 @@ class Vec3(object):
         True
         '''
 
-        if self == Vec3(0,0,0):
+        if self == Vec3(0, 0, 0):
             return True
         else:
             return False
@@ -171,8 +177,8 @@ class Vec3(object):
         >>> v.cylindrical_coords()
         (3.605551275463989, 0.982793723247329, 4.0)
         '''
-        radius = m.sqrt(self.x**2 + self.y**2)
-        angle = m.atan(self.y/self.x)
+        radius = m.sqrt(self.x ** 2 + self.y ** 2)
+        angle = m.atan(self.y / self.x)
         height = self.z
 
         return (radius, angle, height)
@@ -188,7 +194,7 @@ class Vec3(object):
         '''
         radius = self.norm()
         theta = m.acos(self.z / radius)
-        phi = m.atan(self.y/ self.x)
+        phi = m.atan(self.y / self.x)
 
         sph = (radius, theta, phi)
 
@@ -207,7 +213,7 @@ class Vec3(object):
         reflection = 2 * (self.dot(other)) * other - self
         return reflection
 
-    def lerp(self, other , range_lerp):
+    def lerp(self, other, range_lerp):
         '''Retorna um vetor com tamanho máximo baseado no vetor resultante da
         diferença entre dois vetores, sendo que o range_lerp assume valores
         entre 0 e 1.
@@ -253,13 +259,13 @@ class Vec3(object):
         --------
         >>> v = Vec3(2, 4, 5)
         >>> v.clamp(8, 10)
-        Vec3(2.38513918, 4.77027835, 5.96284794)
+        Vec3(2.39, 4.77, 5.96)
         '''
 
         if self.norm() < maximum:
-            distance_min_max = minimum/self.norm()
+            distance_min_max = minimum / self.norm()
         else:
-            distance_min_max = maximum/self.norm()
+            distance_min_max = maximum / self.norm()
 
         self = self * distance_min_max
         self.x = round(self.x, 8)
@@ -272,7 +278,6 @@ class Vec3(object):
         '''Retorna o módulo (norma) do vetor'''
 
         return m.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2)
-
 
     def norm_sqr(self):
         '''Retorna o módulo do vetor ao quadrado'''
@@ -334,7 +339,7 @@ class Vec3(object):
 
         return m.trunc(self.x), m.trunc(self.y), m.trunc(self.z)
 
-    @C.locals(vec='Vec3', x='double', y='double', z = 'double')
+    @C.locals(vec='Vec3', x='double', y='double', z='double')
     def dot(self, other):
         '''Retorna o resultado do produto escalar com outro vetor
 
@@ -351,7 +356,14 @@ class Vec3(object):
             x, y, z = other
             return self.x * x + self.y * y + self.z * z
 
-    @C.locals(vec='Vec3', x='double', y='double', z='double', a='double', b='double', c='double')
+    @C.locals(
+        vec='Vec3',
+        x='double',
+        y='double',
+        z='double',
+        a='double',
+        b='double',
+        c='double')
     def cross(self, other):
         '''Retorna o produto vetorial de dois vetores 3D como um terceiro vetor
 
@@ -364,15 +376,15 @@ class Vec3(object):
 
         try:
             vec = other
-            a = (self.y * vec.z) - (self.z * vec.y);
-            b = -(self.x * vec.z) + (self.z * vec.x);
-            c = (self.x * vec.y) - (self.y * vec.x);
+            a = (self.y * vec.z) - (self.z * vec.y)
+            b = -(self.x * vec.z) + (self.z * vec.x)
+            c = (self.x * vec.y) - (self.y * vec.x)
             return Vec3(a, b, c)
         except (TypeError, AttributeError):
             x, y, z = other
-            a = (self.y * z) - (self.z * y);
-            b = -(self.x * z) + (self.z * x);
-            c = (self.x * y) - (self.y * x);
+            a = (self.y * z) - (self.z * y)
+            b = -(self.x * z) + (self.z * x)
+            c = (self.x * y) - (self.y * x)
             return Vec3(a, b, c)
 
     def null(self):
@@ -385,9 +397,9 @@ class Vec3(object):
         '''x.__repr__() <==> repr(x)'''
 
         x, y, z = self
-        x = str(x) if x != int(x) else str(int(x))
-        y = str(y) if y != int(y) else str(int(y))
-        z = str(z) if z != int(z) else str(int(z))
+        x = '%.2f' % x if x != int(x) else str(int(x))
+        y = '%.2f' % y if y != int(y) else str(int(y))
+        z = '%.2f' % z if z != int(z) else str(int(z))
         tname = type(self).__name__
         return '%s(%s, %s, %s)' % (tname, x, y, z)
 
@@ -445,13 +457,25 @@ class Vec3(object):
     def __div__(self, other):
         '''x.__div__(y) <==> x / y'''
 
-        return self._from_coords(self.x / other, self.y / other, self.z / other)
+        return self._from_coords(
+            self.x /
+            other,
+            self.y /
+            other,
+            self.z /
+            other)
 
     @C.locals(self='Vec3', other='double')
     def __truediv__(self, other):
         '''x.__div__(y) <==> x / y'''
 
-        return self._from_coords(self.x / other, self.y / other, self.z / other)
+        return self._from_coords(
+            self.x /
+            other,
+            self.y /
+            other,
+            self.z /
+            other)
 
     @C.locals(A='Vec3', B='Vec3', x='double', y='double', z='double')
     def __add__(self, other):
@@ -486,17 +510,23 @@ class Vec3(object):
         except (TypeError, AttributeError):
             try:
                 A = self
-                x, y = other
+                x, y, z = other
                 return A._from_coords(A.x - x, A.y - y, A.z - z)
             except TypeError:
                 B = other
-                x, y = self
+                x, y, z = self
                 return B._from_coords(x - B.x, y - B.y, z - B.z)
 
     def __rsub__(self, other):
         '''x.__rsub__(y) <==> y - x'''
         try:
-            return self._from_coords(other.x - self.x, other.y - self.y, other.z - self.z)
+            return self._from_coords(
+                other.x -
+                self.x,
+                other.y -
+                self.y,
+                other.z -
+                self.z)
         except AttributeError:
             x, y, z = other
             return self._from_coords(x - self.x, y - self.y, z - self.z)
@@ -522,7 +552,7 @@ class Vec3(object):
             return self.x == x and self.y == y and self.z == z
         elif method == 3:  # diferente (!=)
             x, y, z = other
-            return self.x != x or self.y != y or self.z!= z
+            return self.x != x or self.y != y or self.z != z
         else:
             raise TypeError('invalid rich comparison: %s' % method)
 
@@ -658,7 +688,7 @@ if not C.compiled:
         '''Implementa métodos que tem algum tipo de problema de performance
         ou de semântica diferente entre Cython e o Python interpretado'''
 
-        def __init__(self, x_or_data, y=None, z = None):
+        def __init__(self, x_or_data, y=None, z=None):
             if y is None:
                 x, y, z = x_or_data
             else:
@@ -683,7 +713,13 @@ if not C.compiled:
                 other = float(other)
             except TypeError:
                 return other.__rmul__(self)
-            return self._from_coords(self.x * other, self.y * other, self.z * other)
+            return self._from_coords(
+                self.x *
+                other,
+                self.y *
+                other,
+                self.z *
+                other)
 
         def __eq__(self, other):
             x, y, z = other

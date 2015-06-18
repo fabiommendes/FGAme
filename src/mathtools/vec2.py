@@ -2,7 +2,6 @@
 
 import cython as C
 import mathtools as m
-import decimal
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 
@@ -96,7 +95,7 @@ class Vec2(object):
 
         return (self.x, self.y)
 
-    def almost_equals(self , other, delta_angle = 1/1000 , delta_norm = 1/1000):
+    def almost_equals(self, other, delta_angle=1 / 1000, delta_norm=1 / 1000):
         '''Verifica se o vetor é quase igual a outro
 
         Exemplo:
@@ -108,15 +107,16 @@ class Vec2(object):
         '''
 
         # Faz o teste primeiramente com o angulo entre os dois vetores
-        if ( self.angle(other) < delta_angle ):
+        if (self.angle(other) < delta_angle):
             # Testa o tamanho dos vetores com base no delta
-            if (self.norm() <= other.norm() + delta_norm and self.norm() >= other.norm() - delta_norm):
+            if (self.norm() <= other.norm() +
+                    delta_norm and self.norm() >= other.norm() -
+                    delta_norm):
                 return True
             else:
-                return False 
+                return False
         else:
             return False
-
 
     def distance_to(self, other):
         '''Retorna a distância entre dois vetores
@@ -143,7 +143,7 @@ class Vec2(object):
         >>> v.angle(other)
         1.5707963267948966
         '''
-        return m.acos((self.dot(other))/(self.norm()*other.norm()))
+        return m.acos((self.dot(other)) / (self.norm() * other.norm()))
 
     def is_null(self):
         '''Verifica se o vetor é nulo
@@ -155,7 +155,7 @@ class Vec2(object):
         True
         '''
 
-        if self == Vec2(0,0):
+        if self == Vec2(0, 0):
             return True
         else:
             return False
@@ -170,7 +170,7 @@ class Vec2(object):
         (1.0, 0.0)
         '''
         radius = self.norm()
-        x_unit = Vec2(1,0)
+        x_unit = Vec2(1, 0)
         angle = self.angle(x_unit)
 
         polar = (radius, angle)
@@ -186,51 +186,48 @@ class Vec2(object):
         >>> other = Vec2(1,0)
         >>> v.reflect(other)
         Vec2(3, -4)
-        ''' 
+        '''
         # confere se algum dos vetores é nulo
-        if ( other.is_null() or self.is_null() ):
+        if (other.is_null() or self.is_null()):
 
             return self
         else:
 
             angle = self.angle(other)
 
-            if ( other.x < 0 ):
-                reflect = self.rotate(2*angle)
+            if (other.x < 0):
+                reflect = self.rotate(2 * angle)
             else:
-                reflect = self.rotate(-2*angle)
+                reflect = self.rotate(-2 * angle)
 
-            reflect.x = round(reflect.x,4)
-            reflect.y = round(reflect.y,4)
+            reflect.x = round(reflect.x, 4)
+            reflect.y = round(reflect.y, 4)
 
             return reflect
 
-    def lerp(self, other , range_lerp):
-        '''Retorna um vetor com tamanho máximo baseado no vetor resultante da
-        diferença entre dois vetores, sendo que o range_lerp assume valores
-        entre 0 e 1.
+    def lerp(self, other, weight):
+        '''Retorna um vetor entre self e other, ponderado pelo valor do peso
+        `weight`, que deve ser entre 0 e 1.
 
         Exemplo
         --------
-        >>> v = Vec2(1,0)
-        >>> v1 = Vec2(0,1)
-        >>> v.lerp(v1, 0)
-        Vec2(1, 0)
+        >>> u = Vec2(1, 0)
+        >>> v = Vec2(0, 1)
+        >>> u.lerp(v, 0), u.lerp(v, 0.5), u.lerp(v, 1)
+        (Vec2(1, 0), Vec2(0.5, 0.5), Vec2(0, 1))
+
         '''
 
-        if range_lerp > 1 or range_lerp < 0:
-
-            lerp = self
+        if not 0 <= weight <= 1:
+            raise ValueError('weight must be between 0 and 1')
         else:
             subtraction_vectors = other - self
-
-            lerp = subtraction_vectors * range_lerp + self
-
+            lerp = subtraction_vectors * weight + self
         return lerp
 
-    def perpendicular(self , inverse = False):
+    def perpendicular(self, inverse=False):
         '''Retorna um vetor 2d perpendicular a ele, sendo que a convenção do
-        parametro inverse é o sentido anti-horário
+        parametro inverse é o sentido anti-horário.
 
         Exemplo
         --------
@@ -239,11 +236,11 @@ class Vec2(object):
         Vec2(0, -1)
         '''
 
-        if ( inverse == False ):
-            perpendicular = Vec2(-self.y,self.x)
+        if (inverse == False):
+            perpendicular = Vec2(-self.y, self.x)
 
         else:
-            perpendicular = Vec2(self.y,-self.x)
+            perpendicular = Vec2(self.y, -self.x)
 
         return perpendicular
 
@@ -261,11 +258,11 @@ class Vec2(object):
         dot = self.dot(other)
         module_square = other.norm_sqr()
 
-        return dot*other/module_square
+        return dot * other / module_square
 
     def clamp(self, minimum, maximum):
         '''Retorna um vetor na mesma direção com o módulo baseado entre os valores
-        minimo e máximo.Se for menor que o máximo, retorna um vetor com módulo igual ao 
+        minimo e máximo.Se for menor que o máximo, retorna um vetor com módulo igual ao
         mínimo , se for maior que o máximo, retorna um vetor com módulo igual ao
         máximo.
 
@@ -277,21 +274,20 @@ class Vec2(object):
         '''
 
         if self.norm() < maximum:
-            distance_min_max = minimum/self.norm()
+            distance_min_max = minimum / self.norm()
         else:
-            distance_min_max = maximum/self.norm()
-        
+            distance_min_max = maximum / self.norm()
+
         self = self * distance_min_max
         self.x = round(self.x, 8)
         self.y = round(self.y, 8)
 
         return self
 
-    def norm(self): 
+    def norm(self):
         '''Retorna o módulo (norma) do vetor'''
 
         return m.sqrt(self.x ** 2 + self.y ** 2)
-    
 
     def norm_sqr(self):
         '''Retorna o módulo do vetor ao quadrado'''
@@ -393,8 +389,8 @@ class Vec2(object):
         '''x.__repr__() <==> repr(x)'''
 
         x, y = self
-        x = str(x) if x != int(x) else str(int(x))
-        y = str(y) if y != int(y) else str(int(y))
+        x = '%.2f' % x if x != int(x) else str(int(x))
+        y = '%.2f' % y if y != int(y) else str(int(y))
         tname = type(self).__name__
         return '%s(%s, %s)' % (tname, x, y)
 
