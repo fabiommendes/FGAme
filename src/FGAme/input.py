@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.core import EventDispatcher, signal
+from FGAme.events import EventDispatcher, signal
 
 
 class Input(EventDispatcher):

@@ -4,8 +4,9 @@ Created on 22/03/2015
 @author: chips
 '''
 
-from FGAme.core import EventDispatcherMeta, signal, conf
-from FGAme.draw import Color, Shape
+from FGAme.events import EventDispatcherMeta, signal
+from FGAme.core import conf
+from FGAme.draw import Color
 from FGAme.util import lazy
 DEBUG = False
 

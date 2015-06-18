@@ -7,7 +7,9 @@ import pygame
 import pygame.locals as pg
 from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN
 
-from FGAme.core import env, Canvas, Input, MainLoop
+from FGAme.core import env, Canvas
+from FGAme.input import Input
+from FGAme.mainloop import MainLoop
 from FGAme.draw import Color, rgb
 from FGAme.util import autodoc
 

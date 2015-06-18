@@ -2,7 +2,8 @@
 
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
-from FGAme.core import EventDispatcher, signal, conf
+from FGAme.events import EventDispatcher, signal
+from FGAme.core import conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
 from FGAme.physics import Body

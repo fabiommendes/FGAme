@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import time
-from FGAme.core import env, EventDispatcher, signal
+from FGAme.core import env
+from FGAme.events import EventDispatcher, signal
 
 
 class MainLoop(EventDispatcher):

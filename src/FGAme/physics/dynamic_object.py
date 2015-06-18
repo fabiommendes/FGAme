@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from FGAme.core import EventDispatcher, EventDispatcherMeta, signal
+from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathutils import Vec2, sin, cos, sqrt, nullvec2, Circle
 from FGAme.util import six
 from FGAme.physics.flags import BodyFlags as flags

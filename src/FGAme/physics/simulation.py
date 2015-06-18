@@ -3,7 +3,7 @@
 from collections import defaultdict
 from FGAme.mathutils import Vec2, nullvec2
 from FGAme.physics.flags import BodyFlags
-from FGAme.core import EventDispatcher, signal
+from FGAme.events import EventDispatcher, signal
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
 from FGAme.draw import Color
 
