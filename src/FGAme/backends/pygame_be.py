@@ -19,6 +19,11 @@ class PyGameCanvas(Canvas):
     __slots__ = ['_screen']
     _circle = pygame.draw.circle
 
+    def get_screen(self):
+        '''Retorna o objeto do tipo screen do Pygame'''
+
+        return self._screen
+
     def show(self):
         self._screen = pygame.display.set_mode((self.width, self.height))
         super(PyGameCanvas, self).show()
@@ -90,8 +95,13 @@ class PyGameInput(Input):
             D[c] = getattr(pg, 'K_' + c)
 
         self._key_conversions = {v: k for (k, v) in D.items()}
-        self._mouse_conversions = {1: 'left', 2: 'middle', 3: 'right',
-                                   4: 'wheel-up', 5: 'wheel-down'}
+        self._mouse_conversions = {
+            1: 'left',
+            2: 'middle',
+            3: 'right',
+            4: 'wheel-up',
+            5: 'wheel-down'
+        }
 
     # Laço principal de escuta de eventos #####################################
     def query(self):

@@ -13,8 +13,8 @@ __all__ = ['Body', 'LinearRigidBody']
 ###############################################################################
 
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
+INERTIA_SCALE = 1
 INF = float('inf')
-INERTIA_SCALE = 0.3
 
 
 def do_nothing(*args, **kwds):
@@ -422,6 +422,22 @@ class Body(object):
     @property
     def pos_ne(self):
         return Vec2(self.xmax, self.ymax)
+
+    @property
+    def pos_right(self):
+        return Vec2(self.xmax, self.pos.y)
+
+    @property
+    def pos_left(self):
+        return Vec2(self.xmin, self.pos.y)
+
+    @property
+    def pos_up(self):
+        return Vec2(self.pos.x, self.ymax)
+
+    @property
+    def pos_down(self):
+        return Vec2(self.pos.x, self.ymin)
 
     @property
     def shape_bb(self):

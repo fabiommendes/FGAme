@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 import time
-from FGAme.core import env
-import gc
-
-# gc.disable()
-# gc.enable()
+from FGAme.core import env, EventDispatcher, signal
 
 
-class MainLoop(object):
+class MainLoop(EventDispatcher):
 
     '''Implementa o loop principal de jogo.
 
@@ -24,9 +20,23 @@ class MainLoop(object):
         fps : float
             Número de quadros por segundo que a simulação de física deve
             tentar rodar
+
+    Sinais
+    ------
+
+    pre-draw :
+        Emitido antes de iniciar a renderização principal, mas após pintar o
+        fundo. O callback possui a assinatura callback(screen), onde `screen`
+        é o objecto que realiza a renderização na tela no backend selecionado.
+    post-draw :
+        Semelhante ao pre-draw, mas executado após a renderização principal.
     '''
 
+    pre_draw = signal('pre-draw', num_args=1)
+    post_draw = signal('post-draw', num_args=1)
+
     def __init__(self, fps=60):
+        super(MainLoop, self).__init__()
         self.fps = fps
         self.dt = 1.0 / self.fps
 
@@ -63,7 +73,9 @@ class MainLoop(object):
 
             # Desenha os objetos na tela
             screen.clear_background(state.background)
+            self.trigger_pre_draw(screen)
             state.get_render_tree().paint(screen)
+            self.trigger_post_draw(screen)
             screen.flip()
 
             # Espera até completar o frame

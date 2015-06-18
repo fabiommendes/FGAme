@@ -6,6 +6,7 @@ from FGAme.core import EventDispatcher, signal, conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
 from FGAme.physics import Body
+from FGAme.util import lazy
 
 
 class World(EventDispatcher):
@@ -88,7 +89,8 @@ class World(EventDispatcher):
         return obj in self._render_tree or obj in self._simulation
 
     # Controle de eventos #####################################################
-    # Delegações
+
+    # Delegações para o Input
     long_press = signal('long-press', 'key', delegate_to='_input')
     key_up = signal('key-up', 'key', delegate_to='_input')
     key_down = signal('key-down', 'key', delegate_to='_input')
@@ -99,6 +101,10 @@ class World(EventDispatcher):
         signal('mouse-button-down', 'button', delegate_to='_input')
     mouse_long_press = \
         signal('mouse-long-press', 'button', delegate_to='_input')
+
+    # Delegação para o mainloop
+    pre_draw = signal('pre-draw', num_args=1, delegate_to='_mainloop')
+    post_draw = signal('post-draw', num_args=1, delegate_to='_mainloop')
 
     # Eventos privados
     frame_enter = signal('frame-enter')
@@ -133,18 +139,22 @@ class World(EventDispatcher):
         return self._simulation.time
 
     # Laço principal ##########################################################
+    @lazy
+    def _mainloop(self):
+        return conf.get_mainloop()
+
     def run(self, timeout=None, real_time=True, **kwds):
         '''Roda a simulação de física durante o tempo 'timeout' especificado.
 
         O parâmetro `real_time` especifica se o tempo considerado consiste no
         tempo real ou no tempo de simulação.'''
 
-        conf.get_mainloop().run(self, timeout=timeout, **kwds)
+        self._mainloop.run(self, timeout=timeout, **kwds)
 
     def stop(self):
         '''Finaliza o laço principal de simulação'''
 
-        conf.get_mainloop().stop()
+        self._mainloop.stop()
 
     def set_next_state(self, value):
         '''Passa a simulação para o próximo estado'''
