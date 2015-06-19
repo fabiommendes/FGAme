@@ -1,12 +1,12 @@
 # -*- coding: utf8 -*-
 
 import cython as C
-import mathfuncs as m
-from base import auto_public
-from util import pyinject
-from exceptions import DoesNotHaveInverseMatrixError, InvalidAxisError
+import mathtools.mathfuncs as m
+from   mathtools.base       import auto_public
+from   mathtools.util       import pyinject
+from   mathtools.exceptions import DoesNotHaveInverseMatrixError
 if not C.compiled:
-    from vec3 import Vec3
+    from mathtools.vec3 import Vec3
 __all__ = ['Mat3','RotMat3','mMat3']
 
 number = (float,int)
@@ -336,7 +336,6 @@ class Mat3(object):
     # Operações matemáticas###############
     def __mul__(self,other):
         '''x.__mul__(y) <==> x * y'''
-
         if isinstance(other, Mat3):
             return self._matrix_a_mult_matrix_b(other)
         elif isinstance(other, number):
