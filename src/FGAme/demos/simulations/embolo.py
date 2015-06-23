@@ -13,7 +13,7 @@ class Gas(World):
 
     def __init__(self,
                  gravity=200, friction=0.0, restitution=0.9,
-                 num_balls=200, speed=200, radius=10,
+                 num_balls=100, speed=200, radius=10,
                  color='random'):
         '''Cria uma simulação de um gás de wpartículas confinado por um êmbolo
         com `num_balls` esferas de raio `radius` com velocidades no intervalo
