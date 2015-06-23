@@ -113,7 +113,7 @@ class PyGameInput(Input):
         }
 
     # Laço principal de escuta de eventos #####################################
-    def query(self):
+    def poll(self):
         key_get = self._key_conversions.get
         mouse_button_get = self._mouse_conversions.get
         window_height = conf.window_height

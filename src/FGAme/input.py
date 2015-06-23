@@ -6,7 +6,11 @@ from FGAme.events import EventDispatcher, signal
 class Input(EventDispatcher):
 
     '''Objetos do tipo listener escutam eventos de entrada do usuário e executam
-    os callbacks de resposta registrados a estes eventos'''
+    os callbacks de resposta registrados a estes eventos.
+
+    Esta classe define uma interface genérica que não implementa o método
+    poll() que busca por eventos a cada frame de simulação. Este método deve
+    ser implementado pelo backend específico (ex.: pygame, SDL2, etc)'''
 
     long_press = signal('long-press', 'key')
     key_up = signal('key-up', 'key')
@@ -79,7 +83,7 @@ class Input(EventDispatcher):
     ###########################################################################
     #             Passo de resposta a eventos executado em cada loop
     ###########################################################################
-    def query(self):
+    def poll(self):
         '''Função executada a cada loop, que investiga todos os eventos de
         usuários que ocorreram. Deve ser reimplementada nas classes filho'''
 

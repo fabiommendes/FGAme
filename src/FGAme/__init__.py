@@ -26,7 +26,7 @@ A partir daí, podemos criar objetos e inserí-los na simulação
 
 Para modificar as propriedades físicas dos objetos basta modificar diretamente
 os atributos correspondentes. Uma lista completa de atributos pode ser
-encontrada no módulo `FGAme.objects`:module:.
+encontrada no módulo `FGAme.objects2`:module:.
 
 >>> obj1.mass = 10
 >>> obj2.mass = 20
@@ -351,7 +351,7 @@ Referência
 Objetos
 =======
 
-.. automodule:: FGAme.objects
+.. automodule:: FGAme.objects2
 
 
 Classe mundo e aplicações
@@ -392,6 +392,7 @@ from FGAme.events import listen, signal, EventDispatcher
 from FGAme.core import *
 from FGAme import physics
 from FGAme.physics import *
+from FGAme.world import World
 from FGAme.objects import *
 from FGAme.app import *
 from FGAme.extra.orientation_objects import *

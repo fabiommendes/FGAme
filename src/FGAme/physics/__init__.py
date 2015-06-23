@@ -7,7 +7,7 @@ Todos os objetos físicos na FGAme herdam da classe Dynamic ou de uma das
 subclasses derivadas aqui. Não é possível instanciar estas classes diretamente,
 mas elas são a base para todos os tipos de objetos utilizados na FGAme.
 
-.. automodule:: FGAme.objects.base
+.. automodule:: FGAme.objects2.base
 
 Classes derivadas
 -----------------

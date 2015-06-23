@@ -48,6 +48,26 @@ class MainLoop(EventDispatcher):
         pass
 
     def run(self, state, timeout=None, maxiter=None, wait=True):
+        '''Roda o loop principal.
+
+        Parameters
+        ----------
+
+        state :
+            Objeto que controla o estado principal do jogo ou aplicação.
+            Deve suportar o método state.update(dt), que atualiza o estado dado
+            um incremento temporal e o sinal 'frame-skip', que é disparado
+            quando a computação demora mais que o frame-rate desejado.
+        timeout : float
+            Executa a simulação até o tempo máximo especificado.
+        maxiter : int
+            Define um número máximo de iterações.
+        wait : bool
+            Se wait=False, renderiza e atualiza cada frame imediatamente após
+            o outro. Isto desabilita o controle de frame-rate e é utilizado
+            apenas para depuração.
+        '''
+
         # Assegura que o motor de jogos foi inicializado
         conf.init()
 
@@ -68,11 +88,11 @@ class MainLoop(EventDispatcher):
 
             # Captura entrada do usuário e atualiza o estado (e física) de
             # acordo
-            input_.query()
+            input_.poll()
             state.update(self.dt)
 
             # Desenha os objetos na tela
-            screen.clear_background(state.background)
+            screen.clear_background(getattr(state, 'background', 'white'))
             self.trigger_pre_draw(screen)
             state.get_render_tree().paint(screen)
             self.trigger_post_draw(screen)

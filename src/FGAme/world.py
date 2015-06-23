@@ -41,6 +41,7 @@ class World(EventDispatcher):
 
         self.is_paused = False
         super(World, self).__init__()
+        self.init()
 
     background = color_property('background', 'white')
 
@@ -85,6 +86,12 @@ class World(EventDispatcher):
         self._render_tree.remove(obj)
         if isinstance(obj, Body):
             self._simulation.remove(obj)
+
+    def init(self):
+        '''Método executado após a inicialização do objeto World(). Normalmente
+        é sobrescrito pelas sub-classes para popular o mundo com objetos e
+        realizar outras operações de inicialização. A implementação padrão não
+        faz nada.'''
 
     def __contains__(self, obj):
         return obj in self._render_tree or obj in self._simulation

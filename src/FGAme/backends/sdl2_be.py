@@ -107,7 +107,7 @@ class SDL2Input(Input):
     # Laço principal de escuta de eventos
     #===========================================================================
 
-    def query(self):
+    def poll(self):
         for event in self.sdl2.ext.get_events():
             if event.type == self.sld2.SDL_QUIT:
                 raise SystemExit
