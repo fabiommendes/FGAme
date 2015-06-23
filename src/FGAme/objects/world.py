@@ -177,10 +177,9 @@ class World(EventDispatcher):
         '''
 
         # Processa argumentos
-        hard = kwds.get('hard', True)
-        delta = kwds.get('delta', 10000)
-        use_poly = kwds.get('use_poly', False)
-        color = kwds.get('color', 'black')
+        hard = kwds.pop('hard', True)
+        delta = kwds.pop('delta', 10000)
+        use_poly = kwds.pop('use_poly', False)
 
         if len(args) == 4:
             xmin, xmax, ymin, ymax = args
@@ -213,10 +212,16 @@ class World(EventDispatcher):
 
         assert xmin < xmax and ymin < ymax, 'invalid bounds'
         maker = Rectangle if use_poly else AABB
-        up = maker(bbox=(xmin - delta, xmax + delta, ymax, ymax + delta))
-        down = maker(bbox=(xmin - delta, xmax + delta, ymin - delta, ymin))
-        left = maker(bbox=(xmin - delta, xmin, ymin, ymax))
-        right = maker(bbox=(xmax, xmax + delta, ymin, ymax))
+
+        up = maker(
+            bbox=(xmin - delta, xmax + delta, ymax, ymax + delta), **kwds)
+        down = maker(
+            bbox=(xmin - delta, xmax + delta, ymin - delta, ymin), **kwds)
+        left = maker(
+            bbox=(xmin - delta, xmin, ymin, ymax), **kwds)
+        right = maker(
+            bbox=(xmax, xmax + delta, ymin, ymax), **kwds)
+
         for box in [up, down, left, right]:
             box.make_static()
             assert box._invmass == 0.0

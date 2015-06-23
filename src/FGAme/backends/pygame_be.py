@@ -7,7 +7,7 @@ import pygame
 import pygame.locals as pg
 from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN
 
-from FGAme.core import env, Canvas
+from FGAme.core import Canvas, conf
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color, rgb
@@ -116,7 +116,7 @@ class PyGameInput(Input):
     def query(self):
         key_get = self._key_conversions.get
         mouse_button_get = self._mouse_conversions.get
-        window_height = env.window_height
+        window_height = conf.window_height
 
         for event in pygame.event.get():
             if event.type == QUIT:

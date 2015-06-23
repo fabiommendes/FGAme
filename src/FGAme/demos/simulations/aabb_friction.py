@@ -9,11 +9,13 @@ from FGAme import World, AABB
 
 # Cria mundo com coeficiente de atrito global não-nulo
 world = World(dfriction=0.1)
-world.add_bounds(width=10)
+world.add_bounds(width=10, col_layer=[0, 2])
 
 # Cria objetos
-A = AABB(pos=(400, 100), shape=(50, 50), color='black')
-B = AABB(pos=(150, 500), shape=(50, 50), vel=(200, -400), color='red')
+A = AABB(pos=(400, 100), shape=(50, 50), color='black', col_layer=2,
+         col_group=1)
+B = AABB(pos=(150, 500), shape=(50, 50), vel=(200, -400), color='red',
+         col_layer=2, col_group=1)
 
 
 def pause():

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
-from FGAme.core import env
+from FGAme.core import conf
 from FGAme.events import EventDispatcher, signal
 
 
@@ -49,15 +49,14 @@ class MainLoop(EventDispatcher):
 
     def run(self, state, timeout=None, maxiter=None, wait=True):
         # Assegura que o motor de jogos foi inicializado
-        from FGAme.core import init
-        init()
+        conf.init()
 
         # Prepara o loop principal
         self._running = True
         sleep = time.sleep
         gettime = time.time
-        input_ = env.input_object
-        screen = env.canvas_object
+        input_ = conf.input_object
+        screen = conf.canvas_object
         sim_start = gettime()
         screen.show()
         n_skip = 0

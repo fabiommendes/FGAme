@@ -206,6 +206,18 @@ class Body(object):
     rect
         Uma tupla com (xmin, ymin, Lx, Ly)
 
+        **Flags de colisão**
+    col_group : int ou sequência
+        Número inteiro positivoque representa o grupo a qual o objeto pertence.
+        Objetos do mesmo grupo nunca colidem entre si. `col_group` pode ser uma
+        sequência de valores caso o objeto pertença a vários grupos. O grupo
+        zero (padrão) é tratado de forma especial e todos os objetos deste
+        grupo colidem entre si.
+    col_layer : int ou sequência
+        Número inteiro positivo representando a camdada à qual o objeto
+        pertence. O valor padrão é zero. Apenas objetos que estão na mesma
+        camada colidem entre si. `col_layer` pode ser uma sequência de valores
+        caso o objeto participe de várias camadas.
     '''
 
     __slots__ = [
@@ -301,7 +313,17 @@ class Body(object):
         # Filtros de colisões #################################################
         # Colide se objetos estão em groupos diferentes (exceto os que estão
         # no grupo 0) e no mesmo layer
-        self._col_layer = int(col_layer)
+        if col_layer:
+            if isinstance(col_layer, int):
+                self._col_layer_mask = 1 << col_layer
+            else:
+                mask = 0
+                for n in col_layer:
+                    mask |= 1 << n
+                self._col_layer_mask = mask
+        else:
+            self._col_layer_mask = 0
+
         if col_group:
             if isinstance(col_group, int):
                 self._col_group_mask = 1 << (col_group - 1)
@@ -312,11 +334,6 @@ class Body(object):
                 self._col_group_mask = mask
         else:
             self._col_group_mask = 0
-        # TODO: fundir col_layer com col_group_mask no mesmo inteiro?
-        # (talvez 50 bits para grupos e 10 ==> 1024 layers diferentes)
-        # Do jeito que está, podemos utilizar strings como identificadores
-        # de layers (mas não para grupos). A classe mundo poderia fazer um
-        # mapa entre strings > números nos dois casos.
 
         # Presença em mundo ###################################################
         if world is not None:

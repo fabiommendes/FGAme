@@ -96,17 +96,6 @@ class BroadPhase(AbstractCollisionPhase):
 
     __slots__ = []
 
-    def get_collide_filter(self):
-        '''Retorna uma função que aceita ou rejeita colisões entre dois objetos
-        baseada na máscara de bits de ambos'''
-
-        try:
-            return self.world.can_collide
-        except AttributeError:
-            def can_collide(A, B):
-                return True
-            return can_collide
-
     def pairs(self):
         '''Retorna a lista de pares encontradas por update'''
 
@@ -122,7 +111,7 @@ class BroadPhaseAABB(BroadPhase):
 
     def update(self, L):
         IS_SLEEP = BodyFlags.is_sleeping
-        can_collide = self.get_collide_filter()
+        can_collide = self.world.can_collide
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.xmin)
         self._data[:] = []
@@ -166,7 +155,7 @@ class BroadPhaseCBB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        can_collide = self.get_collide_filter()
+        can_collide = self.world.can_collide
         L = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
         N = len(L)
         self._data[:] = []
@@ -204,7 +193,7 @@ class BroadPhaseMixed(BroadPhase):
 
     def update(self, L):
         IS_SLEEP = BodyFlags.is_sleeping
-        can_collide = self.get_collide_filter()
+        can_collide = self.world.can_collide
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
         self._data[:] = []

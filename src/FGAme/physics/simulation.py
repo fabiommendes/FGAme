@@ -388,12 +388,17 @@ class Simulation(EventDispatcher):
 
         flags = BodyFlags
 
-        # TODO: talvez fazer uma única consulta ao A.flags e B.flags...
+        # Testa se os dois objetos são estáticos
         if ((not A._invmass or A.flags & flags.is_sleeping) and
                 (not B._invmass or B.flags & flags.is_sleeping)):
             return False
-        elif A._col_layer != B._col_layer:
+
+        # Testa se estão na mesma camada de colisão
+        elif ((A._col_layer_mask != B._col_layer_mask)
+              and not (A._col_layer_mask & B._col_layer_mask)):
             return False
+
+        # Testa se estão no mesmo grupo de colisão mesma camada de colisão
         elif A._col_group_mask & B._col_group_mask:
             return False
 
