@@ -1,12 +1,14 @@
 # -*- coding: utf8 -*-
 
 from FGAme.util import lazy
+from FGAme.core import conf
 from FGAme.mathutils import Vec2
 
 __all__ = ['pos', 'vel']
 
 
 def _factory_pos_property(pos):
+    '''Cria propriedades que retornam as posições absolutas no objeto `pos`'''
     a, b = pos
 
     def pos_prop(self):
@@ -20,6 +22,8 @@ def _factory_pos_property(pos):
 
 
 def _factory_from_func(prop):
+    '''Cria funções que retornam posições relativas no objeto `pos`'''
+
     a, b = prop.fget.terms
 
     def from_pos(self, x, y):
@@ -32,13 +36,12 @@ def _factory_from_func(prop):
 
 class GlobalObject(object):
 
+    '''Base para PosObject e VelObject'''
+
     @lazy
     def _globals(self):
-        from FGAme.core import env
-        if not env.has_init:
-            from FGAme.core import init_canvas
-            init_canvas()
-        self._globals = env
+        conf.init_canvas()  # @UndefinedVariable
+        self._globals = conf
         return self._globals
 
     @property
@@ -74,26 +77,59 @@ class PosObject(GlobalObject):
     (Vec2(500, 400), Vec2(800, 500))
     '''
 
+    # Alinhados
     middle, north, south, east, west = \
         map(_factory_pos_property,
             [(.5, .5), (.5, 1), (.5, 0), (1, .5), (0, .5)])
 
+    # Alinhados relativos
     from_middle, from_north, from_south, from_east, from_west = \
         map(_factory_from_func, [middle, north, south, east, west])
 
-    sw, se, ne, nw = map(
-        _factory_pos_property, [
-            (0, 0), (1, 0), (1, 1), (0, 1)])
+    # Diagonais
+    sw, se, ne, nw = \
+        map(_factory_pos_property, [(0, 0), (1, 0), (1, 1), (0, 1)])
+
+    # Diagnoais (verboso)
     south_west, sout_east, north_east, nort_west = sw, se, ne, nw
 
-    from_sw, from_se, from_ne, from_nw = map(
-        _factory_from_func, [
-            sw, se, ne, nw])
+    # Relativos diagonais
+    from_sw, from_se, from_ne, from_nw = \
+        map(_factory_from_func, [sw, se, ne, nw])
+
+    # Relativos diagonais (verboso)
     from_south_west, from_south_east, from_north_east, from_north_west = \
         from_sw, from_se, from_ne, from_nw
 
 
 class VelObject(GlobalObject):
+
+    '''Implementa o objeto `vel`, que permite definir facilmente algumas
+    velocidades no mundo'''
+
+    def set_speeds(self, slow, fair, fast):
+        '''Define o padrão de referência para as velocidades lenta, média e
+        rápida'''
+
+        if slow <= fair <= fast:
+            self.set_slow(slow)
+            self.set_fair(fair)
+            self.set_fast(fast)
+
+    def set_fast(self, value):
+        '''Define a velocidade referência considerada "rápida"'''
+
+        self._globals.speed_fast = value
+
+    def set_fair(self, value):
+        '''Define a velocidade referência considerada "média"'''
+
+        self._globals.speed_fair = value
+
+    def set_slow(self, value):
+        '''Define a velocidade referência considerada "lenta"'''
+
+        self._globals.speed_slow = value
 
     @property
     def fast(self):
@@ -107,9 +143,10 @@ class VelObject(GlobalObject):
     def fair(self):
         return self._globals.speed_fair
 
+    # TODO: definir atributos e métodos para as velocidades
     # Velocidades aleatórias ##################################################
     def _random(self, scale, angle):
-        pass
+        return scale * vec_x.rotate(random.uniform(0, 2 * pi))
 
     def random(self, angle=None):
         return self._random(self.fair, angle)

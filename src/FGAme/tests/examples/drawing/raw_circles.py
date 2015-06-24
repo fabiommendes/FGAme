@@ -1,18 +1,20 @@
 #-*-coding: utf8 -*-
-from FGAme import draw, init_canvas
+
+from FGAme import draw, conf
 from time import sleep
 
 # Cria a árvore de renderização com vários círculos
 p0 = (400, 300)
 tree = draw.RenderTree()
-tree.add(draw.Circle(p0, 150, color='red'))
-tree.add(draw.Circle(p0, 120, color='white'))
-tree.add(draw.Circle(p0, 100, color='red'))
-tree.add(draw.Circle(p0, 70, color='white'))
-tree.add(draw.Circle(p0, 50, color='red'))
+tree.add(draw.Circle(150, p0, color='red'))
+tree.add(draw.Circle(120, p0, color='white'))
+tree.add(draw.Circle(100, p0, color='red'))
+tree.add(draw.Circle(70, p0, color='white'))
+tree.add(draw.Circle(50, p0, color='red'))
 
 # Cria um objeto Canvas com a geometria da tela
-canvas = init_canvas(800, 600)
+canvas = conf.init_canvas(800, 600)
+canvas.show()
 
 # Loop principal
 for i in range(50):

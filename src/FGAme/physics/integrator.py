@@ -32,15 +32,10 @@ class GravityIntegrator(Integrator):
 
     def __init__(self):
         super(GravityIntegrator, self).__init__()
-        #...
 
     def update_accelerations(self):
         '''Retorna a lista de acelerações para cada objeto'''
 
-        #...
-
     def update(self, dt):
         '''Utiliza o método de Velocity Verlet para atualizar as posições e
         velocidades'''
-
-        #...

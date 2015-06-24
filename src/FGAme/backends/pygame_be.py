@@ -1,18 +1,13 @@
 # -*- coding: utf8 -*-
 
 import cython
-from math import trunc
 import string
 import pygame
-import pygame.locals as pg
-from pygame.locals import QUIT, KEYDOWN, KEYUP, MOUSEMOTION, MOUSEBUTTONUP, MOUSEBUTTONDOWN
-
 from FGAme.core import Canvas, conf
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color, rgb
 from FGAme.util import autodoc
-
 pygame.init()
 
 
@@ -89,6 +84,7 @@ class PyGameInput(Input):
 
     def __init__(self):
         super(PyGameInput, self).__init__()
+        pg = pygame
         D = dict(
             up=pg.K_UP,
             down=pg.K_DOWN,
@@ -116,25 +112,26 @@ class PyGameInput(Input):
     def poll(self):
         key_get = self._key_conversions.get
         mouse_button_get = self._mouse_conversions.get
-        window_height = conf.window_height
+        window_height = conf.window_height  # @UndefinedVariable
+        pg = pygame
 
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == pg.QUIT:
                 raise SystemExit
-            elif event.type == KEYDOWN:
+            elif event.type == pg.KEYDOWN:
                 self.process_key_down(key_get(event.key))
-            elif event.type == KEYUP:
+            elif event.type == pg.KEYUP:
                 self.process_key_up(key_get(event.key))
-            elif event.type == MOUSEMOTION:
+            elif event.type == pg.MOUSEMOTION:
                 x, y = event.pos
                 y = window_height - y
                 self.process_mouse_motion((x, y))
-            elif event.type == MOUSEBUTTONUP:
+            elif event.type == pg.MOUSEBUTTONUP:
                 x, y = event.pos
                 y = window_height - y
                 button = mouse_button_get(event.button)
                 self.process_mouse_button_up(button, (x, y))
-            elif event.type == MOUSEBUTTONDOWN:
+            elif event.type == pg.MOUSEBUTTONDOWN:
                 x, y = event.pos
                 y = window_height - y
                 button = mouse_button_get(event.button)

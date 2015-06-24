@@ -4,8 +4,6 @@ Created on 18/06/2015
 @author: chips
 '''
 from FGAme import *
-import os
-import pygame
 from random import random
 
 world = World()
