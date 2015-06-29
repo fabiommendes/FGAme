@@ -19,7 +19,6 @@ world.listen('long-press', 'left')(lambda: box.move((-2, 0)))
 world.listen('long-press', 'right')(lambda: box.move((4, 0)))
 world.listen('long-press', 'up')(lambda: box.move((0, 2)))
 world.listen('long-press', 'down')(lambda: box.move((0, -2)))
-
 idx = 0
 
 

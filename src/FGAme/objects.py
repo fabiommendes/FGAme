@@ -15,53 +15,10 @@ DEBUG = False
 __all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
 
 
-class HasVisualization(object):
-    _is_mixin_ = True
-    _slots_ = ['_color', '_linecolor', '_linewidth']
-
-    def _init_has_visualization(self,
-                                color='black',
-                                linecolor=None, linewidth=1):
-
-        self._color = None if color is None else Color(color)
-        self._linecolor = None if linecolor is None else Color(linecolor)
-        self._linewwidth = linewidth
-
-    # Desenhando objeto #######################################################
-    @property
-    def color(self):
-        return self._color
-
-    @color.setter
-    def color(self, value):
-        if value is None:
-            self._color = None
-        else:
-            self._color = Color(value)
-
-    @property
-    def linecolor(self):
-        return self._linecolor
-
-    @linecolor.setter
-    def linecolor(self, value):
-        if value is None:
-            self._linecolor = None
-        else:
-            self._color = Color(value)
-
-    def _debug(self, screen):
-        if DEBUG:
-            self.paint_contact_points(screen)
-
-    def paint_contact_points(self, screen):
-        for col in self._contacts:
-            screen.paint_circle(2, col.pos, Color('black'))
-
-
 @EventDispatcherMeta.decorate
-class ObjectMixin(HasVisualization):
-    _mixin_args = set(['color', 'line_color'])
+class ObjectMixin(object):
+    _is_mixin_ = True
+    _mixin_args = ['color', 'line_color', 'line_width']
 
     long_press = signal('long-press', 'key', delegate_to='_input')
     key_up = signal('key-up', 'key', delegate_to='_input')
@@ -81,7 +38,7 @@ class ObjectMixin(HasVisualization):
     def __init__(self, *args, **kwds):
         mixin_kwds = self._extract_mixin_kwargs(kwds)
         self._init_physics(*args, **kwds)
-        self._init_mixin(**mixin_kwds)
+        self._init_visualization(**mixin_kwds)
 
     def _extract_mixin_kwargs(self, kwds):
         D = {}
@@ -93,35 +50,65 @@ class ObjectMixin(HasVisualization):
             del kwds[k]
         return D
 
-    def _init_mixin(self,
-                    world=None,
-                    color='black', linecolor=None, linewidth=1):
+    def _init_visualization(
+            self, color='black', line_color=None, line_width=1):
+        '''Init visualization parameters'''
 
-        self._init_has_visualization(color=color,
-                                     linecolor=linecolor, linewidth=linewidth)
+        self._color = None
+        self._line_color = None
+        self._line_width = line_width
+        self.color = color
+        self.line_color = line_color
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        if value is None:
+            self._color = None
+        else:
+            self._color = Color(value)
+
+    @property
+    def line_color(self):
+        return self._line_color
+
+    @line_color.setter
+    def line_color(self, value):
+        if value is None:
+            self._line_color = None
+        else:
+            self._color = Color(value)
+
+    @property
+    def line_width(self):
+        return self._line_width
+
+    @line_width.setter
+    def line_width(self, value):
+        self._line_width = value
 
 
 class AABB(ObjectMixin, physics.AABB):
     _init_physics = physics.AABB.__init__
 
-    def paint(self, screen):
-        if self.color is not None:
-            screen.paint_rect(self.rect, self.color)
-            self._debug(screen)
+    def draw(self, screen):
+        if self._color is not None:
+            color = self._color
+            lw, lc = self._line_width, self._line_color
+            screen.draw_aabb(self.aabb, True, color, lw, lc)
 
 
 class Circle(ObjectMixin, physics.Circle):
     _init_physics = physics.Circle.__init__
 
-    def paint(self, screen):
+    def draw(self, screen):
         if self._color is not None:
             color = self._color
-            screen.paint_circle(self.radius, self.pos, color)
-        if self._linecolor is not None:
-            screen.paint_circle(self.radius, self.pos,
-                                self._linecolor,
-                                self._linewidth)
-        self._debug(screen)
+            lw, lc = self._line_width, self._line_color
+            screen.draw_circle(self.bounding_box, True, color, lw, lc)
 
 
 class Poly(ObjectMixin, physics.Poly):

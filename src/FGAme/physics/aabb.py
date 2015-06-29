@@ -67,7 +67,7 @@ class AABB(LinearRigidBody):
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
         self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
-        aabb = _AABB(xmin, xmax, ymin, ymax)
+        aabb = _AABB(-dx, dx, -dy, dy)
         super(AABB, self).__init__(pos, vel, mass=mass, density=density,
                                    baseshape=aabb, **kwds)
 
@@ -79,7 +79,11 @@ class AABB(LinearRigidBody):
         data = ', '.join('%.1f' % x for x in self.bbox)
         return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
 
-    # Torna as os limites da AABB modificáveis ################################
+    # Torna as os limites da AABB mutáveis ####################################
+    @property
+    def aabb(self):
+        return self.bounding_box
+
     @property
     def xmin(self):
         return self._pos.x - self._delta_x
@@ -88,7 +92,7 @@ class AABB(LinearRigidBody):
     def xmin(self, value):
         xmin = float(value)
         xmax = self.xmax
-        self._pos.x = (xmax + xmin) / 2
+        self._pos = self._pos.setx((xmax + xmin) / 2)
         self._delta_x = (xmax - xmin) / 2
 
     @property
@@ -99,7 +103,7 @@ class AABB(LinearRigidBody):
     def xmax(self, value):
         xmin = self.xmin
         xmax = float(value)
-        self._pos.x = (xmax + xmin) / 2
+        self._pos = self._pos.setx((xmax + xmin) / 2)
         self._delta_x = (xmax - xmin) / 2
 
     @property
@@ -110,7 +114,7 @@ class AABB(LinearRigidBody):
     def ymin(self, value):
         ymin = float(value)
         ymax = self.ymax
-        self._pos.y = (ymax + ymin) / 2
+        self._pos = self._pos.sety((ymax + ymin) / 2)
         self._delta_y = (ymax - ymin) / 2
 
     @property
@@ -121,7 +125,7 @@ class AABB(LinearRigidBody):
     def ymax(self, value):
         ymin = self.ymin
         ymax = float(value)
-        self._pos.y = (ymax + ymin) / 2
+        self._pos = self._pos.sety((ymax + ymin) / 2)
         self._delta_y = (ymax - ymin) / 2
 
     # Propriedades geométricas ################################################
@@ -132,9 +136,6 @@ class AABB(LinearRigidBody):
         a = self._delta_x
         b = self._delta_y
         return (a ** 2 + b ** 2) / 3
-
-    def primitive(self):
-        return AABB(bbox=self.bbox)
 
 
 if __name__ == '__main__':

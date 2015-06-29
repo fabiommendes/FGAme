@@ -130,7 +130,7 @@ Main features:
       package_dir={'': 'src'},
       packages=['FGAme', 'FGAme.app', 'FGAme.backends', 'FGAme.core',
                 'FGAme.demos', 'FGAme.demos.simulations', 'FGAme.demos.games',
-                'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.objects', 'FGAme.util',
+                'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.util',
                 'mathtools', 'mathtools.base', 'mathtools.shapes',
                 ],
       license='GPL',

@@ -56,20 +56,23 @@ class RenderTree(object):
         else:
             self._data.append((layer, [obj]))
 
-    def remove(self, obj):
-        '''Remove um objeto da árvore de renderização'''
+    def remove(self, value):
+        '''Remove a primeira ocorrência de um valor.'''
 
         for _, L in self._data:
-            if obj in L:
-                L.remove(obj)
+            if value in L:
+                L.remove(value)
                 break
         else:
-            raise ValueError('object %r not in RenderTree' % obj)
+            raise ValueError('object %r not in RenderTree' % value)
 
-    # TODO: Mover objetos entre Layers ou modifica a ordem do objeto dentro de
-    # um layer
+    def remove_all(self, value):
+        '''Remove todas as ocorrências do valor dado.'''
 
-    # Iteradores -------------------------------------------------------------
+        for _, L in self._data:
+            while value in L:
+                L.remove(value)
+
     def walk(self, reverse=False):
         '''Percorre sobre todos os objetos na ordem correta. Se reverse=True,
         percorre os objetos na ordem contrária.
@@ -118,12 +121,12 @@ class RenderTree(object):
         for obj in self.walk():
             obj.update(dt)
 
-    def paint(self, screen):
+    def draw(self, screen):
         '''Percorre todos os objetos na árvore invocando o método
         `obj.paint(screen)`'''
 
         for obj in self.walk():
-            obj.paint(screen)
+            obj.draw(screen)
 
     def linearize(self, layer=0):
         '''Retorna uma versão linearizada da árvore de renderização onde

@@ -44,9 +44,13 @@ class Circle(Body):
 
     def rescale(self, scale, update_physics=False):
         self.cbb_radius *= scale
-        super(CommonCircle, self).rescale(scale, update_physics)
+        super(Circle, self).rescale(scale, update_physics)
 
     # Caixa de contorno #######################################################
+    @property
+    def bounding_box(self):
+        return self.cbb
+
     @property
     def xmin(self):
         return self._pos.x - self.cbb_radius

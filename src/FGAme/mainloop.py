@@ -94,7 +94,7 @@ class MainLoop(EventDispatcher):
             # Desenha os objetos na tela
             screen.clear_background(getattr(state, 'background', 'white'))
             self.trigger_pre_draw(screen)
-            state.get_render_tree().paint(screen)
+            state.get_render_tree().draw(screen)
             self.trigger_post_draw(screen)
             screen.flip()
 

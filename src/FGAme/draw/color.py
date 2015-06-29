@@ -1,4 +1,5 @@
 # -*-coding: utf8 -*-
+from math import sqrt, acos
 
 
 class Color(object):
@@ -15,7 +16,7 @@ class Color(object):
     >>> w1 = Color(255, 255, 255)
     >>> w2 = Color('white')
 
-    Os objetos do tipo Color são imutáveos e se comportam como uma tupla.
+    Os objetos do tipo Color são imutáveis e se comportam como uma tupla.
 
     >>> list(w1)
     [255, 255, 255, 255]
@@ -50,26 +51,57 @@ class Color(object):
         try:
             return cls._CACHE[args]
         except KeyError:
-            objs = cls._CACHE
+            color_cache = cls._CACHE
             if len(args) == 1:
                 args = args[0]
             if len(args) == 3:
                 try:
-                    return objs[args]
+                    return color_cache[args]
                 except KeyError:
-                    objs[args] = new = Color(*(args + (255,)))
+                    color_cache[args] = new = Color(*(args + (255,)))
                     return new
             if len(args) == 4:
                 try:
-                    return objs[args]
+                    return color_cache[args]
                 except KeyError:
-                    objs[args] = new = object.__new__(cls)
+                    color_cache[args] = new = object.__new__(cls)
                     new._red, new._green, new._blue, new._alpha = args
                     return new
 
             else:
                 del cls._CACHE[args]
 
+    # Componentes RGBa
+    @property
+    def red(self):
+        return self._red
+
+    @property
+    def green(self):
+        return self._green
+
+    @property
+    def blue(self):
+        return self._blue
+
+    @property
+    def alpha(self):
+        return self._alpha
+
+    # Componentes HSI
+    @property
+    def hue(self):
+        return NotImplemented
+
+    @property
+    def saturation(self):
+        return NotImplemented
+
+    @property
+    def intensity(self):
+        return NotImplemented
+
+    # Representações em diferentes espaço de cores
     @property
     def rgba(self):
         return tuple(self)
@@ -96,23 +128,50 @@ class Color(object):
         c = self
         return (c[0] << 16) + (c[1] << 8) + c[2]
 
+    @property
+    def hsi(self):
+        return self.hsia[:-1]
+
+    @property
+    def hsia(self):
+        # Conversão para (H)ue, (S)aturation, (I)ntensity
+        # ref: https://en.wikipedia.org/wiki/RGB_color_model#Nonlinearity
+        R, G, B, a = self
+
+        I = (R + G + B) / 3
+        S = 1 - min(R, G, B) / I
+
+        # Valores normalizados
+        r, g, b = R / 255, G / 255, B / 255
+        h_numer = acos(((r - g) + (r - b)) / 2)
+        h_denom = sqrt((r - b) ** 2 + (r - b) * (g - b))
+        return h_numer / h_denom, S, I, a
+
+    @property
+    def f_hsia(self):
+        return tuple(x / 255 for x in self.hsia)
+
+    @property
+    def f_hsi(self):
+        return tuple(x / 255 for x in self.hsi)
+
     # Transformações simples de cores #########################################
-    def setred(self, value):
+    def set_red(self, value):
         '''Retorna cor com novo valor para a componente vermelha'''
 
         return Color(value, self._green, self._blue, self._alpha)
 
-    def setgreen(self, value):
+    def set_green(self, value):
         '''Retorna cor com novo valor para a componente verde'''
 
         return Color(self._red, value, self._blue, self._alpha)
 
-    def setblue(self, value):
+    def set_blue(self, value):
         '''Retorna cor com novo valor para a componente azul'''
 
-        return Color(self._red, self._green, blue, self._alpha)
+        return Color(self._red, self._green, value, self._alpha)
 
-    def setalpha(self, value):
+    def set_alpha(self, value):
         '''Retorna cor com novo valor para a componente alpha'''
 
         return Color(self._red, self._green, self._blue, value)
@@ -150,7 +209,7 @@ class Color(object):
         raise IndexError(key)
 
     def __hash__(self):
-        return self._red ^ self._green ^ self._blue ^ self._alpha
+        return (self._red ^ self._green) ^ (self._blue ^ self._alpha)
 
 Color._CACHE.update({
     # Tons de cinza

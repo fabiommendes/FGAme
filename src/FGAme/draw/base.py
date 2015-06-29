@@ -1,13 +1,12 @@
 # -*- coding: utf8 -*-
 # TODO: manter este modelo de renderização?
-#
-# Estamos reimplementando o método paint() nos objetos por questões de
-# eficiência. Talvez os objetos deste módulo virem obsoletos
-
 import copy
 from FGAme.draw import Color
-from FGAme import mathutils as m
+from FGAme import mathutils as shapes
 from FGAme.core import PyGameTextureManager
+
+black = Color('black')
+white = Color('white')
 
 
 class Drawable(object):
@@ -97,7 +96,7 @@ def delegate_property(name):
     return getter
 
 
-class Shape(Drawable):
+class ShapeBase(Drawable):
 
     '''Classe pai para todos os objetos de geometria simples.'''
 
@@ -116,11 +115,11 @@ class Shape(Drawable):
     def from_primitive(cls, obj,
                        color='black', line_color='black', line_width=0.0):
 
-        if isinstance(obj, m.AbstractCircle):
+        if isinstance(obj, shapes.AbstractCircle):
             obj_cls = Circle
-        elif isinstance(obj, m.AbstractPoly):
+        elif isinstance(obj, shapes.AbstractPoly):
             obj_cls = Poly
-        elif isinstance(obj, m.AbstractAABB):
+        elif isinstance(obj, shapes.AbstractAABB):
             obj_cls = AABB
         else:
             tname = type(obj).__name__
@@ -149,72 +148,7 @@ class Shape(Drawable):
         getattr(canvas, 'draw_' + self.canvas_primitive)(self)
 
 
-class Circle(Shape):
-
-    '''Objetos da classe Circle representam círculos.'''
-
-    __slots__ = []
-    canvas_primitive = 'circle'
-
-    def __init__(self, radius, pos=(0, 0), **kwds):
-
-        super(Circle, self).__init__(m.Circle(radius, pos), **kwds)
-
-    def draw(self, canvas):
-        canvas.draw_circle(self)
-
-    @property
-    def radius(self):
-        return self.geometric.radius
-
-    @property
-    def pos(self):
-        return self.geometric.pos
-
-
-class AABB(Shape):
-
-    '''Objetos da classe RectangleAA representam retângulos alinhados aos eixos
-    principais.
-
-    É inicializado com uma tupla (x, y, dx, dy) onde (x,y) representam as
-    coordenadas inferior-esquerda do retângulo e dx e dy as dimensões nos eixos
-    X e Y respectivamente.
-
-    Existem construtores alternativos: centered(), ..., etc.
-    '''
-    __slots__ = []
-    canvas_primitive = 'aabb'
-
-    xmin = delegate_property('xmin')
-    xmax = delegate_property('xmax')
-    ymin = delegate_property('ymin')
-    ymax = delegate_property('ymax')
-    bbox = delegate_property('bbox')
-    rect = delegate_property('rect')
-    shape = delegate_property('shape')
-    pos = delegate_property('pos')
-    pos = delegate_property('pos_sw')
-    pos = delegate_property('pos_nw')
-    pos = delegate_property('pos_se')
-    pos = delegate_property('pos_ne')
-
-    def __init__(self,
-                 bbox=None, rect=None, shape=None, pos=None,
-                 xmin=None, xmax=None, ymin=None, ymax=None, **kwds):
-
-        obj = m.AABB(bbox=bbox, rect=rect, shape=shape, pos=pos,
-                     xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax)
-        super(AABB, self).__init__(obj, **kwds)
-
-    def get_vertices(self, tol=1e-6):
-        raise NotImplementedError
-
-    def draw(self, canvas):
-        canvas.draw_aabb(self)
-
-
-class Poly(Shape):
+class Poly(ShapeBase):
 
     '''Objetos da classe Poly representam polígonos especificados por uma lista
     de vértices.'''
@@ -224,7 +158,7 @@ class Poly(Shape):
     canvas_primitive = 'poly'
 
     def __init__(self, vertices, **kwds):
-        obj = m.Poly(vertices)
+        obj = shapes.Poly(vertices)
         super(Poly, self).__init__(obj, **kwds)
 
     def get_vertices(self, tol=1e-6):
@@ -245,14 +179,145 @@ class Rectangle(Poly):
         super(Poly, self).__init__(**kwds)
 
 
+###############################################################################
+# TODO: refatorar para shapes herdarem dos primitivos geométricos extendidos
+# com a classe shape
+###############################################################################
+class Curve(Drawable):
+
+    '''Classe pai para todos os objetos geométricos que definem uma curva
+    aberta.
+     '''
+
+    def __init__(self, width=1.0, color=black):
+        self._color = Color(color)
+        self.width = width
+
+    def _init_colors_from_kwds(self, kwds):
+        '''Extrai as keywords do dicionário kwds, e inicializa as propriedades
+        de cores do objeto. As outras entradas do dicionário podem ser
+        passadas para o construtor do objeto geométrico'''
+
+        width = kwds.pop('solid', 1.0)
+        color = kwds.pop('solid', black)
+        Curve.__init__(self, width, color)
+
+    def draw(self, canvas):
+        '''Desenha o objeto no objeto canvas fornecido'''
+
+        raise NotImplementedError('must be implemented in subclasses')
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        self._color = Color(value)
+
+    @property
+    def line_color(self):
+        return self._color
+
+    @line_color.setter
+    def line_color(self, value):
+        self._color = Color(value)
+
+
+class Segment(Curve):
+
+    '''Um segmento de reta que vai do ponto pt1 até pt2'''
+
+    def __init__(self, pt1, pt2, **kwds):
+        pass
+
+
+# Objetos sólidos (figuras fechadas) ##########################################
+class Shape(Drawable):
+
+    '''Classe pai para todas as figuras fechadas. Define as propriedades
+    solid, color, line_width e line_color.'''
+
+    def __init__(self, solid=True, color=black,
+                 line_width=0.0, line_color=black):
+
+        self._color = Color(color)
+        self._line_color = Color(line_color)
+        self.line_width = line_width
+        self.solid = bool(solid)
+
+    def _init_colors_from_kwds(self, kwds):
+        '''Extrai as keywords do dicionário kwds, e inicializa as propriedades
+        de cores do objeto. As outras entradas do dicionário podem ser
+        passadas para o construtor do objeto geométrico'''
+
+        solid = kwds.pop('solid', True)
+        color = kwds.pop('solid', black)
+        line_color = kwds.pop('solid', black)
+        line_width = kwds.pop('solid', 0.0)
+        Shape.__init__(self, solid, color, line_width, line_color)
+
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        self._color = Color(value)
+
+    @property
+    def line_color(self):
+        return self._line_color
+
+    @line_color.setter
+    def line_color(self, value):
+        self._line_color = Color(value)
+
+
+class Circle(shapes.Circle, Shape):
+
+    '''Um círculo de raio `radius` e centro em `pos`.'''
+
+    def __init__(self, radius, pos=(0, 0), **kwds):
+
+        shapes.Circle.__init__(self, radius, pos)
+        Shape.__init__(self, **kwds)
+
+    def draw(self, canvas):
+        canvas.draw_circle(self)
+
+
+class AABB(shapes.mAABB, Shape):
+
+    '''Um círculo de raio `radius` e centro em `pos`.'''
+
+    def __init__(self, *args, **kwds):
+        self._init_colors_from_kwds(kwds)
+        shapes.AABB.__init__(self, *args, **kwds)
+
+    def draw(self, canvas):
+        canvas.draw_circle(self)
+
+
 class Image(AABB):
+
+    '''Define uma imagem/pixmap não-animado'''
+
     manager = PyGameTextureManager()
     canvas_primitive = 'image'
 
-    def __init__(self, name, pos=(0, 0)):
-        self._data = self.manager.get_image(name)
-        shape = self.manager.get_shape(self._data)
-        super(Image, self).__init__(pos=pos, shape=shape)
+    def __init__(self, path, pos=(0, 0), reference='center'):
+        #self._data = self.manager.get_image(name)
+        #shape = self.manager.get_shape(self._data)
+        #super(Image, self).__init__(pos=pos, shape=shape)
+        pass
 
     def draw(self, canvas):
         self.draw_image(self)
+
+
+class Sprite(Image):
+
+    '''Define uma image animada. O controle de frames é feito a cada chamada
+    do método draw(). Desta forma, caso o método seja chamado duas vezes por
+    frame, a velocidade de animação será o dobro da desejada.'''

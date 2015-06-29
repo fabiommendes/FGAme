@@ -757,7 +757,7 @@ class EventDispatcherMeta(type):
 
     '''Meta-classe para EventDispatcher.
 
-    Fabrica e registra automaticamente os métodos liste_* e trigger_*. Salva
+    Fabrica e registra automaticamente os métodos listen_* e trigger_*. Salva
     algumas constantes úteis obtidas por introspecção e  Além disto, atualiza
     os __slots__ caso a classe filho os utilize.'''
 
@@ -767,6 +767,9 @@ class EventDispatcherMeta(type):
 
     @classmethod
     def _populate_namespace(cls, name, bases, ns):
+        '''Retorna o namespace ns acrescentado dos métodos trigger_* e
+        listen_* apropriados para a classe em questão'''
+
         ns = dict(ns)
 
         # Lê os sinais e monta um dicionário de sinais
@@ -837,8 +840,19 @@ class EventDispatcherMeta(type):
         bases = ev_type.__bases__
         ns = dict(ev_type.__dict__)
         ns = cls._populate_namespace(name, bases, ns)
-        for k, v in ns.items():
-            setattr(ev_type, k, v)
+
+        # Remove read-only attributes
+        ns.pop('__doc__', None)
+        ns.pop('__dict__', None)
+        for k, new in ns.items():
+            old = getattr(ev_type, k, None)
+            if old is not new:
+                try:
+                    setattr(ev_type, k, new)
+                except AttributeError:
+                    tname = ev_type.__name__
+                    msg = 'could not write %s=%r for type %s' % (k, new, tname)
+                    raise ValueError(msg)
         return ev_type
 
 

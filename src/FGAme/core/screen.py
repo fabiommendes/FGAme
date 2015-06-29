@@ -1,13 +1,16 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathutils import Vec2
-from FGAme.draw import color_property
+from FGAme.draw import color_property, Color
+
+black = Color('black')
+white = Color('white')
+
 
 ###############################################################################
 #                          Classe Screen genérica
 ###############################################################################
-
-
+# TODO: refatorar para ter uma classe de Canvas separada da classe Window?
 class Screen(object):
 
     '''Classe que define a funcionalidade básica de todos os backends que
@@ -52,8 +55,6 @@ class Screen(object):
 ###############################################################################
 #     Classe Canvas: backends baseados em renderização do tipo "pintura"
 ###############################################################################
-
-
 class Canvas(Screen):
 
     '''Sub-classes implementam a metáfora de "pintura" para a renderização das
@@ -68,9 +69,6 @@ class Canvas(Screen):
     def __init__(self, shape=(800, 600), pos=(0, 0), zoom=1, background=None):
         super(Canvas, self).__init__(shape, pos, zoom, background)
         self._drawing_funcs = {}
-
-    def init(self):
-        pass
 
     def show(self):
         self.clear_background('white')
@@ -90,87 +88,93 @@ class Canvas(Screen):
         self.flip()
 
     # Objetos primitivos ######################################################
-    def paint_pixel(self, pos, color='black'):
-        '''Pinta um pixel na posição especificada na tela'''
+    # Estas funções desenham objetos primitivos na tela sem se atentar para
+    # transformações de escala, translação e rotação. São as operações
+    # primitivas que devem ser sobrescritas por cada backend suportado.
+    # A maior parte das implementações padrão é vazia
 
-        x, y = pos
-        self.paint_rect((x, y, 1, 1), color)
-
-    def paint_circle(self, radius, pos, color='black', solid=True):
-        '''Pinta um círculo especificando a posição do centro, seu raio e
-        opcionalmente a cor.
-
-        Se a opção solid=True (padrão), desenha um círculo sólido. Caso
-        contrário, desenha apenas uma linha'''
-
+    # Entes primitivos
+    def draw_raw_pixel(self, pos, color=black):
+        '''Desenha um pixel na posição dada'''
         raise NotImplementedError
 
-    def paint_poly(self, L_points, color='black', solid=True):
-        '''Pinta um polígono a partir de uma lista de vértices'''
-
+    def draw_raw_segment(self, segment, width=1.0, color=black):
+        '''Desenha um segmento de reta'''
         raise NotImplementedError
 
-    def paint_aabb(self, xmin, xmax, ymin, ymax, color='black', solid=True):
-        '''Pinta uma caixa de contorno alinhada aos eixos'''
-
-        dx, dy = xmax - xmin, ymax - ymin
-        self.paint_rect((xmin, ymin, dx, dy), color=color, solid=solid)
-
-    def paint_rect(self, rect, color='black'):
-        '''Semelhante à paint_aabb(), mas utiliza uma tupla com
-        (xmin, ymin, width, height) como entrada e somente pinta cores
-        sólidas'''
-
-        x, y, w, h = rect
-        self.paint_poly(
-            [(x, y), (x + w, y), (x + w, y + h), (x, y + h)], color)
-
-    def paint_line(self, pt1, pt2, color='black', solid=True):
-        '''Pinta na tela uma linha que vai do ponto pt1 até o ponto pt2'''
-
+    def draw_raw_line(self, line, width=1.0, color=black):
+        '''Desenha uma linha infinita'''
+        # TODO: implementar a partir de raw_segment()
         raise NotImplementedError
 
-    def paint_image(self, pos, texture):
-        '''Pinta uma textura/imagem na tela. O parâmetro pos especifica a
-        posição do canto inferior esquerdo'''
+    def draw_raw_ray(self, line, width=1.0, color=black):
+        '''Desenha um raio (ou linha semi-infinita)'''
+        # TODO: implementar a partir de raw_segment()
+        raise NotImplementedError
 
-    def clear_background(self, color=None):
+    # Figuras sólidas
+    def draw_raw_circle_solid(self, circle, color=black):
+        '''Desenha um círculo sólido na tela'''
+        raise NotImplementedError
+
+    def draw_raw_circle_border(self, circle, width=1.0, color=black):
+        '''Desenha a borda de um círculo'''
+        raise NotImplementedError
+
+    def draw_raw_aabb_solid(self, poly, color=black):
+        '''Desenha uma aabb sólida'''
+        raise NotImplementedError
+
+    def draw_raw_aabb_border(self, aabb, width=1.0, color=black):
+        '''Desenha a borda de uma aabb'''
+        raise NotImplementedError
+
+    def draw_raw_poly_solid(self, poly, color=black):
+        '''Desenha um polígono sólido'''
+        raise NotImplementedError
+
+    def draw_raw_poly_border(self, poly, width=1.0, color=black):
+        '''Desenha a borda de um polígono'''
+        # TODO: implementar a partir de raw_segment()
+        raise NotImplementedError
+
+    def draw_raw_image(self, image, start_pos=(0, 0)):
+        '''Desenha uma imagem na tela'''
+        raise NotImplementedError
+
+    def clear_background(self, color):
         '''Limpa o fundo com a cor especificada'''
 
         raise NotImplementedError
 
     # Objetos derivados #######################################################
+    # Estas são as funções que devem ser utilizadas diretamente pelos usuários
+    # da FGAme. Elas desenham um objeto a partir de uma figura primitiva e
+    # aplicam automaticamente as transformações de escala, translação e rotação
+    # necessárias.
+    def draw_circle(self, circle, solid=True, color=black,
+                    line_width=0.0, line_color=black):
+        '''Desenha um círculo na tela.'''
 
-    def draw_tree(self, tree):
-        '''Renderiza uma DrawingTree chamando a função correspondente para
-        desenhar cada objeto'''
+        if not self._direct:
+            raise RuntimeError
 
-        for obj in tree.walk():
-            try:
-                obj.draw(self)
-            except AttributeError:
-                tt = type(obj).__name__
-                raise ValueError("don't know how to draw %s object" % tt)
+        if solid:
+            self.draw_raw_circle_solid(circle, color)
+        if line_color is not None and line_width:
+            self.draw_raw_circle_border(circle, line_width, line_color)
 
-    def draw_circle(self, circle):
-        '''Desenha um círculo utilizando as informações de geometria, cor e
-        localização do objeto `circle` associado.
+    def draw_aabb(self, aabb, solid=True, color=black,
+                  line_width=0.0, line_color=black):
+        '''Desenha uma AABB na tela.'''
 
-        Nota: diferentemente das funções do tipo paint_*, as funções do tipo
-        draw_* adaptam automaticamente a renderização para os padrões de zoom e
-        deslocamento da tela.'''
+        if not self._direct:
+            raise RuntimeError
 
-        self.paint_circle(circle.radius, circle.pos, circle.color, True)
-
-    def draw_aabb(self, aabb):
-        '''Desenha um círculo utilizando as informações de geometria, cor e
-        localização do objeto `circle` associado.
-
-        Nota: diferentemente das funções do tipo paint_*, as funções do tipo
-        draw_* adaptam automaticamente a renderização para os padrões de zoom e
-        deslocamento da tela.'''
-
-        self.paint_rect(aabb.rect, aabb.color, True)
+        if solid:
+            self.draw_raw_aabb_solid(aabb, color)
+        if line_color is not None and line_width:
+            self.draw_raw_aabb_border(aabb, line_width, line_color)
 
     def draw_poly(self, poly):
         '''Desenha um círculo utilizando as informações de geometria, cor e
@@ -189,5 +193,14 @@ class Canvas(Screen):
         else:
             raise NotImplementedError
 
+    # Interface de objetos do tipo Drawable. Objetos podem sinalizar que são
+    # desenhaveis quando implementam o método obj.draw(canvas). O método draw
+    # é chamado com um objeto do tipo Canvas como atributo e deve se desenhar
+    # a partir de chamadas às funções primitivas de desenho.
     def draw(self, object):
+        '''Desenha objetos do tipo Drawable.
+
+        Objetos do tipo Drawable possuem uma função obj.draw(screen) que
+        desenha o objeto na tela fornecida como parâmetro de entrada.
+        '''
         object.draw(self)

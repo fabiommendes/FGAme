@@ -10,6 +10,9 @@ from FGAme.draw import Color, rgb
 from FGAme.util import autodoc
 pygame.init()
 
+black = Color('black')
+white = Color('white')
+
 
 @autodoc
 class PyGameCanvas(Canvas):
@@ -17,7 +20,8 @@ class PyGameCanvas(Canvas):
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
 
     __slots__ = ['_screen']
-    _circle = pygame.draw.circle
+    _pg_draw_circle = pygame.draw.circle
+    _pg_draw_rect = pygame.draw.rect
 
     def get_screen(self):
         '''Retorna o objeto do tipo screen do Pygame'''
@@ -31,19 +35,34 @@ class PyGameCanvas(Canvas):
     def flip(self):
         pygame.display.update()
 
-    def _map_point(self, point):
-        try:
-            return point.flip_y(self.height).round()
-        except AttributeError:
-            x, y = point
-            return (round(x), round(self.height - y))
+    # Funções de desenho - chama as funções de pygame.draw
+    def draw_raw_aabb_solid(self, aabb, color=black):
+        self.draw_raw_aabb_border(aabb, 0, color)
 
-    @cython.locals(radius='double', x='int', y='int')
-    def paint_circle(self, radius, pos, color=Color(0, 0, 0), solid=True):
-        x, y = pos.trunc()
-        self._circle(self._screen, rgb(color),
-                     (x, self.height - y), int(radius))
+    def draw_raw_aabb_border(self, aabb, width=1.0, color=black):
+        Y = self.height
+        x, x_, y, y_ = map(int, aabb)
+        rect = (x, Y - y_, x_ - x, y_ - y)
+        self._pg_draw_rect(
+            self._screen,
+            color,       # color
+            rect,        # rect
+            int(width))  # line width
 
+    def draw_raw_circle_solid(self, circle, color=black):
+        self.draw_raw_circle_border(circle, 0, color)
+
+    def draw_raw_circle_border(self, circle, width=1.0, color=black):
+        Y = self.height
+        x, y = circle.pos
+        self._pg_draw_circle(
+            self._screen,
+            color,                 # line color
+            (int(x), Y - int(y)),  # center
+            int(circle.radius),    # radius
+            int(width))            # line width
+
+    # TODO: refatorar para a nova API
     def paint_poly(self, points, color=Color(0, 0, 0), solid=True):
         points = [self._map_point(pt) for pt in points]
         pygame.draw.polygon(self._screen, rgb(color), points)
@@ -53,8 +72,10 @@ class PyGameCanvas(Canvas):
         x, y = self._map_point((x, y + dy))
         pygame.draw.rect(self._screen, rgb(color), (x, y, dx, dy))
 
-    def paint_line(self, pt1, pt2, color=Color(0, 0, 0), solid=True):
-        raise NotImplementedError
+    def paint_line(self, pt1, pt2, color=Color(0, 0, 0), width=1):
+        pt1 = self._map_point(pt1)
+        pt2 = self._map_point(pt2)
+        pygame.draw.line(self._screen, rgb(color), pt1, pt2, width=width)
 
     def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)

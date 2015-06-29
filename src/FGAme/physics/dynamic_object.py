@@ -9,22 +9,37 @@ __all__ = ['Body', 'LinearRigidBody']
 
 
 ###############################################################################
-#                                 Funções úteis
+#                              Funções úteis
 ###############################################################################
-
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INERTIA_SCALE = 1
 INF = float('inf')
 
 
+# TODO: mover para FGAme.util
 def do_nothing(*args, **kwds):
-    pass
+    '''A handle that does nothing'''
 
 
-def raises_method(ex=NOT_IMPLEMENTED):
+def raises_method(exception=NOT_IMPLEMENTED):
+    '''Returns a method that raises the given exception'''
+
     def method(self, *args, **kwds):
-        raise ex
+        raise exception
     return method
+
+
+def popattr(obj, attr, value=None):
+    '''Returns attribute `attr` from `obj` and delete it afterwards.
+    If attribute does not exist, return `value`'''
+
+    try:
+        result = getattr(obj, attr)
+    except AttributeError:
+        return value
+    else:
+        delattr(obj, attr)
+        return result
 
 ###############################################################################
 #          Classes Base --- todos objetos físicos derivam delas
@@ -190,9 +205,9 @@ class Body(object):
 
     ::
         **Variáveis dinâmicas**
-    _theta
+    theta
         Ângulo da rotação em torno do eixo saindo do centro de massa do objeto
-    _omega
+    omega
         Velocidade angular de rotação
 
     ::
@@ -372,17 +387,17 @@ class Body(object):
         '''Caixa de contorno alinhada aos eixos que envolve o objeto'''
 
         if self.flags & flags.dirty_aabb:
-            self._aabb = self._shape.aabb()
+            self._aabb = self.bounding_box.get_aabb()
             self.flags &= flags.not_dirty_aabb
         return self._aabb
 
     @property
-    def shape(self):
+    def bounding_box(self):
         '''Retorna um objeto que representa o formato geométrico do corpo
         físico, ex.: Circle, AABB, Poly, etc'''
 
         if self.flags & flags.dirty_any:
-            self._shape = self._shape_base.move(self.pos).rotate(self._theta)
+            self._shape = self._baseshape.move(self.pos).rotate(self._theta)
             self.flags &= flags.not_dirty
         return self._shape
 
@@ -455,10 +470,6 @@ class Body(object):
     @property
     def pos_down(self):
         return Vec2(self.pos.x, self.ymin)
-
-    @property
-    def shape_bb(self):
-        return self.aabb
 
     ###########################################################################
     #                          Contatos e vínculos
@@ -602,7 +613,6 @@ class Body(object):
 
     @mass.setter
     def mass(self, value):
-        print('changing mass to value', value)
         value = float(value)
 
         if value <= 0:
@@ -615,6 +625,7 @@ class Body(object):
             self._invmass = 1.0 / value
         else:
             self._invmass = 0.0
+            self._invinertia = 0.0
 
     @property
     def inertia(self):
@@ -648,8 +659,7 @@ class Body(object):
         if self._invmass:
             self._invmass = 1.0 / (self.area() * rho)
         if self._invinertia:
-            self._invinertia = INERTIA_SCALE / \
-                (self.area() * rho * self.ROG_sqr())
+            self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
 
     # Grandezas físicas derivadas
     def linearE(self):
@@ -707,17 +717,17 @@ class Body(object):
     def area(self):
         '''Retorna a área do objeto'''
 
-        return self._baseshape.area()
+        return self._baseshape.area
 
     def ROG_sqr(self):
         '''Retorna o raio de giração ao quadrado'''
 
-        return self._baseshape.ROG_sqr()
+        return self._baseshape.ROG_sqr
 
     def ROG(self):
         '''Retorna o raio de giração'''
 
-        return sqrt(self.ROG_sqr())
+        return sqrt(self.ROG_sqr)
 
     ###########################################################################
     #                      Aplicação de forças e torques
@@ -1058,7 +1068,7 @@ class Body(object):
 
         return bool(self._invinertia)
 
-    def make_dynamic(self, what=None):
+    def make_dynamic(self, what=None, restore_speed=True):
         '''Resgata a massa, inércia e velocidades anteriores de um objeto
         paralizado pelo método `obj.make_static()` ou `obj.make_kinematic()`.
 
@@ -1066,52 +1076,38 @@ class Body(object):
         '''
 
         if what is None or what == 'both':
-            self.make_dynamic_linear()
-            self.make_dynamic_angular()
+            self.make_dynamic_linear(restore_speed)
+            self.make_dynamic_angular(restore_speed)
         elif what == 'linear':
-            self.make_dynamic_linear()
+            self.make_dynamic_linear(restore_speed)
         elif what == 'angular':
-            self.make_dynamic_angular()
+            self.make_dynamic_angular(restore_speed)
         else:
             raise ValueError('unknown mode: %r' % what)
 
-    def make_dynamic_linear(self):
+    def make_dynamic_linear(self, restore_speed=True):
         '''Resgata os parâmetros dinâmicos lineares de um objeto estático ou
         cinemático paralizado pelos métodos `obj.make_static()` ou
         `obj.make_kinematic()`.'''
 
         if not self.is_dynamic_linear():
-            # Regata a massa
-            mass = self._getp('old_mass', None)
-            if mass is None:
-                raise RuntimeError('old mass is not available for recovery')
-            else:
-                self.mass = mass
+            self._invmass = 1.0 / (self.area() * self._density)
 
             # Resgata a velocidade
-            if self._vel == nullvec2:
-                self._vel = self._getp('old_vel', nullvec2)
+            if restore_speed and self._vel.is_null():
+                self._vel = popattr(self, '_old_vel', nullvec2)
 
-        self._clearp('old_mass', 'old_vel')
-
-    def make_dynamic_angular(self):
+    def make_dynamic_angular(self, restore_speed=True):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
         cinemático paralizado pelos métodos `obj.make_static()` ou
         `obj.make_kinematic()`.'''
 
         if not self.is_dynamic_angular():
-            # Regata a massa
-            inertia = self._getp('old_inertia', None)
-            if inertia is None:
-                raise RuntimeError('old inertia is not available for recovery')
-            else:
-                self.inertia = inertia
+            self._inertia = 1.0 / (self._density * self.ROG_sqr())
 
             # Resgata a velocidade
-            if self._omega == 0:
-                self._omega = self._getp('old_omega', 0)
-
-        self._clearp('old_inertia', 'old_omega')
+            if restore_speed and self._omega == 0:
+                self._omega = popattr(self, '_old_omega', 0.0)
 
     # Kinematic ###############################################################
     def is_kinematic(self, what=None):
@@ -1169,18 +1165,14 @@ class Body(object):
         cinemático paralizado pelos métodos `obj.make_static()` ou
         `obj.make_kinematic()`.'''
 
-        if not self.is_kinematic_linear():
-            self._old_mass = self.mass
-            self.mass = 'inf'
+        self._invmass = 0.0
 
     def make_kinematic_angular(self):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
         cinemático paralizado pelos métodos `obj.make_static()` ou
         `obj.make_kinematic()`.'''
 
-        if not self.is_kinematic_angular():
-            self._old_inertia = self.inertia
-            self.inertia = 'inf'
+        self._invinertia = 0.0
 
     # Static ##################################################################
     def is_static(self, what=None):
@@ -1235,9 +1227,8 @@ class Body(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_linear()
-        if self._vel != nullvec2:
-            self._old_vel = self._vel
-            self._vel = Vec2(0, 0)
+        self._old_vel = self._vel
+        self._vel = nullvec2
 
     def make_static_angular(self):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
@@ -1245,9 +1236,8 @@ class Body(object):
         `obj.make_kinematic()`.'''
 
         self.make_kinematic_angular()
-        if self._omega != 0:
-            self._old_omega = self._omega
-            self._omega = 0.0
+        self._old_omega = self._omega
+        self._omega = 0.0
 
     ###########################################################################
     # Erros e miscelânea
