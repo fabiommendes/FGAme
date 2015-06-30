@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from FGAme.mathutils import Vec2, nullvec2
+from FGAme.mathutils import Vec2, null2D
 from FGAme.physics.flags import BodyFlags
 from FGAme.util import lazy
 from math import exp
@@ -255,7 +255,7 @@ class Collision(Pair):
         self.world = world
         self.is_active = True
         self.resolved = False
-        self.vrel = nullvec2
+        self.vrel = null2D
         if pos is None:
             raise ValueError(A, B)
         self.pos = Vec2(pos)

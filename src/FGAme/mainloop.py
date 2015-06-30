@@ -69,14 +69,14 @@ class MainLoop(EventDispatcher):
         '''
 
         # Assegura que o motor de jogos foi inicializado
-        conf.init()
+        conf.init()  # @UndefinedVariable
 
         # Prepara o loop principal
         self._running = True
         sleep = time.sleep
         gettime = time.time
-        input_ = conf.input_object
-        screen = conf.canvas_object
+        input_ = conf.input_object  # @UndefinedVariable
+        screen = conf.canvas_object  # @UndefinedVariable
         sim_start = gettime()
         screen.show()
         n_skip = 0

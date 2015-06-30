@@ -1,35 +1,37 @@
 # -*- coding: utf8 -*-
-from mathtools import dot, Vec2, pi
+from copy import copy
+from mathtools import dot, Vec2, pi, sqrt
+from mathtools.shapes import Curve
+
+SQRT_HALF = 1 / sqrt(2)
 
 
-class Circle(object):
+class CircleBase(Curve):
 
-    '''Representa um círculo com raio e centro dados.
+    '''Base class for Circle and mCircle classes'''
 
-    Exemplos
-    --------
-
-    >>> C = Circle(50, (50, 0))
-    '''
-
-    __slots__ = ['radius', 'pos']
+    __slots__ = ['_radius', '_pos']
 
     def __init__(self, radius, pos=(0, 0)):
-        self.radius = radius
-        self.pos = Vec2(*pos)
+        self._radius = radius
+        self._pos = Vec2(pos)
 
     def __repr__(self):
-        s_center = '%.1f, %.1f' % self.center
-        return 'Circle(%.1f, (%s))' % (self.radius, s_center)
+        s_center = '%.1f, %.1f' % self._center
+        tname = type(self).__name__
+        return '%s(%.1f, (%s))' % (tname, self._radius, s_center)
 
+    @property
     def area(self):
-        return pi * self.radius * self.radius
+        return pi * self._radius * self._radius
 
+    @property
     def ROG_sqr(self):
-        return self.radius * self.radius / 2
+        return self._radius * self._radius / 2
 
+    @property
     def ROG(self):
-        return self.radius / sqrt(2)
+        return self._radius * SQRT_HALF
 
     # Métodos utilizado pelo SAT ##############################################
     def directions(self, n):
@@ -46,41 +48,67 @@ class Circle(object):
         '''Retorna as coordenadas da sombra na direção n dada.
         Assume n normalizado.'''
 
-        p0 = dot(self.pos, n)
-        r = self.radius
+        p0 = dot(self._pos, n)
+        r = self._radius
         return (p0 - r, p0 + r)
 
     # Cálculo de distâncias ###################################################
     def distance_center(self, other):
         '''Retorna a distância entre centros de dois círculos.'''
 
-        pass
+        return self._pos.distance(other.pos)
 
     def distance_circle(self, other):
         '''Retorna a distância para um outro círculo. Zero se eles se
         interceptam'''
 
-        pass
+        distance = self._pos.distance(other.pos)
+        sum_radius = self._radius + other.radius
+        return max(distance - sum_radius, 0)
 
-    # Pontos de interceptação #################################################
-    def intersects_circle(self, other):
-        '''Retorna True se o círculo intercepta outro círculo ou False, caso
-        contrário'''
-
-    def intersects_point(self, point, tol=1e-6):
-        '''Retorna True se o ponto está na fronteira do círculo dada a margem
-        de tolerância tol.'''
-
-        pass
-
-    # Contêm ou não figuras geométricas #######################################
+    # Containement FGAme_tests ######################################################
     def contains_circle(self, other):
-        '''Retorna True se o círculo intecepta outro círculo ou False, caso
-        contrário'''
+        return (self.contains_point(other.pos) and
+                (self.distance_center(other) + other.radius < self._radius))
 
     def contains_point(self, point):
-        '''Retorna True se o círculo intecepta outro círculo ou False, caso
-        contrário'''
+        return self._pos.distance(point) <= self._radius
+
+
+class Circle(CircleBase):
+
+    '''Representa um círculo imutável.'''
+
+    __slots__ = []
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @property
+    def pos(self):
+        return self._pos
+
+
+class mCircle(CircleBase):
+
+    '''A mutable circle class'''
+
+    __slots__ = []
+
+    radius = copy(Circle.radius)
+    pos = copy(Circle.pos)
+
+    @radius.setter
+    def radius(self, value):
+        self._radius = float(value)
+
+    @pos.setter
+    def pos(self, value):
+        self._pos = Vec2(value)
+
+# Late binding
+Curve._Circle = CircleBase
 
 if __name__ == '__main__':
     import doctest

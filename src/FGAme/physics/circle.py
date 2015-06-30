@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import pi, sqrt, nullvec2, Circle as _Circle
+from FGAme.mathutils import null2D, Circle as _Circle
 from FGAme.physics import Body
 
 __all__ = ['Circle']
@@ -32,7 +32,7 @@ class Circle(Body):
         self.cbb_radius = float(radius)
         super(Circle, self).__init__(
             pos, vel, mass=mass, density=density,
-            baseshape=_Circle(self.cbb_radius, nullvec2), ** kwds)
+            baseshape=_Circle(self.cbb_radius, null2D), ** kwds)
 
     @property
     def radius(self):

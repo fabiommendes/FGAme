@@ -1,5 +1,5 @@
 from math import *
-from .vec2 import *
+from .veclike import *
 from .mat2 import *
 from .array import *
 from .vec_array import *

@@ -33,7 +33,7 @@ class ObjectMixin(object):
 
     @lazy
     def _input(self):
-        return conf.get_input()
+        return conf.get_input()  # @UndefinedVariable
 
     def __init__(self, *args, **kwds):
         mixin_kwds = self._extract_mixin_kwargs(kwds)

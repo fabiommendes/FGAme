@@ -107,7 +107,7 @@ def auto_public(tt=None, slots=None):
 #                 Classes mãe para objetos geométricos
 ###############################################################################
 
-class Shape(object):
+class ShapeBase(object):
 
     def intercepts(self, obj):
         pass
@@ -122,12 +122,12 @@ class Shape(object):
         pass
 
 
-class ClosedShape(Shape):
+class ClosedShape(ShapeBase):
 
     def contains(self, other):
         pass
 
     def __contains__(self, other):
-        if isinstance(other, Shape):
+        if isinstance(other, ShapeBase):
             pass
         return self.contains(other)

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from collections import defaultdict
-from FGAme.mathutils import Vec2, nullvec2
+from FGAme.mathutils import Vec2, null2D
 from FGAme.physics.flags import BodyFlags
 from FGAme.events import EventDispatcher, signal
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
@@ -51,7 +51,7 @@ class Simulation(EventDispatcher):
         self._kinetic0 = None
         self._potential0 = None
         self._interaction0 = None
-        self._gravity = nullvec2
+        self._gravity = null2D
         self._damping = self._adamping = self._sfriction = self._dfriction = 0
         self._restitution = 1
         self.gravity = gravity or (0, 0)
@@ -322,7 +322,7 @@ class Simulation(EventDispatcher):
             if obj._invinertia:
                 obj.aboost(obj._alpha * dt)
 
-            obj._e_vel = nullvec2
+            obj._e_vel = null2D
             obj._e_omega = 0.0
 
     def resolve_positions(self, dt):

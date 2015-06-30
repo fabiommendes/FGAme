@@ -7,57 +7,17 @@ from mathtools.util import pyinject
 if not C.compiled:
     import mathtools.mathfuncs as m
 
-__all__ = ['AABB',
+__all__ = ['AABB', 'mAABB',
            'aabb_rect', 'aabb_bbox',
            'aabb_pshape', 'aabb_shape', 'aabb_center']
 
-dir_x = Vec2(1, 0)
-dir_y = Vec2(0, 1)
+direction_x = Vec2(1, 0)
+direction_y = Vec2(0, 1)
 
 
-class AABB(object):
+class AABBBase(object):
 
-    '''Representa uma caixa de contorno retangular alinhada aos eixos.
-
-    Atributos
-    ---------
-
-    xmin, xmax, ymin, ymax
-        Limites da AABB
-    bbox
-        Tupla com (xmin, xmax, ymin, ymax)
-    shape
-        Tupla com (largura, altura)
-    pos
-        Posição do centro da AABB
-    pos_sw, pos_se, pos_ne, pos_nw,
-        Posições dos extremos da AABB nas direções sudoeste, sudeste, nordeste
-        e noroeste
-    vertices
-        Tupla com os quatro vétices acima que formam a AABB
-    radius_cbb
-        Raio do círculo de contorno que envolve o objeto cujo centro é dado
-        por pos
-
-
-    Exemplos
-    --------
-
-    Objetos do tipo AABB podem ser inicializados a partir das coordenadas
-    (xmin, xmax, ymin, ymax) ou especificando qualquer conjunto de parâmetros
-    que permita a construção da caixa de contorno.
-
-    Todas os construtores abaixo são equivalentes
-
-    >>> a = AABB(0, 50, 0, 100)
-    >>> b = AABB((0, 50, 0, 100))
-    >>> c = AABB(bbox=(0, 50, 0, 100))
-    >>> d = AABB(pos=(25, 50), shape=(50, 100))
-    >>> e = AABB(rect=(0, 0, 50, 100))
-    >>> a == b == c == d == e
-    True
-
-    '''
+    '''Classe pai para AABB e mAABB'''
 
     if C.compiled:
         __slots__ = []
@@ -75,7 +35,7 @@ class AABB(object):
     @classmethod
     @C.locals(xmax='double', xmin='double', ymax='double', ymin='double')
     def _constructor(cls, xmin, xmax, ymin, ymax):
-        new = object.__new__(cls)
+        new = AABB.__new__(cls)
         new.xmin = xmin
         new.xmax = xmax
         new.ymin = ymin
@@ -174,7 +134,7 @@ class AABB(object):
         vazia de forma que somente as direções do outro objeto serão
         consideradas'''
 
-        return [dir_x, dir_y]
+        return [direction_x, direction_y]
 
     def shadow(self, n):
         '''Retorna as coordenadas da sombra na direção n dada.
@@ -198,7 +158,9 @@ class AABB(object):
     def rotate(self, theta):
         '''Retorna o objeto rotacionado pelo ângulo fornecido'''
 
-        raise ValueError('cannot irotate AABB')
+        if theta != 0:
+            raise ValueError('cannot rotate AABB')
+        return self
 
     def rescale(self, scale):
         '''Retorna um objeto modificado pelo fator de escala fornecido'''
@@ -257,9 +219,56 @@ class AABB(object):
     def shadow_y(self):
         return (self.ymin, self.ymax)
 
-    def shadow(self, norm):
-        coords = [v.dot(norm) for v in self.vertices]
-        return min(coords), max(coords)
+
+class AABB(AABBBase):
+
+    '''Representa uma caixa de contorno retangular alinhada aos eixos.
+
+    Atributos
+    ---------
+
+    xmin, xmax, ymin, ymax
+        Limites da AABB
+    bbox
+        Tupla com (xmin, xmax, ymin, ymax)
+    shape
+        Tupla com (largura, altura)
+    pos
+        Posição do centro da AABB
+    pos_sw, pos_se, pos_ne, pos_nw,
+        Posições dos extremos da AABB nas direções sudoeste, sudeste, nordeste
+        e noroeste
+    vertices
+        Tupla com os quatro vétices acima que formam a AABB
+    radius_cbb
+        Raio do círculo de contorno que envolve o objeto cujo centro é dado
+        por pos
+
+
+    Exemplos
+    --------
+
+    Objetos do tipo AABB podem ser inicializados a partir das coordenadas
+    (xmin, xmax, ymin, ymax) ou especificando qualquer conjunto de parâmetros
+    que permita a construção da caixa de contorno.
+
+    Todas os construtores abaixo são equivalentes
+
+    >>> a = AABB(0, 50, 0, 100)
+    >>> b = AABB((0, 50, 0, 100))
+    >>> c = AABB(bbox=(0, 50, 0, 100))
+    >>> d = AABB(pos=(25, 50), shape=(50, 100))
+    >>> e = AABB(rect=(0, 0, 50, 100))
+    >>> a == b == c == d == e
+    True
+
+    '''
+
+
+class mAABB(AABBBase):
+
+    '''Mutable version of AABB'''
+
 
 if not C.compiled:
     @pyinject(globals())

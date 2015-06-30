@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2, sin, cos, sqrt, nullvec2, Circle
+from FGAme.mathutils import Vec2, sin, cos, sqrt, null2D, Circle
 from FGAme.util import six
 from FGAme.physics.flags import BodyFlags as flags
 
@@ -244,7 +244,7 @@ class Body(object):
 
     DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
-    def __init__(self, pos=nullvec2, vel=nullvec2, theta=0.0, omega=0.0,
+    def __init__(self, pos=null2D, vel=null2D, theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
                  restitution=None, sfriction=None, dfriction=None,
@@ -260,11 +260,11 @@ class Body(object):
         # Variáveis de estado #################################################
         self._pos = Vec2(pos)
         self._vel = Vec2(vel)
-        self._e_vel = nullvec2
+        self._e_vel = null2D
         self._e_omega = 0.0
         self._theta = float(theta)
         self._omega = float(omega)
-        self._accel = nullvec2
+        self._accel = null2D
         self._alpha = 0.0
 
         # Harmoniza massa, inércia e densidade ################################
@@ -304,7 +304,7 @@ class Body(object):
         self._density = float(density)
 
         # Controle de parâmetros físicos locais ###############################
-        self._gravity = nullvec2
+        self._gravity = null2D
         self._damping = self._adamping = 0.0
         self._sfriction = self._dfriction = 0.0
         self._restitution = 1.0
@@ -736,7 +736,7 @@ class Body(object):
         '''Move o objeto por vetor de deslocamento delta'''
 
         if y is None:
-            if delta_or_x is nullvec2:
+            if delta_or_x is null2D:
                 return
             self._pos += delta_or_x
         else:
@@ -761,7 +761,7 @@ class Body(object):
         "monkey patching" do Python
         '''
 
-        return nullvec2
+        return null2D
 
     def init_accel(self):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
@@ -775,7 +775,7 @@ class Body(object):
         elif self._gravity is not None:
             a = self._gravity
         else:
-            a = nullvec2
+            a = null2D
         self._accel = a
 
     def apply_force(self, force, dt, pos=None, relative=False):
@@ -1095,7 +1095,7 @@ class Body(object):
 
             # Resgata a velocidade
             if restore_speed and self._vel.is_null():
-                self._vel = popattr(self, '_old_vel', nullvec2)
+                self._vel = popattr(self, '_old_vel', null2D)
 
     def make_dynamic_angular(self, restore_speed=True):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
@@ -1198,7 +1198,7 @@ class Body(object):
     def is_static_linear(self):
         '''Verifica se o objeto é dinâmico nas variáveis lineares'''
 
-        return self.is_kinematic_linear() and self._vel == nullvec2
+        return self.is_kinematic_linear() and self._vel == null2D
 
     def is_static_angular(self):
         '''Verifica se o objeto é dinâmico nas variáveis angulares'''
@@ -1228,7 +1228,7 @@ class Body(object):
 
         self.make_kinematic_linear()
         self._old_vel = self._vel
-        self._vel = nullvec2
+        self._vel = null2D
 
     def make_static_angular(self):
         '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou

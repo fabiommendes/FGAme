@@ -5,7 +5,7 @@ import mathtools.mathfuncs as m
 from mathtools.base import auto_public
 from mathtools.util import pyinject
 if not C.compiled:
-    from mathtools.vec2 import Vec2
+    from mathtools.veclike import Vec2
 
 __all__ = ['Mat2', 'RotMat2', 'mMat2']
 number = (float, int)
@@ -121,10 +121,10 @@ class Mat2(object):
         '''Itera sobre todos elementos da matriz, primeiro os elementos da
         primeira linha e depois da segunda'''
 
-        yield(self._a)
-        yield(self._b)
-        yield(self._c)
-        yield(self._d)
+        yield self._a
+        yield self._b
+        yield self._c
+        yield self._d
 
     def colvecs(self):
         '''Retorna uma lista com os vetores coluna da matriz.'''
@@ -348,11 +348,10 @@ class Mat2(object):
     def __nonzero__(self):
         return any(self.flat())
 
+
 ###############################################################################
 #                            Matriz de rotação
 ###############################################################################
-
-
 class RotMat2(Mat2):
 
     '''Cria uma matriz de rotação que realiza a rotação pelo ângulo theta
@@ -388,7 +387,6 @@ class RotMat2(Mat2):
 ###############################################################################
 #                            Matriz mutável
 ###############################################################################
-
 class mMat2(Mat2):
 
     '''Versão mutável de Mat2'''
