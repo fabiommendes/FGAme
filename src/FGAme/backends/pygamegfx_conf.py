@@ -1,4 +1,4 @@
-mainloop = 'PyGameGFXMainLoop'
+mainloop = 'PyGameMainLoop'
 screen = 'PyGameGFXCanvas'
-input = 'PyGameGFXInput'
+input = 'PyGameInput'
 imports = ['pygame']

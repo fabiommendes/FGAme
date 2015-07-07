@@ -14,6 +14,8 @@ DEBUG = False
 
 __all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
 
+black = Color('black')
+
 
 @EventDispatcherMeta.decorate
 class ObjectMixin(object):
@@ -100,6 +102,10 @@ class AABB(ObjectMixin, physics.AABB):
             lw, lc = self._line_width, self._line_color
             screen.draw_aabb(self.aabb, True, color, lw, lc)
 
+        elif self._line_width:
+            lw, lc = self._line_width, self._line_color
+            screen.draw_aabb(self.aabb, False, black, lw, lc)
+
 
 class Circle(ObjectMixin, physics.Circle):
     _init_physics = physics.Circle.__init__
@@ -110,14 +116,23 @@ class Circle(ObjectMixin, physics.Circle):
             lw, lc = self._line_width, self._line_color
             screen.draw_circle(self.bounding_box, True, color, lw, lc)
 
+        elif self._line_width:
+            lw, lc = self._line_width, self._line_color
+            screen.draw_circle(self.bounding_box, False, black, lw, lc)
+
 
 class Poly(ObjectMixin, physics.Poly):
     _init_physics = physics.Poly.__init__
 
-    def paint(self, screen):
-        if self.color is not None:
-            screen.paint_poly(self.vertices, self.color)
-            self._debug(screen)
+    def draw(self, screen):
+        if self._color is not None:
+            color = self._color
+            lw, lc = self._line_width, self._line_color
+            screen.draw_poly(self.bounding_box, True, color, lw, lc)
+
+        elif self._line_width:
+            lw, lc = self._line_width, self._line_color
+            screen.draw_poly(self.bounding_box, False, black, lw, lc)
 
 
 class Rectangle(ObjectMixin, Poly, physics.Rectangle):

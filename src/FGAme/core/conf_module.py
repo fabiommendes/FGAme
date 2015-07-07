@@ -1,4 +1,8 @@
 # -*- coding: utf8 -*-
+'''
+Define o objeto principal que guarda e altera as configurações da FGAme.
+'''
+
 from FGAme.core import log
 from FGAme import backends
 
@@ -11,7 +15,7 @@ class Conf(object):
 
     # Propriedades relativas ao backend
     backend = None
-    backends = ['pygame', 'pygamegfx', 'pygamegl', 'sdl2']
+    backends = ['pygame', 'sdl2cffi', 'sdl2', 'pygamegfx', 'pygamegl']
     backend_classes = None
 
     # Leitura de entradas do usuário

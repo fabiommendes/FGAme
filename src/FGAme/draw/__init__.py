@@ -1,3 +1,3 @@
 from .color import *
-from .tree import *
 from .base import *
+from .tree import *

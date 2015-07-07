@@ -842,8 +842,11 @@ class EventDispatcherMeta(type):
         ns = cls._populate_namespace(name, bases, ns)
 
         # Remove read-only attributes
-        ns.pop('__doc__', None)
-        ns.pop('__dict__', None)
+        blacklist = ['__doc__', '__dict__', '__weakref__']
+        for k in blacklist:
+            ns.pop(k, None)
+
+        # Write new attributes
         for k, new in ns.items():
             old = getattr(ev_type, k, None)
             if old is not new:

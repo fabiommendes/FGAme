@@ -47,3 +47,48 @@ def pyinject(globals, name=None):
         return None
 
     return decorator
+
+
+#
+# Printing functions
+#
+def tp_print(x):
+    '''Mesmo que type(x).__name__'''
+
+    return type(x).__name__
+
+
+def num_print(x):
+    '''Representação do número como string'''
+
+    if int(x) == x:
+        return str(int(x))
+    else:
+        return '%.1s' % x
+
+
+def pt_print(pt):
+    '''Representação de ponto (ou sequência de números) como string'''
+
+    return '(%s)' % (', '.join(map(num_print, pt)))
+
+
+#
+# Conversion of arguments
+#
+def args_to_vec2(x_or_delta, y):
+    '''Convert the sequence of arguments (x_or_delta, y) to a proper vector'''
+
+    try:
+        vec2 = Vec2  # @UndefinedVariable
+    except NameError:
+        from mathtools import Vec2
+        vec2 = globals()['Vec2'] = Vec2
+
+    if y is None:
+        if isinstance(x_or_delta, vec2):
+            return x_or_delta
+        else:
+            return vec2.from_seq(x_or_delta)
+    else:
+        return vec2(x_or_delta, y)

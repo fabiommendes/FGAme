@@ -12,7 +12,7 @@ class Curve(object):
 
     # Geometric operations ####################################################
 
-    # Distance FGAme_tests ##########################################################
+    # Distance FGAme_tests ###################################################
     def distance_point(self, point):
         '''Return the distance of object to the given point. Return 0.0 if
         they intercept'''
@@ -45,7 +45,7 @@ class Solid(Curve):
 
     __slots__ = []
 
-    # Containement FGAme_tests ######################################################
+    # Containement FGAme_tests ###############################################
     def contains_point(self, point):
         '''Tests if the given point is completely contained by object'''
 
@@ -76,8 +76,8 @@ class Convex(Curve):
 
     '''Base class for all convex shaped objects'''
 
-    # Generic containement FGAme_tests implementations that are valid for all convex
-    # shapes
+    # Generic containement FGAme_tests implementations that are valid for all
+    # convex shapes
 
     def contains_segment(self, segment):
         pt_test = self.contains_point

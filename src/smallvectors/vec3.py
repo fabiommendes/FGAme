@@ -30,8 +30,8 @@ Vec3(0.3, 0.7, 0.7)
 '''
 
 import cython as C
-import mathtools as m
-from mathtools.veclike.cartesian import Vec, Direction, Point
+import math as m
+from smallvectors.cartesian import Vec, Direction, Point
 
 
 class Base3D(object):
@@ -118,7 +118,7 @@ class VecAndDirectionBase3D(Base3D):
     '''Base class with common implementations for for Vec2 and Direction2'''
 
     def cross(self, other):
-        '''The cross product between two tridimensional vectors'''
+        '''The cross product between two tridimensional smallvectors'''
 
         x, y, z = self
         a, b, c = other
@@ -150,7 +150,7 @@ class Point3(Base3D, Point):
 
 
 ###############################################################################
-# Module constant vectors
+# Module constant smallvectors
 ###############################################################################
 null3D = Vec3(0, 0, 0)
 ux3D = Direction3(1, 0, 0)

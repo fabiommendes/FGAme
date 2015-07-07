@@ -82,6 +82,14 @@ class AABBBase(object):
         return Vec2(self.xmax, self.ymax)
 
     @property
+    def width(self):
+        return self.xmax - self.xmin
+
+    @property
+    def height(self):
+        return self.ymax - self.ymin
+
+    @property
     def vertices(self):
         return (Vec2(self.xmin, self.ymin), Vec2(self.xmax, self.ymin),
                 Vec2(self.xmax, self.ymax), Vec2(self.xmin, self.ymax))
@@ -174,6 +182,8 @@ class AABBBase(object):
     # Cálculo de distâncias ###################################################
     def distance_center(self, other):
         '''Retorna a distância entre centros de duas AABBs.'''
+
+        return (self.pos - other.pos).norm()
 
     def distance_aabb(self, other):
         '''Retorna a distância para outra AABB. Zero se elas se interceptam'''

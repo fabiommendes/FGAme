@@ -1,6 +1,10 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vec2, mVec2, pi
+'''
+testing vectors
+'''
+
+from math import pi, sqrt
 from FGAme.util import lazy
 from nose.tools import raises, assert_almost_equal, assert_almost_equals
 import nose

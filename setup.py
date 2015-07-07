@@ -4,6 +4,7 @@ import sys
 from distutils.core import setup
 
 VERSION = '0.3.1-alpha-1'
+IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
 
 
@@ -60,6 +61,9 @@ def get_extensions():
 
     from distutils.extension import Extension
     win_platforms = ['win32', 'cygwin']
+    
+    if IS_PYPY:
+        return []
 
     exts = []
     for path in find_pyx() + find_pure():
@@ -129,9 +133,9 @@ Main features:
       ],
       package_dir={'': 'src'},
       packages=['FGAme', 'FGAme.app', 'FGAme.backends', 'FGAme.core',
-                'FGAme.demos', 'FGAme.demos.simulations', 'FGAme.demos.games',
                 'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.util',
-                'mathtools', 'mathtools.base', 'mathtools.shapes',
+                'mathshapes', 'mathshapes.base', 'mathshapes.shapes',
+                'smallvectors',
                 ],
       license='GPL',
       requires=['pygame'],

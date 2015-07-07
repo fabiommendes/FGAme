@@ -1,7 +1,8 @@
 # -*- coding: utf8 -*-
 
 from collections import MutableSequence
-from mathtools import Vec2, RotMat2, Array
+from mathtools import vec, Vec2
+from mathtools.util import args_to_vec2
 
 __all__ = ['VecArray']
 
@@ -66,17 +67,16 @@ class VecArray(MutableSequence):
     def rotate(self, theta, axis=None):
         '''Retorna um vetor rotacionado por um ângulo theta'''
 
-        axis = Vec2(axis)
         R = RotMat2(theta)
         if axis is None:
-            return VecArray([R * u for u in self._data])
+            self._data[:] = [R * u for u in self._data]
         else:
-            v = axis
-            return VecArray([v + R * (u - v) for u in self._data])
+            v = vec(axis)
+            self._data[:] = [v + R * (u - v) for u in self._data]
 
-    # Métodos inplace #########################################################
-    def irotate(self, theta, axis=None):
-        pass
+    def move(self, x_or_delta, y=None):
+        delta = args_to_vec2(x_or_delta, y)
+        self._data[:] = [u + delta for u in self._data]
 
     # Métodos mágicos #########################################################
     def __len__(self):

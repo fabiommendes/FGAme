@@ -113,6 +113,10 @@ class Poly(Body):
     #                     Sobrescrita de métodos
     ###########################################################################
     @property
+    def bounding_box(self):
+        return _Poly(self.vertices)
+
+    @property
     def vertices(self):
         pos = self._pos
         return [v + pos for v in self._rvertices]

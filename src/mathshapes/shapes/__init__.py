@@ -3,7 +3,7 @@
 Geometrical shapes
 ==================
 
-The mathtools.shape module define classes for various geometric primitives
+The mathshapes.shape module define classes for various geometric primitives
 such as points, lines, circles, polygons, etc. All these objects define some
 common mathematical operations such as containment and distance FGAme_tests,
 projections, and superposition calculations via SAT.
@@ -19,8 +19,8 @@ change is geometric properties). All other sittuations should use immutable
 types, (e.g.: check if to circles of given radius and positions intercept or
 not).
 '''
-from .base import *
-from .circle import *
-from .aabb import *
-from .poly import *
-from .line import *
+from mathshapes import *
+from mathshapes import *
+from mathshapes import *
+from mathshapes import *
+from mathshapes import *

@@ -1,11 +1,9 @@
 # -*- coding: utf8 -*-
 
-import cython as C
-import mathtools.mathfuncs as m
+import math as m
 from mathtools.base import auto_public
 from mathtools.util import pyinject
-if not C.compiled:
-    from mathtools.veclike import Vec2
+from smallvectors.vec2 import Vec2
 
 __all__ = ['Mat2', 'RotMat2', 'mMat2']
 number = (float, int)
@@ -14,8 +12,6 @@ number = (float, int)
 ###############################################################################
 #                            Matriz 2 x 2
 ###############################################################################
-
-
 class Mat2(object):
 
     '''Implementa uma matriz bidimensional e operações básicas de álgebra
@@ -174,8 +170,8 @@ class Mat2(object):
         Finalmente, multiplicamos M por v1: o resultado deve ser igual que
         multiplicar o autovetor pelo autovalor correspondente
 
-        >>> M * v1, vals[0] * v1                           # doctest: +ELLIPSIS
-        (Vec2(2.23..., 4.88...), Vec2(2.23..., 4.88...))
+        >>> M * v1, vals[0] * v1
+        (Vec2(2.2, 4.9), Vec2(2.2, 4.9))
         '''
 
         v1, v2 = self.eigvec()
@@ -415,20 +411,6 @@ class mMat2(Mat2):
 ###############################################################################
 #               Código injetado para rodar no modo interpretado
 ###############################################################################
-if not C.compiled:
-    @pyinject(globals())
-    class Mat2Inject:
-        pass
-
-    @pyinject(globals())
-    class mMat2Inject:
-        pass
-
-    @pyinject(globals())
-    class RotMat2Inject:
-        pass
-
-    auto_public(Mat2)
 
 if __name__ == '__main__' and not C.compiled:
     import doctest

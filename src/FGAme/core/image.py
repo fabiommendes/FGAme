@@ -1,6 +1,4 @@
 import os
-import sys
-import pygame
 try:
     import PIL
 except ImportError:
@@ -90,6 +88,7 @@ def get_default_image_path():
 class PyGameTextureManager(TextureManager):
 
     def image_from_path(self, path):
+        import pygame
         return pygame.image.load(path)
 
     def get_shape(self, img):

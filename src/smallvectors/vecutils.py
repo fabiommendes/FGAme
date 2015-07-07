@@ -1,8 +1,8 @@
 #-*- coding: utf8 -*-
 
-from mathtools.veclike import Vec2, Vec3, Vec4, VecND
-from mathtools.veclike import Direction2, Direction3, Direction4, DirectionND
-from mathtools.veclike import Point2, Point3, Point4, PointND
+from smallvectors import Vec2, Vec3, Vec4, VecND
+from smallvectors import Direction2, Direction3, Direction4, DirectionND
+from smallvectors import Point2, Point3, Point4, PointND
 
 
 ###############################################################################

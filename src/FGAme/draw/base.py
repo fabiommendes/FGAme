@@ -3,7 +3,6 @@
 import copy
 from FGAme.draw import Color
 from FGAme import mathutils as shapes
-from FGAme.core import PyGameTextureManager
 
 black = Color('black')
 white = Color('white')
@@ -15,174 +14,36 @@ class Drawable(object):
 
     __slots__ = []
 
-    # Funções que modificam o objeto selecionado *inplace* ####################
-    def irotate(self, theta, axis=None):
-        '''Rotaciona o objeto pelo ângulo dado. É possível fornecer um eixo
-        opcional para realizar a rotação. Caso contrário, realiza a rotação
-        em torno do centro.'''
-
-        raise NotImplementedError
-
-    def move(self, delta):
-        '''Desloca o objeto pelas coordenadas (delta_x, delta_y) fornecidas'''
-
-        raise NotImplementedError
-
-    def rescale(self, scale):
-        '''Multiplica as dimensões do objeto por um fator de escala'''
-
-        raise NotImplementedError
-
-    def transform(self, M):
-        '''Realiza uma transformação linear por uma matriz M'''
-
-        raise NotImplementedError
-
-    # Retorna versões transformadas dos objetos ###############################
     def copy(self):
         '''Retorna uma cópia do objeto'''
 
         return copy.copy(self)
 
-    def rescaled(self, value):
-        '''Retorna uma versão modificada por um fator de escala igual a
-        `value`'''
-
-        new = self.copy()
-        new.scale(value)
-        return new
-
-    def rotate(self, theta, axis=None):
-        '''Retorna uma cópia do objeto rotacionada pelo ângulo fornecido em
-        torno do eixo fornecido (ou o centro do objeto)'''
-
-        new = self.copy()
-        new.irotate(theta, axis)
-        return new
-
-    def moved(self, delta):
-        '''Retorna uma cópia do objeto deslocada por um fator
-        (delta_x, delta_y)'''
-
-        new = self.copy()
-        new.move(delta)
-        return new
-
-    def transformed(self, M):
-        '''Retorna uma cópia do objeto transformada por uma matriz M'''
-
-        new = self.copy()
-        new.transform(M)
-        return new
-
-    def update(self, dt):
-        '''Update its state after elapsing a time dt'''
-
-    @property
-    def visualization(self):
-        return self
-
-###############################################################################
-#                            Objetos primitivos
-###############################################################################
-
-
-def delegate_property(name):
-    '''Propriedade que simplesmente extrai o valor do atributo .geometric'''
-    @property
-    def getter(self):
-        return getattr(self.geometric, name)
-
-    return getter
-
-
-class ShapeBase(Drawable):
-
-    '''Classe pai para todos os objetos de geometria simples.'''
-
-    __slots__ = ['geometric', 'color', 'line_color', 'line_width', 'sync']
-    canvas_primitive = None
-
-    def __init__(self, geometric,
-                 color='black', line_color='black', line_width=0.0):
-
-        self.geometric = geometric
-        self.color = Color(color)
-        self.line_color = Color(line_color)
-        self.line_width = line_width
-
-    @classmethod
-    def from_primitive(cls, obj,
-                       color='black', line_color='black', line_width=0.0):
-
-        if isinstance(obj, shapes.AbstractCircle):
-            obj_cls = Circle
-        elif isinstance(obj, shapes.AbstractPoly):
-            obj_cls = Poly
-        elif isinstance(obj, shapes.AbstractAABB):
-            obj_cls = AABB
-        else:
-            tname = type(obj).__name__
-            raise ValueError('unsupported primitive: %s' % tname)
-
-        new = Shape.__new__(obj_cls, obj, color, line_color, line_width)
-        Shape.__init__(new, obj, color, line_color, line_width)
-        return new
-
-    def get_vertices(self, tol=2):
-        '''Retorna uma lista de vértices que aproxima o objeto.
-
-        Em caso de figuras poligonais, tol é ignorado e a lista de vértices
-        corresponde aos vértices do objeto original. Em figuras não poligonais,
-        tol corresponde a uma margem de tolerância (estimada) de quantos pixels
-        as linhas do polígono podem se afastar do objeto original.'''
-
-        raise NotImplementedError
-
-    def __getattr__(self, attr):
-        return getattr(self.geometric, attr)
-
     def draw(self, canvas):
-        '''Desenha o objeto no objeto canvas fornecido'''
+        '''Desenha objeto na tela'''
 
-        getattr(canvas, 'draw_' + self.canvas_primitive)(self)
-
-
-class Poly(ShapeBase):
-
-    '''Objetos da classe Poly representam polígonos especificados por uma lista
-    de vértices.'''
-
-    __slots__ = []
-    shape = delegate_property('vertices')
-    canvas_primitive = 'poly'
-
-    def __init__(self, vertices, **kwds):
-        obj = shapes.Poly(vertices)
-        super(Poly, self).__init__(obj, **kwds)
-
-    def get_vertices(self, tol=1e-6):
-        return self.geometric.vertices
-
-    def draw(self, canvas):
-        canvas.draw_poly(self)
-
-
-class Rectangle(Poly):
-    __slots__ = []
-
-    def __init__(self, bbox=None, rect=None, shape=None, pos=None,
-                 xmin=None, ymin=None, xmax=None, ymax=None, **kwds):
-
-        obj = m.Rectangle(bbox=bbox, rect=rect, shape=shape, pos=pos,
-                          xmin=xmin, ymin=ymin, xmax=xmax, ymax=ymax)
-        super(Poly, self).__init__(**kwds)
+        try:
+            func = getattr(canvas, self._canvas_shape_name)
+        except AttributeError:
+            name = 'draw_' + type(self).__name__.lower()
+            type(self)._canvas_shape_name = name
+            func = getattr(canvas, self._canvas_shape_name)
+        return func(self, **self._draw_kwds())
 
 
 ###############################################################################
-# TODO: refatorar para shapes herdarem dos primitivos geométricos extendidos
-# com a classe shape
-###############################################################################
+def lazy_curve_init(self, *args, **kwds):
+    '''Generic init implementation for multiple inheritance from a
+    mathematical shape and Curve.
+
+    It is less efficient that it could be, but is a workable default for
+    lazy coders.'''
+
+    get = kwds.pop
+    Curve.__init__(self, get('width', 1.0), get('color', black))
+    type(self).__bases__[0].__init__(self, *args, **kwds)
+
+
 class Curve(Drawable):
 
     '''Classe pai para todos os objetos geométricos que definem uma curva
@@ -198,14 +59,10 @@ class Curve(Drawable):
         de cores do objeto. As outras entradas do dicionário podem ser
         passadas para o construtor do objeto geométrico'''
 
-        width = kwds.pop('solid', 1.0)
-        color = kwds.pop('solid', black)
+        get = kwds.pop
+        width = get('width', 1.0)
+        color = get('color', black)
         Curve.__init__(self, width, color)
-
-    def draw(self, canvas):
-        '''Desenha o objeto no objeto canvas fornecido'''
-
-        raise NotImplementedError('must be implemented in subclasses')
 
     @property
     def color(self):
@@ -213,7 +70,10 @@ class Curve(Drawable):
 
     @color.setter
     def color(self, value):
-        self._color = Color(value)
+        if isinstance(value, Color):
+            self._color = value
+        else:
+            self._color = Color(value)
 
     @property
     def line_color(self):
@@ -223,16 +83,54 @@ class Curve(Drawable):
     def line_color(self, value):
         self._color = Color(value)
 
+    def _draw_kwds(self):
+        return dict(color=self.color, width=self.width)
 
-class Segment(Curve):
 
-    '''Um segmento de reta que vai do ponto pt1 até pt2'''
+class Segment(shapes.mSegment, Curve):
 
-    def __init__(self, pt1, pt2, **kwds):
-        pass
+    '''Um segmento de reta que vai do ponto start até end'''
 
+    __init__ = lazy_curve_init
+
+
+class Ray(shapes.mRay, Curve):
+
+    '''Um segmento de reta semi-finito que inicia em um ponto start
+    específico'''
+
+    __init__ = lazy_curve_init
+
+
+class Line(shapes.mLine, Curve):
+
+    '''Uma linha infinita'''
+
+    __init__ = lazy_curve_init
+
+
+class Path(shapes.mPath, Curve):
+
+    '''Um caminho formado por uma sequência de pontos'''
+
+    __init__ = lazy_curve_init
 
 # Objetos sólidos (figuras fechadas) ##########################################
+
+
+def lazy_shape_init(self, *args, **kwds):
+    '''Generic init implementation for multiple inheritance from a
+    mathematical shape and Shape.
+
+    It is less efficient that it could be, but is a workable default for
+    lazy coders.'''
+
+    get = kwds.pop
+    Shape.__init__(self, get('solid', True), get('color', black),
+                   get('line_width', 0.0), get('line_color', black))
+    type(self).__bases__[0].__init__(self, *args, **kwds)
+
+
 class Shape(Drawable):
 
     '''Classe pai para todas as figuras fechadas. Define as propriedades
@@ -241,8 +139,12 @@ class Shape(Drawable):
     def __init__(self, solid=True, color=black,
                  line_width=0.0, line_color=black):
 
-        self._color = Color(color)
-        self._line_color = Color(line_color)
+        if not isinstance(color, Color):
+            color = Color(color)
+        if not isinstance(line_color, Color):
+            line_color = Color(color)
+        self._color = color
+        self._line_color = line_color
         self.line_width = line_width
         self.solid = bool(solid)
 
@@ -273,47 +175,40 @@ class Shape(Drawable):
     def line_color(self, value):
         self._line_color = Color(value)
 
+    def _draw_kwds(self):
+        return dict(
+            solid=self.solid,
+            color=self.color,
+            line_width=self.line_width,
+            line_color=self.line_color)
 
-class Circle(shapes.Circle, Shape):
 
-    '''Um círculo de raio `radius` e centro em `pos`.'''
+class Circle(shapes.mCircle, Shape):
+
+    '''Um círculo de raio `radius` e centro em `center`.'''
 
     def __init__(self, radius, pos=(0, 0), **kwds):
 
-        shapes.Circle.__init__(self, radius, pos)
+        shapes.mCircle.__init__(self, radius, pos)
         Shape.__init__(self, **kwds)
-
-    def draw(self, canvas):
-        canvas.draw_circle(self)
 
 
 class AABB(shapes.mAABB, Shape):
 
-    '''Um círculo de raio `radius` e centro em `pos`.'''
+    '''Caixa de contorno alinhada aos eixos'''
 
-    def __init__(self, *args, **kwds):
-        self._init_colors_from_kwds(kwds)
-        shapes.AABB.__init__(self, *args, **kwds)
-
-    def draw(self, canvas):
-        canvas.draw_circle(self)
+    __init__ = lazy_shape_init
 
 
 class Image(AABB):
 
     '''Define uma imagem/pixmap não-animado'''
 
-    manager = PyGameTextureManager()
+    # manager = PyGameTextureManager()
     canvas_primitive = 'image'
 
     def __init__(self, path, pos=(0, 0), reference='center'):
-        #self._data = self.manager.get_image(name)
-        #shape = self.manager.get_shape(self._data)
-        #super(Image, self).__init__(pos=pos, shape=shape)
         pass
-
-    def draw(self, canvas):
-        self.draw_image(self)
 
 
 class Sprite(Image):
@@ -321,3 +216,48 @@ class Sprite(Image):
     '''Define uma image animada. O controle de frames é feito a cada chamada
     do método draw(). Desta forma, caso o método seja chamado duas vezes por
     frame, a velocidade de animação será o dobro da desejada.'''
+
+
+class Circuit(shapes.mCircuit, Shape):
+
+    '''Um caminho fechado com um interior bem definido.'''
+
+    __init__ = lazy_shape_init
+
+
+class Poly(shapes.mPoly, Shape):
+
+    '''Objetos da classe Poly representam polígonos dados por uma lista
+    de vértices.'''
+
+    __init__ = lazy_shape_init
+
+
+class Rectangle(shapes.mRectangle, Shape):
+
+    '''Especialização de Poly para representar retângulos.
+
+    Pode ser inicializado como uma AABB, mas com um parâmetro extra `theta`
+    para definir um ângulo de rotação.'''
+
+    # TODO: não consegue herdar de Poly. Porque?
+    __init__ = lazy_shape_init
+
+    def draw(self, canvas):
+        canvas.draw_poly(self, **self._draw_kwds())
+
+
+class Triangle(shapes.mTriangle, Shape):
+
+    '''Especialização de Poly para representar triângulos.'''
+
+    # TODO: não consegue herdar de Poly. Porque?
+    __init__ = lazy_shape_init
+
+    def draw(self, canvas):
+        canvas.draw_poly(self, **self._draw_kwds())
+
+
+if __name__ == '__main__':
+    seg = Segment((0, 1), (1, 0), width=2, color=white)
+    print(seg.__dict__)

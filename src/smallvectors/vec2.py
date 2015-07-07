@@ -28,8 +28,8 @@ vetor unitário, etc.
 >>> v.normalize()
 Vec2(0.6, 0.8)
 '''
-import mathtools as m
-from mathtools.veclike.cartesian import Vec, Direction, Point
+from math import cos, sin, sqrt, atan2
+from smallvectors import Vec, Direction, Point
 
 
 class Base2D(object):
@@ -97,7 +97,7 @@ class Base2D(object):
     def distance(self, other):
         '''Computes the distance between two objects'''
 
-        return m.sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
+        return sqrt((other.x - self.x) ** 2 + (other.y - self.y) ** 2)
 
     def copy(self, x=None, y=None):
         '''Return a copy possibly overriding the values for x and y'''
@@ -121,11 +121,11 @@ class VecAndDirectionBase2D(Base2D):
     #
 
     def angle(self, other):
-        '''Computes the angle between two vectors'''
+        '''Computes the angle between two smallvectors'''
 
         cos_t = self.dot(other)
         sin_t = self.cross(other)
-        return m.atan2(sin_t, cos_t)
+        return atan2(sin_t, cos_t)
 
     #
     # 2D specific geometric properties and operations
@@ -133,7 +133,7 @@ class VecAndDirectionBase2D(Base2D):
     def polar(self):
         '''Return a tuple with the (radius, theta) polar coordinates '''
 
-        return (self.norm(), m.atan2(self.y, self.x))
+        return (self.norm(), atan2(self.y, self.x))
 
     def perp(self, ccw=True):
         '''Return the counterclockwise perpendicular vector.
@@ -150,7 +150,7 @@ class VecAndDirectionBase2D(Base2D):
         '''Rotate vector by an angle theta around origin'''
 
         x, y = self
-        cos_t, sin_t = m.cos(theta), m.sin(theta)
+        cos_t, sin_t = cos(theta), sin(theta)
         return self.from_coords(
             x * cos_t - y * sin_t,
             x * sin_t + y * cos_t)
@@ -159,14 +159,14 @@ class VecAndDirectionBase2D(Base2D):
         '''Rotate vector around given axis by the angle theta'''
 
         dx, dy = self - axis
-        cos_t, sin_t = m.cos(theta), m.sin(theta)
+        cos_t, sin_t = cos(theta), sin(theta)
         return Vec2(
             dx * cos_t - dy * sin_t + axis[0],
             dx * sin_t + dy * cos_t + axis[1])
 
     def cross(self, other):
         '''The z component of the cross product between two bidimensional
-        vectors'''
+        smallvectors'''
 
         x, y = other
         return self.x * y - self.y * x
@@ -200,7 +200,7 @@ class Vec2(VecAndDirectionBase2D, Vec):
     def norm(self):
         '''Returns the norm of a vector'''
 
-        return m.sqrt(self.x ** 2 + self.y ** 2)
+        return sqrt(self.x ** 2 + self.y ** 2)
 
     def norm_sqr(self):
         '''Returns the squared norm of a vector'''
@@ -217,7 +217,7 @@ class Direction2(VecAndDirectionBase2D, Direction):
             x, y = x_or_data
         else:
             x = x_or_data
-        norm = m.sqrt(x * x + y * y)
+        norm = sqrt(x * x + y * y)
         if norm == 0:
             raise ValueError('null vector does not define a valid direction')
 
@@ -228,7 +228,7 @@ class Direction2(VecAndDirectionBase2D, Direction):
         '''Rotate vector by an angle theta around origin'''
 
         x, y = self
-        cos_t, sin_t = m.cos(theta), m.sin(theta)
+        cos_t, sin_t = cos(theta), sin(theta)
         new = Base2D.__new__(Direction2, x, y)
         new.x = x * cos_t - y * sin_t
         new.y = x * sin_t + y * cos_t

@@ -3,8 +3,7 @@
 Quaternion algebra and rotations
 '''
 
-from mathtools.veclike import Vec3, normalize
-from mathtools import Mat3
+from smallvectors import Vec3, normalize
 import math as m
 
 
@@ -68,6 +67,8 @@ class Quaternion(object):
     #
     def to_matrix(self):
         '''Convert quaternion to the equivalent rotation matrix'''
+
+        from mathtools import Mat3
 
         s, (x, y, z) = self.normalize()
 

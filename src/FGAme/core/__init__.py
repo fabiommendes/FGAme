@@ -8,5 +8,5 @@ from FGAme.core.image import *
 #                     Interface de inicialização
 ###############################################################################
 
-from FGAme.core.conf import Conf as _conf
+from FGAme.core.conf_module import Conf as _conf
 conf = _conf()

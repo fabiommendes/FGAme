@@ -4,6 +4,7 @@ Base classes for vector-like types.
 '''
 
 import math as m
+number = (int, float)
 
 
 def norm(vec):
@@ -36,7 +37,10 @@ def vec(*args):
     '''Return a vector of the correct dimensionality from the given
     components'''
 
-    return VecND(*args)
+    if len(args) == 1:
+        return VecND(*args[0])
+    else:
+        return VecND(*args)
 
 
 ###############################################################################
@@ -92,7 +96,7 @@ class Cartesian(object):
     # Geometric properties
     #
     def almost_equals(self, other, tol=1e-3):
-        '''Return True if two vectors are almost equal to each other'''
+        '''Return True if two smallvectors are almost equal to each other'''
 
         return (self - other).norm_sqr() < tol * tol
 
@@ -165,7 +169,7 @@ class Cartesian(object):
     #
     def _assure_match(self, other):
         if len(self) != len(other):
-            raise TypeError('dimensions do not match')
+            raise NotImplementedError
 
     def __repr__(self):
         '''x.__repr__() <==> repr(x)'''
@@ -203,11 +207,11 @@ class Point(Cartesian):
         self._assure_match(other)
         if isinstance(other, Point):
             raise TypeError('cannot add two points together')
-        return self.from_data([x + y for (x, y) in zip(self, other)])
+        return self.from_seq([x + y for (x, y) in zip(self, other)])
 
     def __radd__(self, other):
         self._assure_match(other)
-        return self.from_data([x + y for (x, y) in zip(self, other)])
+        return self.from_seq([x + y for (x, y) in zip(self, other)])
 
     def __sub__(self, other):
         self._assure_match(other)
@@ -224,7 +228,7 @@ class VecAndDirection(Cartesian):
     '''Base class with common implementation for Vec and Direction'''
 
     def angle(self, other):
-        '''Angle between two vectors'''
+        '''Angle between two smallvectors'''
 
         cos_t = self.dot(other) / (self.norm() * norm(other))
         return m.acos(cos_t)
@@ -255,16 +259,21 @@ class VecAndDirection(Cartesian):
             return self
 
     def dot(self, other):
-        '''Dot product between two vectors'''
+        '''Dot product between two smallvectors'''
 
-        self._assure_match(other)
+        if len(self) != len(other):
+            N, M = len(self), len(other)
+            raise ValueError('dimension mismatch: %s and %s' % (N, M))
         return sum(x * y for (x, y) in zip(self, other))
 
     #
     # Arithmetic operations
     #
     def __mul__(self, other):
-        return self.to_vector([x * other for x in self])
+        if isinstance(other, number):
+            return self.to_vector([x * other for x in self])
+        else:
+            return NotImplemented
 
     def __rmul__(self, other):
         return self * other
@@ -289,7 +298,7 @@ class VecAndDirection(Cartesian):
         self._assure_match(other)
         data = [x - y for (x, y) in zip(self, other)]
         if isinstance(other, Point):
-            return other.from_data(data)
+            return other.from_seq(data)
         return self.to_vector(data)
 
     def __rsub__(self, other):
@@ -297,7 +306,7 @@ class VecAndDirection(Cartesian):
         return self.to_vector([x - y for (x, y) in zip(other, self)])
 
     def __neg__(self):
-        return self.from_data([-x for x in self])
+        return self.from_seq([-x for x in self])
 
     def __nonzero__(self):
         return True
@@ -337,7 +346,8 @@ class Vec(VecAndDirection):
     def normalize(self):
         '''Return a normalized version of vector'''
 
-        return self / self.norm()
+        Z = self.norm()
+        return (self / Z if Z != 0.0 else self)
 
 
 class Direction(VecAndDirection):
@@ -392,6 +402,10 @@ class BaseND(object):
             return cls._dim3(*args)
         elif N == 4:
             return cls._dim4(*args)
+        elif N == 0:
+            raise TypeError('must be called with at least 1 argument')
+        else:
+            raise RuntimeError(N)
 
     def __len__(self):
         return len(self._data)

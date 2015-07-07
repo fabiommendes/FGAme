@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vec2
+from FGAme.mathutils import Vec2, Segment
 from FGAme.draw import color_property, Color
 
 black = Color('black')
@@ -176,15 +176,47 @@ class Canvas(Screen):
         if line_color is not None and line_width:
             self.draw_raw_aabb_border(aabb, line_width, line_color)
 
-    def draw_poly(self, poly):
-        '''Desenha um círculo utilizando as informações de geometria, cor e
-        localização do objeto `circle` associado.
+    def draw_poly(self, poly, solid=True, color=black,
+                  line_width=0.0, line_color=black):
+        '''Desenha um polígono na tela.'''
 
-        Nota: diferentemente das funções do tipo paint_*, as funções do tipo
-        draw_* adaptam automaticamente a renderização para os padrões de zoom e
-        deslocamento da tela.'''
+        if not self._direct:
+            raise RuntimeError
 
-        self.paint_poly(poly.vertices, poly.color)
+        if solid:
+            self.draw_raw_poly_solid(poly, color)
+        if line_color is not None and line_width:
+            self.draw_raw_poly_border(poly, line_width, line_color)
+
+    def draw_segment(self, segment, width=0.0, color=black):
+        '''Desenha um segmento de reta.'''
+
+        if not self._direct:
+            raise RuntimeError
+
+        self.draw_raw_segment(segment, width, color)
+
+    def draw_ray(self, ray, width=0.0, color=black):
+        '''Desenha um raio (reta semi-finita)'''
+
+        raise NotImplementedError
+
+    def draw_line(self, ray, width=0.0, color=black):
+        '''Desenha uma reta infinita'''
+
+        raise NotImplementedError
+
+    def draw_path(self, path, width=0.0, color=black):
+        '''Desenha um caminho formado por vários pontos.'''
+
+        if not self._direct:
+            raise RuntimeError
+
+        points = iter(path)
+        pt0 = next(points)
+        for pt1 in points:
+            self.draw_raw_segment(Segment(pt0, pt1), width, color)
+            pt0 = pt1
 
     def draw_image(self, image):
         if self._direct:

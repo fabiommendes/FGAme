@@ -1,10 +1,9 @@
 # -*- coding: utf8 -*-
 import cython
-from mathtools import Mat2, Vec2
 
 
 def sign(x):
-    '''Retorna -1 para um numero negativo e 1 para um número positivo'''
+    '''Returns the sign of a number'''
 
     if x > 0:
         return 1
@@ -15,9 +14,7 @@ def sign(x):
 
 
 def shadow_x(A, B):
-    '''Retorna o tamanho da sombra comum entre os objetos A e B no eixo x.
-    Caso não haja superposição, retorna um valor negativo que corresponde ao
-    tamanho do buraco'''
+    '''Overlap between shapes A and B in the x direction'''
 
     return min(A.xmax, B.xmax) - max(A.xmin, B.xmin)
 
@@ -39,7 +36,7 @@ def asvector(v):
         return Vec2.from_seq(v)
 
 
-@cython.locals(A='Vec2', B='mVec2')
+# TODO: move to smallvectors
 def dot(v1, v2):
     '''Calcula o produto escalar entre dois vetores
 

@@ -23,12 +23,6 @@ class Color(object):
     >>> w1
     Color(255, 255, 255, 255)
 
-    Além disto, o construtor reaproveita objetos, de modo que cores iguais
-    preservam a identidade
-
-    >>> w1 is w2
-    True
-
     Podemos acessar a cor em várias representações diferentes utilizando os
     atributos adequados.
 
@@ -47,29 +41,35 @@ class Color(object):
     _CACHE = {}
     _RANGE = (0, 1, 2, 3)
 
-    def __new__(cls, *args):
-        try:
-            return cls._CACHE[args]
-        except KeyError:
-            color_cache = cls._CACHE
-            if len(args) == 1:
-                args = args[0]
-            if len(args) == 3:
-                try:
-                    return color_cache[args]
-                except KeyError:
-                    color_cache[args] = new = Color(*(args + (255,)))
-                    return new
-            if len(args) == 4:
-                try:
-                    return color_cache[args]
-                except KeyError:
-                    color_cache[args] = new = object.__new__(cls)
-                    new._red, new._green, new._blue, new._alpha = args
-                    return new
-
+    def __new__(cls, value, *args):
+        if not args:
+            if isinstance(value, Color):
+                return value
+            elif isinstance(value, tuple):
+                a = 255
+                if len(value) == 3:
+                    r, g, b = value
+                else:
+                    r, g, b, a = value
+            elif isinstance(value, str):
+                return cls._CACHE[value]
             else:
-                del cls._CACHE[args]
+                raise ValueError
+        else:
+            r = value
+            a = 255
+            if len(args) == 2:
+                g, b = args
+            else:
+                g, b, a = args
+
+        # Create new object
+        new = object.__new__(cls)
+        new._red = int(r)
+        new._green = int(g)
+        new._blue = int(b)
+        new._alpha = int(a)
+        return new
 
     # Componentes RGBa
     @property
@@ -209,23 +209,23 @@ class Color(object):
         raise IndexError(key)
 
     def __hash__(self):
-        return (self._red ^ self._green) ^ (self._blue ^ self._alpha)
+        return hash(self.u_rgba)
 
-Color._CACHE.update({
+Color._CACHE.update(
     # Tons de cinza
-    ('white',): Color(255, 255, 255),
-    ('black',): Color(0, 0, 0),
+    white=Color(255, 255, 255),
+    black=Color(0, 0, 0),
 
     # Cores básicas
-    ('red',): Color(255, 0, 0),
-    ('green',): Color(0, 255, 0),
-    ('blue',): Color(0, 0, 255),
-})
-
+    red=Color(255, 0, 0),
+    green=Color(0, 255, 0),
+    blue=Color(0, 0, 255),
+)
 
 ###############################################################################
 #                          Funções e objetos úteis
 ###############################################################################
+
 
 class color_property(property):
 

@@ -13,7 +13,8 @@ A module for all line-like primitives::
 '''
 
 # TODO
-from mathtools import dot, Vec2
+from mathtools import dot, Vec2, Point2
+from mathtools.util import pt_print, tp_print
 from mathtools.shapes import Curve
 
 Inf = float('inf')
@@ -34,11 +35,15 @@ class SegmentBase(Curve):
 
     @property
     def start(self):
-        return self._point1
+        return self._start
 
     @property
     def end(self):
-        return self._point2
+        return self._end
+
+    def __iter__(self):
+        yield self._start
+        yield self._end
 
 
 class Segment(SegmentBase):
@@ -81,7 +86,7 @@ class LineBase(Curve):
     '''Base class for Line and mLine'''
 
     def __init__(self, *args):
-        pass
+        raise NotImplementedError
 
     def directions(self, n):
         return [self.tangent(), self.normal()]
@@ -103,6 +108,40 @@ class mLine(LineBase):
 
     '''A mutable Line'''
 
+
+###############################################################################
+# Path -- a sequence of points
+###############################################################################
+class PathBase(Curve):
+
+    '''Base class for Path and mPath'''
+
+    def __init__(self, points):
+        self._points = list(Point2(*pt) for pt in points)
+
+    def __iter__(self):
+        return iter(self._points)
+
+    def __getitem__(self, idx):
+        return self._points[idx]
+
+    def __len__(self):
+        return len(self._points)
+
+    def __repr__(self):
+        data = [pt_print(pt) for pt in self._points]
+        data = ', '.join(data)
+        return '%s([%s])' % (tp_print(self), data)
+
+
+class Path(PathBase):
+
+    '''A path represented by a sequence of points'''
+
+
+class mPath(PathBase):
+
+    '''A mutable Path'''
 if __name__ == '__main__':
     import doctest
     doctest.testmod()

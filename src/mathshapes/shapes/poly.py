@@ -1,15 +1,18 @@
 # -*- coding: utf8 -*-
 
-from mathtools import RotMat2, Vec2, VecArray
-from mathtools.shapes import *
+from mathtools import RotMat2, Vec2, Point2, VecArray, dot
+from mathtools.shapes import aabb_bbox
 from math import sqrt, pi, sin
 
 
-class Poly(VecArray):
+###############################################################################
+# Generic polygons
+###############################################################################
+class CircuitBase(VecArray):
 
-    '''Representa um polígono'''
+    '''Base class for Circuit and mCircuit'''
 
-    __slots__ = []
+    __slots__ = ['vertices']
 
     def iter_closing(self):
         '''Itera sobre os pontos do objeto repetindo o primeiro ao final'''
@@ -81,37 +84,71 @@ class Poly(VecArray):
         return ROG_sqr(self, axis)
 
 
-class SimplePoly(Poly):
+class Circuit(CircuitBase):
+
+    '''Circuit is a closed path with a well defined inside.
+
+    Differently from polygons, circuits allows for lines crossing each other'''
+
+
+class mCircuit(CircuitBase):
+
+    '''A mutable polygon'''
+
+
+###############################################################################
+# Simple polygons
+###############################################################################
+class PolyBase(CircuitBase):
+
+    '''Base class for Poly and mPoly'''
     __slots__ = []
 
     def is_simple(self):
         True
 
 
-class ConvexPoly(SimplePoly):
+class Poly(PolyBase, Circuit):
+
+    '''Generic polygon class.
+
+    The sides of a simple polygon never cross each other'''
+
+
+class mPoly(PolyBase, mCircuit):
+
+    '''A mutable simple polygon'''
+
+
+###############################################################################
+# Convex polygons
+###############################################################################
+class ConvexPolyBase(PolyBase):
+
+    '''Base class for ConvexPoly and mConvexPoly'''
     __slots__ = []
 
     def is_convex(self):
         True
 
 
-class Triangle(ConvexPoly):
-    __slots__ = []
+class ConvexPoly(ConvexPolyBase, Poly):
+
+    '''A convex polygon'''
 
 
-class Rectangle(ConvexPoly):
-    __slots__ = []
+class mConvexPoly(ConvexPolyBase, mPoly):
 
-    def __init__(self, pos=None, shape=None, theta=None):
-        self.theta = float(theta or 0)
-        xmin, xmax, ymin, ymax = aabb_bbox(pos=pos, shape=shape)
-        vertices = [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
-        super(Rectangle, self).__init__(vertices)
-        if theta:
-            self.irotate(self.theta)
+    '''A mutable convex polygon'''
 
 
-class RegularPoly(ConvexPoly):
+###############################################################################
+# Regular polygons
+###############################################################################
+class RegularPolyBase(ConvexPolyBase):
+
+    '''Base class for RegularPoly and mRegularPoly'''
+
     __slots__ = []
 
     def __init__(self, N, length, theta=None, pos=None):
@@ -122,15 +159,71 @@ class RegularPoly(ConvexPoly):
         for _ in range(N):
             vertices.append(p)
             p = R * p
-        super(RegularPoly, self).__init__(vertices)
+        super(RegularPolyBase, self).__init__(vertices)
 
         # Altera posição e ângulo
         if pos is not None:
             self += pos
         if theta is not None:
-            self.irotate(theta)
+            self.rotate(theta)
 
 
+class RegularPoly(RegularPolyBase, ConvexPoly):
+
+    '''A regular polygon with N sides'''
+
+
+class mRegularPoly(RegularPolyBase, mConvexPoly):
+
+    '''A mutable regular polygon'''
+
+
+###############################################################################
+# Specific geometric shapes
+###############################################################################
+class TriangleBase(ConvexPolyBase):
+
+    '''Base class for Triangle and mTriangle'''
+    __slots__ = []
+
+
+class Triangle(TriangleBase, ConvexPoly):
+
+    '''A generic triangle'''
+
+
+class mTriangle(TriangleBase, mConvexPoly):
+
+    '''A mutable triangle'''
+
+
+class RectangleBase(ConvexPolyBase):
+
+    '''Base class for Rectangle and mRectangle'''
+
+    def __init__(self, *args, **kwds):
+        theta = kwds.pop('theta', 0.0)
+        self.theta = 0.0
+        xmin, xmax, ymin, ymax = aabb_bbox(*args, **kwds)
+        vertices = [(xmax, ymin), (xmax, ymax), (xmin, ymax), (xmin, ymin)]
+        super(RectangleBase, self).__init__(vertices)
+        if theta:
+            self.rotate(theta)
+
+
+class Rectangle(RectangleBase, ConvexPoly):
+
+    '''A rectangle'''
+
+
+class mRectangle(RectangleBase, mConvexPoly):
+
+    '''A mutable rectangle'''
+
+
+###############################################################################
+# Utility functions
+###############################################################################
 def _w_list(L):
     '''Calcula os termos W0 = 1/2 * (y1*x0 - y0*x1) de todos os pontos da
     lista'''

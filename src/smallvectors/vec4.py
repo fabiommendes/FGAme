@@ -30,8 +30,8 @@ Vec4(0.5, 0.5, 0.5, 0.5)
 '''
 
 import cython as C
-import mathtools as m
-from mathtools.veclike.cartesian import Vec, Direction, Point
+import math as m
+from smallvectors.cartesian import Vec, Direction, Point
 
 
 class Base4D(object):
@@ -150,7 +150,7 @@ class Point4(Base4D, Point):
 
 
 ###############################################################################
-# Module constant vectors
+# Module constant smallvectors
 ###############################################################################
 null4D = Vec4(0, 0, 0, 0)
 ux4D = Direction4(1, 0, 0, 0)
