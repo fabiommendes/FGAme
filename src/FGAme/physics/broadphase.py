@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
-from mathtools import shadow_y
 from collections import MutableSequence
+from FGAme.mathtools import shadow_y
 from FGAme.physics import CBBContact, AABBContact
 from FGAme.physics import get_collision, get_collision_generic, CollisionError
 from FGAme.physics.flags import BodyFlags

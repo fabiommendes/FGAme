@@ -6,7 +6,7 @@ Created on 18/06/2015
 from FGAme import *
 conf.set_backend('pygame')
 import pygame
-from mathtools import shapes
+import smallshapes as shapes
 from random import random
 
 world = World()

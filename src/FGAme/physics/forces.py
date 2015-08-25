@@ -5,7 +5,7 @@ Created on 19/11/2014
 @author: chips
 '''
 
-from FGAme.mathutils import Vec2
+from FGAme.mathtools import Vec2
 
 
 class ForceProperty(object):

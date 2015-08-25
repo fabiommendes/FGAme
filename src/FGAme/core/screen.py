@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vec2, Segment
+from FGAme.mathtools import Vec2, shapes
 from FGAme.draw import color_property, Color
 
 black = Color('black')
@@ -215,7 +215,7 @@ class Canvas(Screen):
         points = iter(path)
         pt0 = next(points)
         for pt1 in points:
-            self.draw_raw_segment(Segment(pt0, pt1), width, color)
+            self.draw_raw_segment(shapes.Segment(pt0, pt1), width, color)
             pt0 = pt1
 
     def draw_image(self, image):

@@ -2,7 +2,7 @@
 
 from FGAme.util import lazy
 from FGAme.core import conf
-from FGAme.mathutils import Vec2
+from FGAme.mathtools import Vec2
 
 __all__ = ['pos', 'vel']
 

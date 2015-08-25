@@ -1,14 +1,13 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathutils import Vec2, dot, area, center_of_mass, clip, pi
-from FGAme.mathutils import shadow_x, shadow_y
+from FGAme.mathtools import pi, Vec2, dot, ux2D
+from FGAme.mathtools import shadow_x, shadow_y, area, center_of_mass, clip, pi
 
 from FGAme.physics.collision import Collision
 from FGAme.physics import Circle, AABB, Poly, Rectangle
 from FGAme.util import multifunction
 
-u_x = Vec2(1, 0)
-DEFAULT_DIRECTIONS = [u_x.rotate(n * pi / 12) for n in
+DEFAULT_DIRECTIONS = [ux2D.rotate(n * pi / 12) for n in
                       [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11]]
 
 

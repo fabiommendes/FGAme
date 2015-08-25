@@ -78,20 +78,29 @@ class Conf(object):
     ###########################################################################
     #         Set state functions -- can be executed only before init
     ###########################################################################
+    def set_framerate(self, value):
+        '''Configura o número de frames por segundo'''
+
+        value = float(value)
+        dt = 1.0 / value
+        self.physics_fps = value
+        self.screen_fps = value
+        self.physics_dt = dt
+        self.screen_dt = dt
 
     def set_resolution(self, *args):
         '''Configura a tela com a resolução dada.
 
         conf.set_resolution(800, 600)     --> define o formato em pixels
-        conf.set_resolution('fullcanvas') --> modo tela cheia
+        conf.set_resolution('fullscreen') --> modo tela cheia
         '''
 
         if len(args) == 2:
             x, y = args
             self.window_shape = (int(x), int(y))
 
-        elif args == ('fullcanvas',):
-            self.window_shape = 'fullcanvas'
+        elif args == ('fullscreen',):
+            self.window_shape = 'fullscreen'
 
         else:
             raise TypeError('invalid arguments: %s' % args)

@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathutils import Vec2, sin, cos, sqrt, null2D, Circle
+from FGAme.mathtools import Vec2, asvector, sin, cos, sqrt, null2D, shapes
 from FGAme.util import six
 from FGAme.physics.flags import BodyFlags as flags
 
@@ -258,8 +258,8 @@ class Body(object):
         self.flags = flags
 
         # Variáveis de estado #################################################
-        self._pos = Vec2(pos)
-        self._vel = Vec2(vel)
+        self._pos = asvector(pos)
+        self._vel = asvector(vel)
         self._e_vel = null2D
         self._e_omega = 0.0
         self._theta = float(theta)
@@ -380,7 +380,7 @@ class Body(object):
     def cbb(self):
         '''Caixa de contorno circular que envolve o objeto'''
 
-        return Circle(self.cbb_radius, self.pos)
+        return shapes.Circle(self.cbb_radius, self.pos)
 
     @property
     def aabb(self):
@@ -868,7 +868,11 @@ class Body(object):
         específico e também resolve a dinâmica angular.
         '''
 
-        self.boost(Vec2(impulse_or_x, y) * self._invmass)
+        if y is None:
+            impulse = asvector(impulse_or_x)
+        else:
+            impulse = Vec2(impulse_or_x, y)
+        self.boost(impulse * self._invmass)
 
     # Variáveis angulares #####################################################
     def rotate(self, theta):
@@ -1259,7 +1263,7 @@ def vec_property(slot):
 
         def __set__(self, obj, value):
             if not isinstance(value, Vec2):
-                value = Vec2(value)
+                value = asvector(value)
             setter(obj, value)
 
         def __get__(self, obj, cls):

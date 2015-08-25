@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from FGAme.mathutils import Vec2, null2D
+from FGAme.mathtools import Vec2, asvector, null2D
 from FGAme.physics.flags import BodyFlags
 from FGAme.util import lazy
 from math import exp
@@ -258,8 +258,8 @@ class Collision(Pair):
         self.vrel = null2D
         if pos is None:
             raise ValueError(A, B)
-        self.pos = Vec2(pos)
-        self.normal = Vec2(normal)
+        self.pos = asvector(pos)
+        self.normal = asvector(normal)
         self.delta = delta
         self.Jn = 0.0
         self.vel_bias = 0.0
@@ -380,7 +380,7 @@ class Collision(Pair):
         n = self.normal
         tangent = Vec2(-n.y, n.x)
         if tangent.dot(self.vrel) > 0:
-            tangent *= -1
+            tangent = -tangent
         return tangent
 
     @property

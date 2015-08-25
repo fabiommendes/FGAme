@@ -2,7 +2,7 @@
 # TODO: manter este modelo de renderização?
 import copy
 from FGAme.draw import Color
-from FGAme import mathutils as shapes
+from FGAme.mathtools import shapes
 
 black = Color('black')
 white = Color('white')
@@ -208,7 +208,7 @@ class Image(AABB):
     canvas_primitive = 'image'
 
     def __init__(self, path, pos=(0, 0), reference='center'):
-        pass
+        raise
 
 
 class Sprite(Image):

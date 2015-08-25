@@ -36,9 +36,9 @@ class MainLoop(EventDispatcher):
     pre_draw = signal('pre-draw', num_args=1)
     post_draw = signal('post-draw', num_args=1)
 
-    def __init__(self, fps=60):
+    def __init__(self, fps=None):
         super(MainLoop, self).__init__()
-        self.fps = fps
+        self.fps = conf.screen_fps
         self.dt = 1.0 / self.fps
 
     def init(self):

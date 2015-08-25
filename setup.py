@@ -1,11 +1,24 @@
 #-*- coding: utf8 -*-
 import os
 import sys
-from distutils.core import setup
+import setuptools
+from setuptools import setup
 
-VERSION = '0.3.1-alpha-1'
+VERSION = '0.4a0'
+AUTHOR = 'Fábio Macêdo Mendes'
 IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
+
+#
+# Create meta.py file with updated version/author info
+#
+base, _ = os.path.split(__file__)
+path = os.path.join(base, 'src', 'FGAme', 'meta.py')
+with open(path, 'w') as F:
+    F.write(
+        '# Auto-generated file. Please do not edit'
+        '__version__ = %r\n' % VERSION +
+        '__author__ = %r\n' % AUTHOR)
 
 
 ###############################################################################
@@ -61,7 +74,7 @@ def get_extensions():
 
     from distutils.extension import Extension
     win_platforms = ['win32', 'cygwin']
-    
+
     if IS_PYPY:
         return []
 
@@ -104,7 +117,6 @@ else:
             "build_ext": build_ext},
         ext_modules=get_extensions())
 
-
 ##########################################################################
 # Main configuration script
 ##########################################################################
@@ -132,12 +144,8 @@ Main features:
           'Topic :: Software Development :: Libraries',
       ],
       package_dir={'': 'src'},
-      packages=['FGAme', 'FGAme.app', 'FGAme.backends', 'FGAme.core',
-                'FGAme.draw', 'FGAme.extra', 'FGAme.physics', 'FGAme.util',
-                'mathshapes', 'mathshapes.base', 'mathshapes.shapes',
-                'smallvectors',
-                ],
+      packages=setuptools.find_packages(),
       license='GPL',
-      requires=['pygame'],
+      requires=['pygame', 'six'],
       **setup_kwds
       )

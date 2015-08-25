@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 import contextlib
-from mathtools import pi, Vec2, Direction2, ux2D, uy2D
+from FGAme.mathtools import pi, Vec2, Direction2, ux2D, uy2D
 from FGAme.draw import Color
 from FGAme.draw import base as draw
 

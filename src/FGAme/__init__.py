@@ -385,8 +385,8 @@ Loop principal
 
 '''
 
-from FGAme import mathutils as math
-from FGAme.mathutils import Vec2, Mat2, pi
+from FGAme import mathtools as math
+from FGAme.mathtools import Vec2, pi
 from FGAme import draw
 from FGAme.events import listen, signal, EventDispatcher
 from FGAme.core import *

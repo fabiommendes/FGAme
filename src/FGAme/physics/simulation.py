@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from collections import defaultdict
-from FGAme.mathutils import Vec2, null2D
+from FGAme.mathtools import Vec2, null2D
 from FGAme.physics.flags import BodyFlags
 from FGAme.events import EventDispatcher, signal
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase

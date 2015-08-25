@@ -1,10 +1,8 @@
 # -*- coding: utf8 -*-
 
 from FGAme.physics import Body
-from FGAme.mathutils import aabb_bbox, Poly as _Poly
-from FGAme.mathutils import Vec2, RotMat2
-from FGAme.mathutils import sin, pi
-from FGAme.mathutils import area, center_of_mass, ROG_sqr
+from FGAme.mathtools import Vec2, RotMat2, sin, pi
+from FGAme.mathtools import area, aabb_bbox, center_of_mass, ROG_sqr, shapes
 
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
@@ -114,7 +112,7 @@ class Poly(Body):
     ###########################################################################
     @property
     def bounding_box(self):
-        return _Poly(self.vertices)
+        return shapes.Poly(self.vertices)
 
     @property
     def vertices(self):
@@ -175,7 +173,7 @@ class Poly(Body):
 
     @property
     def shape_bb(self):
-        return _Poly(self.vertices)
+        return shapes.Poly(self.vertices)
 
 ###############################################################################
 #                         Especialização de polígonos

@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.physics import LinearRigidBody
-from FGAme.mathutils import aabb_bbox, sqrt, AABB as _AABB
+from FGAme.mathtools import sqrt, shapes
 
 __all__ = ['AABB']
 
@@ -58,16 +58,16 @@ class AABB(LinearRigidBody):
                  bbox=None, shape=None, rect=None, **kwds):
 
         # Define as propriedades das caixas de contorno
-        xmin, xmax, ymin, ymax = aabb_bbox(bbox=bbox, rect=rect,
-                                           shape=shape, pos=pos,
-                                           xmin=xmin, xmax=xmax,
-                                           ymin=ymin, ymax=ymax)
+        xmin, xmax, ymin, ymax = shapes.aabb_bbox(bbox=bbox, rect=rect,
+                                                  shape=shape, pos=pos,
+                                                  xmin=xmin, xmax=xmax,
+                                                  ymin=ymin, ymax=ymax)
 
         pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
         self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
-        aabb = _AABB(-dx, dx, -dy, dy)
+        aabb = shapes.AABB(-dx, dx, -dy, dy)
         super(AABB, self).__init__(pos, vel, mass=mass, density=density,
                                    baseshape=aabb, **kwds)
 
