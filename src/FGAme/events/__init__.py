@@ -337,7 +337,7 @@ if __name__ == '__main__':
 
 from .util import listen, signal
 from .base import EventDispatcher, EventDispatcherMeta
-from .global_dispatcher import dispatcher
+from .dispatcher import dispatcher
 
 if __name__ == '__main__':
     import doctest

@@ -26,9 +26,14 @@ class Screen(object):
           da tela devem ser re-escritas com base numa árvore que guarda e
           atualiza as funções de renderização.
     '''
+    __instance = None
     is_canvas = False
     background = color_property('background')
-    __slots__ = ['_direct', 'width', 'height', 'pos', 'zoom', '_background']
+
+    def __new__(cls, *args, **kwds):
+        if cls.__instance is not None:
+            raise TypeError('cannot create two instances of singleton object')
+        return object.__new__(cls)
 
     def __init__(self, shape=(800, 600), pos=(0, 0), zoom=1, background=None):
         self.width, self.height = shape
@@ -64,7 +69,6 @@ class Canvas(Screen):
     básicos como círculos, linhas, pontos, polígonos, etc.
     '''
     is_canvas = True
-    __slots__ = ['_drawing_funcs']
 
     def __init__(self, shape=(800, 600), pos=(0, 0), zoom=1, background=None):
         super(Canvas, self).__init__(shape, pos, zoom, background)

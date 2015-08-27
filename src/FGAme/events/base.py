@@ -130,10 +130,10 @@ class EventDispatcher(object):
 
     def __init__(self):
         for signal in self.__signals__.values():
-            ctl = signal.default_control()
+            ctl = signal.default_control(self)
             setattr(self, '_%s_ctl' % pyname(signal.name), ctl)
             if not isinstance(signal, DelegateSignal):
-                setattr(self, '_%s_book' % pyname(signal.name), ctl.book)
+                setattr(self, '_%s_book' % pyname(signal.name), ctl._runner)
 
             # Registra os métodos criados pelo mecanismo on_signal...
             auto_method = getattr(self, 'on_' + pyname(signal.name), None)

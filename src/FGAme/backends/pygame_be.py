@@ -18,18 +18,12 @@ class PyGameCanvas(Canvas):
 
     '''Implementa a interface Canvas utilizando a biblioteca pygame'''
 
-    __slots__ = ['_screen']
     _pg_draw_circle = pygame.draw.circle
     _pg_draw_rect = pygame.draw.rect
     _pg_draw_poly = pygame.draw.polygon
 
-    def get_screen(self):
-        '''Retorna o objeto do tipo screen do Pygame'''
-
-        return self._screen
-
     def show(self):
-        self._screen = pygame.display.set_mode((self.width, self.height))
+        self.__screen = pygame.display.set_mode((self.width, self.height))
         super(PyGameCanvas, self).show()
 
     def flip(self):
@@ -44,7 +38,7 @@ class PyGameCanvas(Canvas):
         x, x_, y, y_ = map(int, aabb)
         rect = (x, Y - y_, x_ - x, y_ - y)
         self._pg_draw_rect(
-            self._screen,
+            self.__screen,
             color,       # color
             rect,        # rect
             int(width))  # line width
@@ -56,7 +50,7 @@ class PyGameCanvas(Canvas):
         Y = self.height
         x, y = circle.pos
         self._pg_draw_circle(
-            self._screen,
+            self.__screen,
             color,                 # line color
             (int(x), Y - int(y)),  # center
             int(circle.radius),    # radius
@@ -69,7 +63,7 @@ class PyGameCanvas(Canvas):
         Y = self.height
         vertices = [(int(x), int(Y - y)) for (x, y) in poly]
         self._pg_draw_poly(
-            self._screen,
+            self.__screen,
             color,        # line color
             vertices,     # center
             int(width))   # line width
@@ -77,28 +71,28 @@ class PyGameCanvas(Canvas):
     def draw_raw_segment(self, segment, width=1.0, color=black):
         Y = self.height
         pt1, pt2 = [(int(x), int(Y - y)) for (x, y) in segment]
-        pygame.draw.line(self._screen, color, pt1, pt2, int(width))
+        pygame.draw.line(self.__screen, color, pt1, pt2, int(width))
 
     def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)
         # TODO: talvez use pygame.display.get_surface() para obter a tela
         # correta
         # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
-        self._screen.set_at(x, y, rgb(color))
+        self.__screen.set_at(x, y, rgb(color))
 
     def paint_image(self, pos, image):
         x, y, dx, dy = image.get_rect()
         x += pos[0]
         y += pos[1]
-        self._screen.blit(image, (x, y, dx, dy))
+        self.__screen.blit(image, (x, y, dx, dy))
 
     def clear_background(self, color=None):
         if color is None:
             if self.background is None:
                 raise RuntimeError('background was not defined')
-            self._screen.fill(self.background)
+            self.__screen.fill(self.background)
         else:
-            self._screen.fill(Color(color))
+            self.__screen.fill(Color(color))
 
 
 class PyGameInput(Input):

@@ -212,6 +212,9 @@ class Conf(object):
         '''Inicializa a tela na resolução padrão de 800x600 ou na resolução
         especificada pelo usuário usando o método conf.set_resolution()'''
 
+        if self.canvas_object is not None:
+            raise RuntimeError('trying to re-init canvas object')
+
         if self.canvas_class is None:
             self.set_backend()
             self.canvas_class = self.backend_classes['screen']
@@ -229,6 +232,15 @@ class Conf(object):
         self.canvas_object = canvas
         canvas.init()
         return canvas
+
+    def show_screen(self):
+        '''Força mostrar a tela'''
+
+        if self.has_init:
+            self.canvas_object.show()
+        else:
+            self.init()
+            self.canvas_object.show()
 
     def init_input(self):
         '''Inicializa o sistema de inputs de teclado e mouse.'''

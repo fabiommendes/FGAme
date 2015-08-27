@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import functools
 from collections import deque, namedtuple
 from FGAme.core import conf
 from FGAme.events import EventDispatcher, signal
@@ -24,28 +25,31 @@ class MainLoop(EventDispatcher):
 
     Parameters
     ----------
-        fps : float
-            Número de quadros por segundo que a simulação de física deve
-            tentar rodar.
-        time : float (padrão=0.0)
-            Tempo de simulação a partir do do método run(). Pode defasar com
-            relação ao tempo real devido à eventos de "frame-skip"
-        n_iter : int (padrão=0)
-            Número de frames processados. É incrementado a cada passo de
-            simulação.
-        clock : Clock
-            Objeto do tipo clock. Serve como controle para a execução de ações
-            programadas.
+
+    fps : float
+        Número de quadros por segundo que a simulação de física deve
+        tentar rodar.
+    time : float (padrão=0.0)
+        Tempo de simulação a partir do do método run(). Pode defasar com
+        relação ao tempo real devido à eventos de "frame-skip"
+    n_iter : int (padrão=0)
+        Número de frames processados. É incrementado a cada passo de
+        simulação.
+    clock : Clock
+        Objeto do tipo clock. Serve como controle para a execução de ações
+        programadas.
 
     Attributes
     ----------
 
     Todos os parâmetros estão disponíveis como atributos. Além destes, temos
 
-        dt : float
-            Recíproco de fps, mostra o tempo esperado gasto em cada frame.
-        n_skip : int
-            Número de frames pulados durante a simulação.
+    dt : float
+        Recíproco de fps, mostra o tempo esperado gasto em cada frame.
+    n_skip : int
+        Número de frames pulados durante a simulação.
+    sleep_time : float
+        Tempo necessário dormir que manteria a taxa de atualização constante.
 
 
     Sinais
@@ -69,12 +73,15 @@ class MainLoop(EventDispatcher):
     pre_draw = signal('pre-draw', num_args=1)
     post_draw = signal('post-draw', num_args=1)
     frame_skip = signal('frame-skip', num_args=1)
+    frame_enter = signal('frame-enter')
+    frame_frame_leave = signal('frame-leave')
 
     def __init__(self, fps=None, time=0.0, n_iter=0, clock=None):
         super(MainLoop, self).__init__()
         self.fps = conf.screen_fps
         self.dt = 1.0 / self.fps
         self.time = 0.0
+        self.sleep_time = 0.0
         self.n_iter = 0
         self.n_skip = 0
         self._running = False
@@ -108,7 +115,7 @@ class MainLoop(EventDispatcher):
 
         # Assegura que o motor de jogos foi inicializado
         conf.init()
-        conf.canvas_object.show()  # @UndefinedVariable
+        conf.show_screen()
         timeout = float('inf') if timeout is None else float(timeout)
         timeout += self.time
         maxiter = float('inf') if maxiter is None else maxiter
@@ -124,17 +131,18 @@ class MainLoop(EventDispatcher):
             if maxiter is not None and self.n_iter >= maxiter:
                 break
 
-            # Executa ações one_shot após o término dos frames
-            Q = self._action_queue
-            while Q and (self.time > Q[0].time):
-                x = Q.popleft()
-                x.action(*x.args, **x.kwds)
-
     def step(self, state, wait=True):
         '''Realiza um passo de simulação sobre o estado fornecido'''
 
         start_time = time.time()
         canvas = conf.canvas_object
+        self.trigger_frame_enter()
+
+        # Executa ações one_shot no início dos frames
+        Q = self._action_queue
+        while Q and (self.time > Q[0].time):
+            x = Q.popleft()
+            x.action(*x.args, **x.kwds)
 
         # Captura entrada do usuário
         conf.input_object.poll()  # @UndefinedVariable
@@ -151,11 +159,18 @@ class MainLoop(EventDispatcher):
         self.trigger_post_draw(canvas)
         canvas.flip()
 
+        # Finaliza o frame
+        time_interval = time.time() - start_time
+        self.sleep_time = self.dt - time_interval
+        self.trigger_frame_leave()
+
+        # Recalcula o tempo de dormir pois frame_leave() pode ter consumido
+        # alguns ciclos
+        time_interval = time.time() - start_time
+        self.sleep_time = self.dt - time_interval
         if wait:
-            time_interval = time.time() - start_time
-            wait_time = self.dt - time_interval
-            if wait_time > 0:
-                time.sleep(wait_time)
+            if self.sleep_time > 0:
+                time.sleep(self.sleep_time)
             else:
                 self.n_skip += 1
                 self.trigger_frame_skip(-wait)
@@ -168,42 +183,251 @@ class MainLoop(EventDispatcher):
 
         self._running = False
 
-    def one_shot(self, action, time, *args, **kwds):
+    def one_shot(self, time, function=None, *args, **kwds):
         '''Agenda a execução da ação dada para acontecer imediatamente após
         transcorridos o número de segundos fornecidos. A ação será executada
-        logo após o fim de cada passo, antes de iniciar o frame seguinte.'''
+        logo após o fim de cada passo, antes de iniciar o frame seguinte.
+        '''
 
-        timed_action = TimedAction(self.time + time, action, args, kwds)
-        self._action_queue.append(timed_action)
-        self._action_queue.sort(key=lambda x: x.time)
+        # Decorator form
+        if function is None or function is Ellipsis:
+            def decorator(func):
+                return self.one_shot(time, func, *args, **kwds)
+            return decorator
 
-    def one_shot_frames(self, action, n_frames, *args, **kwds):
+        Q = self._action_queue
+        Q.append(TimedAction(self.time + time, function, args, kwds))
+        self._action_queue = deque(sorted(Q, key=lambda x: x.time))
+
+    def one_shot_frames(self, n_frames, function=None, *args, **kwds):
         '''Similar a one_shot, mas agenda a execução para ocorrer em um número
-        de frames especificado'''
+        de frames especificado
+        '''
 
-        self.one_shot(action, n_frames * self.dt, *args, **kwds)
+        return self.one_shot(n_frames * self.dt, function, *args, **kwds)
 
-    def one_shot_absolute(self, action, time, *args, **kwds):
+    def one_shot_absolute(self, time, function=None, *args, **kwds):
         '''Similar a one_shot, mas agenda a execução para ocorrer em um valor
-        específico de tempo e não após transcorrido o intervalo dado.
+        absoluto na linha de tempo e não após transcorrido o intervalo dado.
+        '''
 
-        A ação é executada imediatamente se o tempo de simulação superar o
-        valor de time.'''
+        return self.one_shot(time - self.time, function, *args, **kwds)
 
-        self.one_shot(action, time - self.time, *args, **kwds)
-
-    def schedule(self, action, time_interval, *args, **kwds):
+    def periodic(self, time_interval, function=None, *args, **kwds):
         '''Similar à one_shot, mas agenda a simulação para ocorrer
         repetidamente cada vez que passar o intervalo de tempo fornecido.'''
 
-        def recursive_action():
-            action(*args, **kwds)
-            self.one_shot(recursive_action, time_interval)
+        # Decorador
+        if function is None or function is Ellipsis:
+            def decorator(func):
+                return self.periodic(time_interval, func, *args, **kwds)
+            return decorator
 
-        self.one_shot(recursive_action, time_interval)
+        def recursive_action(*r_args, **r_kwds):
+            function(*r_args, **r_kwds)
+            self.one_shot(time_interval, recursive_action, *args, **kwds)
 
-    def schedule_frames(self, action, n_frames, *args, **kwds):
-        '''Similar à schedule(), mas agenda o intervalo de execução em frames
+        self.one_shot(0, recursive_action, *args, **kwds)
+
+    def periodic_frames(self, n_frames, function=None, *args, **kwds):
+        '''Similar à periodic(), mas agenda o intervalo de execução em frames
         ao invés de segundos'''
 
-        self.schedule(action, n_frames * self.dt, *args, **kwds)
+        self.periodic(n_frames * self.dt, function, *args, **kwds)
+
+    def schedule(self, function=None, *args, **kwds):
+        '''Agenda função para ser executada em cada frame.
+
+        Parameters
+        ----------
+
+        start : bool
+            Determina se a ação deve ser executada no início ou ao final do
+            frame. (padrão=True)
+        skip : int ou tuple
+            Determina quantos frames são pulados a cada execução. Por exemplo,
+            se skip=2, a função é executada a cada dois frames. (padrão=1)
+            Se for uma tupla (x, y), o primeiro valor representa o intervalo
+            e o segundo representa quantos frames é necessário esperar para
+            iniciar a execução.
+
+        Argumentos adicionais serão transferidos para a função fornecida'''
+
+        # Decorator form
+        if function is None or function is Ellipsis:
+            def decorator(func):
+                return self.schedule(func, *args, **kwds)
+            return decorator
+
+        skip = kwds.pop('skip', 1)
+        if skip != 1:
+            raise NotImplementedError
+
+        if kwds.pop('start', True):
+            return self.frame_enter.listen(function, *args, **kwds)
+        else:
+            return self.frame_leave.listen(function, *args, **kwds)
+
+    def schedule_optional(self, action, *args, **kwds):
+        '''Agenda ação para executar ao final de cada frame se o mesmo não
+        tiver estourado o tempo limite.
+
+        Útil para executar ações de manutenção que podem ser adiadas para
+        quando a CPU estiver mais livre.
+        '''
+
+        mainloop = conf.mainloop_object
+
+        def optional_action():
+            if mainloop.sleep_tile:
+                action()
+
+        return self.schedule(optional_action, start=False)
+
+    def schedule_iter(self, iterator, *args, **kwds):
+        '''Agenda a execução de um iterador ou gerador em um passo a cada frame.
+
+        Quando o gerador for totalmente consumido, ele é eliminado do loop de
+        execução.
+
+        Parameters
+        ----------
+
+        iterator :
+            Qualquer iterador ou gerador. O loop principal chamará
+            repetidamente next(iterator) para cada frame executado.
+        start : bool
+            Determina se a ação será executada no início ou no fim do frame.
+        skip : int
+            Executa as ações a cada skip (padrão skip=1) frames.
+        '''
+
+        start = kwds.pop('start', True)
+        skip = kwds.pop('skip', 1)
+
+        # Inicia variáveis
+        action_id = None
+        idx = 1
+
+        # Aceita uma função geradora como entrada (funções com cláusula yield)
+        try:
+            iterator = iter(iterator)
+        except TypeError:
+            iterator = iterator()
+
+        def step():
+            nonlocal idx
+
+            try:
+                if idx % skip == 0:
+                    next(iterator)
+            except StopIteration:
+                mainloop = conf.mainloop_object
+                if start:
+                    mainloop.frame_enter.remove(action_id)
+                else:
+                    mainloop.frame_leave.remove(action_id)
+            idx += 1
+
+        action_id = self.schedule(step, start=start)
+        return action_id
+
+    def delayed(self, time, function=None, *args, **kwds):
+        '''Semelhante à schedule, mas atrasa a execução da função pelo tempo
+        especificado'''
+
+        # Decorador
+        if function is None:
+            def decorator(func):
+                return self.delayed(time, func, *args, **kwds)
+            return decorator
+
+        def do_schedule():
+            self.schedule(function, *args, **kwds)
+
+        return self.one_shot(time, do_schedule)
+
+    def delayed_frames(self, n_frames, function=None, *args, **kwds):
+        '''Semelhante à delayed(), mas especifica um número de frames ao invés
+        do intervalo de tempo'''
+
+        return self.delayed(self.dt * n_frames, function, *args, **kwds)
+
+    def delayed_absolute(self, time, function=None, *args, **kwds):
+        '''Semelhante à delayed(), mas inicia após a simulação atingir um valor
+        absoluto de tempo.'''
+
+        return self.delayed(time - self.time, function, *args, **kwds)
+
+    def unschedule(self, handler):
+        '''Remove uma ação da execução'''
+
+        # TODO: make everything cancellable!
+        if conf.mainloop_object is not None:
+            mainloop = conf.mainloop_object
+            mainloop.frame_enter.remove(action)
+            mainloop.frame_leave.remove(action)
+        else:
+            raise RuntimeError('cannot unschedule action from simulation that '
+                               'has not started')
+
+
+#
+# Global schedulers
+#
+def _make_scheduler(name):
+    '''Cria uma função tipo "scheduler" que delega a ação para o objeto
+    mainloop principal'''
+
+    @functools.wraps(getattr(MainLoop, name))
+    def scheduler_function(*args, **kwds):
+        if conf.mainloop_object is None:
+            conf.init()
+        func = getattr(conf.mainloop_object, name)
+        return func(*args, **kwds)
+
+    globals()[name] = scheduler_function
+    return scheduler_function
+
+one_shot = _make_scheduler('one_shot')
+one_shot_frames = _make_scheduler('one_shot_frames')
+one_shot_absolute = _make_scheduler('one_shot_absolute')
+periodic = _make_scheduler('periodic')
+periodic_frames = _make_scheduler('periodic_frames')
+schedule = _make_scheduler('schedule')
+schedule_iter = _make_scheduler('schedule_iter')
+delayed = _make_scheduler('delayed')
+delayed_frames = _make_scheduler('delayed_frames')
+delayed_absolute = _make_scheduler('delayed_absolute')
+
+
+if __name__ == '__main__':
+    from FGAme import World, Circle, pos
+    w = World()
+    c1 = Circle(10, world=w)
+    c2 = Circle(10, color='red', world=w)
+    c3 = Circle(10, color='blue', world=w)
+
+    @schedule
+    def move():
+        c2.pos += (1, 1)
+
+    @schedule_iter
+    def move_circle():
+        for _ in range(50):
+            c1.pos += (2, 5)
+            yield
+
+    @periodic(1)
+    def move_c3():
+        c3.pos += (50, 30)
+
+    @delayed(2)
+    def move_circle2():
+        c1.pos += (1, 0)
+
+    @one_shot(3)
+    def move_circle3():
+        c1.pos = pos.middle
+
+    w.run()

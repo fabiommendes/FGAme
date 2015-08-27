@@ -1,3 +1,4 @@
+import weakref
 from collections import namedtuple
 from FGAme.events.util import pyname, wrap_handler
 
@@ -30,11 +31,11 @@ class Signal(object):
         tname = type(self).__name__
         return '%s(%r, %s)' % (tname, self.name, self.num_args)
 
-    def default_control(self):
+    def default_control(self, owner):
         '''Retorna o objeto tipo SignalCtl apropriado para essa classe de
         sinais'''
 
-        return SignalCtl(self)
+        return SignalCtl(self, owner)
 
     ###########################################################################
     # Fábrica de funções para os métodos listen_<sinal> e trigger_<sinal>
@@ -85,10 +86,10 @@ class Signal(object):
             ctl = getattr(self, '_%s_ctl' % pyname(signal.name))
 
             if signal._num_filters == 0:
-                idx = len(ctl.control)
+                idx = len(ctl._data)
                 elem = ControlElem(idx, owner, wrapped, handler, args, kwargs)
-                ctl.book.append(wrapped)
-                ctl.control.append(elem)
+                ctl._runner.append(wrapped)
+                ctl._data.append(elem)
                 return idx
 
             elif signal._num_filters == 1:
@@ -97,7 +98,7 @@ class Signal(object):
 
                 if key is None:
                     # Registra como handler de todas os filtros no livro
-                    for k in ctl.book:
+                    for k in ctl._runner:
                         if k is None:
                             continue
                         wrapped_i = wrap_handler(handler, (k,) + args, kwargs,
@@ -106,8 +107,8 @@ class Signal(object):
 
                     # Cria um elemento de controle substituindo o campo
                     # "wrapped" pelo dicionário das ids em cada filtro
-                    control = ctl.control.setdefault(None, [])
-                    book = ctl.book.setdefault(None, [])
+                    control = ctl._data.setdefault(None, [])
+                    book = ctl._runner.setdefault(None, [])
                     idx = len(control)
                     elem = ControlElem(idx, owner, ids, handler, args, kwargs)
                     control.append(elem)
@@ -118,29 +119,29 @@ class Signal(object):
                     return (None, idx)
                 else:
                     try:
-                        idx = len(ctl.control[key])
+                        idx = len(ctl._data[key])
                     except KeyError:
-                        ctl.control[key] = []
-                        ctl.book[key] = []
+                        ctl._data[key] = []
+                        ctl._runner[key] = []
 
-                        for ctl_e in ctl.control.get(None, []):
+                        for ctl_e in ctl._data.get(None, []):
                             wrapped_i = wrap_handler(
                                 ctl_e.handler, (key,) + ctl_e.args,
                                 ctl_e.kwargs, signal.num_args)
                             ctl_e.wrapped[key] = listen_method(
                                 self, key, wrapped_i)
 
-                        idx = len(ctl.control[key])
+                        idx = len(ctl._data[key])
 
                     elem = ControlElem(
                         idx, owner, wrapped, handler, args, kwargs)
-                    ctl.book[key].append(wrapped)
-                    ctl.control[key].append(elem)
+                    ctl._runner[key].append(wrapped)
+                    ctl._data[key].append(elem)
                     return key, idx
 
             else:
-                book = ctl.book[filter_args]
-                control = ctl.control[filter_args]
+                book = ctl._runner[filter_args]
+                control = ctl._data[filter_args]
             raise RuntimeError
 
         listen_method.__name__ = 'listen_' + pyname(signal.name)
@@ -199,8 +200,8 @@ class FilteredSignal(Signal):
         self._num_filters = 1
         self._filter_names = filter_names or (None,) * self._num_filters
 
-    def default_control(self):
-        return SignalCtlMulti(self)
+    def default_control(self, owner):
+        return SignalCtlMulti(self, owner)
 
     def _factory_trigger_method(self):
         signal = self  # não confundir com o self da função fabricada!
@@ -309,10 +310,15 @@ class SignalCtl(object):
     '''A classe SignalCtl implementa uma interface para gerenciar os handlers
     registrados para um determinado sinal'''
 
-    def __init__(self, signal):
+    def __init__(self, signal, instance):
         self.signal = signal
-        self.control = []
-        self.book = []
+        self._data = []
+        self._runner = []
+        self._instance = weakref.ref(instance)
+
+    @property
+    def instance(self):
+        return self._instance()
 
     @property
     def name(self):
@@ -320,24 +326,24 @@ class SignalCtl(object):
 
     @property
     def handlers(self):
-        return [ctl.handler for ctl in self.control if ctl is not None]
+        return [ctl.handler for ctl in self._data if ctl is not None]
 
     @property
     def handlers_full(self):
         return [(ctl.handler, ctl.args, ctl.kwargs)
-                for ctl in self.control if ctl is not None]
+                for ctl in self._data if ctl is not None]
 
     @property
     def owners(self):
-        return [ctl.owner for ctl in self.control if ctl is not None]
+        return [ctl.owner for ctl in self._data if ctl is not None]
 
-    def remove(self, **kwds):
+    def remove(self, *args, **kwds):
         '''Remove handlers baseado em algum critério.
 
         Assinaturas
         -----------
 
-        obj.remove(id=<handler_id>)
+        obj.remove(id=<handler_id>) ou obj.remove(<handler_id>)
             Remove handler especificando a id retornada pelo método listen()
 
         obj.remove(handler=<handler function>)
@@ -351,31 +357,36 @@ class SignalCtl(object):
             vários objetos diferentes.
         '''
 
-        if len(kwds) != 1:
+        if not args:
+            key, value = kwds.popitem()
+        elif len(args) == 1:
+            key, value = 'id', args[0]
+        else:
+            raise TypeError('wrong number of positional arguments')
+        if kwds:
             raise TypeError('must specify exactly one criteria')
 
-        key, value = kwds.popitem()
         removed = []
 
         if key == 'id':
             idx = value
-            wrapped = self.control[idx].wrapped
-            w_idx = [i for i, w in enumerate(self.book) if w is wrapped]
+            wrapped = self._data[idx].wrapped
+            w_idx = [i for i, w in enumerate(self._runner) if w is wrapped]
             if len(w_idx) > 1:
                 raise NotImplementedError
 
-            del self.book[w_idx[0]]
-            removed.append(self.control[idx])
-            self.control[idx] = None
+            del self._runner[w_idx[0]]
+            removed.append(self._data[idx])
+            self._data[idx] = None
 
         elif key == 'handler':
-            for i, ctl in enumerate(self.control):
+            for i, ctl in enumerate(self._data):
                 if ctl.handler == value:
                     removed_obj = self.remove(id=i)
                     removed.extend(removed_obj)
 
         elif key == 'owner':
-            for i, ctl in enumerate(self.control):
+            for i, ctl in enumerate(self._data):
                 if ctl.owner == value:
                     removed_obj = self.remove(id=i)
                     removed.extend(removed_obj)
@@ -389,13 +400,29 @@ class SignalCtl(object):
         '''Restaura uma lista de sinais removidas pelo método remove()'''
 
         for ctl_elem in L:
-            if self.control[ctl_elem.idx] is not None:
+            if self._data[ctl_elem.idx] is not None:
                 raise RuntimeError(
                     'restoring handler that were not removed or '
                     'were already restored')
             else:
-                self.control[ctl_elem.idx] = ctl_elem
-                self.book.append(ctl_elem.wrapped)
+                self._data[ctl_elem.idx] = ctl_elem
+                self._runner.append(ctl_elem.wrapped)
+
+    def listen(self, *args, **kwds):
+        '''Registra um callback para o sinal'''
+
+        return self.instance.listen(self.name, *args, **kwds)
+
+    def trigger(self, *args, **kwds):
+        '''Emite um sinal'''
+
+        return self.instance.trigger(self.name, *args, **kwds)
+
+    #
+    # Magic methods
+    #
+    def __contains__(self, handler):
+        return handler in self._data
 
 
 class SignalCtlMulti(SignalCtl):
@@ -404,7 +431,7 @@ class SignalCtlMulti(SignalCtl):
 
     # TODO: talvez implementar como um dicionario de SignalCtl
 
-    def __init__(self, signal):
-        super(SignalCtlMulti, self).__init__(signal)
-        self.book = {}
-        self.control = {}
+    def __init__(self, signal, owner):
+        super(SignalCtlMulti, self).__init__(signal, owner)
+        self._runner = {}
+        self._data = {}

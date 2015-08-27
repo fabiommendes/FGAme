@@ -40,7 +40,7 @@ class GlobalObject(object):
 
     @lazy
     def _globals(self):
-        conf.init_canvas()  # @UndefinedVariable
+        conf.init()
         self._globals = conf
         return self._globals
 

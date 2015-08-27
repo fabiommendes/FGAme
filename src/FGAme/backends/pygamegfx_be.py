@@ -15,13 +15,13 @@ class PyGameGFXCanvas(PyGameCanvas):
     def _paint_circle(self, pos, radius, color='black', solid=True):
         x, y = self._map_point(pos)
         color = Color(color)
-        self.gfx.aacircle(self._screen, x, y, trunc(radius), color)
+        self.gfx.aacircle(self.__screen, x, y, trunc(radius), color)
         if solid:
-            self.gfx.filled_circle(self._screen, x, y, trunc(radius), color)
+            self.gfx.filled_circle(self.__screen, x, y, trunc(radius), color)
 
     def _paint_poly(self, points, color='black', solid=True):
         points = [self._map_point(pt) for pt in points]
         color = Color(color)
-        self.pygame.gfxdraw.aapolygon(self._screen, points, color)
+        self.pygame.gfxdraw.aapolygon(self.__screen, points, color)
         if solid:
-            self.pygame.gfxdraw.filled_polygon(self._screen, points, color)
+            self.pygame.gfxdraw.filled_polygon(self.__screen, points, color)

@@ -71,7 +71,7 @@ class GlobalEventDispatcher(EventDispatcher):
         ctl = signal_obj.default_control()
         setattr(self, '_%s_ctl' % attr, ctl)
         if not isinstance(signal, DelegateSignal):
-            setattr(self, '_%s_book' % attr, ctl.book)
+            setattr(self, '_%s_book' % attr, ctl._runner)
 
 
 dispatcher = GlobalEventDispatcher()
