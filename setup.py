@@ -4,7 +4,7 @@ import sys
 import setuptools
 from setuptools import setup
 
-VERSION = '0.4a0'
+VERSION = '0.4a3'
 AUTHOR = 'Fábio Macêdo Mendes'
 IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
@@ -144,7 +144,7 @@ Main features:
           'Topic :: Software Development :: Libraries',
       ],
       package_dir={'': 'src'},
-      packages=setuptools.find_packages(),
+      packages=setuptools.find_packages('src'),
       license='GPL',
       requires=['pygame', 'six'],
       **setup_kwds

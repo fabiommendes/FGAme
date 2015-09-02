@@ -111,19 +111,19 @@ class SDL2Canvas(Canvas):
                 trunc(circle.radius), *color))
 
     def draw_raw_circle_border(self, circle, width, color):
-        safe = self._no_error
+        safe_operator = self._no_error
         x, y = trunc(circle.x), trunc(self.height - circle.y)
         renderer = self._renderer
 
         if width == 1:
             radius = trunc(circle.radius)
-            safe(gfx.aacircleRGBA(renderer, x, y, radius, *color))
+            safe_operator(gfx.aacircleRGBA(renderer, x, y, radius, *color))
         else:
             # Very ugly hack! can it be better?
             min_r = trunc(circle.radius - width / 2)
             max_r = trunc(circle.radius + width / 2)
             for r in range(min_r, max_r):
-                safe(gfx.aacircleRGBA(renderer, x, y, r, *color))
+                safe_operator(gfx.aacircleRGBA(renderer, x, y, r, *color))
 
     def _get_poly_xy(self, poly):
         '''Implementação comum que cria lista de posições x e y para passsar

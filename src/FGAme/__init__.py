@@ -54,7 +54,7 @@ anterior. Veja como fica a posição final do objeto.
 
 >>> obj1.move(150, 0) # deslocamento com relação à posição inicial
 >>> obj1.pos
-Vec2(300, 50)
+Vec(300, 50)
 
 Para iniciar a simulação, basta chamar o comando
 
@@ -385,8 +385,9 @@ Loop principal
 
 '''
 
+from FGAme import conf
 from FGAme import mathtools as math
-from FGAme.mathtools import Vec2, pi
+from FGAme.mathtools import Vec, pi
 from FGAme import draw
 from FGAme.events import listen, signal, EventDispatcher
 from FGAme.core import *
@@ -396,6 +397,8 @@ from FGAme.world import World
 from FGAme.objects import *
 from FGAme.app import *
 from FGAme.extra.orientation_objects import *
+from FGAme.mainloop import *
+del MainLoop
 
 if __name__ == '__main__':
     import doctest

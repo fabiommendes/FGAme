@@ -4,10 +4,9 @@ Re-define os objetos do módulo FGAme.physics e adiciona propriades extras de
 renderização
 '''
 
-
 from FGAme import physics
+from FGAme import conf
 from FGAme.events import EventDispatcherMeta, signal
-from FGAme.core import conf
 from FGAme.draw import Color, color
 from FGAme.util import lazy
 DEBUG = False
@@ -41,6 +40,16 @@ class ObjectMixin(object):
         mixin_kwds = self._extract_mixin_kwargs(kwds)
         self._init_physics(*args, **kwds)
         self._init_visualization(**mixin_kwds)
+
+        # Action control
+        self.visible = True
+        self.actions = []
+        self.to_remove = []
+        self.skip_frame = False
+        self.scheduled = False          # deprecated, soon to be removed
+        self.scheduled_calls = []       #: list of scheduled callbacks
+        self.scheduled_interval_calls = []
+        self.is_running = False         #: whether of not the object is running
 
     def _extract_mixin_kwargs(self, kwds):
         D = {}
@@ -91,6 +100,12 @@ class ObjectMixin(object):
     @line_width.setter
     def line_width(self, value):
         self._line_width = value
+
+    def show(self):
+        self.visible = True
+
+    def hide(self):
+        self.visible = False
 
 
 class AABB(ObjectMixin, physics.AABB):

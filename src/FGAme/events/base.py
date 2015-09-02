@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from FGAme.util import six
+import six
 from FGAme.events.util import pyname
 from FGAme.events.signals import Signal, DelegateSignal
 

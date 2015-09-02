@@ -551,7 +551,7 @@ if __name__ == '__main__':
 
     N = 2000000
 
-    def func(x, y):
+    def force(x, y):
         return x + y
 
 #    def func(*args, **kwds):

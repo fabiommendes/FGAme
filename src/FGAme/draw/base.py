@@ -14,6 +14,14 @@ class Drawable(object):
 
     __slots__ = []
 
+    visible = True
+
+    def show(self):
+        self.visible = True
+
+    def hide(self):
+        self.visible = False
+
     def copy(self):
         '''Retorna uma cópia do objeto'''
 

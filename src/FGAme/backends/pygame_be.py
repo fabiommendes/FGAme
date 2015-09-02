@@ -2,7 +2,8 @@
 
 import string
 import pygame
-from FGAme.core import Canvas, conf
+from FGAme import conf
+from FGAme.core import Canvas
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color, rgb
@@ -129,7 +130,7 @@ class PyGameInput(Input):
     def poll(self):
         key_get = self._key_conversions.get
         mouse_button_get = self._mouse_conversions.get
-        window_height = conf.window_height  # @UndefinedVariable
+        window_height = conf.get_resolution()[1]
         pg = pygame
 
         for event in pygame.event.get():

@@ -4,7 +4,7 @@ Implementa o exemplo de "pseudo-gravidade" da documentação.
 '''
 
 from FGAme import *
-from FGAme.physics.forces import SpringF, GravityF, SpringSF, GravitySF
+from FGAme.physics.forces import SpringTensorPair, GravityPair, SpringTensor, Gravity
 
 # get_mainloop(fps=240)
 
@@ -23,7 +23,7 @@ class Gravity(World):
 
         # Definimos a força de interação entre ambos
         K = self.K = A.mass
-        F = SpringF(A, B, (K, 2 * K))
+        F = SpringTensorPair(A, B, (K, 2 * K))
         A.force, B.force = F.forces()
 
         E0 = F.totalE()

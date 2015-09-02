@@ -240,16 +240,16 @@ class ConsoleHandler(logging.StreamHandler):
 
 class LogFile(object):
 
-    def __init__(self, channel, func):
+    def __init__(self, channel, force):
         self.buffer = ''
-        self.func = func
+        self.force = force
         self.channel = channel
         self.errors = ''
 
     def write(self, s):
         s = self.buffer + s
         self.flush()
-        f = self.func
+        f = self.force
         channel = self.channel
         lines = s.split('\n')
         for l in lines[:-1]:

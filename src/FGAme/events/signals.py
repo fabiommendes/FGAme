@@ -314,11 +314,13 @@ class SignalCtl(object):
         self.signal = signal
         self._data = []
         self._runner = []
-        self._instance = weakref.ref(instance)
+        #self._instance = weakref.ref(instance)
+        self._instance = instance
 
     @property
     def instance(self):
-        return self._instance()
+        # return self._instance()
+        return self._instance
 
     @property
     def name(self):

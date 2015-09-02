@@ -36,6 +36,13 @@ class RenderTree(object):
     '''
 
     is_tree = True
+    visible = True
+
+    def show(self):
+        self.visible = True
+
+    def hide(self):
+        self.visible = False
 
     def __init__(self, parent=None):
         self._data = []
@@ -142,11 +149,12 @@ class RenderTree(object):
         `obj.paint(screen)`'''
 
         for obj in self.walk():
-            try:
-                obj.draw(screen)
-            except Exception:
-                print('debug: error drawing %s' % obj)
-                raise
+            if obj.visible:
+                try:
+                    obj.draw(screen)
+                except Exception:
+                    print('debug: error drawing %s' % obj)
+                    raise
 
     def linearize(self, layer=0):
         '''Retorna uma versão linearizada da árvore de renderização onde

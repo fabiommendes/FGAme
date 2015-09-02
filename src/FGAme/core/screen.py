@@ -41,6 +41,7 @@ class Screen(object):
         self.zoom = zoom
         self.background = background
         self._direct = True
+        self.visible = False
 
     def init(self):
         '''Deve ser chamado como primeira função para iniciar explicitamente a
@@ -51,6 +52,8 @@ class Screen(object):
     def show(self):
         '''Deve ser chamado como primeira função para iniciar explicitamente a
         tela e para abrir e mostrar a janela de jogo.'''
+
+        self.visible = True
 
     @property
     def shape(self):
@@ -75,8 +78,10 @@ class Canvas(Screen):
         self._drawing_funcs = {}
 
     def show(self):
-        self.clear_background('white')
-        self.flip()
+        if not self.visible:
+            super(Canvas, self).show()
+            self.clear_background('white')
+            self.flip()
 
     def flip(self):
         '''Transmite o buffer de pintura para a tela do computador'''

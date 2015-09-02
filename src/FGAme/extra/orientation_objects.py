@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
+from FGAme import conf
 from FGAme.util import lazy
-from FGAme.core import conf
 from FGAme.mathtools import Vec2
 
 __all__ = ['pos', 'vel']
@@ -46,11 +46,11 @@ class GlobalObject(object):
 
     @property
     def _shape(self):
-        return self._globals.window_shape
+        return self._globals.get_resolution()
 
     @property
     def _origin(self):
-        return self._globals.window_origin
+        return Vec2(0, 0)
 
 
 class PosObject(GlobalObject):
@@ -65,16 +65,16 @@ class PosObject(GlobalObject):
     O objeto pos conhece as coordenadas de vários pontos de interesse na tela
 
     >>> pos.middle, pos.nw, pos.ne, pos.sw, pos.se
-    (Vec2(400, 300), Vec2(0, 600), Vec2(800, 600), Vec2(0, 0), Vec2(800, 0))
+    (Vec(400, 300), Vec(0, 600), Vec(800, 600), Vec(0, 0), Vec(800, 0))
 
     >>> pos.north, pos.south, pos.east, pos.west
-    (Vec2(400, 600), Vec2(400, 0), Vec2(800, 300), Vec2(0, 300))
+    (Vec(400, 600), Vec(400, 0), Vec(800, 300), Vec(0, 300))
 
     Também podemos especificar coordenadas relativas a partir de qualquer um
     destes pontos
 
     >>> pos.from_middle(100, 100), pos.from_ne(0, -100)
-    (Vec2(500, 400), Vec2(800, 500))
+    (Vec(500, 400), Vec(800, 500))
     '''
 
     # Alinhados

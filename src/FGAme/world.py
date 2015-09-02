@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
 
+from FGAme import conf
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
 from FGAme.events import EventDispatcher, signal
-from FGAme.core import conf
 from FGAme.draw import RenderTree, color_property
 from FGAme.util import delegate_to
 from FGAme.physics import Body
@@ -20,8 +20,11 @@ class World(EventDispatcher):
                  gravity=None, damping=0, adamping=0,
                  restitution=1, sfriction=0, dfriction=0,
                  bounds=None, max_speed=None,
-                 simulation=None):
+                 simulation=None, force_init=True):
 
+        if force_init:
+            conf.init()
+            conf.show_screen()
         self.background = background
         self._render_tree = RenderTree()
         self._input = conf.get_input()
@@ -196,7 +199,7 @@ class World(EventDispatcher):
             if 'width' not in kwds:
                 raise TypeError('not enougth parameters to set boundaries')
 
-            W, H = conf.get_window_shape()
+            W, H = conf.get_resolution()
             value = kwds.pop('width')
             try:
                 N = len(value)

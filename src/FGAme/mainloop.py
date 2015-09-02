@@ -2,7 +2,6 @@
 import time
 import functools
 from collections import deque, namedtuple
-from FGAme.core import conf
 from FGAme.events import EventDispatcher, signal
 
 
@@ -26,6 +25,10 @@ class MainLoop(EventDispatcher):
     Parameters
     ----------
 
+    screen : Screen
+        Objeto do tipo Screen já inicializado.
+    input : Screen
+        Objeto do tipo Input já inicializado.
     fps : float
         Número de quadros por segundo que a simulação de física deve
         tentar rodar.
@@ -75,10 +78,13 @@ class MainLoop(EventDispatcher):
     frame_skip = signal('frame-skip', num_args=1)
     frame_enter = signal('frame-enter')
     frame_frame_leave = signal('frame-leave')
+    _instance = None
 
-    def __init__(self, fps=None, time=0.0, n_iter=0, clock=None):
+    def __init__(self, screen, input, fps=None):  # @ReservedAssignment
         super(MainLoop, self).__init__()
-        self.fps = conf.screen_fps
+        self.screen = screen
+        self.input = input
+        self.fps = fps or 60
         self.dt = 1.0 / self.fps
         self.time = 0.0
         self.sleep_time = 0.0
@@ -87,11 +93,10 @@ class MainLoop(EventDispatcher):
         self._running = False
         self._action_queue = deque()
 
-    def init(self):
-        '''Ações adicionais que devem ser feitas entre a alocação e execução
-        do método run()'''
-
-        pass
+        if self._instance is not None:
+            raise RuntimeError('MainLoop is a singleton')
+        else:
+            MainLoop._instance = self
 
     def run(self, state, timeout=None, maxiter=None, wait=True):
         '''Roda o loop principal.
@@ -113,9 +118,6 @@ class MainLoop(EventDispatcher):
             apenas para depuração.
         '''
 
-        # Assegura que o motor de jogos foi inicializado
-        conf.init()
-        conf.show_screen()
         timeout = float('inf') if timeout is None else float(timeout)
         timeout += self.time
         maxiter = float('inf') if maxiter is None else maxiter
@@ -135,7 +137,6 @@ class MainLoop(EventDispatcher):
         '''Realiza um passo de simulação sobre o estado fornecido'''
 
         start_time = time.time()
-        canvas = conf.canvas_object
         self.trigger_frame_enter()
 
         # Executa ações one_shot no início dos frames
@@ -145,19 +146,20 @@ class MainLoop(EventDispatcher):
             x.action(*x.args, **x.kwds)
 
         # Captura entrada do usuário
-        conf.input_object.poll()  # @UndefinedVariable
+        self.input.poll()  # @UndefinedVariable
 
         # Atualiza o estado (física e animações) de acordo
         state.update(self.dt)
 
         # Desenha os objetos na tela
+        screen = self.screen
         bg_color = getattr(state, 'background', 'white')
         if bg_color is not None:
-            canvas.clear_background(bg_color)
-        self.trigger_pre_draw(canvas)
-        state.get_render_tree().draw(canvas)
-        self.trigger_post_draw(canvas)
-        canvas.flip()
+            screen.clear_background(bg_color)
+        self.trigger_pre_draw(screen)
+        state.get_render_tree().draw(screen)
+        self.trigger_post_draw(screen)
+        screen.flip()
 
         # Finaliza o frame
         time_interval = time.time() - start_time
@@ -241,6 +243,10 @@ class MainLoop(EventDispatcher):
         Parameters
         ----------
 
+        function : callable
+            Função a ser executada em cada frame. Por padrão, a função não
+            recebe nenhum parâmetro, no entanto os parâmetros posicionais ou
+            por nome adicionais são repassados.
         start : bool
             Determina se a ação deve ser executada no início ou ao final do
             frame. (padrão=True)
@@ -250,8 +256,7 @@ class MainLoop(EventDispatcher):
             Se for uma tupla (x, y), o primeiro valor representa o intervalo
             e o segundo representa quantos frames é necessário esperar para
             iniciar a execução.
-
-        Argumentos adicionais serão transferidos para a função fornecida'''
+'''
 
         # Decorator form
         if function is None or function is Ellipsis:
@@ -268,7 +273,15 @@ class MainLoop(EventDispatcher):
         else:
             return self.frame_leave.listen(function, *args, **kwds)
 
-    def schedule_optional(self, action, *args, **kwds):
+    def schedule_dt(self, function=None, *args, **kwds):
+        '''Similar à `schedule()`, mas utiliza uma função que recebe o
+        intervalo de tempo `dt` transcorrido entre cada frame como primeiro
+        parâmetro.
+        '''
+
+        return self.schedule(function, self.dt, *args, **kwds)
+
+    def schedule_optional(self, function, *args, **kwds):
         '''Agenda ação para executar ao final de cada frame se o mesmo não
         tiver estourado o tempo limite.
 
@@ -276,13 +289,21 @@ class MainLoop(EventDispatcher):
         quando a CPU estiver mais livre.
         '''
 
-        mainloop = conf.mainloop_object
+        mainloop = MainLoop._instance
 
         def optional_action():
             if mainloop.sleep_tile:
-                action()
+                function()
 
         return self.schedule(optional_action, start=False)
+
+    def schedule_optional_dt(self, function, *args, **kwds):
+        '''Similar à `schedule_optional()`, mas utiliza uma função que recebe o
+        intervalo de tempo `dt` transcorrido entre cada frame como primeiro
+        parâmetro.
+        '''
+
+        self.schedule_optional(function, self.dt, *args, **kwds)
 
     def schedule_iter(self, iterator, *args, **kwds):
         '''Agenda a execução de um iterador ou gerador em um passo a cada frame.
@@ -313,7 +334,7 @@ class MainLoop(EventDispatcher):
         try:
             iterator = iter(iterator)
         except TypeError:
-            iterator = iterator()
+            iterator = iterator(*args, **kwds)
 
         def step():
             nonlocal idx
@@ -322,7 +343,7 @@ class MainLoop(EventDispatcher):
                 if idx % skip == 0:
                     next(iterator)
             except StopIteration:
-                mainloop = conf.mainloop_object
+                mainloop = MainLoop._instance
                 if start:
                     mainloop.frame_enter.remove(action_id)
                 else:
@@ -331,6 +352,14 @@ class MainLoop(EventDispatcher):
 
         action_id = self.schedule(step, start=start)
         return action_id
+
+    def schedule_iter_dt(self, iterator, *args, **kwds):
+        '''Similar à `schedule_iter()`, mas utiliza uma função que recebe o
+        intervalo de tempo `dt` transcorrido entre cada frame como primeiro
+        parâmetro.
+        '''
+
+        self.schedule_iter(iterator, self.dt, *args, **kwds)
 
     def delayed(self, time, function=None, *args, **kwds):
         '''Semelhante à schedule, mas atrasa a execução da função pelo tempo
@@ -363,10 +392,10 @@ class MainLoop(EventDispatcher):
         '''Remove uma ação da execução'''
 
         # TODO: make everything cancellable!
-        if conf.mainloop_object is not None:
-            mainloop = conf.mainloop_object
-            mainloop.frame_enter.remove(action)
-            mainloop.frame_leave.remove(action)
+        mainloop = MainLoop._instance
+        if mainloop is not None:
+            mainloop.frame_enter.remove(handler)
+            mainloop.frame_leave.remove(handler)
         else:
             raise RuntimeError('cannot unschedule action from simulation that '
                                'has not started')
@@ -381,9 +410,10 @@ def _make_scheduler(name):
 
     @functools.wraps(getattr(MainLoop, name))
     def scheduler_function(*args, **kwds):
-        if conf.mainloop_object is None:
-            conf.init()
-        func = getattr(conf.mainloop_object, name)
+        try:
+            func = getattr(MainLoop._instance, name)
+        except AttributeError:
+            raise RuntimeError('MainLoop is not configured')
         return func(*args, **kwds)
 
     globals()[name] = scheduler_function
@@ -395,10 +425,15 @@ one_shot_absolute = _make_scheduler('one_shot_absolute')
 periodic = _make_scheduler('periodic')
 periodic_frames = _make_scheduler('periodic_frames')
 schedule = _make_scheduler('schedule')
+schedule_optional = _make_scheduler('schedule_optional')
 schedule_iter = _make_scheduler('schedule_iter')
+schedule_dt = _make_scheduler('schedule_dt')
+schedule_optional_dt = _make_scheduler('schedule_optional_dt')
+schedule_iter_dt = _make_scheduler('schedule_iter_dt')
 delayed = _make_scheduler('delayed')
 delayed_frames = _make_scheduler('delayed_frames')
 delayed_absolute = _make_scheduler('delayed_absolute')
+unschedule = _make_scheduler('unschedule')
 
 
 if __name__ == '__main__':

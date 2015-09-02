@@ -4,7 +4,7 @@ Ilustra a interseção entre duas figuras geométricas
 '''
 
 from FGAme import *
-from FGAme.mathutils import clip, convex_hull
+from FGAme.mathtools import clip, convex_hull
 
 world = World()
 A = Rectangle(shape=(200, 100), mass='inf')

@@ -1,8 +1,9 @@
 # -*- coding: utf8 -*-
+import six
 from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathtools import Vec2, asvector, sin, cos, sqrt, null2D, shapes
-from FGAme.util import six
 from FGAme.physics.flags import BodyFlags as flags
+from FGAme.physics.forces import ForceProperty
 
 
 __all__ = ['Body', 'LinearRigidBody']
@@ -603,6 +604,7 @@ class Body(object):
     ###########################################################################
     #                        Propriedades físicas
     ###########################################################################
+    force = ForceProperty()
 
     @property
     def mass(self):
@@ -753,16 +755,6 @@ class Body(object):
             self._vel += Vec2(delta_or_x, y)
 
     # Resposta a forças, impulsos e atualização da física #####################
-    def force(self, t):
-        '''Define uma força externa que depende do tempo t.
-
-        Pode ser utilizado por sub-implementações para definir uma força
-        externa aplicada aos objetos de uma sub-classe ou usando o recurso de
-        "monkey patching" do Python
-        '''
-
-        return null2D
-
     def init_accel(self):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
         e ao amortecimento'''
@@ -794,7 +786,7 @@ class Body(object):
                 tau = (pos - self._pos).cross(force)
             self.apply_torque(tau, dt)
 
-    def apply_accel(self, a, dt):
+    def apply_accel(self, a, dt, method=None):
         '''Aplica uma aceleração linear durante um intervalo de tempo dt.
 
         Tem efeito em objetos cinemáticos.
@@ -812,16 +804,16 @@ class Body(object):
 
         A integração de Euler seria implementada como:
 
-            x(t + dt) = x(t) + v(t) * dt + a(t) * dt**2 / 2
+            x(t + dt) = x(t) + v(t) * dt
             v(t + dt) = v(t) + a(t) * dt
 
-        Em código Python
+        Em código Python,
 
         >>> self.move(self.vel * dt + a * (dt**2/2))           # doctest: +SKIP
         >>> self.boost(a * dt)                                 # doctest: +SKIP
 
         Este método simples e intuitivo sofre com o efeito da "deriva de
-        energia". Devido aos erros de truncamento, o valor da energia da
+        energia". Devido aos erros de aproximação, o valor da energia da
         solução numérica flutua com relação ao valor exato. Na grande maioria
         dos sistemas, esssa flutuação ocorre com mais probabilidade para a
         região de maior energia e portanto a energia tende a crescer
@@ -855,10 +847,18 @@ class Body(object):
         credibilidade.
         '''
 
-        # TODO: reimplementar algoritmo correto
-        a = Vec2.from_seq(a)
-        self.move(self._vel * dt + a * (dt ** 2 / 2.0))
-        self.boost(a * dt)
+        if method is None or method == 'euler-semi-implicit':
+            a = Vec2.from_seq(a)
+            self.boost(a * dt)
+            self.move(self._vel * dt + a * (0.5 * dt * dt))
+        elif method == 'verlet':
+            raise NotImplementedError
+        elif method == 'euler':
+            a = Vec2.from_seq(a)
+            self.move(self._vel * dt + a * (0.5 * dt * dt))
+            self.boost(a * dt)
+        else:
+            raise ValueError('invalid method: %r' % method)
 
     def apply_impulse(self, impulse_or_x, y=None):
         '''Aplica um impulso linear ao objeto. Isto altera sua velocidade

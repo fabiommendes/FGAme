@@ -25,7 +25,7 @@ Funções especiais para a criação de objetos
 '''
 
 from FGAme.physics.flags import *
-from FGAme.physics.dynamic_object import Body, LinearRigidBody
+from FGAme.physics.body import Body, LinearRigidBody
 from FGAme.physics import flags
 from FGAme.physics.particle import Particle
 from FGAme.physics.aabb import AABB
