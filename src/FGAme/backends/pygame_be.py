@@ -27,6 +27,9 @@ class PyGameCanvas(Canvas):
         self.__screen = pygame.display.set_mode((self.width, self.height))
         super(PyGameCanvas, self).show()
 
+    def get_pygame_screen(self):
+        return self.__screen
+
     def flip(self):
         pygame.display.update()
 
@@ -74,18 +77,29 @@ class PyGameCanvas(Canvas):
         pt1, pt2 = [(int(x), int(Y - y)) for (x, y) in segment]
         pygame.draw.line(self.__screen, color, pt1, pt2, int(width))
 
+    def draw_raw_texture(self, texture, pos=(0, 0)):
+        try:
+            pg_texture = texture.data
+        except AttributeError:
+            pil_data = texture.get_pil_data()
+            if pil_data.mode not in 'RGB' or 'RGBA':
+                pil_data = pil_data.convert('RGBA')
+            pg_texture = pygame.image.fromstring(
+                pil_data.tostring(),
+                texture.shape, pil_data.mode)
+            texture.set_data(pg_texture)
+
+        x, y, dx, dy = pg_texture.get_rect()
+        x += pos[0]
+        y += pos[1] + dy
+        self.__screen.blit(pg_texture, (x, self.height - y, dx, dy))
+
     def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)
         # TODO: talvez use pygame.display.get_surface() para obter a tela
         # correta
         # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
         self.__screen.set_at(x, y, rgb(color))
-
-    def paint_image(self, pos, image):
-        x, y, dx, dy = image.get_rect()
-        x += pos[0]
-        y += pos[1]
-        self.__screen.blit(image, (x, y, dx, dy))
 
     def clear_background(self, color=None):
         if color is None:

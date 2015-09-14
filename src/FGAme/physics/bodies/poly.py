@@ -1,8 +1,8 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import Body
 from FGAme.mathtools import Vec2, RotMat2, sin, pi
 from FGAme.mathtools import area, aabb_bbox, center_of_mass, ROG_sqr, shapes
+from . import Body
 
 __all__ = ['Poly', 'RegularPoly', 'Rectangle']
 
@@ -233,13 +233,11 @@ class Rectangle(Poly):
             None, vel, theta, omega, **kwds)
 
 
-@classmethod
 def triangle(cls, sides, pos=(0, 0), **kwds):
     '''Cria um triângulo especificando o tamanho dos lados'''
     pass
 
 
-@classmethod
 def blob(cls, N, scale, pos=(0, 0), **kwds):
     '''Cria um polígono convexo aleatório especificando o número de lados e
     um fator de escala.'''

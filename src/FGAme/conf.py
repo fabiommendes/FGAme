@@ -1,6 +1,32 @@
 # -*- coding: utf8 -*-
 '''
-Define o objeto principal que guarda e altera as configurações da FGAme.
+A FGAme permite modificar os parâmetros de inicialização utilizando as funções
+do módulo :mod:`FGAme.conf`. Nesta estão funções que controlam a inicialização
+do motor de jogos e permitem recuperar o valor de alguns parâmetros globais.
+
+Note que quase todas as funções que modificam o estado global contidas neste
+módulo só podem ser executadas antes de iniciar o loop principal do jogo e de
+definir eventos e callbacks para objetos. Modificar uma propriedade após a
+inicialização quase sempre resultará em um erro.
+
+A inicialização pode ser feita explicitamente invocando a função
+:func:`FGAme.init()` ou implicitamente, quando executamos o loop principal. De
+um modo geral, o programa deve ser organizado assim::
+
+    from FGAme import *
+
+    # Configurações
+    conf.set_resolution(1024, 764)
+    conf.set_backend('sdl2')
+    ...
+    init()
+
+    # Cria objetos
+    world = World()
+    ...
+
+    # Inicia mundo
+    world.run()
 '''
 
 from FGAme.core import log as _log
@@ -8,54 +34,29 @@ from FGAme import backends as _backend_module
 
 
 # --------------------------------------------------------------------------- #
-#                         Propriedades da simulação
+#                       Variáveis globais para o módulo
 # --------------------------------------------------------------------------- #
 _has_init = False
 _app_name = None
 _conf_path = None
-
-# --------------------------------------------------------------------------- #
-#                                  Input
-# --------------------------------------------------------------------------- #
 _input_class = None
 _input_object = None
-
-
-def init_input():
-    '''Inicializa o sistema de inputs de teclado e mouse.'''
-
-    global _input_object, _input_class
-
-    if _input_class is None:
-        set_backend()
-        _input_class = _backend_classes['input']
-
-    _input_object = _input_class()
-    _input_object.init()
-    return _input_object
-
-
-def get_input():
-    '''Retorna o objeto screen inicializado'''
-
-    return _input_object or init_input()
-
-
-# --------------------------------------------------------------------------- #
-#                              Resolução e tela
-# --------------------------------------------------------------------------- #
+_physics_fps = 60
+_physics_dt = 1 / 60.
+_mainloop_class = None
+_mainloop_object = None
 _screen_class = None
 _screen_object = None
 _window_origin = (0, 0)
 _window_shape = None
+_backend = None
+_backends = ['pygame', 'sdl2cffi', 'sdl2', 'pygamegfx', 'pygamegl']
+_backend_classes = None
 
 
-def get_resolution():
-    '''Retorna uma tupla com a (largura, altura) da tela em pixels'''
-
-    return _window_shape or (800, 600)
-
-
+# --------------------------------------------------------------------------- #
+#                     Configuram parâmetros da simulação
+# --------------------------------------------------------------------------- #
 def set_resolution(*args):
     '''Configura a tela com a resolução dada.
 
@@ -80,93 +81,6 @@ def set_resolution(*args):
             'cannot change resolution after screen initialization')
 
 
-def get_screen():
-    '''Retorna o objeto screen inicializado'''
-
-    return _screen_object or init_screen()
-
-
-def init_screen(*args, **kwds):
-    '''Inicializa a tela na resolução padrão de 800x600 ou na resolução
-    especificada pelo usuário usando a função `set_resolution()`'''
-
-    global _screen_class, _screen_object
-
-    if _screen_object is not None:
-        raise RuntimeError('trying to re-init screen object')
-
-    if _screen_class is None:
-        set_backend()
-        _screen_class = _backend_classes['screen']
-
-    if not args:
-        shape = get_resolution()
-        screen = _screen_class(shape=shape, **kwds)
-    elif len(args) == 2:
-        screen = _screen_class(shape=args, **kwds)
-    elif args == ('fullscreen',):
-        screen = _screen_class(shape=args, **kwds)
-
-    # Save environment variables
-    if _window_shape is None:
-        set_resolution(screen.shape)
-    _screen_object = screen
-    screen.init()
-    return screen
-
-
-def show_screen():
-    '''Mostra a tela principal.
-
-    Inicia com os parâmetros definidos, caso a tela ainda não tenha sido
-    criada'''
-
-    (_screen_object or init_screen()).show()
-
-
-# --------------------------------------------------------------------------- #
-#                    Propriedades da simulação/Mainloop
-# --------------------------------------------------------------------------- #
-_physics_fps = 60
-_physics_dt = 1 / 60.
-_mainloop_class = None
-_mainloop_object = None
-
-
-def init_mainloop():
-    '''Inicializa o loop principal.'''
-
-    global _mainloop_class, _mainloop_object
-
-    if _mainloop_class is None:
-        set_backend()
-        _mainloop_class = _backend_classes['mainloop']
-
-    screen = get_screen()
-    input_ = get_input()
-    fps = get_framerate()
-    _mainloop_object = _mainloop_class(screen, input_, fps)
-    return _mainloop_object
-
-
-def get_mainloop():
-    '''Retorna o objeto screen inicializado'''
-
-    return _mainloop_object or init_mainloop()
-
-
-def get_framerate():
-    '''Retorna a taxa de atualização global em frames por segundo'''
-
-    return _physics_fps
-
-
-def get_frame_duration():
-    '''Retorna a duração de cada frame (inverso do framerate) em segundos'''
-
-    return _physics_dt
-
-
 def set_framerate(value):
     '''Configura o número de frames por segundo'''
 
@@ -180,14 +94,6 @@ def set_frame_duration(value):
     '''Configura a duração de um frame de simulação'''
 
     set_framerate(1.0 / value)
-
-
-# --------------------------------------------------------------------------- #
-#                         Propriedades do backend
-# --------------------------------------------------------------------------- #
-_backend = None
-_backends = ['pygame', 'sdl2cffi', 'sdl2', 'pygamegfx', 'pygamegl']
-_backend_classes = None
 
 
 def set_backend(backend=None):
@@ -244,7 +150,9 @@ def set_backend(backend=None):
             raise RuntimeError(msg)
 
 
-###############################################################################
+# --------------------------------------------------------------------------- #
+#                          Funções de inicialização
+# --------------------------------------------------------------------------- #
 def init():
     '''Inicializa todas as classes relevantes do FGAme.
 
@@ -271,3 +179,144 @@ def init():
         init_mainloop()
 
     _has_init = True
+
+
+def init_mainloop(screen=None, input=None, fps=None):  # @ReservedAssignment
+    '''Inicializa o objeto de loop principal.
+
+    Note que esta função não executa o loop principal, mas apenas instancia o
+    objeto que irá coordenar o loop principal quando uma função como
+    :meth:`World.run` for chamada.
+    '''
+
+    global _mainloop_class, _mainloop_object
+
+    if _mainloop_class is None:
+        set_backend()
+        _mainloop_class = _backend_classes['mainloop']
+
+    _set_screen(screen)
+    _set_input(screen)
+    _set_fps(fps)
+    screen = screen or get_screen()
+    input_ = input or get_input()
+    fps = fps or get_framerate()
+    _mainloop_object = _mainloop_class(screen, input_, fps)
+    return _mainloop_object
+
+
+def init_input():
+    '''Inicializa o sistema de inputs de teclado e mouse.'''
+
+    global _input_object, _input_class
+
+    if _input_class is None:
+        set_backend()
+        _input_class = _backend_classes['input']
+
+    _input_object = _input_class()
+    return _input_object
+
+
+def init_screen(*args, **kwds):
+    '''Inicializa a tela na resolução padrão de 800x600 ou na resolução
+    especificada pelo usuário usando a função `set_resolution()`'''
+
+    global _screen_class, _screen_object
+
+    if _screen_object is not None:
+        raise RuntimeError('trying to re-init screen object')
+
+    if _screen_class is None:
+        set_backend()
+        _screen_class = _backend_classes['screen']
+
+    if not args:
+        shape = get_resolution()
+        screen = _screen_class(shape=shape, **kwds)
+    elif len(args) == 2:
+        screen = _screen_class(shape=args, **kwds)
+    elif args == ('fullscreen',):
+        screen = _screen_class(shape=args, **kwds)
+
+    # Save environment variables
+    if _window_shape is None:
+        set_resolution(screen.shape)
+    _screen_object = screen
+    screen.init()
+    return screen
+
+
+# --------------------------------------------------------------------------- #
+#                     Retornam objetos e estados de simulação
+# --------------------------------------------------------------------------- #
+def get_mainloop():
+    '''Retorna o objeto screen inicializado'''
+
+    return _mainloop_object or init_mainloop()
+
+
+def get_input():
+    '''Retorna o objeto screen inicializado'''
+
+    return _input_object or init_input()
+
+
+def get_screen():
+    '''Retorna o objeto screen inicializado'''
+
+    return _screen_object or init_screen()
+
+
+def get_resolution():
+    '''Retorna uma tupla com a (largura, altura) da tela em pixels'''
+
+    return _window_shape or (800, 600)
+
+
+def get_framerate():
+    '''Retorna a taxa de atualização global em frames por segundo'''
+
+    return _physics_fps
+
+
+def get_frame_duration():
+    '''Retorna a duração de cada frame (inverso do framerate) em segundos'''
+
+    return _physics_dt
+
+
+# --------------------------------------------------------------------------- #
+#                                Outras funções
+# --------------------------------------------------------------------------- #
+def show_screen():
+    '''Mostra a tela principal.
+
+    Inicia com os parâmetros definidos, caso a tela ainda não tenha sido
+    criada'''
+
+    (_screen_object or init_screen()).show()
+
+
+# --------------------------------------------------------------------------- #
+#                         Funções privadas
+# --------------------------------------------------------------------------- #
+def _set_var_worker(var, force=False):
+    def func(value):
+        G = globals()
+        obj = G[var]
+        if value is not None:
+            if obj is None or obj is value or force:
+                obj = value
+            else:
+                name = var.strip('_')
+                if name.endswith('_object'):
+                    name = name[:-7]
+                name = name.replace('_', ' ')
+                raise RuntimeError('reseting %s object' % name)
+    return func
+
+_set_screen = _set_var_worker('_screen_object')
+_set_input = _set_var_worker('_input_object')
+_set_mainloop = _set_var_worker('_mainloop_object')
+_set_fps = _set_var_worker('_physics_fps', force=True)

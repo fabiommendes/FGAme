@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 from FGAme.mathtools import null2D, shapes
-from FGAme.physics import Body
+from . import Body
 
 __all__ = ['Circle']
 

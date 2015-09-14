@@ -7,8 +7,11 @@
 Welcome to FGAme's documentation!
 ===================================
 
+.. toctree::
+   :maxdepth: 2
+   
 .. automodule:: FGAme
-
+   
 ==================
 Indices and tables
 ==================

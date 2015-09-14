@@ -18,9 +18,12 @@ class World(EventDispatcher):
 
     def __init__(self, background=None,
                  gravity=None, damping=0, adamping=0,
-                 restitution=1, sfriction=0, dfriction=0,
+                 restitution=1, sfriction=0, dfriction=0, friction=None,
                  bounds=None, max_speed=None,
                  simulation=None, force_init=True):
+
+        if friction is not None:
+            dfriction = sfriction = friction
 
         if force_init:
             conf.init()
@@ -44,6 +47,8 @@ class World(EventDispatcher):
 
         self.is_paused = False
         super(World, self).__init__()
+
+        # Inicia e popula o mundo
         self.init()
 
     background = color_property('background', 'white')
@@ -76,6 +81,11 @@ class World(EventDispatcher):
         if isinstance(obj, (tuple, list)):
             for obj in obj:
                 self.add(obj, layer=layer)
+            return
+
+        # Objetos que implementam update_world()
+        elif hasattr(obj, 'update_world'):
+            obj.update_world(self, layer=layer)
             return
 
         # Adiciona na lista de renderização
@@ -144,10 +154,8 @@ class World(EventDispatcher):
         '''Rotina principal da simulação de física.'''
 
         self.trigger('frame-enter')
-        if self.is_paused:
-            return
-        self._simulation.update(dt)
-        return self._simulation.time
+        if not self.is_paused:
+            self._simulation.update(dt)
 
     # Laço principal ##########################################################
     @lazy

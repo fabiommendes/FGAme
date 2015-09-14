@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-
+from contextlib import contextmanager
 from FGAme.mathtools import Vec2, shapes
 from FGAme.draw import color_property, Color
 
@@ -89,12 +89,28 @@ class Canvas(Screen):
         raise NotImplementedError
 
     # Context managers ########################################################
-    def __enter__(self):
-        if self.background is not None:
-            self.clear_background(self.background)
+    @contextmanager
+    def autoflip(self):
+        '''Ao sair do bloco `with`, executa automaticamente o método flip()'''
 
-    def __exit__(self, *args):
-        self.flip()
+        try:
+            yield None
+        finally:
+            self.flip()
+
+    @contextmanager
+    def painting(self):
+        '''Semelhante ao método `autoflip()`, mas limpa a tela antes de fazer
+        os desenhos.
+
+        Deste modo, somente as imagens referentes aos comandos dentro do bloco
+        serão exibidas.'''
+
+        self.clear_background(self.background or Color('white'))
+        try:
+            yield None
+        finally:
+            self.flip()
 
     # Objetos primitivos ######################################################
     # Estas funções desenham objetos primitivos na tela sem se atentar para
@@ -147,9 +163,14 @@ class Canvas(Screen):
         # TODO: implementar a partir de raw_segment()
         raise NotImplementedError
 
-    def draw_raw_image(self, image, start_pos=(0, 0)):
-        '''Desenha uma imagem na tela'''
+    def draw_raw_texture(self, texture, start_pos=(0, 0)):
+        '''Desenha uma textura na tela'''
         raise NotImplementedError
+
+    def draw_raw_image(self, image):
+        '''Desenha uma imagem na tela'''
+
+        self.draw_raw_texture(image.texture, image.pos_sw)
 
     def clear_background(self, color):
         '''Limpa o fundo com a cor especificada'''
@@ -161,8 +182,8 @@ class Canvas(Screen):
     # da FGAme. Elas desenham um objeto a partir de uma figura primitiva e
     # aplicam automaticamente as transformações de escala, translação e rotação
     # necessárias.
-    def draw_circle(self, circle, solid=True, color=black,
-                    line_width=0.0, line_color=black):
+    def draw_circle(self, circle, solid=None, color=None,
+                    line_width=None, line_color=None):
         '''Desenha um círculo na tela.'''
 
         if not self._direct:
@@ -229,8 +250,7 @@ class Canvas(Screen):
 
     def draw_image(self, image):
         if self._direct:
-            pos = image.pos_sw
-            self.paint_image(pos, image._data)
+            self.draw_raw_image(image)
         else:
             raise NotImplementedError
 

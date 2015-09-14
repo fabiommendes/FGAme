@@ -127,11 +127,9 @@ class FileHandler(logging.Handler):
 
     def _configure(self):
         from time import strftime
-        from easygtk.config import Config
         log_dir = Config.get('kivy', 'log_dir')
         log_name = Config.get('kivy', 'log_name')
 
-        _dir = easygtk.home_dir
         if len(log_dir) and log_dir[0] == '/':
             _dir = log_dir
         else:

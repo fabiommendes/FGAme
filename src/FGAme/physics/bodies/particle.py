@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import Body
+from . import Body
 
 __all__ = ['Particle']
 

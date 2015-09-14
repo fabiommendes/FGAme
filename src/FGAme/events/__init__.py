@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
 '''
-===================
-Controle de eventos
-===================
-
 O controle de despacho de mensagens e eventos é centralizado na classe
 EventDispatcher deste módulo. Ela controla a transmissão de "mensagens" ou
 eventos entre objetos implementado o padrão "observador", onde um objeto pode
@@ -16,10 +12,9 @@ Um exemplo típico da utilidade do despachante de eventos se dá na implementaç
 da resposta às entradas do usuário. Uma parte do motor de jogos deve ser
 dedicada a ler os comandos de teclado, mouse, etc. Ao invés de responder
 explicitamente à cada interação, o sistema de entrada simplesmente anuncia algo
-do tipo: *a tecla
-"p" foi pressionada*. Todos os objetos que estiverem registrados para ouvir
-este evento serão notificados (e assim chamando a função de callback()
-apropriada).
+do tipo: *a tecla "p" foi pressionada*. Todos os objetos que estiverem
+registrados para ouvir este evento serão notificados (e assim chamando a função
+de callback() apropriada).
 
 O sinais associados a cada objeto são definidos durante a criação da classe.
 Vamos começar criando uma classe que define alguns sinais simples.
@@ -321,13 +316,6 @@ sinal.pyname
 {...}
 >>> foo.do_foo.handlers
 []
-
-
-Funções auxiliares
-==================
-
-Na maioria das vezes, não é necessário explicitar qual tipo de sinal deve ser
-utilizado
 '''
 
 __package__ = 'FGAme.events'

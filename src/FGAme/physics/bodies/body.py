@@ -1,10 +1,11 @@
 # -*- coding: utf8 -*-
+import copy
 import six
 from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathtools import Vec2, asvector, sin, cos, sqrt, null2D, shapes
+from FGAme.mathtools import Vec2, asvector, sin, cos, null2D, shapes
 from FGAme.physics.flags import BodyFlags as flags
 from FGAme.physics.forces import ForceProperty
-
+from .body_interfaces import HasAABB, HasGlobalForces, HasInertia
 
 __all__ = ['Body', 'LinearRigidBody']
 
@@ -17,7 +18,22 @@ INERTIA_SCALE = 1
 INF = float('inf')
 
 
+def flag_property(flag):
+    '''Retorna uma propriedade que controla a flag especificada no argumento'''
+
+    def fget(self):
+        return self.flags & flag
+
+    def fset(self, value):
+        if value:
+            self.flags |= flag
+        else:
+            self.flags &= ~flag
+    return property(fget, fset)
+
 # TODO: mover para FGAme.util
+
+
 def do_nothing(*args, **kwds):
     '''A handle that does nothing'''
 
@@ -29,18 +45,6 @@ def raises_method(exception=NOT_IMPLEMENTED):
         raise exception
     return method
 
-
-def popattr(obj, attr, value=None):
-    '''Returns attribute `attr` from `obj` and delete it afterwards.
-    If attribute does not exist, return `value`'''
-
-    try:
-        result = getattr(obj, attr)
-    except AttributeError:
-        return value
-    else:
-        delattr(obj, attr)
-        return result
 
 ###############################################################################
 #          Classes Base --- todos objetos físicos derivam delas
@@ -151,7 +155,7 @@ class PhysElementMeta(EventDispatcherMeta):
 
 
 @six.add_metaclass(PhysElementMeta)
-class Body(object):
+class Body(HasAABB, HasGlobalForces, HasInertia):
 
     '''Classe mãe de todos objetos com propriedades dinâmicas.
 
@@ -403,74 +407,6 @@ class Body(object):
         return self._shape
 
     # Propriedades da caixa de contorno #######################################
-    @property
-    def xmin(self):
-        raise NotImplementedError
-
-    @property
-    def xmax(self):
-        raise NotImplementedError
-
-    @property
-    def ymin(self):
-        raise NotImplementedError
-
-    @property
-    def ymax(self):
-        raise NotImplementedError
-
-    @property
-    def bbox(self):
-        return (self.xmin, self.xmax, self.ymin, self.ymax)
-
-    @property
-    def shape(self):
-        return (self.xmax - self.xmin, self.ymax - self.ymin)
-
-    @property
-    def width(self):
-        return self.xmax - self.xmin
-
-    @property
-    def height(self):
-        return self.ymax - self.ymin
-
-    @property
-    def rect(self):
-        x, y = self.xmin, self.ymin
-        return (x, y, self.xmax - x, self.ymax - y)
-
-    @property
-    def pos_sw(self):
-        return Vec2(self.xmin, self.ymin)
-
-    @property
-    def pos_se(self):
-        return Vec2(self.xmax, self.ymin)
-
-    @property
-    def pos_nw(self):
-        return Vec2(self.xmin, self.ymax)
-
-    @property
-    def pos_ne(self):
-        return Vec2(self.xmax, self.ymax)
-
-    @property
-    def pos_right(self):
-        return Vec2(self.xmax, self.pos.y)
-
-    @property
-    def pos_left(self):
-        return Vec2(self.xmin, self.pos.y)
-
-    @property
-    def pos_up(self):
-        return Vec2(self.pos.x, self.ymax)
-
-    @property
-    def pos_down(self):
-        return Vec2(self.pos.x, self.ymin)
 
     ###########################################################################
     #                          Contatos e vínculos
@@ -543,6 +479,17 @@ class Body(object):
             flag = self._get_flag(flag)
         return bool(self.flags | flag)
 
+    #
+    # Propriedades definidas por flags
+    #
+    can_rotate = flag_property(flags.can_rotate)
+    owns_gravity = flag_property(flags.owns_gravity)
+    owns_damping = flag_property(flags.owns_damping)
+    owns_adamping = flag_property(flags.owns_adamping)
+    owns_restitution = flag_property(flags.owns_restitution)
+    owns_dfriction = flag_property(flags.owns_dfriction)
+    owns_sfriction = flag_property(flags.owns_sfriction)
+
     ###########################################################################
     #        Controle de criação e destruição e interação com o mundo
     ###########################################################################
@@ -565,7 +512,7 @@ class Body(object):
     def is_rogue(self):
         '''Retorna True se o objeto não estiver associado a uma simulação'''
 
-        return self.world is None
+        return (self._world is None)
 
     def destroy(self):
         '''Destrói o objeto físico'''
@@ -575,6 +522,16 @@ class Body(object):
                 self.world.remove(self)
 
         # TODO: desaloca todos os sinais
+
+    def copy(self):
+        '''Cria uma cópia do objeto'''
+
+        try:
+            world, self._world = self._world, None
+            cp = copy.copy(self)
+        finally:
+            self._world = world
+        return cp
 
     ###########################################################################
     #                          Estado dinâmico
@@ -606,64 +563,6 @@ class Body(object):
     ###########################################################################
     force = ForceProperty()
 
-    @property
-    def mass(self):
-        try:
-            return 1.0 / self._invmass
-        except ZeroDivisionError:
-            return float('inf')
-
-    @mass.setter
-    def mass(self, value):
-        value = float(value)
-
-        if value <= 0:
-            raise ValueError('mass cannot be null or negative')
-        elif value != INF:
-            self._density = value / self.area()
-            if self._invinertia:
-                inertia = value * self.ROG_sqr()
-                self._invinertia = 1.0 / inertia
-            self._invmass = 1.0 / value
-        else:
-            self._invmass = 0.0
-            self._invinertia = 0.0
-
-    @property
-    def inertia(self):
-        try:
-            return 1.0 / self._invinertia
-        except ZeroDivisionError:
-            return INF
-
-    @inertia.setter
-    def inertia(self, value):
-        value = float(value)
-
-        if self.flags & flags.can_rotate:
-            if value <= 0:
-                raise ValueError('inertia cannot be null or negative')
-            elif value != INF:
-                self._invinertia = 1.0 / value
-            else:
-                self._invinertia = 0.0
-        else:
-            self._raise_cannot_rotate_error()
-
-    @property
-    def density(self):
-        return self._density
-
-    @density.setter
-    def density(self, value):
-        rho = float(value)
-        self._density = rho
-        if self._invmass:
-            self._invmass = 1.0 / (self.area() * rho)
-        if self._invinertia:
-            self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
-
-    # Grandezas físicas derivadas
     def linearE(self):
         '''Energia cinética das variáveis lineares'''
 
@@ -712,24 +611,6 @@ class Body(object):
             return delta + self._omega / self._invinertia
         else:
             return delta
-
-    ###########################################################################
-    #                        Propriedades Geométricas
-    ###########################################################################
-    def area(self):
-        '''Retorna a área do objeto'''
-
-        return self._baseshape.area
-
-    def ROG_sqr(self):
-        '''Retorna o raio de giração ao quadrado'''
-
-        return self._baseshape.ROG_sqr
-
-    def ROG(self):
-        '''Retorna o raio de giração'''
-
-        return sqrt(self.ROG_sqr)
 
     ###########################################################################
     #                      Aplicação de forças e torques
@@ -949,306 +830,6 @@ class Body(object):
         '''Aplica um impulso angular ao objeto.'''
 
         self.aboost(itorque / self.inertia)
-
-    ###########################################################################
-    #                    Controle de forças locais/globais
-    ###########################################################################
-
-    @property
-    def gravity(self):
-        return self._gravity
-
-    @gravity.setter
-    def gravity(self, value):
-        try:
-            self._gravity = Vec2(*value)
-        except TypeError:
-            self._gravity = Vec2(0, -value)
-        self.flags |= flags.owns_gravity
-
-    @property
-    def damping(self):
-        return self._damping
-
-    @damping.setter
-    def damping(self, value):
-        self._damping = float(value)
-        self.flags |= flags.owns_damping
-
-    @property
-    def adamping(self):
-        return self._adamping
-
-    @adamping.setter
-    def adamping(self, value):
-        self._adamping = float(value)
-        self.flags |= flags.owns_adamping
-
-    @property
-    def restitution(self):
-        return self._restitution
-
-    @restitution.setter
-    def restitution(self, value):
-        self._restitution = float(value)
-        self.flags |= flags.owns_restitution
-
-    @property
-    def dfriction(self):
-        return self._dfriction
-
-    @dfriction.setter
-    def dfriction(self, value):
-        self._dfriction = float(value)
-        self.flags |= flags.owns_dfriction
-
-    @property
-    def sfriction(self):
-        return self._sfriction
-
-    @sfriction.setter
-    def sfriction(self, value):
-        self._sfriction = float(value)
-        self.flags |= flags.owns_sfriction
-
-    @property
-    def owns_gravity(self):
-        return bool(self.flags & flags.owns_gravity)
-
-    @property
-    def owns_damping(self):
-        return bool(self.flags & flags.owns_damping)
-
-    @property
-    def owns_adamping(self):
-        return bool(self.flags & flags.owns_adamping)
-
-    @property
-    def owns_restitution(self):
-        return bool(self.flags & flags.owns_restitution)
-
-    @property
-    def owns_dfriction(self):
-        return bool(self.flags & flags.owns_dfriction)
-
-    @property
-    def owns_sfriction(self):
-        return bool(self.flags & flags.owns_sfriction)
-
-    ###########################################################################
-    #               Manipulação/consulta do estado dinâmico
-    ###########################################################################
-    # Simplificar e usar apenas a massa e a flag can_rotate como quesito de
-    # teste.
-    # FIXME: Alterar as flags nas funções make_*
-    def is_dynamic(self, what=None):
-        '''Retorna True se o objeto for dinâmico ou nas variáveis lineares ou
-        nas angulares. Um objeto é considerado dinâmico nas variáveis lineares
-        se possuir massa finita. De maneira análoga, o objeto torna-se dinâmico
-        nas variáveis angulares se possuir momento de inércia finito.
-
-        Opcionalmente pode especificar um parâmetro posicional 'linear',
-        'angular', 'both' or 'any' (padrão) para determinar o tipo de consulta
-        a ser realizada'''
-
-        if what is None or what == 'any':
-            return self.is_dynamic_linear() or self.is_dynamic_angular()
-        elif what == 'both':
-            return self.is_dynamic_linear() and self.is_dynamic_angular()
-        elif what == 'linear':
-            return self.is_dynamic_linear()
-        elif what == 'angular':
-            return self.is_dynamic_angular()
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def is_dynamic_linear(self):
-        '''Verifica se o objeto é dinâmico nas variáveis lineares'''
-
-        return bool(self._invmass)
-
-    def is_dynamic_angular(self):
-        '''Verifica se o objeto é dinâmico nas variáveis angulares'''
-
-        return bool(self._invinertia)
-
-    def make_dynamic(self, what=None, restore_speed=True):
-        '''Resgata a massa, inércia e velocidades anteriores de um objeto
-        paralizado pelo método `obj.make_static()` ou `obj.make_kinematic()`.
-
-        Aceita um argumento com a mesma semântica de is_dynamic()
-        '''
-
-        if what is None or what == 'both':
-            self.make_dynamic_linear(restore_speed)
-            self.make_dynamic_angular(restore_speed)
-        elif what == 'linear':
-            self.make_dynamic_linear(restore_speed)
-        elif what == 'angular':
-            self.make_dynamic_angular(restore_speed)
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def make_dynamic_linear(self, restore_speed=True):
-        '''Resgata os parâmetros dinâmicos lineares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        if not self.is_dynamic_linear():
-            self._invmass = 1.0 / (self.area() * self._density)
-
-            # Resgata a velocidade
-            if restore_speed and self._vel.is_null():
-                self._vel = popattr(self, '_old_vel', null2D)
-
-    def make_dynamic_angular(self, restore_speed=True):
-        '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        if not self.is_dynamic_angular():
-            self._inertia = 1.0 / (self._density * self.ROG_sqr())
-
-            # Resgata a velocidade
-            if restore_speed and self._omega == 0:
-                self._omega = popattr(self, '_old_omega', 0.0)
-
-    # Kinematic ###############################################################
-    def is_kinematic(self, what=None):
-        '''Retorna True se o objeto for cinemático ou nas variáveis lineares ou
-        nas angulares. Um objeto é considerado cinemático (em uma das
-        variáveis) se não for dinâmico. Se, além de cinemático, o objeto
-        possuir velocidade nula, ele é considerado estático.
-
-        Opcionalmente pode especificar um parâmetro posicional 'linear',
-        'angular', 'both' (padrão) or 'any' para determinar o tipo de consulta
-        a ser realizada.
-        '''
-
-        if what is None or what == 'both':
-            return not (self.is_dynamic_linear() or self.is_dynamic_angular())
-        elif what == 'any':
-            return (
-                not self.is_dynamic_linear()) or (
-                not self.is_dynamic_angular())
-        elif what == 'linear':
-            return not self.is_dynamic_linear()
-        elif what == 'angular':
-            return not self.is_dynamic_angular()
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def is_kinematic_linear(self):
-        '''Verifica se o objeto é dinâmico nas variáveis lineares'''
-
-        return not self.is_dynamic_linear()
-
-    def is_kinematic_angular(self):
-        '''Verifica se o objeto é dinâmico nas variáveis angulares'''
-
-        return not self.is_dynamic_angular()
-
-    def make_kinematic(self, what=None):
-        '''Define a massa e/ou inércia como infinito.
-
-        Aceita um argumento com a mesma semântica de is_kinematic()
-        '''
-
-        if what is None or what == 'both':
-            self.make_kinematic_linear()
-            self.make_kinematic_angular()
-        elif what == 'linear':
-            self.make_kinematic_linear()
-        elif what == 'angular':
-            self.make_kinematic_angular()
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def make_kinematic_linear(self):
-        '''Resgata os parâmetros dinâmicos lineares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        self._invmass = 0.0
-
-    def make_kinematic_angular(self):
-        '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        self._invinertia = 0.0
-
-    # Static ##################################################################
-    def is_static(self, what=None):
-        '''Retorna True se o objeto for estatático nas variáveis lineares e
-        nas angulares. Um objeto é considerado estático (em uma das variáveis)
-        se além de cinemático, a velocidade for nula.
-
-        Opcionalmente pode especificar um parâmetro posicional 'linear',
-        'angular', 'both' (padrão) or 'any' para determinar o tipo de consulta
-        a ser realizada'''
-
-        if what is None or what == 'both':
-            return self.is_static_linear() and self.is_static_angular()
-        elif what == 'any':
-            return self.is_static_linear() or self.is_static_angular()
-        elif what == 'linear':
-            return self.is_static_linear()
-        elif what == 'angular':
-            return self.is_static_angular()
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def is_static_linear(self):
-        '''Verifica se o objeto é dinâmico nas variáveis lineares'''
-
-        return self.is_kinematic_linear() and self._vel == null2D
-
-    def is_static_angular(self):
-        '''Verifica se o objeto é dinâmico nas variáveis angulares'''
-
-        return self.is_kinematic_angular() and self._omega == 0
-
-    def make_static(self, what=None):
-        '''Define a massa e/ou inércia como infinito.
-
-        Aceita um argumento com a mesma semântica de is_static()
-        '''
-
-        if what is None or what == 'both':
-            self.make_static_linear()
-            self.make_static_angular()
-        elif what == 'linear':
-            self.make_static_linear()
-        elif what == 'angular':
-            self.make_static_angular()
-        else:
-            raise ValueError('unknown mode: %r' % what)
-
-    def make_static_linear(self):
-        '''Resgata os parâmetros dinâmicos lineares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        self.make_kinematic_linear()
-        self._old_vel = self._vel
-        self._vel = null2D
-
-    def make_static_angular(self):
-        '''Resgata os parâmetros dinâmicos angulares de um objeto estático ou
-        cinemático paralizado pelos métodos `obj.make_static()` ou
-        `obj.make_kinematic()`.'''
-
-        self.make_kinematic_angular()
-        self._old_omega = self._omega
-        self._omega = 0.0
-
-    ###########################################################################
-    # Erros e miscelânea
-    ###########################################################################
-    def _raise_cannot_rotate_error(self):
-        raise ValueError('Cannot change angular variables with disabled '
-                         '`can_rotate` flag')
 
 
 def vec_property(slot):

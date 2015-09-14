@@ -1,9 +1,5 @@
 # -*- coding: utf8 -*-
 from FGAme.mathtools import Vec2, asvector, null2D
-from FGAme.physics.flags import BodyFlags
-from FGAme.util import lazy
-from math import exp
-
 
 ###############################################################################
 #                 Pontos de Contato/Manifolds

@@ -180,12 +180,13 @@ class move_by(move_to):
 
     def runner(self, dt, target, **kwds):
         time = 0
-        interval = self.interval
-        delta = self.pos * (dt / (self.interval))
+        interval = self.duration
+        delta = self.pos * (dt / interval)
 
         while time < interval:
             time += dt
             target.pos += delta
+            yield
 
 
 class place_at(InstantAction):
@@ -244,11 +245,9 @@ class call_function(InstantAction):
 
 class loop(ActionModifier):
 
-    def __init__(self, action, iterations='forever'):
+    def __init__(self, action, iterations=None):
         super(loop, self).__init__(action)
-        if iterations == 'forever':
-            self.iterations = float('inf')
-        self.iterations = iterations
+        self.iterations = float('inf') if iterations is None else iterations
 
     def runner(self, *args, **kwds):
         i = 0
@@ -312,7 +311,7 @@ class set_trajectory(Action):
 class set_attribute(InstantAction):
 
     def __init__(self, attribute, value):
-        self.attribute = property
+        self.attribute = attribute
         self.value = value
 
     def execute(self, target, **kwds):
@@ -326,6 +325,14 @@ class set_color(InstantAction):
 
     def execute(self, target, **kwds):
         target.color = self.color
+
+
+class set_velocity(set_attribute):
+
+    def __init__(self, velocity, vy=None):
+        if vy is not None:
+            velocity = (velocity, vy)
+        super(set_velocity, self).__init__('vel', velocity)
 
 
 class color_effect(IntervalAction):
@@ -419,7 +426,7 @@ class step_forward(IntervalAction):
             target.pos += Vec2.from_polar(delta, target.theta)
 
 
-if __name__ == '__main__' or True:
+if __name__ == '__main__':
     from FGAme import *
     w = World()
     circles = [draw.Circle(10, pos=pos.middle) for _ in range(20)]

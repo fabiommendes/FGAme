@@ -17,7 +17,8 @@ class MainLoop(EventDispatcher):
           executar ações pertinentes.
         * Atualizar o estado de jogo
         * Atualizar a visualização
-        * Tentar manter uma taxa de atualização fixa (se o computador permitir)
+        * Tentar manter uma taxa de atualização fixa (se a capacidade de
+          processamento do computador permitir)
         * Agendar tarefas
         * Gerenciar os estados de jogo (ex., coordenar entre estados de menu,
           jogo, configuração, etc)

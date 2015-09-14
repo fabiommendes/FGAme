@@ -208,18 +208,7 @@ class AABB(shapes.mAABB, Shape):
     __init__ = lazy_shape_init
 
 
-class Image(AABB):
-
-    '''Define uma imagem/pixmap não-animado'''
-
-    # manager = PyGameTextureManager()
-    canvas_primitive = 'image'
-
-    def __init__(self, path, pos=(0, 0), reference='center'):
-        raise
-
-
-class Sprite(Image):
+class Sprite(AABB):
 
     '''Define uma image animada. O controle de frames é feito a cada chamada
     do método draw(). Desta forma, caso o método seja chamado duas vezes por

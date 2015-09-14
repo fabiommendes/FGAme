@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 import types
 
-__all__ = ['lazy', 'delegate_to', 'autodoc']
+__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr']
 
 
 class lazy(object):
@@ -100,6 +100,19 @@ def autodoc(cls):
             value.__doc__ = doc
 
     return cls
+
+
+def popattr(obj, attr, value=None):
+    '''Returns attribute `attr` from `obj` and delete it afterwards.
+    If attribute does not exist, return `value`'''
+
+    try:
+        result = getattr(obj, attr)
+    except AttributeError:
+        return value
+    else:
+        delattr(obj, attr)
+        return result
 
 
 if __name__ == '__main__':

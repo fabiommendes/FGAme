@@ -4,7 +4,7 @@ import sys
 import setuptools
 from setuptools import setup
 
-VERSION = '0.4a3'
+VERSION = '0.4a5'
 AUTHOR = 'Fábio Macêdo Mendes'
 IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
@@ -16,7 +16,7 @@ base, _ = os.path.split(__file__)
 path = os.path.join(base, 'src', 'FGAme', 'meta.py')
 with open(path, 'w') as F:
     F.write(
-        '# Auto-generated file. Please do not edit'
+        '# Auto-generated file. Please do not edit\n'
         '__version__ = %r\n' % VERSION +
         '__author__ = %r\n' % AUTHOR)
 

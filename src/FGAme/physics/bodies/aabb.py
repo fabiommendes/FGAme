@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.physics import LinearRigidBody
+from . import LinearRigidBody
 from FGAme.mathtools import sqrt, shapes
 
 __all__ = ['AABB']

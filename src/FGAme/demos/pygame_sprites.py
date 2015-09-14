@@ -13,7 +13,7 @@ world = World()
 Circle(20, (500, 500), world=world)
 
 # Cria a caixa e a imagem associada
-imgs = [pygame.image.load('alien%s.gif' % i) for i in range(1, 4)]
+imgs = [pygame.image.load('resources/alien%s.gif' % i) for i in range(1, 4)]
 _x, _y, dx, dy = imgs[0].get_rect()
 box = AABB(0, dx, 0, dy, color=None, world=world)
 
@@ -36,7 +36,7 @@ def draw_sprite(screen):
     screen.draw_circle(shapes.Circle(40, Vec2(400, 300)))
 
     # Recupera o Surface para utilizar manualmente as funções do pygame
-    pg_screen = screen.get_screen()
+    pg_screen = screen.get_pygame_screen()
     pg_screen.blit(imgs[int(idx % 3)], (box.xmin, 600 - box.ymax, dx, dy))
 
 
