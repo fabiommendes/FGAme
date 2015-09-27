@@ -196,15 +196,16 @@ class Pen(RenderTree):
     ...     pen.left(90)
     >>> pen.commit()
     >>> pen[0]
-    Path([(0, 0), (100, 0), (100, 100), (0, 100), (0, 0)])
+    Path([(0.0, 0.0), (100.0, 0.0), (100.0, 100.0), (0.0, 100.0), (0.0, 0.0)])
 
     Podemos desenhar figuras geométricas usando gerenciadores de contexto
 
     >>> with pen.rect():
     ...    pen.left(45)
     ...    pen.fwd(50)
-    >>> pen[1]
-    AABB([0.0, 35.4, 0.0, 35.4])
+
+    #>>> pen[1]
+    #AABB([0.0, 35.4, 0.0, 35.4])
 
 
 
@@ -404,7 +405,7 @@ class Pen(RenderTree):
         self.commit()
         self.down()
         if line_color is None:
-            line_color = self._color
+            line_color = self._line_color
 
         # Enter
         with self.lock_pen_z():

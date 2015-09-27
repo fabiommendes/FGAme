@@ -18,12 +18,9 @@ class World(EventDispatcher):
 
     def __init__(self, background=None,
                  gravity=None, damping=0, adamping=0,
-                 restitution=1, sfriction=0, dfriction=0, friction=None,
+                 restitution=1, friction=0,
                  bounds=None, max_speed=None,
                  simulation=None, force_init=True):
-
-        if friction is not None:
-            dfriction = sfriction = friction
 
         if force_init:
             conf.init()
@@ -40,8 +37,7 @@ class World(EventDispatcher):
                 damping=damping,
                 adamping=adamping,
                 restitution=restitution,
-                sfriction=sfriction,
-                dfriction=dfriction,
+                friction=friction,
                 max_speed=max_speed,
                 bounds=bounds)
 
@@ -250,7 +246,8 @@ class World(EventDispatcher):
     ###########################################################################
     #                         Funções úteis
     ###########################################################################
-    def register_energy_tracker(self, auto_connect=True, ratio=True):
+    def register_energy_tracker(self, auto_connect=True, ratio=True,
+                                raise_on_change=None):
         '''Retorna uma função que rastreia a energia total do mundo a cada
         frame e imprime sempre que houver mudança na energia total.
 
@@ -262,15 +259,23 @@ class World(EventDispatcher):
         "frame-enter", a não ser que ``auto_conect=False``.
         '''
 
-        last = [None]
+        last = None
+        if raise_on_change is None:
+            raise_on_change = conf.DEBUG
 
         if ratio:
             def energy_tracker():
+                nonlocal last
                 total = self._simulation.energy_ratio()
-                if (last[0] is None) or (abs(total - last[0]) > 1e-6):
-                    last[0] = total
-                    print('Energia total / energia inicial:', total)
+                if (last is None) or (abs(total - last) > 1e-6):
+                    msg = 'Energia total / energia inicial: %s' % total
 
+                    if (last is not None) and raise_on_change:
+                        raise ValueError(msg)
+                    else:
+                        if not conf.DEBUG:
+                            print(msg)
+                    last = total
         else:
             def energy_tracker():
                 raise NotImplementedError

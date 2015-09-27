@@ -1,12 +1,15 @@
-from math import trunc
 import ctypes
+from math import trunc
+
 import sdl2
 import sdl2.ext as sdl2_ext
 import sdl2.sdlgfx as gfx
+
 from FGAme.core.screen import Canvas
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color
+from FGAme import conf
 
 #
 # Module constants
@@ -33,7 +36,7 @@ class SDL2Canvas(Canvas):
         # Create window
         self._window = self._no_null(
             sdl2.SDL_CreateWindow(
-                b"FGAme App",
+                b"FGAme Game",
                 sdl2.SDL_WINDOWPOS_CENTERED,
                 sdl2.SDL_WINDOWPOS_CENTERED,
                 self.width,
@@ -128,6 +131,7 @@ class SDL2Canvas(Canvas):
     def _get_poly_xy(self, poly):
         '''Implementação comum que cria lista de posições x e y para passsar
         para draw_raw_poly_solid e draw_raw_poly_border'''
+
         N = len(poly)
         height = self.height
         int16_array = ctypes.c_int16 * N
@@ -202,38 +206,58 @@ class SDL2Input(Input):
 
     '''Objetos do tipo listener.'''
 
-    #=========================================================================
-    # Conversões entre strings e teclas
-    #=========================================================================
-# Setas direcionais
-#     KEY_CONVERSIONS = {
-#         'up': SDLK_UP, 'down': SDLK_DOWN, 'left': SDLK_LEFT, 'right': SDLK_RIGHT,
-#         'return': SDLK_RETURN, 'space': SDLK_SPACE, 'enter': SDLK_RETURN,
-#     }
-#
-# Adiciona as letras e números
-#     chars = '0123456789' + string.ascii_lowercase
-#     for c in chars:
-#         KEY_CONVERSIONS[c] = getattr(sdl2, 'SDLK_' + c)
+    # Keyboard key codes
+    _key_transformations = {}
+    _key_conversions = {}
+    for attr in dir(sdl2):
+        if attr.startswith('SDLK_'):
+            value = getattr(sdl2, attr)
+            name = attr[5:].lower()
+            name = _key_transformations.get(name, name)
+            _key_conversions[value] = name
+    del name, value, attr
 
-    #=========================================================================
-    # Laço principal de escuta de eventos
-    #=========================================================================
+    # Mouse buttons
+    _mouse_conversions = {
+        sdl2.mouse.SDL_BUTTON_LEFT: 'left',
+        sdl2.mouse.SDL_BUTTON_MIDDLE: 'middle',
+        sdl2.mouse.SDL_BUTTON_RIGHT: 'right',
+        sdl2.mouse.SDL_BUTTON_X1: 'wheel-up',
+        sdl2.mouse.SDL_BUTTON_X2: 'wheel-down'
+    }
 
     def poll(self):
+        key_get = self._key_conversions.get
+        mouse_button_get = self._mouse_conversions.get
+        window_height = conf.get_resolution()[1]
+
         for event in sdl2_ext.get_events():
             if event.type == sdl2.SDL_QUIT:
                 raise SystemExit
             elif event.type == sdl2.SDL_KEYDOWN:
-                self.on_key_down(event.key.keysym.sym)
+                self.process_key_down(key_get(event.key.keysym.sym))
             elif event.type == sdl2.SDL_KEYUP:
-                self.on_key_up(event.key.keysym.sym)
+                self.process_key_up(key_get(event.key.keysym.sym))
             elif event.type == sdl2.SDL_MOUSEMOTION:
-                # TODO: converter para coordenadas locais em screen
-                # self.on_mouse_motion(event.pos)
-                pass
+                event = event.motion
+                x = event.x
+                y = window_height - event.y
+                self.process_mouse_motion((x, y))
+            elif event.type == sdl2.SDL_MOUSEBUTTONUP:
+                event = event.button
+                x = event.x
+                y = window_height - event.y
+                button = mouse_button_get(event.button)
+                self.process_mouse_button_up(button, (x, y))
+            elif event.type == sdl2.SDL_MOUSEBUTTONDOWN:
+                event = event.button
+                x = event.x
+                y = window_height - event.y
+                button = mouse_button_get(event.button)
+                self.process_mouse_button_down(button, (x, y))
 
-        # self.on_long_press()
+        self.process_long_press()
+        self.process_mouse_longpress()
 
 
 class SDL2MainLoop(MainLoop):

@@ -83,19 +83,18 @@ class Input(EventDispatcher):
         for button in self._longpress_mouse_buttons:
             callback(button, pos)
 
-    ###########################################################################
-    #             Passo de resposta a eventos executado em cada loop
-    ###########################################################################
+    #
+    # Consulta as entradas de comandos pelo usuário
+    #
     def poll(self):
         '''Função executada a cada loop, que investiga todos os eventos de
         usuários que ocorreram. Deve ser reimplementada nas classes filho'''
 
         raise NotImplementedError
 
-    ###########################################################################
-    #                     Funções exportadas para o módulo
-    ###########################################################################
-
+    #
+    # Funções utilizadas como funções globais no módulo FGAme.input
+    #
     def _on_key_down(self, key, func=None, *args, **kwds):
         '''Registra função func para ser executada no frame em que a tecla
         fornecida for pressionada'''

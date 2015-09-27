@@ -32,10 +32,10 @@ um modo geral, o programa deve ser organizado assim::
 from FGAme.core import log as _log
 from FGAme import backends as _backend_module
 
-
 # --------------------------------------------------------------------------- #
 #                       Variáveis globais para o módulo
 # --------------------------------------------------------------------------- #
+DEBUG = False
 _has_init = False
 _app_name = None
 _conf_path = None
@@ -50,13 +50,13 @@ _screen_object = None
 _window_origin = (0, 0)
 _window_shape = None
 _backend = None
-_backends = ['pygame', 'sdl2cffi', 'sdl2', 'pygamegfx', 'pygamegl']
+_backends = ['sdl2', 'sdl2cffi', 'pygamegfx', 'pygame']
 _backend_classes = None
 
 
-# --------------------------------------------------------------------------- #
-#                     Configuram parâmetros da simulação
-# --------------------------------------------------------------------------- #
+#
+# Configuram parâmetros da simulação
+#
 def set_resolution(*args):
     '''Configura a tela com a resolução dada.
 
@@ -100,8 +100,9 @@ def set_backend(backend=None):
     '''Define o backend a ser utilizado pela FGAme.
 
     Se for chamada sem nenhum argumento, tenta carregar os backends na
-    ordem dada por _backends. Se o argumento for uma lista, tenta
-    carregar os backends na ordem especificada pela lista.'''
+    ordem padrão. Se o argumento for uma lista, tenta carregar os backends na
+    ordem especificada pela lista. Retorna uma string descrevendo o backend
+    carregado.'''
 
     global _backend, _backend_classes
 
@@ -148,11 +149,24 @@ def set_backend(backend=None):
                     # '\n    * kivy'
                 )
             raise RuntimeError(msg)
+    return _backend
 
 
-# --------------------------------------------------------------------------- #
-#                          Funções de inicialização
-# --------------------------------------------------------------------------- #
+def get_backend(force=False):
+    '''Retorna uma string com o backend incializado.
+
+    Caso nenhum backend tenha sido inicializado, retorna None. Se o argumento
+    `force` for verdadeiro, força a inicialização de algum backend.'''
+
+    if force and _backend is None:
+        return set_backend()
+    return _backend
+
+#
+# Funções de inicialização
+#
+
+
 def init():
     '''Inicializa todas as classes relevantes do FGAme.
 
@@ -247,9 +261,9 @@ def init_screen(*args, **kwds):
     return screen
 
 
-# --------------------------------------------------------------------------- #
-#                     Retornam objetos e estados de simulação
-# --------------------------------------------------------------------------- #
+#
+# Retornam objetos e estados de simulação
+#
 def get_mainloop():
     '''Retorna o objeto screen inicializado'''
 
@@ -286,9 +300,9 @@ def get_frame_duration():
     return _physics_dt
 
 
-# --------------------------------------------------------------------------- #
-#                                Outras funções
-# --------------------------------------------------------------------------- #
+#
+# Outras funções
+#
 def show_screen():
     '''Mostra a tela principal.
 
@@ -298,9 +312,9 @@ def show_screen():
     (_screen_object or init_screen()).show()
 
 
-# --------------------------------------------------------------------------- #
-#                         Funções privadas
-# --------------------------------------------------------------------------- #
+#
+# Funções privadas
+#
 def _set_var_worker(var, force=False):
     def func(value):
         G = globals()

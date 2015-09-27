@@ -3,15 +3,10 @@ import random
 conf.set_framerate(60)
 
 
-def random_color():
-    return random.choice(['black', 'red', 'green', 'blue'])
-    return [int(random.random() * 255) for _ in range(3)]
-
 world = World()
 circle_list = []
 for _ in range(5):
-    color = random_color()
-    circle = Circle(50, pos=pos.middle, world=world, color=color)
+    circle = Circle(50, pos=pos.middle, world=world, color='random')
     circle_list.append(circle)
 
 o1 = AABB(pos=pos.middle, shape=(80, 71))

@@ -14,7 +14,7 @@ tree.add(
     Path([(0, 0), (200, 300), (300, 50), (800, 600)], color='red', width=20))
 
 # Cria um objeto Canvas com a geometria da tela
-canvas = conf.init_canvas(800, 600)
+canvas = conf.init_screen(800, 600)
 canvas.show()
 white = Color('white')
 

@@ -19,6 +19,9 @@ class GravityWorld(World):
         # Redefinimos a constante de amortecimento
         self.damping = 0.5
 
+        # Definimos uma margem de 10px de espessura
+        self.add_bounds(width=10)
+
     @listen('key-down', 'space')
     def toggle(self):
         self.toggle_pause()
@@ -39,6 +42,22 @@ class GravityWorld(World):
     def move_down(self):
         self.A.move(0, -5)
 
+    @listen('mouse-button-down', 'left')
+    def add_circle(self, pos):
+        self.pause()
+        self.circle = Circle(20, pos=pos, color='random')
+        self.line = draw.Segment(pos, pos)
+        self.add([self.circle, self.line])
+
+    @listen('mouse-long-press', 'left')
+    def set_circle_velocity(self, pos):
+        self.line.end = pos
+
+    @listen('mouse-button-up', 'left')
+    def launch_circle(self, pos):
+        self.unpause()
+        self.remove(self.line)
+        self.circle.boost(4 * self.line.direction)
 
 if __name__ == '__main__':
     world = GravityWorld()

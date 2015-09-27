@@ -184,7 +184,7 @@ if __name__ == '__main__':
 
     w = World()
     tm = TileManager((30, 30))
-    tm.register_spec('brick', 'x', color='red', image='python-logo')
+    tm.register_spec('brick', 'x', color='red')
     tm.register_spec('coin', 'o', mode='circle', color='yellow')
     tm.register_spec('spike', 'i', color='black')
     tm.add_tileset(ts)

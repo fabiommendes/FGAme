@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
+from math import sqrt
 from FGAme.mathtools import Vec2, asvector, null2D
 
-###############################################################################
-#                 Pontos de Contato/Manifolds
-###############################################################################
+#
+# Pontos de Contato/Manifolds
+#
 
 
 class ContactPoint(Vec2):
@@ -19,7 +20,7 @@ class ContactPoint(Vec2):
 
 class BaseContactManifold(object):
 
-    '''Classe mãe para ContactManifold e SimpleContactManifold'''
+    '''Classe mãe para ContactManifold restitution SimpleContactManifold'''
 
     def __iter__(self):
         return iter(self.points)
@@ -55,13 +56,12 @@ class SimpleContactManifold(BaseContactManifold):
         yield self.point
 
 
-###############################################################################
-#                           Contatos abstratos
-###############################################################################
-
+#
+# Contatos abstratos
+#
 class Pair(object):
 
-    '''Representa alguma ligação/conexão entre dois objetos'''
+    '''Representa alguma ligação, conexão ou agrupamento de dois objetos'''
 
     __slots__ = ('A', 'B')
 
@@ -69,26 +69,25 @@ class Pair(object):
         self.A = A
         self.B = B
 
-    def _constructor(self, A, B):
-        '''Cria um novo objeto tipo Pair a partir dos dois objetos
-        fornecidos'''
+    def swap(self):
+        '''Troca os dois objetos do par *INPLACE*'''
 
-        return type(self)(A, B)
+        self.B, self.A = self.A, self.B
 
     def swapped(self):
-        '''Retorna uma colisão com o papel dos objetos A e B trocados'''
+        '''Retorna um par com os elementos trocados'''
 
-        A, B = self.objects
-        return self._constructor(B, A)
+        new = self.copy()
+        new.swap()
+        return new
 
     def other(self, obj):
         '''Se for chamada com o objeto A, retorna o objeto B e vice-versa'''
 
-        A, B = self.objects
-        if obj is A:
-            return B
-        elif obj is B:
-            return A
+        if obj is self.A:
+            return self.B
+        elif obj is self.B:
+            return self.A
         else:
             raise ValueError('object does not participate in the connection')
 
@@ -104,7 +103,26 @@ class Pair(object):
 
         raise NotImplementedError
 
-    # __magic__ ###############################################################
+    #
+    # Propriedades físicas
+    #
+    def center_of_mass(self):
+        A, B = self
+        return (A. mass * A.pos + B.mass * B.pos) / (A.mass + B.mass)
+
+    def energyK(self):
+        return self.A.energyK() + self.B.energyK()
+
+    def momentumP(self):
+        return self.A.momentumP() + self.B.momentumP()
+
+    def momentumL(self):
+        pos = (0, 0)
+        return self.A.momentumL(pos) + self.B.momentumL(pos)
+
+    #
+    # Magic methods
+    #
     def __eq__(self, other):
         return self is other
 
@@ -123,13 +141,8 @@ class Pair(object):
         yield self.A
         yield self.B
 
-    def __getattr_(self, attr):
-        if not attr.startswith('get_'):
-            value = getattr(self, 'get_' + attr)()
-            setattr(self, value)
-            return value
-        else:
-            raise AttributeError(attr)
+    def __contains__(self, element):
+        return element is self.A or element is self.B
 
 
 class BroadContact(Pair):
@@ -172,8 +185,8 @@ class Collision(Pair):
 
     '''Representa a colisão entre dois objetos.
 
-    Subclasses de Collision devem implementar o método .resolve(dt) que resolve
-    a colisão entre os objetos respeitando os vínculos de is_dynamic*.
+    Subclasses de Collision devem implementar o método .resolve() que resolve
+    a colisão entre os dois objetos.
 
     Example
     -------
@@ -192,40 +205,40 @@ class Collision(Pair):
     ...                 pos=(1, 1),    # ponto de colisão
     ...                 normal=(1, 0)) # normal da colisão
 
-    Podemos investigar as propriedades físicas da colisão e verificar que as
-    leis de conservação são preservadas
+    Podemos investigar as propriedades físicas da colisão restitution verificar
+    que as leis de conservação são preservadas
 
-    >>> col.kineticE(); col.momentumP(); col.momentumL()
+    >>> col.energyK(); col.momentumP(); col.momentumL()
     0.5
-    Vec2(1, 0)
+    Vec(1, 0)
     -1.0
 
     Podemos resolver a colisão utilizando ou o método step() ou o resolve(). O
-    segundo é chamado apenas uma vez e já aciona os sinais de colisão. O método
-    step() é utilizado em resoluções iterativas com vários objetos colidindo
-    simultaneamente.
+    segundo é chamado apenas uma vez restitution já aciona os sinais de
+    colisão. O método step() é utilizado em resoluções iterativas com vários
+    objetos colidindo simultaneamente.
 
     >>> col.resolve()
 
-    Agora investigamos os valores finais e vemos que as leis de conservação
-    foram satisfeitas.
+    Agora investigamos os valores finais restitution vemos que as leis de
+    conservação foram satisfeitas.
 
-    >>> col.kineticE(); col.momentumP(); col.momentumL()
+    >>> col.energyK(); col.momentumP(); col.momentumL()
     0.5
-    Vec2(1, 0)
+    Vec(1, 0)
     -1.0
 
     Investigando as propriedades, verificamos que de fato a velocidade dos dois
     objetos foi invertida
 
     >>> A.vel; B.vel
-    Vec2(0, 0)
-    Vec2(1, 0)
+    Vec(0, 0)
+    Vec(1, 0)
 
 
     Suponha agora que a colisão não se deu no ponto selecionado anteriormente.
 
-    >>> A.vel, B.vel = B.vel, A.vel
+    >>> A.vel, B.vel = (1, 0), (0, 0)
     >>> col = Collision(A, B,
     ...                 pos=(0, 0),    # ponto de colisão
     ...                 normal=(1, 0)) # normal da colisão
@@ -234,103 +247,55 @@ class Collision(Pair):
     de movimento linear para angular.
 
     >>> col.resolve()
-    >>> A.linearE() + B.linearE(), A.angularE() + B.angularE()
-    (0.265625, 0.234375)
+    >>> A.linearK() + B.linearK(), A.angularK() + B.angularK(), col.energyK()
+    (0.2777777777777778, 0.2222222222222222, 0.5)
 
     As leis de conservação continuam sendo satisfeitas
-    >>> col.kineticE(); col.momentumP(); col.momentumL()
+    >>> col.energyK(); col.momentumP(); col.momentumL()
     0.5
-    Vec2(1, 0)
+    Vec(1, 0)
     -1.0
     '''
-    min_vel_bias = 1.0
 
-    def __init__(self, A, B, world=None, pos=None, normal=None, delta=0.0):
+    def __init__(self, A, B, normal=None, pos=None, delta=0.0):
         super(Collision, self).__init__(A, B)
-        self.objects = A, B
-        self.world = world
-        self.is_active = True
-        self.resolved = False
-        self.vrel = null2D
-        if pos is None:
-            raise ValueError(A, B)
-        self.pos = asvector(pos)
-        self.normal = asvector(normal)
-        self.delta = delta
-        self.Jn = 0.0
-        self.vel_bias = 0.0
-        self.init()
+        self.normal = normal = asvector(normal)
+        self.pos = pos = asvector(pos)
+        self.delta = delta = float(delta)
+        self.active = True
 
-        # Certifica se normal foi bem escolhida
-        if (self.rA.dot(self.normal) < 0):
-            self.__init__(self.A, self.B, world=world, pos=pos, normal=-normal,
-                          delta=delta)
+        # Obtêm parâmetros da colisão
+        self.restitution = sqrt(A.restitution * B.restitution)
+        self.friction = sqrt(A.friction * B.friction)
 
-    ###########################################################################
-    #                 Propriedades calculadas sob demanda
-    ###########################################################################
-    def init(self):
-        '''Calcula propriedades da colisão'''
-
-        A, B = self.A, self.B
-        n = self.normal
-        P = self.pos
-
-        # Coeficiente de atrito e restituição
-        self.mu = self.get_friction_coeff()
-        self.e = self.get_restitution()
-
-        # Pontos de contato
-        self.rA = rA = P - A.pos
-        self.rB = rB = P - B.pos
-        self.rA_ortho = Vec2(-rA.y, rA.x)
-        self.rB_ortho = Vec2(-rB.y, rB.x)
+        # Posições e velocidades relativas
+        rA = self.pos - A.pos
+        rB = self.pos - B.pos
+        assert rA.dot(normal) >= 0, 'normal is pointing towards the first body'
 
         # Massa efetiva
-        eff_invmass = A._invmass + B._invmass
+        invmass = A.invmass + B.invmass
+        invmass += A.invinertia * (rA.cross(normal) ** 2)
+        invmass += B.invinertia * (rB.cross(normal) ** 2)
+        self.effmass = 1.0 / invmass
 
-        if A._invinertia:
-            eff_invmass += rA.cross(n) ** 2 * A._invinertia
+    def resolve(self):
+        A, B = self
+        normal = self.normal
+        pos = self.pos
+        vrel = B.vpoint(pos) - A.vpoint(pos)
+        vrel_normal = vrel.dot(normal)
 
-        if B._invinertia:
-            eff_invmass += rB.cross(n) ** 2 * B._invinertia
+        if vrel_normal < 0:
+            # Impulso normal
+            J = self.effmass * (1 + self.restitution) * vrel_normal
+            Jvec = J * normal
+            pos = self.pos
 
-        self.effmass = 1.0 / eff_invmass
+            # Impulso tangente
 
-        # Viés na velocidade relativa para definir o coeficiente de restituição
-        vrel = ((B.vel + B.omega * self.rB_ortho)
-                - (A.vel + A.omega * self.rA_ortho))
-        vrel_normal = vrel.dot(n)
-        if -vrel_normal > self.min_vel_bias:
-            self.vel_bias = -self.e * vrel_normal
-
-    def step(self):
-        A, B = self.A, self.B
-        n = self.normal
-
-        # Velocidade de contato relativa
-        self.vrel = vrel = ((B.vel + B.omega * self.rB_ortho)
-                            - (A.vel + A.omega * self.rA_ortho))
-        vrel_normal = vrel.dot(n)
-
-        # Impulso normal calculado no passo
-        deltaJ = -self.effmass * (vrel_normal - self.vel_bias)
-        self.Jn += deltaJ
-        self.apply_impulse(deltaJ)
-
-    def apply_impulse(self, J):
-        # Aplica incremento no impulso
-        if J != 0:
-            A, B = self.A, self.B
-            Jvec = J * self.normal
-            if A._invmass:
-                A.apply_impulse(-Jvec)
-                if A._invinertia:
-                    A.apply_aimpulse(Jvec.cross(self.rA))
-            if B._invmass:
-                B.apply_impulse(Jvec)
-                if B._invinertia:
-                    B.apply_aimpulse(-Jvec.cross(self.rB))
+            A.apply_impulse(Jvec, pos=pos)
+            B.apply_impulse(-Jvec, pos=pos)
 
     def apply_tangent(self, J):
         # Aplica incremento no impulso
@@ -343,16 +308,15 @@ class Collision(Pair):
 
         # Calcula o impulso tangente máximo
         vrel_tan = -vrel.dot(tangent)
-        Jtan_max = abs(self.mu * J)
+        Jtan_max = abs(self.friction * J)
 
         # Limita a ação do impulso tangente
         if A._invmass and B._invmass:
-            J = min(
-                [Jtan_max, vrel_tan / A._invmass, vrel_tan / B._invmass])
+            J = min(Jtan_max, vrel_tan / A._invmass, vrel_tan / B._invmass)
         elif A._invmass:
-            J = min([Jtan_max, vrel_tan / A._invmass])
+            J = min(Jtan_max, vrel_tan / A._invmass)
         elif B._invmass:
-            J = min([Jtan_max, vrel_tan / B._invmass])
+            J = min(Jtan_max, vrel_tan / B._invmass)
         else:
             J = 0.0
 
@@ -366,10 +330,19 @@ class Collision(Pair):
             if B._invinertia:
                 B.apply_aimpulse(-Jvec.cross(self.rB))
 
-    def finalize(self):
-        if self.Jn < 0:
-            self.apply_impulse(-self.Jn)
-        self.apply_tangent(self.Jn)
+    def finalize(self, clear=True, trigger=True):
+        if self.impulse > 0:
+            self.apply_impulse(self.impulse)
+        # self.apply_tangent(self.impulse)
+
+        if trigger:
+            # TODO: inspect collision triggers
+            # self.A.trigger_collision(self)
+            # self.B.trigger_collision(self)
+            pass
+        if clear:
+            self.A.remove_contact(self)
+            self.B.remove_contact(self)
 
     def get_tangent(self):
         # Vetor unitário tangente à colisão
@@ -379,21 +352,6 @@ class Collision(Pair):
             tangent = -tangent
         return tangent
 
-    @property
-    def pos_cm(self):
-        A, B = self
-        return (A. mass * A.pos + B.mass * B.pos) / (A.mass + B.mass)
-
-    def kineticE(self):
-        return self.A.kineticE() + self.B.kineticE()
-
-    def momentumP(self):
-        return self.A.momentumP() + self.B.momentumP()
-
-    def momentumL(self):
-        pos = (0, 0)
-        return self.A.momentumL(pos) + self.B.momentumL(pos)
-
     ###########################################################################
     #                       Métodos da API de Collision
     ###########################################################################
@@ -401,30 +359,8 @@ class Collision(Pair):
         '''Retorna True se o contato for o único contato de ambos os objetos
         envolvidos'''
 
+        print('foo')
         return (len(self.A._contacts) <= 1) and (len(self.B._contacts) <= 1)
-
-    def resolve(self, dt=0, trigger=True, clear=True):
-        '''Resolve a colisão entre A e B, distribuindo os impulsos de acordo
-        com as propriedades can_move* do objeto'''
-
-        A, B = self
-
-        # Impulso nulo
-        if self.resolved:
-            self.resolved = True
-        else:
-            # Resolve as colisões
-            self.step()
-            self.finalize()
-            self.resolved = True
-
-            # Dispara sinais?
-            if trigger:
-                A.trigger_collision(self)
-                B.trigger_collision(self)
-            if clear:
-                A.remove_contact(self)
-                B.remove_contact(self)
 
     def remove_overlap(self, beta=1.0):
         '''Remove a superposição entre os objetos movendo cada objeto por uma
@@ -461,16 +397,6 @@ class Collision(Pair):
             b *= beta
             A.move(-a * self.normal)
             B.move(b * self.normal)
-
-    def get_restitution(self):
-        '''Retorna o coeficiente de restituição entre os dois objetos'''
-
-        return (self.A.restitution * self.B.restitution) ** 0.5
-
-    def get_friction_coeff(self):
-        '''Retorna o coeficiente de restituição entre os dois objetos'''
-
-        return (self.A.dfriction * self.B.dfriction) ** 0.5
 
 
 class ContactOrdered(Collision):

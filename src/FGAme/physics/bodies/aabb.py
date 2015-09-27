@@ -125,7 +125,7 @@ class AABB(LinearRigidBody):
     def ymax(self, value):
         ymin = self.ymin
         ymax = float(value)
-        self._pos = self._pos.set_y((ymax + ymin) / 2)
+        self.pos = self.pos.copy(y=(ymax + ymin) / 2)
         self._delta_y = (ymax - ymin) / 2
 
     # Propriedades geométricas ################################################

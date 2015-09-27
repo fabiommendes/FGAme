@@ -89,7 +89,7 @@ de `Pool` ou de `ConservativePool`
 .. autoclass::SpringPool
 '''
 
-from FGAme.mathtools import Vec2, null2D
+from FGAme.mathtools import Vec2, null2D, asvector
 
 EMPTY_FORCE = lambda t: null2D
 NO_UPDATE = object()
@@ -321,9 +321,9 @@ class ForceCtrl(object):
         def fast_func(t):
             F = null2D
             for k, func in nmuls:
-                Fi = func(t)
+                Fi = asvector(func(t))
                 try:
-                    F += k * Fi
+                    F += Fi * k
                 except TypeError:
                     x, y = Fi
                     F += Vec2(k * x, k * y)
@@ -342,7 +342,7 @@ class ForceCtrl(object):
                 Fi = func(t)
                 k = scalar_func(t)
                 try:
-                    F += k * Fi
+                    F += Fi * k
                 except TypeError:
                     x, y = Fi
                     F += Vec2(k * x, k * y)
@@ -503,17 +503,17 @@ class Conservative(Single):
             obj, force, 'position', register=register)
         self._potential = potential
 
-    def totalE(self):
+    def energyT(self):
         '''Energia total do par de partículas'''
 
-        return self.obj.kineticE() + self.potentialE()
+        return self.obj.energyK() + self.energyU()
 
-    def kineticE(self):
+    def energyK(self):
         '''Energia cinética do par de partículas'''
 
-        return self.obj.kineticE()
+        return self.obj.energyK()
 
-    def potentialE(self):
+    def energyU(self):
         '''Energia potencial do par de partículas'''
 
         return self.U(self.obj.pos)
@@ -801,17 +801,17 @@ class ConservativePair(Pair):
             A, B, force, 'position', register=register)
         self._potential = U
 
-    def totalE(self):
+    def energyT(self):
         '''Energia total do par de partículas'''
 
-        return self.A.kineticE() + self.B.kineticE() + self.potentialE()
+        return self.A.energyK() + self.B.energyK() + self.energyU()
 
-    def kineticE(self):
+    def energyK(self):
         '''Energia cinética do par de partículas'''
 
-        return self.A.kineticE + self.B.kineticE
+        return self.A.energyK + self.B.energyK
 
-    def potentialE(self):
+    def energyU(self):
         '''Energia potencial do par de partículas'''
 
         return self.U(self.A.pos, self.B.pos)
@@ -976,6 +976,17 @@ class GravityPool(ConservativePool):
 #
 #
 if __name__ == '__main__':
+    class HasForce(object):
+        force = ForceProperty()
+
+    obj = HasForce()
+    obj.force = lambda t: (2, 4 - t)
+    obj.force(2)
+    obj.force *= 2
+    obj.force(2)
+
+    import doctest
+    doctest.testmod()
 
     from math import cos
     from FGAme import *

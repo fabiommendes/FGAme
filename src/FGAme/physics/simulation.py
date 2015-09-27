@@ -2,10 +2,9 @@
 
 from collections import defaultdict
 from FGAme.mathtools import Vec2, null2D
-from FGAme.physics.flags import BodyFlags
 from FGAme.events import EventDispatcher, signal
+from FGAme.physics.flags import BodyFlags
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
-from FGAme.draw import Color
 
 ###############################################################################
 #                                Simulação
@@ -28,8 +27,8 @@ class Simulation(EventDispatcher):
     '''
 
     def __init__(self, gravity=None, damping=0, adamping=0,
-                 restitution=1, sfriction=0, dfriction=0, max_speed=None,
-                 bounds=None, broad_phase=None, niter=400, beta=0.0):
+                 restitution=1, friction=0, max_speed=None,
+                 bounds=None, broad_phase=None, niter=5, beta=0.0):
 
         super(Simulation, self).__init__()
 
@@ -52,14 +51,13 @@ class Simulation(EventDispatcher):
         self._potential0 = None
         self._interaction0 = None
         self._gravity = null2D
-        self._damping = self._adamping = self._sfriction = self._dfriction = 0
+        self._damping = self._adamping = self._friction = 0
         self._restitution = 1
         self.gravity = gravity or (0, 0)
         self.damping = damping
         self.adamping = adamping
         self.restitution = restitution
-        self.sfriction = sfriction
-        self.dfriction = dfriction
+        self.friction = friction
         self.max_speed = max_speed
 
         # Limita mundo
@@ -90,8 +88,7 @@ class Simulation(EventDispatcher):
     damping_change = signal('damping-change', num_args=2)
     adamping_change = signal('adamping-change', num_args=2)
     restitution_change = signal('restitution-change', num_args=2)
-    sfriction_change = signal('sfriction-change', num_args=2)
-    dfriction_change = signal('dfriction-change', num_args=2)
+    friction_change = signal('friction-change', num_args=2)
 
     ###########################################################################
     #                       Propriedades físicas
@@ -160,34 +157,19 @@ class Simulation(EventDispatcher):
         self.trigger('restitution-change', old, self._restitution)
 
     @property
-    def sfriction(self):
-        return self._sfriction
+    def friction(self):
+        return self._friction
 
-    @sfriction.setter
-    def sfriction(self, value):
-        owns_prop = BodyFlags.owns_sfriction
-        old = self._sfriction
-        value = self._sfriction = float(value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._sfriction = value
-        self.trigger('sfriction-change', old, self._sfriction)
-
-    @property
-    def dfriction(self):
-        return self._dfriction
-
-    @dfriction.setter
-    def dfriction(self, value):
-        owns_prop = BodyFlags.owns_dfriction
-        old = self._dfriction
-        value = self._dfriction = float(value)
+    @friction.setter
+    def friction(self, value):
+        owns_prop = BodyFlags.owns_friction
+        old = self._friction
+        value = self._friction = float(value)
 
         for obj in self._objects:
             if not obj.flags & owns_prop:
-                obj._dfriction = value
-        self.trigger('dfriction-change', old, self._dfriction)
+                obj._friction = value
+        self.trigger('friction-change', old, self._friction)
 
     ###########################################################################
     #                   Gerenciamento de objetos e colisões
@@ -219,10 +201,8 @@ class Simulation(EventDispatcher):
                 obj._adamping = self.adamping
             if not oflags & flags.owns_restitution:
                 obj._restitution = self.restitution
-            if not oflags & flags.owns_dfriction:
-                obj._dfriction = self.dfriction
-            if not oflags & flags.owns_sfriction:
-                obj._sfriction = self.sfriction
+            if not oflags & flags.owns_friction:
+                obj._friction = self.friction
             self.trigger('object-add', obj)
 
     def remove(self, obj):
@@ -341,31 +321,14 @@ class Simulation(EventDispatcher):
 
         broad_cols = self.broad_phase(self._objects)
         narrow_cols = self.narrow_phase(broad_cols)
-        nonsimple = self._nonsimple = []
-        simple = self._simple = []
 
-        # TODO: emite sinal pré-collision
         for col in narrow_cols:
-            if col.is_simple():
-                col.init()
-                col.resolve()
-                simple.append(col)
-            else:
-                col.init()
-                nonsimple.append(col)
-
-        for _ in range(self.niter):
-            for col in nonsimple:
-                col.step()
-        for col in nonsimple:
-            col.finalize()
-
-        # TODO: emite sinal pós-collision
+            col.resolve()
 
         # Estabiliza contatos usando a estabilização de baumgarte
-        beta = self.beta
-        for col in narrow_cols:
-            col.baumgarte_adjust(beta)
+        #beta = self.beta
+        # for col in narrow_cols:
+        #    col.baumgarte_adjust(beta)
 
     def get_islands(self, contacts):
         '''Retorna a lista de grupos de colisão fechados no gráfico de
@@ -404,30 +367,32 @@ class Simulation(EventDispatcher):
 
         return True
 
-    # Cálculo de parâmetros físicos ###########################################
-    def kineticE(self):
+    #
+    # Cálculo de parâmetros físicos
+    #
+    def energyK(self):
         '''Soma da energia cinética de todos os objetos do mundo'''
 
-        return sum(obj.kineticE() for obj in self._objects
+        return sum(obj.energyK() for obj in self._objects
                    if (obj._invmass or obj._invinertia))
 
-    def potentialE(self):
+    def energyU(self):
         '''Soma da energia potencial de todos os objetos do mundo devido à
         gravidade'''
 
-        return sum(obj.potentialE() for obj in self._objects if obj._invmass)
+        return sum(obj.energyU() for obj in self._objects if obj._invmass)
 
-    def interactionE(self):
+    def energy_interaction(self):
         '''Soma da energia de interação entre todos os pares de partículas
         (Não implementado)'''
 
         return 0.0
 
-    def totalE(self):
+    def energyT(self):
         '''Energia total do sistema de partículas (possivelmente excluindo
         algumas interações entre partículas)'''
 
-        return self.potentialE() + self.kineticE() + self.interactionE()
+        return self.energyU() + self.energyK() + self.energy_interaction()
 
     def energy_ratio(self):
         '''Retorna a razão entre a energia total e a energia inicial calculada
@@ -437,18 +402,18 @@ class Simulation(EventDispatcher):
             self._init_energy0()
             return 1.0
         sum_energies = self._kinetic0 + self._potential0 + self._interaction0
-        return self.totalE() / sum_energies
+        return self.energyT() / sum_energies
 
     def _init_energy0(self):
         '''Chamada para inicializar _kinetic0 e amigos'''
 
-        self._kinetic0 = self.kineticE()
-        self._potential0 = self.potentialE()
+        self._kinetic0 = self.energyK()
+        self._potential0 = self.energyU()
         self._interaction0 = self.interactionE()
 
-    ###########################################################################
-    #                     Serviços esporáticos
-    ###########################################################################
+    #
+    # Serviços esporáticos
+    #
     def enforce_max_speed(self):
         '''Força que todos objetos tenham uma velocidade máxima'''
 

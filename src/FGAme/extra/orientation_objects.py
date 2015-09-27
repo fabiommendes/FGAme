@@ -170,16 +170,16 @@ _speeds = dict(
 )
 
 
-def speed_prop(name, scale, vec):
+def speed_prop(name, scale, Vec):
     def prop(self):
-        return getattr(self, scale) * vec
+        return getattr(self, scale) * Vec
     prop.__name__ = name
     return property(prop)
 
-for name, vec in _speeds.items():
-    setattr(VelObject, name, speed_prop(name, 'fair', vec))
-    setattr(VelObject, name, speed_prop('%s_fast' % name, 'fast', vec))
-    setattr(VelObject, name, speed_prop('%s_slow' % name, 'slow', vec))
+for name, Vec in _speeds.items():
+    setattr(VelObject, name, speed_prop(name, 'fair', Vec))
+    setattr(VelObject, name, speed_prop('%s_fast' % name, 'fast', Vec))
+    setattr(VelObject, name, speed_prop('%s_slow' % name, 'slow', Vec))
 
 # Inicializa objetos
 vel = VelObject()

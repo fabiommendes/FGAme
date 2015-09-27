@@ -11,7 +11,7 @@ SHAPE = (30, 30)
 NUM_POLYS = 50
 
 # Inicializa o mundo
-world = World(gravity=50, dfriction=0)
+world = World()
 world.add_bounds(width=10)
 
 # Preenche o mundo
@@ -22,6 +22,5 @@ for _ in range(NUM_POLYS):
     world.add(obj)
 
 # Inicia a simulação
-import fasttrack
-with fasttrack.timeit('foo'):
-    world.run()
+world.register_energy_tracker()
+world.run()

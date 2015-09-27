@@ -24,16 +24,15 @@ Funções especiais para a criação de objetos
 
 '''
 
-from FGAme.physics.flags import *
-from FGAme.physics.bodies import *
-from FGAme.physics import flags
-from FGAme.physics.collision import Collision, CBBContact, AABBContact
-from FGAme.physics.collision_pairs import (get_collision,
-                                           get_collision_generic,
-                                           CollisionError)
-from FGAme.physics import collision_pairs as collision
-from FGAme.physics.forces import *
-from FGAme.physics.simulation import *
+from .util import *
+from .flags import *
+from .bodies import *
+from . import flags
+from .collision import Collision, CBBContact, AABBContact
+from .collision_pairs import get_collision
+from . import collision_pairs as collision
+from .forces import *
+from .simulation import *
 
 
 __all__ = ['Collision', 'get_collision', 'Simulation']

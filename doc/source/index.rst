@@ -3,18 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-===================================
-Welcome to FGAme's documentation!
-===================================
+=================================
+Bem vindo à documentação da FGAme
+=================================
 
 .. toctree::
    :maxdepth: 2
+
+   install.rst
+   tutorial.rst
+   tutorial2.rst
+   documentation.rst
+   game_engines.rst
    
-.. automodule:: FGAme
    
-==================
-Indices and tables
-==================
+=================
+Tabelas e índices
+=================
 
 * :ref:`genindex`
 * :ref:`modindex`

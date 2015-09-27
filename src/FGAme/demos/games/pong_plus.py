@@ -75,7 +75,7 @@ class Pong(World):
 
     # Lógica do jogo
     max_hits = 12
-    obstacle_N = 20
+    obstacle_N = 15
     obstacle_sides = 4
     obstacle_size = 30
     obstacle_color = (50, 50, 100)
@@ -204,8 +204,9 @@ class Pong(World):
         '''Chamado quando a bola colide com o pong'''
 
         # testa se é uma colisão com a bola ou com as paredes
-        if self.ball in col.objects:
+        if self.ball in col:
             col.resolve()
+            raise
 
             y_ball = self.ball.pos.y
             y_pong = self.pong.pos.y

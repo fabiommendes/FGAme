@@ -5,7 +5,8 @@ from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
 from FGAme.mathtools import Vec2, asvector, sin, cos, null2D, shapes
 from FGAme.physics.flags import BodyFlags as flags
 from FGAme.physics.forces import ForceProperty
-from .body_interfaces import HasAABB, HasGlobalForces, HasInertia
+from FGAme.physics.bodies.body_interfaces import (HasAABB, HasGlobalForces,
+                                                  HasInertia)
 
 __all__ = ['Body', 'LinearRigidBody']
 
@@ -252,7 +253,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
     def __init__(self, pos=null2D, vel=null2D, theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
-                 restitution=None, sfriction=None, dfriction=None,
+                 restitution=None, friction=None,
                  baseshape=None, world=None, col_layer=0, col_group=0,
                  flags=DEFAULT_FLAGS):
 
@@ -289,7 +290,10 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
 
         elif mass is not None:
             mass = float(mass)
-            density = mass / self.area()
+            try:
+                density = mass / self.area()
+            except ZeroDivisionError:
+                density = float('inf')
             if inertia is None:
                 inertia = mass * self.ROG_sqr() / INERTIA_SCALE
             else:
@@ -311,7 +315,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         # Controle de parâmetros físicos locais ###############################
         self._gravity = null2D
         self._damping = self._adamping = 0.0
-        self._sfriction = self._dfriction = 0.0
+        self._friction = 0.0
         self._restitution = 1.0
         if damping is not None:
             self.damping = damping
@@ -321,10 +325,8 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
             self.gravity = gravity
         if restitution is not None:
             self.restitution = restitution
-        if sfriction is not None:
-            self.sfriction = sfriction
-        if sfriction is not None:
-            self.dfriction = dfriction
+        if friction is not None:
+            self.friction = friction
 
         # Vínculos e contatos #################################################
         self._contacts = []
@@ -487,8 +489,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
     owns_damping = flag_property(flags.owns_damping)
     owns_adamping = flag_property(flags.owns_adamping)
     owns_restitution = flag_property(flags.owns_restitution)
-    owns_dfriction = flag_property(flags.owns_dfriction)
-    owns_sfriction = flag_property(flags.owns_sfriction)
+    owns_friction = flag_property(flags.owns_friction)
 
     ###########################################################################
     #        Controle de criação e destruição e interação com o mundo
@@ -507,7 +508,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
             self.flags &= flags.not_active
         else:
             self.world.set_active(self)
-            self.flags |= flags.is_active
+            self.flags |= flags.active
 
     def is_rogue(self):
         '''Retorna True se o objeto não estiver associado a uma simulação'''
@@ -563,7 +564,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
     ###########################################################################
     force = ForceProperty()
 
-    def linearE(self):
+    def linearK(self):
         '''Energia cinética das variáveis lineares'''
 
         if self._invmass:
@@ -571,7 +572,7 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         else:
             return 0.0
 
-    def angularE(self):
+    def angularK(self):
         '''Energia cinética das variáveis angulares'''
 
         if self._invinertia:
@@ -579,38 +580,71 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         else:
             return 0.0
 
-    def kineticE(self):
+    def energyK(self):
         '''Energia cinética total'''
 
-        return self.linearE() + self.angularE()
+        return self.linearK() + self.angularK()
 
-    def potentialE(self):
-        '''Energia potencial associada à gravidade'''
+    def energyU(self):
+        '''Energia potencial associada à gravidade e às forças externas'''
 
         return -self.gravity.dot(self._pos) / self._invmass
 
-    def totalE(self):
+    def energy(self):
         '''Energia total do objeto'''
 
-        return self.kineticE() + self.potentialE()
+        return self.energyK() + self.energyU()
 
     def momentumP(self):
         '''Momentum linear'''
 
-        return self._vel / self._invmass
+        try:
+            return self._vel / self._invmass
+        except ZeroDivisionError:
+            return Vec2(float('inf'), float('inf'))
 
-    def momentumL(self, pos=None):
+    def momentumL(self, pos_or_x=None, y=None):
         '''Momentum angular em torno do ponto dado (usa o centro de massa
-        como padrão)'''
+        como padrão)
 
-        if pos is None:
-            delta = 0.0
+        Examples
+        --------
+
+        Considere uma partícula no ponto (0, 1) com velocidade (1, 0). É fácil
+        calcular o momentum linear resultante
+
+        >>> b1 = Body(pos=(0, 1), vel=(1, 0), mass=2)
+        >>> b1.momentumL(0, 0)
+        -2.0
+
+        É lógico que este valor muda de acordo com o ponto de referência
+
+        >>> b1.momentumL(0, 2)
+        2.0
+
+        Quando chamamos a função sem argumentos, o padrão é utilizar o centro
+        de massa. Numa partícula pontual sem velocidade angular, este valor é
+        sempre zero
+
+        >>> b1.momentumL(b1.pos)
+        0.0
+
+
+        '''
+
+        if pos_or_x is None:
+            momentumL = 0.0
+        elif y is None:
+            delta_pos = self.pos - asvector(pos_or_x)
+            momentumL = delta_pos.cross(self.momentumP())
         else:
-            delta = (self._pos - pos).cross(self._vel) / self._invmass
+            delta_pos = self.pos - Vec2(pos_or_x, y)
+            momentumL = delta_pos.cross(self.momentumP())
+
         if self._invinertia:
-            return delta + self._omega / self._invinertia
+            return momentumL + self.omega * self.inertia
         else:
-            return delta
+            return momentumL
 
     ###########################################################################
     #                      Aplicação de forças e torques
@@ -727,26 +761,87 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         acurácia ficaria reduzida, mas a simulação ainda manteria alguma
         credibilidade.
         '''
+        a = asvector(a)
 
         if method is None or method == 'euler-semi-implicit':
-            a = Vec2.from_seq(a)
             self.boost(a * dt)
             self.move(self._vel * dt + a * (0.5 * dt * dt))
         elif method == 'verlet':
             raise NotImplementedError
         elif method == 'euler':
-            a = Vec2.from_seq(a)
             self.move(self._vel * dt + a * (0.5 * dt * dt))
             self.boost(a * dt)
         else:
             raise ValueError('invalid method: %r' % method)
 
-    def apply_impulse(self, impulse_or_x, y=None):
+    def apply_impulse(self, impulse_or_x, y=None, pos=None, relative=False):
         '''Aplica um impulso linear ao objeto. Isto altera sua velocidade
         linear com relação ao centro de massa.
 
         Se for chamado com dois agumentos aplica o impulso em um ponto
         específico e também resolve a dinâmica angular.
+
+        Examples
+        --------
+
+        Considere um objeto criado na origem e outro na posição (4, 3)
+
+        >>> b1 = Body(pos=(2, 0), mass=1)
+        >>> b2 = Body(pos=(-1, 0), mass=2)
+
+        Criamos um impulso J e aplicamos o mesmo em b1
+
+        >>> J = Vec2(0, 2)
+        >>> b1.apply_impulse(J)
+
+        Note que isto afeta a velocidade do corpo de acordo com a fórmula
+        $\delta v = J / m$:
+
+        >>> b1.vel
+        Vec(0, 2)
+
+        Se aplicarmos um impulso oposto à b2, o resultado não deve alterar o
+        momento linear, que permanece nulo
+
+        >>> b2.apply_impulse(-J, pos=(0, 0)); b2.vel
+        Vec(0, -1)
+        >>> b1.momentumP() + b2.momentumP()
+        Vec(0, 0)
+
+        O exemplo anterior é bastante simples pois os dois objetos não possuem
+        momentum de inércia. As mesmas leis de conservação valem na presença
+        de rotações ou mesmo de velocidades iniciais
+
+        >>> b1 = Body(pos=(0, 0), mass=1, inertia=1, vel=(2, 0), omega=1)
+        >>> b2 = Body(pos=(4, 3), mass=2, inertia=2, vel=(-1, 1))
+
+        Primeiro calculamos os momentos iniciais
+
+        >>> P0 = b1.momentumP() + b2.momentumP()
+
+        Note que o momentum linear exige um ponto de referência para a
+        realização do cálculo. Escolhemos o centro de massa, mas os resultados
+        devem valer para qualquer escolha arbitrária.
+
+        >>> from FGAme.physics import center_of_mass
+        >>> Rcm = center_of_mass(b1, b2)
+        >>> L0 = b1.momentumL(Rcm) + b2.momentumL(Rcm)
+
+        Aplicamos momentos opostos respeitando a terceira lei de Newton. Note
+        que no problema com rotações devemos tomar cuidado em aplicar o impulso
+        no mesmo ponto nos dois objetos. Caso isto não ocorra, haverá a
+        produção de um torque externo, violando a lei de conservação do momento
+        angular.
+
+        >>> b1.apply_impulse(J, pos=(4, 0))
+        >>> b2.apply_impulse(-J, pos=(4, 0))
+
+        E verificamos que os valores finais são iguais aos iniciais
+
+        >>> b1.momentumP() + b2.momentumP() == P0
+        True
+        >>> b1.momentumL(Rcm) + b2.momentumL(Rcm) == L0
+        True
         '''
 
         if y is None:
@@ -754,6 +849,11 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         else:
             impulse = Vec2(impulse_or_x, y)
         self.boost(impulse * self._invmass)
+
+        if pos is not None and self._invinertia:
+            R = asvector(pos)
+            R = R if relative else R - self.pos
+            self.aboost(R.cross(impulse) * self._invinertia)
 
     # Variáveis angulares #####################################################
     def rotate(self, theta):
@@ -764,33 +864,55 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
             self.flags |= flags.dirty_any
 
     def aboost(self, delta):
-        '''Adiciona um valor delta à velocidade ângular'''
+        '''Adiciona um valor delta à velocidade angular'''
 
         self._omega += delta
 
     def vpoint(self, pos_or_x, y=None, relative=False):
-        '''Retorna a velocidade linear de um ponto em _pos preso rigidamente ao
+        '''Retorna a velocidade linear de um ponto preso rigidamente ao
         objeto.
 
-        Se o parâmetro `relative` for verdadeiro, o vetor `_pos` é interpretado
-        como a posição relativa ao centro de massa. O padrão é considerá-lo
-        como a posição absoluta no centro de coordenadas do mundo.'''
+        Se o parâmetro `relative` for verdadeiro, o vetor de entrada é
+        interpretado como a posição relativa ao centro de massa. O padrão é
+        considerá-lo como a posição absoluta no sistema de coordenadas do
+        mundo.
 
-        if relative:
-            if y is None:
-                x, y = pos_or_x
-                return self._vel + self._omega * Vec2(-y, x)
-            else:
-                return self._vel + self._omega * Vec2(-y, pos_or_x)
+        Example
+        -------
 
+        Criamos um objeto inicialmente sem rotação
+
+        >>> b1 = Body(pos=(1, 1), vel=(1, 1), mass=1, inertia=1)
+
+        Neste caso, a velocidade relativa a qualquer ponto corresponde à
+        velocidade do centro de massa
+
+        >>> b1.vpoint(0, 0), b1.vpoint(1, 1)
+        (Vec(1, 1), Vec(1, 1))
+
+        Quando aplicamos uma rotação, a velocidade em cada ponto assume uma
+        componente rotacional.
+
+        >>> b1.aboost(1.0)
+        >>> b1.vpoint(0, 0), b1.vpoint(1, 1)
+        (Vec(2, 0), Vec(1, 1))
+
+        Note que quando o parâmetro ``relative=True``, as posições são
+        calculadas relativas ao centro de massa do objeto
+
+        >>> b1.vpoint(0, 0, relative=True), b1.vpoint(1, 1, relative=True)
+        (Vec(1, 1), Vec(0, 2))
+        '''
+
+        if y is None:
+            pos = asvector(pos_or_x)
         else:
-            if y is None:
-                x, y = pos_or_x - self._pos
-                return self._vel + self._omega * Vec2(-y, x)
-            else:
-                x = pos_or_x - self._pos.x
-                y = y - self._pos.y
-                return self._vel + self._omega * Vec2(-y, x)
+            pos = Vec2(pos_or_x, y)
+
+        if not relative:
+            pos -= self.pos
+
+        return self._vel + pos.perp() * self._omega
 
     def orientation(self, theta=0.0):
         '''Retorna um vetor unitário na direção em que o objeto está orientado.
@@ -826,10 +948,14 @@ class Body(HasAABB, HasGlobalForces, HasInertia):
         self.aboost(alpha * dt)
         self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
 
-    def apply_aimpulse(self, itorque):
-        '''Aplica um impulso angular ao objeto.'''
+    def apply_aimpulse(self, angular_delta):
+        '''Aplica um impulso angular ao objeto.
 
-        self.aboost(itorque / self.inertia)
+        O parâmetro de entrada corresponde à variação do momento angular do
+        objeto.
+        '''
+
+        self.aboost(angular_delta * self._invinertia)
 
 
 def vec_property(slot):

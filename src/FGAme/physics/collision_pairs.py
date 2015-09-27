@@ -1,11 +1,10 @@
 # -*- coding: utf8 -*-
-
-from FGAme.mathtools import pi, Vec2, dot, ux2D
+from warnings import warn
+from generic import generic
+from FGAme.mathtools import Vec2, dot, ux2D
 from FGAme.mathtools import shadow_x, shadow_y, area, center_of_mass, clip, pi
-
 from FGAme.physics.collision import Collision
 from FGAme.physics import Circle, AABB, Poly, Rectangle
-from FGAme.util import multifunction
 
 DEFAULT_DIRECTIONS = [ux2D.rotate(n * pi / 12) for n in
                       [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11]]
@@ -18,22 +17,7 @@ class CollisionError(Exception):
     pass
 
 
-def get_collision_generic(A, B):
-    '''Retorna uma colisão genérica definido pela CBB dos objetos A e B'''
-
-    rA = A.cbb_radius
-    rB = B.cbb_radius
-    delta = B._pos - A._pos
-    if delta.norm() < rA + rB:
-        n = delta.normalize()
-        D = rA + rB - delta.norm()
-        pos = A._pos + (rA - D / 2) * n
-        return Collision(A, B, pos=pos, normal=n, delta=D)
-    else:
-        return None
-
-
-@multifunction(None, None)
+@generic
 def get_collision(A, B):
     '''Retorna um objeto de colisão caso ocorra uma colisão com o objeto
     other. Caso não haja colisão, retorna None.
@@ -45,14 +29,34 @@ def get_collision(A, B):
 
     tA = type(A).__name__
     tB = type(B).__name__
-    raise CollisionError('no collision defined for: (%s, %s)' % (tA, tB))
+    warn('no collision defined for: (%s, %s)' % (tA, tB))
+
+    return collision_circle(A, B)
 
 ###############################################################################
 #                      Colisões entre objetos do mesmo tipo
 ###############################################################################
 
 
-@get_collision.dispatch(AABB, AABB)
+@get_collision.overload([Circle, Circle])
+def collision_circle(A, B):
+    '''Testa a colisão pela distância dos centros'''
+
+    rA = A.cbb_radius
+    rB = B.cbb_radius
+    normal = B.pos - A.pos
+    distance = normal.norm()
+
+    if distance < rA + rB:
+        normal /= distance
+        delta = rA + rB - distance
+        pos = A.pos + (rA - delta / 2) * normal
+        return Collision(A, B, pos=pos, normal=normal, delta=delta)
+    else:
+        return None
+
+
+@get_collision.overload([AABB, AABB])
 def collision_aabb(A, B):
     '''Retorna uma colisão com o objeto other considerando apenas a caixas
     de contorno alinhadas ao eixo.'''
@@ -80,23 +84,7 @@ def collision_aabb(A, B):
     return Collision(A, B, pos=pos_col, normal=n, delta=delta)
 
 
-@get_collision.dispatch(Circle, Circle)
-def collision_circle(A, B):
-    '''Testa a colisão pela distância dos centros'''
-
-    rA = A.cbb_radius
-    rB = B.cbb_radius
-    delta = B._pos - A._pos
-    if delta.norm() < rA + rB:
-        n = delta.normalize()
-        D = rA + rB - delta.norm()
-        pos = A._pos + (rA - D / 2) * n
-        return Collision(A, B, pos=pos, normal=n, delta=D)
-    else:
-        return None
-
-
-@get_collision.dispatch(Poly, Poly)
+@get_collision.overload([Poly, Poly])
 def collision_poly(A, B, directions=None):
     '''Implementa a colisão entre dois polígonos arbitrários'''
 
@@ -146,7 +134,7 @@ def collision_poly(A, B, directions=None):
 #                 Colisões entre objetos de tipos diferentes
 ###############################################################################
 
-@get_collision.dispatch(Circle, AABB)
+@get_collision.overload([Circle, AABB])
 def circle_aabb(A, B):
     # TODO: implementar direito, está utilizando AABBs
     r = A.cbb_radius
@@ -178,19 +166,19 @@ def circle_aabb(A, B):
     return Collision(A, B, pos=pos_col, normal=n)
 
 
-@get_collision.dispatch(AABB, Circle)
+@get_collision.overload([AABB, Circle])
 def aabb_circle(A, B):
     return circle_aabb(B, A)
 
 
-@get_collision.dispatch(Poly, AABB)
+@get_collision.overload([Poly, AABB])
 def poly_aabb(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
     return aabb_poly(B, A)
 
 
-@get_collision.dispatch(AABB, Poly)
+@get_collision.overload([AABB, Poly])
 def aabb_poly(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
 
@@ -200,5 +188,10 @@ def aabb_poly(A, B):
     A_poly = Rectangle(bbox=A.bbox)
     col = collision_poly(A_poly, B)
     if col is not None:
-        col.A = A
-        return col
+        return Collision(A, B, pos=col.pos, normal=col.normal)
+    else:
+        return None
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

@@ -3,7 +3,7 @@
 from collections import MutableSequence
 from FGAme.mathtools import shadow_y
 from FGAme.physics import CBBContact, AABBContact
-from FGAme.physics import get_collision, get_collision_generic, CollisionError
+from FGAme.physics import get_collision
 from FGAme.physics.flags import BodyFlags
 
 
@@ -253,47 +253,13 @@ class NarrowPhase(AbstractCollisionPhase):
         for A, B in broad_cols:
             if A._invmass > B._invmass:
                 A, B = B, A
-            col = self.get_collision(A, B)
+            col = get_collision(A, B)
 
             if col is not None:
                 A.add_contact(col)
                 B.add_contact(col)
                 col.world = self.world
                 cols.append(col)
-
-    def get_collision(self, A, B):
-        '''Retorna a colisão entre os objetos A e B depois que a colisão AABB
-        foi detectada'''
-
-        try:
-            return get_collision(A, B)
-        except CollisionError:
-            pass
-
-        # Colisão não definida. Primeiro tenta a colisão simétrica e registra
-        # o resultado caso bem sucedido. Caso a colisão simétrica também não
-        # seja implementada, define a colisão como uma aabb
-        try:
-            col = get_collision(B, A)
-            if col is None:
-                return
-            col.normal *= -1
-        except CollisionError:
-            get_collision[type(A), type(B)] = get_collision_generic
-            get_collision[type(B), type(A)] = get_collision_generic
-            return get_collision_generic(A, B)
-        else:
-            direct = get_collision.get_implementation(type(B), type(A))
-
-            def inverse(A, B):
-                '''Automatically created collision for A, B from the supported
-                collision B, A'''
-                col = direct(B, A)
-                if col is not None:
-                    return col.swapped()
-
-            get_collision[type(A), type(B)] = inverse
-            return col
 
     def get_groups(self, cols=None):
         '''Retorna uma lista com todos os grupos de colisões fechados'''

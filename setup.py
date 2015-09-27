@@ -4,21 +4,22 @@ import sys
 import setuptools
 from setuptools import setup
 
-VERSION = '0.4a5'
+#
+# Read VERSION from file and write it in the appropriate places
+#
 AUTHOR = 'Fábio Macêdo Mendes'
-IS_PYPY = 'PyPy' in sys.version
-setup_kwds = {}
-
-#
-# Create meta.py file with updated version/author info
-#
-base, _ = os.path.split(__file__)
-path = os.path.join(base, 'src', 'FGAme', 'meta.py')
-with open(path, 'w') as F:
+BASE, _ = os.path.split(__file__)
+with open(os.path.join(BASE, 'VERSION')) as F:
+    VERSION = F.read().strip()
+with open(os.path.join(BASE, 'src', 'FGAme', 'meta.py'), 'w') as F:
     F.write(
         '# Auto-generated file. Please do not edit\n'
         '__version__ = %r\n' % VERSION +
         '__author__ = %r\n' % AUTHOR)
+
+
+IS_PYPY = 'PyPy' in sys.version
+setup_kwds = {}
 
 
 ###############################################################################
@@ -120,14 +121,15 @@ else:
 ##########################################################################
 # Main configuration script
 ##########################################################################
-setup(name='FGAme',
-      version=VERSION,
-      description='A game engine for 2D physics',
-      author='Fábio Macêdo Mendes',
-      author_email='fabiomacedomendes@gmail.com',
-      url='https://github.com/fabiommendes/FGAme',
-      long_description=(
-          r'''A game engine for 2D physics. FGAme was developed for a course on computer
+setup(
+    name='FGAme',
+    version=VERSION,
+    description='A game engine for 2D physics',
+    author='Fábio Macêdo Mendes',
+    author_email='fabiomacedomendes@gmail.com',
+    url='https://github.com/fabiommendes/FGAme',
+    long_description=(
+        r'''A game engine for 2D physics. FGAme was developed for a course on computer
 games physics. Simplicity and ease to use were valued more than raw performance
 and fancy graphics.
 
@@ -135,17 +137,28 @@ Main features:
   * AABB's, Circle and Convex Polygons collisions.
   * Backend agnostic (Pygame and sdl2 are supported, for now).
 '''),
-      classifiers=[
-          'Development Status :: 3 - Alpha',
-          'Intended Audience :: Developers',
-          'License :: OSI Approved :: GNU General Public License (GPL)',
-          'Operating System :: POSIX',
-          'Programming Language :: Python',
-          'Topic :: Software Development :: Libraries',
-      ],
-      package_dir={'': 'src'},
-      packages=setuptools.find_packages('src'),
-      license='GPL',
-      requires=['pygame', 'six'],
-      **setup_kwds
-      )
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Libraries',
+    ],
+
+    package_dir={'': 'src'},
+    packages=setuptools.find_packages('src'),
+    license='GPL',
+
+    install_requires=[
+        'pygame>=1.9*',
+        'six',
+        'smallshapes>=0.1a',
+        'smallvectors>=0.5a'
+    ],
+    dependency_links=[
+        'http://pygame.org/ftp/',
+        'http://www.lfd.uci.edu/~gohlke/pythonlibs/',
+    ],
+    **setup_kwds
+)

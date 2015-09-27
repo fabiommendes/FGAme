@@ -6,7 +6,7 @@ class _BodyFlagsBase:
     N = count()
 
     # Estado dinâmico do objeto
-    is_active = 1 << next(N)
+    active = 1 << next(N)
     is_dynamic = 1 << next(N)
     is_kinematic = 1 << next(N)
     is_static = 1 << next(N)
@@ -20,8 +20,7 @@ class _BodyFlagsBase:
     owns_damping = 1 << next(N)
     owns_adamping = 1 << next(N)
     owns_restitution = 1 << next(N)
-    owns_dfriction = 1 << next(N)
-    owns_sfriction = 1 << next(N)
+    owns_friction = 1 << next(N)
 
     # Contatos e vínculos
     has_joints = 1 << next(N)
@@ -70,7 +69,7 @@ class BodyFlags(_BodyFlagsBase):
     # Negações das flags básicas ##############################################
 
     # Estado dinâmico do objeto
-    not_active = f.full ^ f.is_active
+    not_active = f.full ^ f.active
     not_dynamic = f.full ^ f.is_dynamic
     not_kinematic = f.full ^ f.is_kinematic
     not_static = f.full ^ f.is_static

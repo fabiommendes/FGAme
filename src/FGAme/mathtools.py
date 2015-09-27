@@ -8,6 +8,7 @@ from smallvectors import *
 import smallvectors as linalg
 from smallshapes import *
 import smallshapes as shapes
+from generic import set_promotion_rule, set_conversion
 
 #
 # Apelidos para tipos vetoriais
@@ -15,7 +16,68 @@ import smallshapes as shapes
 Point2 = Point[2, float]
 Point3 = Point[3, float]
 Point4 = Point[4, float]
-Vec2 = Vec[2, float]
+
+
+class FGAmeVec(object):
+    '''A FGAme vector object'''
+
+    def __repr__(self):
+        data = ['%.1f' % x for x in self]
+        if all(x.endswith('.0') for x in data):
+            data = [x[:-2] for x in data]
+        return 'Vec(%s)' % (', '.join(data))
+
+    def __radd__(self, other):
+        return type(self)(*(y + x for (x, y) in zip(self, other)))
+
+    def __rsub__(self, other):
+        return type(self)(*(y - x for (x, y) in zip(self, other)))
+
+    def __rmul__(self, other):
+        return type(self)(*(x * other for x in self))
+
+    def __mul__(self, other):
+        return type(self)(*(x * other for x in self))
+
+    def __rtruediv__(self, other):
+        return type(self)(*(x / other for x in self))
+
+
+class Vec2(FGAmeVec, Vec[2, float]):
+    '''Vetor bidimensional'''
+
+
+@set_conversion(list, Vec2)
+@set_conversion(tuple, Vec2)
+def _tuple2vec2(u):
+    x, y = u
+    return Vec2(x, y)
+
+
+set_promotion_rule(Vec2, tuple, Vec2)
+set_promotion_rule(Vec2, list, Vec2)
+
+
+@add.overload([Vec2, tuple])
+@add.overload([Vec2, list])
+@add.overload([tuple, Vec2])
+@add.overload([list, Vec2])
+def add(u, v):
+    x, y = u
+    a, b = v
+    return Vec2(x + a, y + b)
+
+
+@sub.overload([Vec2, tuple])
+@sub.overload([Vec2, list])
+@sub.overload([tuple, Vec2])
+@sub.overload([list, Vec2])
+def sub(u, v):
+    x, y = u
+    a, b = v
+    return Vec2(x - a, y - b)
+
+
 Vec3 = Vec[3, float]
 Vec4 = Vec[4, float]
 Direction2 = Direction[2, float]
@@ -43,11 +105,11 @@ null4D = Vec4(0, 0, 0, 0)
 #
 
 
-def vec(*args):
+def Vec(*args):
     '''Converte o argumento em um vetor de compontentes do tipo float'''
 
     if len(args) == 1:
-        return vec(*args[0])
+        return Vec(*args[0])
     elif len(args) == 2:
         return Vec2.from_flat(args)
     elif len(args) == 3:
@@ -56,6 +118,13 @@ def vec(*args):
         return Vec4.from_flat(args)
     else:
         return Vec.from_flat(args, dtype=float)
+
+
+def asvector(u):
+    if isinstance(u, (Vec2, Vec3, Vec4)):
+        return u
+    else:
+        return Vec(*u)
 
 
 def point(*args):
@@ -104,3 +173,11 @@ def shadow_y(A, B):
     tamanho do buraco'''
 
     return min(A.ymax, B.ymax) - max(A.ymin, B.ymin)
+
+
+if __name__ == '__main__':
+    print(Vec(1, 2) + (1, 2))
+    print((1, 2) + Vec(1, 2))
+    print(2 * Vec(1, 2))
+    print(Vec(1, 2) * 2)
+    print(asvector((1, 2)))

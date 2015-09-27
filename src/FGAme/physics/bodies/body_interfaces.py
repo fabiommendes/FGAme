@@ -100,6 +100,14 @@ class HasInertia(object):
     __slots__ = []
 
     @property
+    def invmass(self):
+        return self._invmass
+
+    @property
+    def invinertia(self):
+        return self._invinertia
+
+    @property
     def mass(self):
         try:
             return 1.0 / self._invmass
@@ -156,25 +164,31 @@ class HasInertia(object):
         if self._invinertia:
             self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
 
-    ###########################################################################
-    #                        Propriedades Geométricas
-    ###########################################################################
+    #
+    # Propriedades Geométricas
+    #
     def area(self):
         '''Área do objeto'''
 
-        return self._baseshape.area
+        try:
+            return self._baseshape.area()
+        except AttributeError:
+            return 0.0
 
     def ROG_sqr(self):
         '''Raio de giração ao quadrado.'''
 
-        return self._baseshape.ROG_sqr
+        try:
+            return self._baseshape.ROG_sqr()
+        except AttributeError:
+            return float('inf')
 
     def ROG(self):
         '''Raio de giração.
 
         Subclasses devem sobrescrever ROG_sqr, ao invés deste método.'''
 
-        return sqrt(self.ROG_sqr)
+        return sqrt(self.ROG_sqr())
 
     ###########################################################################
     #               Manipulação/consulta do estado dinâmico
@@ -437,19 +451,10 @@ class HasGlobalForces(object):
         self.owns_restitution = True
 
     @property
-    def dfriction(self):
-        return self._dfriction
+    def friction(self):
+        return self._friction
 
-    @dfriction.setter
-    def dfriction(self, value):
-        self._dfriction = float(value)
-        self.owns_dfriction = True
-
-    @property
-    def sfriction(self):
-        return self._sfriction
-
-    @sfriction.setter
-    def sfriction(self, value):
-        self._sfriction = float(value)
-        self.owns_sfriction = True
+    @friction.setter
+    def friction(self, value):
+        self._friction = float(value)
+        self.owns_friction = True

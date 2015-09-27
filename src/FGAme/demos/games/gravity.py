@@ -26,13 +26,13 @@ class Gravity(World):
         F = SpringTensorPair(A, B, (K, 2 * K))
         A.force, B.force = F.forces()
 
-        E0 = F.totalE()
-        #E0 = Fa.totalE() + Fb.totalE()
+        E0 = F.energyT()
+        #E0 = Fa.energyT() + Fb.energyT()
 
         @self.listen('frame-enter')
         def printP():
-            print('%.e' % (F.totalE() + F.totalE() - E0))
-            #print(F.totalE() / E0)
+            print('%.e' % (F.energyT() + F.energyT() - E0))
+            #print(F.energyT() / E0)
 
 if __name__ == '__main__':
     Gravity().run()

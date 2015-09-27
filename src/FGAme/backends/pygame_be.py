@@ -22,18 +22,21 @@ class PyGameCanvas(Canvas):
     _pg_draw_circle = pygame.draw.circle
     _pg_draw_rect = pygame.draw.rect
     _pg_draw_poly = pygame.draw.polygon
+    _pg_segment = pygame.draw.line
 
     def show(self):
-        self.__screen = pygame.display.set_mode((self.width, self.height))
+        self._screen = pygame.display.set_mode((self.width, self.height))
         super(PyGameCanvas, self).show()
 
     def get_pygame_screen(self):
-        return self.__screen
+        return self._screen
 
     def flip(self):
         pygame.display.update()
 
+    #
     # Funções de desenho - chama as funções de pygame.draw
+    #
     def draw_raw_aabb_solid(self, aabb, color=black):
         self.draw_raw_aabb_border(aabb, 0, color)
 
@@ -42,7 +45,7 @@ class PyGameCanvas(Canvas):
         x, x_, y, y_ = map(int, aabb)
         rect = (x, Y - y_, x_ - x, y_ - y)
         self._pg_draw_rect(
-            self.__screen,
+            self._screen,
             color,       # color
             rect,        # rect
             int(width))  # line width
@@ -54,7 +57,7 @@ class PyGameCanvas(Canvas):
         Y = self.height
         x, y = circle.pos
         self._pg_draw_circle(
-            self.__screen,
+            self._screen,
             color,                 # line color
             (int(x), Y - int(y)),  # center
             int(circle.radius),    # radius
@@ -67,7 +70,7 @@ class PyGameCanvas(Canvas):
         Y = self.height
         vertices = [(int(x), int(Y - y)) for (x, y) in poly]
         self._pg_draw_poly(
-            self.__screen,
+            self._screen,
             color,        # line color
             vertices,     # center
             int(width))   # line width
@@ -75,7 +78,7 @@ class PyGameCanvas(Canvas):
     def draw_raw_segment(self, segment, width=1.0, color=black):
         Y = self.height
         pt1, pt2 = [(int(x), int(Y - y)) for (x, y) in segment]
-        pygame.draw.line(self.__screen, color, pt1, pt2, int(width))
+        self._pg_segment(self._screen, color, pt1, pt2, int(width))
 
     def draw_raw_texture(self, texture, pos=(0, 0)):
         try:
@@ -92,22 +95,22 @@ class PyGameCanvas(Canvas):
         x, y, dx, dy = pg_texture.get_rect()
         x += pos[0]
         y += pos[1] + dy
-        self.__screen.blit(pg_texture, (x, self.height - y, dx, dy))
+        self._screen.blit(pg_texture, (x, self.height - y, dx, dy))
 
     def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)
         # TODO: talvez use pygame.display.get_surface() para obter a tela
         # correta
         # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
-        self.__screen.set_at(x, y, rgb(color))
+        self._screen.set_at(x, y, rgb(color))
 
     def clear_background(self, color=None):
         if color is None:
             if self.background is None:
                 raise RuntimeError('background was not defined')
-            self.__screen.fill(self.background)
+            self._screen.fill(self.background)
         else:
-            self.__screen.fill(Color(color))
+            self._screen.fill(Color(color))
 
 
 class PyGameInput(Input):
@@ -116,20 +119,19 @@ class PyGameInput(Input):
 
     def __init__(self):
         super(PyGameInput, self).__init__()
-        pg = pygame
+        _pg = pygame
         D = dict(
-            up=pg.K_UP,
-            down=pg.K_DOWN,
-            left=pg.K_LEFT,
-            right=pg.K_RIGHT,
-            space=pg.K_SPACE,
+            up=_pg.K_UP,
+            down=_pg.K_DOWN,
+            left=_pg.K_LEFT,
+            right=_pg.K_RIGHT,
+            space=_pg.K_SPACE,
         )
-        D['return'] = pg.K_RETURN
+        D['return'] = _pg.K_RETURN
 
         # Adiciona as letras e números
-        chars = '0123456789' + string.ascii_lowercase
-        for c in chars:
-            D[c] = getattr(pg, 'K_' + c)
+        for c in '0123456789' + string.ascii_lowercase:
+            D[c] = getattr(_pg, 'K_' + c)
 
         self._key_conversions = {v: k for (k, v) in D.items()}
         self._mouse_conversions = {
