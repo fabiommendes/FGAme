@@ -3,7 +3,7 @@ from warnings import warn
 from generic import generic
 from FGAme.mathtools import Vec2, dot, ux2D
 from FGAme.mathtools import shadow_x, shadow_y, area, center_of_mass, clip, pi
-from FGAme.physics.collision import Collision
+from FGAme.physics import Collision
 from FGAme.physics import Circle, AABB, Poly, Rectangle
 
 DEFAULT_DIRECTIONS = [ux2D.rotate(n * pi / 12) for n in
