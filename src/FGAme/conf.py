@@ -50,7 +50,7 @@ _screen_object = None
 _window_origin = (0, 0)
 _window_shape = None
 _backend = None
-_backends = ['sdl2', 'sdl2cffi', 'pygamegfx', 'pygame']
+_backends = ['sdl2', 'pygamegfx', 'pygame', 'sdl2cffi']
 _backend_classes = None
 
 

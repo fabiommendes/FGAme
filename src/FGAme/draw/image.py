@@ -1,5 +1,9 @@
 import functools
-import PIL.Image
+try:
+    import PIL.Image
+except ImportError:
+    from warnings import warn
+    warn('PIL not found. FGAme will not be able to render images and textures')
 from FGAme.draw import AABB
 from FGAme.mathtools import asvector
 
