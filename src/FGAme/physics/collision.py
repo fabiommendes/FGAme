@@ -1,12 +1,11 @@
 # -*- coding: utf8 -*-
 from math import sqrt
-from FGAme.mathtools import Vec2, asvector, null2D
+from FGAme.mathtools import Vec2, asvector
+
 
 #
 # Pontos de Contato/Manifolds
 #
-
-
 class ContactPoint(Vec2):
 
     '''Representa um ponto de contato com um certo nível de penetração'''
@@ -271,13 +270,15 @@ class Collision(Pair):
         # Posições e velocidades relativas
         rA = self.pos - A.pos
         rB = self.pos - B.pos
-        assert rA.dot(normal) >= 0, 'normal is pointing towards the first body'
 
         # Massa efetiva
         invmass = A.invmass + B.invmass
         invmass += A.invinertia * (rA.cross(normal) ** 2)
         invmass += B.invinertia * (rB.cross(normal) ** 2)
         self.effmass = 1.0 / invmass
+
+        # Asserções
+        assert rA.dot(normal) >= 0, 'normal is pointing towards the first body'
 
     def resolve(self):
         A, B = self

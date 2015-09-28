@@ -17,7 +17,7 @@ with open(os.path.join(BASE, 'src', 'FGAme', 'meta.py'), 'w') as F:
         '__version__ = %r\n' % VERSION +
         '__author__ = %r\n' % AUTHOR)
 
-
+VERSION_BIG = VERSION.rpartition('.')[0]
 IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
 
@@ -128,15 +128,7 @@ setup(
     author='Fábio Macêdo Mendes',
     author_email='fabiomacedomendes@gmail.com',
     url='https://github.com/fabiommendes/FGAme',
-    long_description=(
-        r'''A game engine for 2D physics. FGAme was developed for a course on computer
-games physics. Simplicity and ease to use were valued more than raw performance
-and fancy graphics.
-
-Main features:
-  * AABB's, Circle and Convex Polygons collisions.
-  * Backend agnostic (Pygame and sdl2 are supported, for now).
-'''),
+    long_description=open(os.path.join(BASE, 'README.txt')).read(),
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -151,14 +143,16 @@ Main features:
     license='GPL',
 
     install_requires=[
-        'pygame>=1.9*',
+        'pysdl2>=0.5', # or 'pygame>=1.9.*'
+        'pillow',
         'six',
-        'smallshapes>=0.1a',
-        'smallvectors>=0.5a'
+        'smallshapes>=%s' % VERSION_BIG,
+        'smallvectors>=%s' % VERSION_BIG,
+        'pygeneric>=0.1.1',
     ],
-    dependency_links=[
-        'http://pygame.org/ftp/',
-        'http://www.lfd.uci.edu/~gohlke/pythonlibs/',
-    ],
+    # dependency_links=[
+    #    'http://pygame.org/ftp/',
+    #    'http://www.lfd.uci.edu/~gohlke/pythonlibs/',
+    #],
     **setup_kwds
 )

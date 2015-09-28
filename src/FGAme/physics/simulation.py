@@ -409,7 +409,7 @@ class Simulation(EventDispatcher):
 
         self._kinetic0 = self.energyK()
         self._potential0 = self.energyU()
-        self._interaction0 = self.interactionE()
+        self._interaction0 = self.energy_interaction()
 
     #
     # Serviços esporáticos
