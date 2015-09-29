@@ -127,7 +127,7 @@ called with args=(0,), kwargs={}
 
 Disparar o sinal com o número errado de argumentos provoca um TypeError
 
->>> x.trigger_bar()
+>>> x.trigger_bar()                         # doctest: +IGNORE_EXCEPTION_DETAIL
 Traceback (most recent call last):
 ...
 TypeError: trigger_method() missing 1 required positional argument: 'arg'

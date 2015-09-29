@@ -259,13 +259,13 @@ class World(EventDispatcher):
         "frame-enter", a não ser que ``auto_conect=False``.
         '''
 
-        last = None
+        last_data = [None]
         if raise_on_change is None:
             raise_on_change = conf.DEBUG
 
         if ratio:
             def energy_tracker():
-                nonlocal last
+                last = last_data[0]
                 total = self._simulation.energy_ratio()
                 if (last is None) or (abs(total - last) > 1e-6):
                     msg = 'Energia total / energia inicial: %s' % total
@@ -275,7 +275,7 @@ class World(EventDispatcher):
                     else:
                         if not conf.DEBUG:
                             print(msg)
-                    last = total
+                    last_data[0] = total
         else:
             def energy_tracker():
                 raise NotImplementedError

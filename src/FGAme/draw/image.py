@@ -1,14 +1,35 @@
 import functools
+import six
+from FGAme.draw import AABB
+from FGAme.mathtools import asvector
+
 try:
     import PIL.Image
 except ImportError:
     from warnings import warn
     warn('PIL not found. FGAme will not be able to render images and textures')
-from FGAme.draw import AABB
-from FGAme.mathtools import asvector
 
 
-@functools.lru_cache(maxsize=512)
+if six.PY3:
+    def lru_cache(func):
+        return functools.lru_cache(maxsize=512)(func)
+else:
+    def lru_cache(func):
+        D = {}
+
+        @functools.wraps(func)
+        def decorated(*args):
+            try:
+                return D[args]
+            except KeyError:
+                result = func(*args)
+                while len(D) > 512:
+                    D.popitem()
+                return result
+        return decorated
+
+
+@lru_cache
 def get_texture(path, theta=0, scale=1):
     if theta == 0 and scale == 1:
         return Texture(path)

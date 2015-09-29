@@ -329,7 +329,7 @@ class MainLoop(EventDispatcher):
 
         # Inicia variáveis
         action_id = None
-        idx = 1
+        idx = [1]
 
         # Aceita uma função geradora como entrada (funções com cláusula yield)
         try:
@@ -338,10 +338,8 @@ class MainLoop(EventDispatcher):
             iterator = iterator(*args, **kwds)
 
         def step():
-            nonlocal idx
-
             try:
-                if idx % skip == 0:
+                if idx[0] % skip == 0:
                     next(iterator)
             except StopIteration:
                 mainloop = MainLoop._instance
@@ -349,7 +347,7 @@ class MainLoop(EventDispatcher):
                     mainloop.frame_enter.remove(action_id)
                 else:
                     mainloop.frame_leave.remove(action_id)
-            idx += 1
+            idx[0] += 1
 
         action_id = self.schedule(step, start=start)
         return action_id

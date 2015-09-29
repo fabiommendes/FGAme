@@ -21,10 +21,15 @@ VERSION_BIG = VERSION.rpartition('.')[0]
 IS_PYPY = 'PyPy' in sys.version
 setup_kwds = {}
 
+#
+# Choose the default Python3 branch or the code converted by 3to2
+#
+PYSRC = 'src' if sys.version.startswith('3') else 'py2src'
 
-###############################################################################
-#                       Find and configure extensions
-###############################################################################
+
+#
+# Find and configure extensions
+#
 def find_pyx():
     '''Return a list of all Cython scripts'''
 
@@ -98,9 +103,9 @@ def get_extensions():
 
     return exts
 
-###############################################################################
-#                          Configure environment
-###############################################################################
+#
+# Configure environment
+#
 
 # Test if installation can compile extensions and configure them
 # Currently only cpython accepts extensions
@@ -118,9 +123,9 @@ else:
             "build_ext": build_ext},
         ext_modules=get_extensions())
 
-##########################################################################
+#
 # Main configuration script
-##########################################################################
+#
 setup(
     name='FGAme',
     version=VERSION,
@@ -138,8 +143,8 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
 
-    package_dir={'': 'src'},
-    packages=setuptools.find_packages('src'),
+    package_dir={'': PYSRC},
+    packages=setuptools.find_packages(PYSRC),
     license='GPL',
 
     install_requires=[

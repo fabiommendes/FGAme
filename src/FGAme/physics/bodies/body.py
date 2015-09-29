@@ -156,7 +156,7 @@ class PhysElementMeta(EventDispatcherMeta):
 
 
 @six.add_metaclass(PhysElementMeta)
-class Body(HasAABB, HasGlobalForces, HasInertia):
+class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
 
     '''Classe mãe de todos objetos com propriedades dinâmicas.
 

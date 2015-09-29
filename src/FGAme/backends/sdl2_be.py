@@ -45,6 +45,8 @@ class SDL2Canvas(Canvas):
 
         # Create a renderer
         # flags = sdl2.SDL_RENDERER_SOFTWARE
+        # flags = sdl2.SDL_RENDERER_ACCELERATED
+        # flags = sdl2.SDL_RENDERER_PRESENTVSYNC
         flags = sdl2.SDL_RENDERER_ACCELERATED | sdl2.SDL_RENDERER_PRESENTVSYNC
         self._renderer = self._no_null(
             sdl2.SDL_CreateRenderer(self._window, -1, flags))
@@ -61,8 +63,11 @@ class SDL2Canvas(Canvas):
             self._bg_color = None
         self._LP_short = gfx.aapolygonRGBA.argtypes[1]
 
+        # Flip image
+        self.flip()
+
     def flip(self):
-        sdl2.SDL_RenderPresent(self._renderer)
+        self._no_error(sdl2.SDL_RenderPresent(self._renderer))
 
     def _map_point(self, point):
         x, y = point

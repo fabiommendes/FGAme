@@ -1,16 +1,20 @@
 '''
 Loads all tests in module and run
 '''
+import doctest
+import sys
+try:
+    from unittest2 import main
+except ImportError:
+    from unittest import main
 
 from smallvectors.tests import *
 from FGAme.tests import *
 import FGAme as mod_current
-
-from unittest2 import main
-import doctest
-import sys
 from FGAme import conf
-conf.set_backend()
+
+
+conf.set_backend('empty')
 print('Starting tests using backend: %s' % conf.get_backend())
 
 
