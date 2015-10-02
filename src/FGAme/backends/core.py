@@ -48,7 +48,7 @@ def get_backend_classes(backend):
     True
     '''
 
-    D = get_info()[backend]
+    get_info()[backend]
     classes = ('input', 'mainloop', 'screen')
     return {k: _get_class_worker(k, backend) for k in classes}
 

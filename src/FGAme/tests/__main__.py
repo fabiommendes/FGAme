@@ -8,10 +8,10 @@ try:
 except ImportError:
     from unittest import main
 
-from smallvectors.tests import *
-from FGAme.tests import *
+from smallvectors.tests import *  # @UnusedWildImport
+from FGAme.tests import *  # @UnusedWildImport
 import FGAme as mod_current
-from FGAme import conf
+from FGAme import conf  # @Reimport
 
 
 conf.set_backend('empty')

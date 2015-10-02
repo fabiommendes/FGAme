@@ -90,28 +90,8 @@ class Game(World):
         '''Game over'''
 
         self.stop()
-        GameOver().run()
 
-
-class GameOver(World):
-
-    def __init__(self):
-        from FGAme.extra.letters import add_word
-
-        super(GameOver, self).__init__(background=(255, 0, 0), gravity=10)
-        Rectangle(shape=(600, 100), pos=(0, -200),
-                  theta=math.pi / 9, world=self, mass='inf', color=(255, 0, 0))
-        letters = add_word('game over', self, scale=5, pos=(-220, 50))
-        for l in letters:
-            l.inertia *= 20
-
-        self.listen('key-down', 'enter', self.reinit)
-
-    def reinit(self):
-        self.stop()
-        Game().run()
 
 if __name__ == '__main__':
     game = Game()
-    print(game._simulation._objects)
     game.run()

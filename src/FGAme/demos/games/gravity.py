@@ -1,12 +1,11 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+
 '''
 Implementa o exemplo de "pseudo-gravidade" da documentação.
 '''
 
-from FGAme import *
-from FGAme.physics.forces import SpringTensorPair, GravityPair, SpringTensor, Gravity
-
-# get_mainloop(fps=240)
+from FGAme import *  # @UnusedWildImport
+from FGAme.physics.forces import SpringTensorPair
 
 
 class Gravity(World):
@@ -27,12 +26,10 @@ class Gravity(World):
         A.force, B.force = F.forces()
 
         E0 = F.energyT()
-        #E0 = Fa.energyT() + Fb.energyT()
 
         @self.listen('frame-enter')
         def printP():
             print('%.e' % (F.energyT() + F.energyT() - E0))
-            #print(F.energyT() / E0)
 
 if __name__ == '__main__':
     Gravity().run()

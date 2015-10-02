@@ -318,16 +318,6 @@ sinal.pyname
 []
 '''
 
-__package__ = 'FGAme.events'
-if __name__ == '__main__':
-    import FGAme
-
-
 from .util import listen, signal
 from .base import EventDispatcher, EventDispatcherMeta
 from .dispatcher import dispatcher
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
-    doctest.testmod(optionflags=doctest.REPORT_ONLY_FIRST_FAILURE)

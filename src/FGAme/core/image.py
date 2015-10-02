@@ -79,9 +79,10 @@ class TextureManager(object):
 def get_default_image_path():
     '''Retorna o caminho para a pasta /images/ abaixo do caminho do script
     principal em execução'''
-    #script_path = sys.modules['__main__'].__file__
-    #base_path = os.path.split(script_path)[0]
-    #path = os.path.join(base_path, 'images')
+
+    # script_path = sys.modules['__main__'].__file__
+    # base_path = os.path.split(script_path)[0]
+    # path = os.path.join(base_path, 'images')
     return ''
 
 

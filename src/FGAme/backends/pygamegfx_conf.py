@@ -1,4 +1,4 @@
 mainloop = 'PyGameMainLoop'
 screen = 'PyGameGFXCanvas'
-input = 'PyGameInput'
+input = 'PyGameInput'  # @ReservedAssignment
 imports = ['pygame', 'pygame.gfxdraw']

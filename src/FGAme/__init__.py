@@ -44,7 +44,7 @@ from FGAme.meta import __version__, __author__
 from FGAme import conf
 from FGAme import mathtools as math
 from FGAme.input import *
-from FGAme.mathtools import Vec, pi
+from FGAme.mathtools import Vec, pi, asvector
 from FGAme import draw
 from FGAme.events import listen, signal, EventDispatcher
 from FGAme.core import *

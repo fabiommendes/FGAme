@@ -1,6 +1,7 @@
 from pygame import gfxdraw  # @UnresolvedImport
 from FGAme.draw import Color
-from FGAme.backends.pygame_be import PyGameCanvas, PyGameInput, PyGameMainLoop
+from FGAme.backends.pygame_be import (
+    PyGameCanvas, PyGameInput, PyGameMainLoop)  # @UnusedImport
 
 black = Color('black')
 

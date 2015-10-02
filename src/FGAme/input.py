@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 from FGAme.events import EventDispatcher, signal
 
 

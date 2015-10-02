@@ -30,12 +30,20 @@ else:
 
 
 @lru_cache
-def get_texture(path, theta=0, scale=1):
+def get_texture_from_path(path, theta=0, scale=1):
+    '''Initializes texture from path'''
     if theta == 0 and scale == 1:
         return Texture(path)
     else:
         return get_texture(path).rotate(theta).rescale(scale)
-
+    
+def get_texture(texture_or_path, theta=0, scale=1):
+    if isinstance(texture_or_path, str):
+        return get_texture_from_path(texture_or_path, theta, scale)
+    elif theta == 0 and scale == 1:
+        return texture_or_path
+    else:
+        return texture_or_path.rotate(theta).scale(scale)
 
 class Texture(object):
 
@@ -43,6 +51,14 @@ class Texture(object):
         self._pil = PIL.Image.open(path)
         self._pil.load()
         self.path = path
+
+    @property
+    def width(self):
+        return self._pil.width
+    
+    @property
+    def height(self):
+        return self._pil.height
 
     def get_pil_data(self):
         '''Retorna um objeto do tipo PIL.Image.Image'''
@@ -74,21 +90,60 @@ class Image(AABB):
     # manager = PyGameTextureManager()
     canvas_primitive = 'image'
 
-    def __init__(self, path_or_texture, pos=(0, 0), reference='center'):
+    def __init__(self, path_or_texture, pos=(0, 0), 
+                 rect=None, bbox=None, 
+                 scale=1):
+        self.texture = get_texture(path_or_texture)
+        self.__crop(rect, bbox)
+        self.__rescale(scale)
+        super(AABB, self).__init__(pos=pos, shape=self.texture.shape)
+
+    def draw(self, screen):
+        screen.draw_image(self)
+
+    def __crop(self, rect=None, bbox=None):
+        '''Crop image to the specified rect or bounding box *inplace*'''
+
+        # No-OP
+        if rect is None and bbox is None:
+            return
+                
+        if rect:
+            xmin, ymin, dx, dy = rect
+            xmax = xmin + dx
+            ymax = ymin + dy
+        elif bbox:
+            xmin, xmax, ymin, ymax = bbox
+        else:
+            raise TypeError('rect or bbox must be specified')
+        
+        left, right = map(int, [xmin, xmax])
+        if ymin <= 0 and ymax < 0:
+            upper, lower = map(int, [-ymin, -ymax])
+        else:
+            H = self.height
+            upper, lower = map(int, [H - ymax, H - ymin])
+
+        img = self.texture._pil.crop([left, upper, right, lower])
+        self.texture._pil = img
+        
+    def __rescale(self, scale):
+        '''Rescale image to the given scale factor *inplace*'''
+        
+        if scale == 1:
+            return
+        
+        shape = (self.texture._pil.width, self.texture._pil.height)
+        shape = map(int, scale * asvector(shape))
+        self.texture._pil = self.texture._pil.resize(shape)
+        
+         
+
+class TileSheet(object):
+    def __init__(self, path_or_texture, shape, origin=(0, 0)):
         if isinstance(path_or_texture, Texture):
             self.texture = path_or_texture
         else:
             self.texture = get_texture(path_or_texture)
 
-        shape = asvector(self.texture.shape)
-        if reference == 'center':
-            pos = asvector(pos)
-        elif reference == 'origin':
-            pos = pos + self.shape / 2
-        else:
-            raise ValueError('invalid reference: %r' % reference)
-
-        super(AABB, self).__init__(pos=pos, shape=shape)
-
-    def draw(self, screen):
-        screen.draw_image(self)
+            

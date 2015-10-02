@@ -6,6 +6,7 @@ renderização
 
 from FGAme import conf
 from FGAme import physics
+from FGAme.mathtools import asvector
 from FGAme.util import lazy
 from FGAme.draw import Color, color, Image
 from FGAme.events import EventDispatcherMeta, signal
@@ -20,8 +21,8 @@ black = Color('black')
 @EventDispatcherMeta.decorate
 class ObjectMixin(object):
     _is_mixin_ = True
-    _mixin_args = ['color', 'line_color', 'line_width', 'image', 'animation',
-                   'sprite']
+    _mixin_args = ['color', 'line_color', 'line_width', 
+                   'image','animation', 'sprite']
 
     long_press = signal('long-press', 'key', delegate_to='_input')
     key_up = signal('key-up', 'key', delegate_to='_input')
@@ -40,10 +41,13 @@ class ObjectMixin(object):
 
     def __init__(self, *args, **kwds):
         mixin_kwds = self._extract_mixin_kwargs(kwds)
+        for k in list(kwds):
+            if k.startswith('image_'):
+                mixin_kwds[k] = kwds.pop(k)
         self._init_physics(*args, **kwds)
         self._init_visualization(**mixin_kwds)
 
-        # Action control
+        # Action control -- necessary?
         self.visible = True
         self.actions = []
         self.to_remove = []
@@ -66,7 +70,9 @@ class ObjectMixin(object):
     def _init_visualization(
             self,
             color='black', line_color=None, line_width=1,
-            image=None, animation=None, sprite=None):
+            image=None, image_offset=(0, 0), image_reference=None, 
+            animation=None, sprite=None,
+            **kwds):
         '''Init visualization parameters'''
 
         self._image = None
@@ -77,9 +83,39 @@ class ObjectMixin(object):
         self._line_width = line_width
         self.color = color
         self.line_color = line_color
-        self.image = image
-        self.sprite = sprite
-        self.animation = animation
+        
+        if image is not None:
+            # Get all image parameters
+            img_kwds = {}
+            for k, v in kwds.items():
+                if k.startswith('image_'):
+                    img_kwds[k[6:]] = v 
+            
+            if isinstance(image, str):
+                image = resources.find_image(image)
+                image = Image(image, self.pos, **img_kwds)
+            else:
+                raise NotImplementedError
+            self._image = image
+            
+            offset = asvector(image_offset)
+            if image_reference in ['pos_ne', 'pos_nw', 'pos_se', 'pos_sw', 
+                                   'pos_left', 'pos_right', 'pos_up', 'pos_down']:
+                pos_ref = getattr(self, image_reference)
+                pos_img_ref = getattr(image, image_reference)
+                offset += pos_ref - pos_img_ref
+            elif image_reference not in ['middle', None]:
+                raise ValueError('invalid image reference: %r' % image_reference)
+            image.offset = offset
+            
+            
+        
+
+
+        
+        
+
+        
 
     @property
     def color(self):
@@ -120,12 +156,10 @@ class ObjectMixin(object):
         if value is None:
             self._image = None
             return
-
         if isinstance(value, str):
             value = resources.find_image(value)
             value = Image(value, self.pos)
         self._image = value
-        self._image.offset = self._image.pos - self.pos
 
     @property
     def animation(self):

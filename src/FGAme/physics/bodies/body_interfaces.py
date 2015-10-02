@@ -9,6 +9,7 @@ from FGAme.util import popattr
 INF = float('inf')
 
 
+
 class HasAABB(object):
 
     '''
@@ -22,6 +23,9 @@ class HasAABB(object):
 
     __slots__ = []
 
+    #
+    # Scalar positions
+    #    
     @property
     def xmin(self):
         return self.aabb.xmin
@@ -38,27 +42,15 @@ class HasAABB(object):
     def ymax(self):
         return self.aabb.ymax
 
-    @property
-    def bbox(self):
-        return (self.xmin, self.xmax, self.ymin, self.ymax)
+    # Scalar setters
+    xmin = xmin.setter(lambda obj, v: obj.move(v - obj.xmin, 0))
+    xmax = xmax.setter(lambda obj, v: obj.move(v - obj.xmax, 0))
+    ymin = ymin.setter(lambda obj, v: obj.move(0, v - obj.ymin))
+    ymax = ymax.setter(lambda obj, v: obj.move(0, v - obj.ymax))
 
-    @property
-    def shape(self):
-        return (self.xmax - self.xmin, self.ymax - self.ymin)
-
-    @property
-    def width(self):
-        return self.xmax - self.xmin
-
-    @property
-    def height(self):
-        return self.ymax - self.ymin
-
-    @property
-    def rect(self):
-        x, y = self.xmin, self.ymin
-        return (x, y, self.xmax - x, self.ymax - y)
-
+    #
+    # Vector positions
+    #
     @property
     def pos_sw(self):
         return Vec2(self.xmin, self.ymin)
@@ -90,6 +82,40 @@ class HasAABB(object):
     @property
     def pos_down(self):
         return Vec2(self.pos.x, self.ymin)
+
+    # Vector setters
+    pos_sw = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_sw))
+    pos_nw = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_nw))
+    pos_se = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_se))
+    pos_ne = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_ne))
+    pos_up    = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_up))
+    pos_down  = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_down))
+    pos_right = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_right))
+    pos_left  = pos_sw.setter(lambda obj, v: obj.move(v - obj.pos_left))
+    
+    #
+    # Shape parameters
+    #
+    @property
+    def bbox(self):
+        return (self.xmin, self.xmax, self.ymin, self.ymax)
+
+    @property
+    def shape(self):
+        return (self.xmax - self.xmin, self.ymax - self.ymin)
+
+    @property
+    def rect(self):
+        x, y = self.xmin, self.ymin
+        return (x, y, self.xmax - x, self.ymax - y)
+    
+    @property
+    def width(self):
+        return self.xmax - self.xmin
+
+    @property
+    def height(self):
+        return self.ymax - self.ymin
 
 
 class HasInertia(object):

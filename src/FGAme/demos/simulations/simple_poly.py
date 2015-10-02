@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 from FGAme import *
 
-#conf.DEBUG = True
 
 # Cria mundo e objetos
 world = World(restitution=1)

@@ -169,8 +169,57 @@ class TileManager(object):
     def __len__(self):
         return len(self.tiles)
 
+class TileObject(object):
+    '''Representa um objeto que está em uma grade de ladrilhos.
+    
+    Útil como classe mix-in para outros objetos na FGAme. Adiciona alguns 
+    atributos e métodos úteis para objetos que vivem em mundos ladrilhados. 
+    
+    Attributes
+    ----------
+    
+    
+    Examples
+    --------
+    
+    Feita para ser utilizada em herança múltipla::
+    
+        class Player(AABB, TileObject):
+            def __init__(self):
+                super().__init__(shape=(50, 100))
+                self.tileinit(50, coords=(0, 2))
+    
+    
+    O construtor acima inicializa a AABB de tamanho (50, 100) no ladrilho (0, 2) 
+    do tileset. Observe que as coordenadas do tileset são relativas ao ponto 
+    inferior esquerdo do objeto.
+    '''
+    
+    def __init__(self, *args, **kwds):
+        self.tileinit(*args, **kwds)
+    
+    def tileinit(self, tilesize, coords=None, tileorigin=(0, 0)):
+        '''Inicializa os valores de tilesize e tileorigin'''
+        
+        self.tileorigin = asvector(tileorigin)
+        self.tilesize = tilesize
+        if coords is not None:
+            self.coords = coords
+    
+    @property
+    def coords(self):
+        x, y = self.pos_sw - self.tileorigin
+        i = x / self.tilesize
+        j = y / self.tilesize
+        return i, j
+    
+    @coords.setter
+    def coords(self, value):
+        self.pos_sw = asvector(value) * self.tilesize + self.tileorigin
+
+
 if __name__ == '__main__':
-    from FGAme import World, AABB
+    from FGAme import World
 
     ts = '''
     |            oo

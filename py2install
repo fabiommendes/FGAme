@@ -5,6 +5,6 @@ rm py2src -rf &&
 cp src py2src -r &&
 3to2 py2src/ --no-diffs -j4 -w -f kwargs -f division &&
 echo "end"
-#python2 setup.py install --user &&
-#python2 -m FGAme.tests &&
-#python2 -m FGAme.demos
+python2 setup.py install --user &&
+python2 -m FGAme.tests &&
+python2 -m FGAme.demos

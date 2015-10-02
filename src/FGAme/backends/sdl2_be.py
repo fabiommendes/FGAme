@@ -1,5 +1,7 @@
 import ctypes
 from math import trunc
+import sys
+from warnings import warn
 
 import sdl2
 import sdl2.ext as sdl2_ext
@@ -42,7 +44,8 @@ class SDL2Canvas(Canvas):
                 self.width,
                 self.height,
                 sdl2.SDL_WINDOW_SHOWN))
-
+        self._surface = sdl2.SDL_GetWindowSurface(self._window)
+        
         # Create a renderer
         # flags = sdl2.SDL_RENDERER_SOFTWARE
         # flags = sdl2.SDL_RENDERER_ACCELERATED
@@ -67,7 +70,7 @@ class SDL2Canvas(Canvas):
         self.flip()
 
     def flip(self):
-        self._no_error(sdl2.SDL_RenderPresent(self._renderer))
+        sdl2.SDL_RenderPresent(self._renderer)
 
     def _map_point(self, point):
         x, y = point
@@ -80,7 +83,15 @@ class SDL2Canvas(Canvas):
     def _no_error(self, value):
         if value != 0:
             msg = sdl2.SDL_GetError()
-            raise RuntimeError('SDL error (%s): %s' % (value, msg))
+            msg = 'SDL error (%s): %s' % (value, msg)
+
+            # TODO: Figure out what is the problem with PyPy and some GFX
+            # functions. For now we are just ignoring errors and rendering
+            # some figures improperly
+            if 'PyPy' in sys.version:
+                warn(msg)
+            else:
+                raise RuntimeError(msg)
 
     def _no_null(self, value):
         if not value:
@@ -189,6 +200,87 @@ class SDL2Canvas(Canvas):
             gfx.aapolygonRGBA(
                 self._renderer, X, Y, N, *Color(color)))
 
+    def draw_raw_texture(self, texture, pos=(0, 0)):
+        try:
+            sdl_texture = texture.data
+        except AttributeError:
+            pil_data = texture.get_pil_data()
+            if pil_data.mode not in 'RGBA':
+                pil_data = pil_data.convert('RGBA')
+            sdl_texture = self.__convert_PIL_to_SDL(pil_data)
+            texture.set_data(sdl_texture)
+
+        dx = texture.width 
+        dy = texture.height
+        x, y = pos
+        y = self.height - y - dy
+        rect_src = sdl2.SDL_Rect(0, 0, dx, dy)
+        rect_dest = sdl2.SDL_Rect(int(x), int(y), dx, dy)
+        sdl2.SDL_RenderCopy(
+            self._renderer,  # renderer
+            sdl_texture,     # source
+            rect_src,        # source rect
+            rect_dest,       # destination rect
+        )
+            
+
+    def __convert_PIL_to_SDL(self, image):
+        # Copied from sdl2.ext.image.load_image()
+        # Thanks to Marcus von. Appen!
+        endian = sdl2.endian
+        mode = image.mode
+        width, height = image.size
+        rmask = gmask = bmask = amask = 0
+        if mode in ("1", "L", "P"):
+            # 1 = B/W, 1 bit per byte
+            # "L" = greyscale, 8-bit
+            # "P" = palette-based, 8-bit
+            pitch = width
+            depth = 8
+        
+        elif mode == "RGB":
+            # 3x8-bit, 24bpp
+            if endian.SDL_BYTEORDER == endian.SDL_LIL_ENDIAN:
+                rmask = 0x0000FF
+                gmask = 0x00FF00
+                bmask = 0xFF0000
+            else:
+                rmask = 0xFF0000
+                gmask = 0x00FF00
+                bmask = 0x0000FF
+            depth = 24
+            pitch = width * 3
+        
+        elif mode in ("RGBA", "RGBX"):
+            # RGBX: 4x8-bit, no alpha
+            # RGBA: 4x8-bit, alpha
+            if endian.SDL_BYTEORDER == endian.SDL_LIL_ENDIAN:
+                rmask = 0x000000FF
+                gmask = 0x0000FF00
+                bmask = 0x00FF0000
+                if mode == "RGBA":
+                    amask = 0xFF000000
+            else:
+                rmask = 0xFF000000
+                gmask = 0x00FF0000
+                bmask = 0x0000FF00
+                if mode == "RGBA":
+                    amask = 0x000000FF
+            depth = 32
+            pitch = width * 4
+        else:
+            # We do not support CMYK or YCbCr for now
+            raise TypeError("unsupported image format")
+
+        pxbuf = image.tostring()
+        surface = sdl2.SDL_CreateRGBSurfaceFrom(pxbuf, width, height,
+                                                depth, pitch, rmask,
+                                                gmask, bmask, amask)
+        return sdl2.SDL_CreateTextureFromSurface(self._renderer, surface)
+        
+
+    
+    
     def clear_background(self, color=None):
         renderer = self._renderer
         sdl2.SDL_RenderClear(renderer)
