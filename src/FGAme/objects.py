@@ -10,7 +10,6 @@ from FGAme.mathtools import asvector
 from FGAme.util import lazy
 from FGAme.draw import Color, color, Image
 from FGAme.events import EventDispatcherMeta, signal
-from FGAme.resources import resources
 DEBUG = False
 
 __all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
@@ -92,7 +91,6 @@ class ObjectMixin(object):
                     img_kwds[k[6:]] = v 
             
             if isinstance(image, str):
-                image = resources.find_image(image)
                 image = Image(image, self.pos, **img_kwds)
             else:
                 raise NotImplementedError

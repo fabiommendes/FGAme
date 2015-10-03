@@ -1,5 +1,9 @@
+from collections import namedtuple
 import FGAme
+from FGAme import draw
 from FGAme.mathtools import asvector
+
+TileSpec = namedtuple('TileSpec', ['tile', 'layer'])
 
 
 class TileManager(object):
@@ -28,7 +32,7 @@ class TileManager(object):
 
         tile :
             Se especificado, corresponde ao ladrilho que será replicado a cada
-            comando :meth:`add_tile` ou :meth:`add_tileset`.
+            comando :meth:`add_tile` ou :meth:`add_tilemap`.
         mode : 'aabb', 'circle'
 
 
@@ -37,12 +41,12 @@ class TileManager(object):
         '''
 
         if tile is None:
-            tile = self._make_tile(name, **kwds)
-        self.specs[name] = tile
+            tilespec = self._make_tile(name, **kwds)
+        self.specs[name] = tilespec
         if char is not None:
-            self.charspecs[char] = tile
+            self.charspecs[char] = tilespec
 
-    def _make_tile(self, name, mode='aabb', **kwds):
+    def _make_tile(self, name, shape=None, layer=None, physics=True, **kwds):
         '''Cria ladrinho para o método register_spec'''
 
         modes = {
@@ -60,20 +64,42 @@ class TileManager(object):
 
         }
 
-        # Obtem argumentos e classe de inicialização a partir do modo
-        mode = modes[mode.lower()]
-        cls = mode.pop('cls')
-        kwds.update(mode)
+        if physics:
+            mode = modes[(shape or 'aabb').lower()]
+            cls = mode.pop('cls')
+            kwds.update(mode)
+            
+            # Configura argumentos padrão para todos os objetos
+            kwds.setdefault('mass', 'inf')
+    
+            # Inicializa e reposiciona
+            tile = cls(**kwds)
+            tile.name = name
 
-        # Configura argumentos padrão para todos os objetos
-        kwds.setdefault('mass', 'inf')
+        else:
+            modes['aabb']['cls'] = draw.AABB
+            modes['circle']['cls'] = draw.Circle
+            modes['poly']['cls'] = draw.Poly
+            mode = modes[(shape or 'aabb').lower()]
+            cls = mode.pop('cls')
+            kwds.update(mode)
+            
+            if 'image' in kwds:
+                if shape is not None:
+                    raise TypeError('when `physics=False`, '
+                                    'cannot specify shape if image is given')
 
-        # Inicializa e reposiciona
-        tile = cls(**kwds)
-        tile.name = name
+                del kwds['shape']                
+                path = kwds.pop('image')
+                for k in list(kwds):
+                    if k.startswith('image_'):
+                        kwds[k[6:]] = kwds.pop(k)
+                tile = draw.Image(path, **kwds)
+            else:
+                tile = cls(**kwds)
+
         tile.move(self.origin - tile.pos_se)
-
-        return tile
+        return TileSpec(tile, layer or 0)
 
     def add_tile(self, pos, tile):
         '''Adiciona o ladrilho especificado na posição dada.
@@ -91,22 +117,23 @@ class TileManager(object):
         i, j = pos
         dx, dy = self.shape
         x0, y0 = self.origin
-
+        layer = 0
+        
         if isinstance(tile, str):
             name = tile
             try:
                 if len(name) == 1:
-                    tile = self.charspecs[name]
+                    tile, layer = self.charspecs[name]
                 else:
-                    tile = self.specs[name]
+                    tile, layer = self.specs[name]
             except KeyError:
                 raise ValueError('%r is not a valid tile name' % name)
 
         tile = tile.copy()
         tile.move(x0 + i * dx, y0 + j * dy)
-        self.tiles.append(tile)
+        self.tiles.append(TileSpec(tile, layer))
 
-    def add_tileset(self, data):
+    def add_tilemap(self, data):
         '''Adiciona um tileset completo a partir da string de especificação.
 
         Um exemplo de string ``data`` é dado abaixo::
@@ -157,11 +184,8 @@ class TileManager(object):
     def update_world(self, world, layer=0):
         '''Usado por World.add() para adicionar o tileset'''
 
-        for tile in self.tiles:
-            if tile.is_rogue():
-                world.add(tile.copy(), layer)
-            else:
-                raise RuntimeError('tile already present in world')
+        for tile, delta in self.tiles:
+            world.add(tile.copy(), layer + delta)
 
     def __iter__(self):
         return iter(self.tiles)
@@ -234,9 +258,9 @@ if __name__ == '__main__':
     w = World()
     tm = TileManager((30, 30))
     tm.register_spec('brick', 'x', color='red')
-    tm.register_spec('coin', 'o', mode='circle', color='yellow')
+    tm.register_spec('coin', 'o', shape='circle', color='yellow')
     tm.register_spec('spike', 'i', color='black')
-    tm.add_tileset(ts)
+    tm.add_tilemap(ts)
 
     w.add(tm)
     w.run()

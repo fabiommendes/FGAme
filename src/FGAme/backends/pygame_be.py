@@ -90,7 +90,7 @@ class PyGameCanvas(Canvas):
             pg_texture = pygame.image.fromstring(
                 pil_data.tostring(),
                 texture.shape, pil_data.mode)
-            texture.set_data(pg_texture)
+            texture.set_backend_data(pg_texture)
 
         x, y, dx, dy = pg_texture.get_rect()
         x += pos[0]

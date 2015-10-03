@@ -1,7 +1,7 @@
-# -*- coding: utf8 -*-
 import types
+import functools
 
-__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr']
+__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr', 'lru_cache']
 
 
 class lazy(object):
@@ -113,6 +113,30 @@ def popattr(obj, attr, value=None):
     else:
         delattr(obj, attr)
         return result
+
+
+try:
+    from functools import lru_cache as _lru_cache
+    def lru_cache(func):
+        '''A least recently used cache: keeps the 512 most recent results of
+        function in cache'''
+        return _lru_cache(maxsize=512)(func)
+except ImportError:
+    def lru_cache(func):
+        '''A least recently used cache: keeps the 512 most recent results of
+        function in cache'''
+        D = {}
+
+        @functools.wraps(func)
+        def decorated(*args):
+            try:
+                return D[args]
+            except KeyError:
+                result = func(*args)
+                while len(D) > 512:
+                    D.popitem()
+                return result
+        return decorated
 
 
 if __name__ == '__main__':

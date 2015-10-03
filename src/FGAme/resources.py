@@ -8,7 +8,6 @@ Por padrão, a FGAme assume que os arquivos estão numa pasta chamada
 
 import os
 import sys
-from FGAme import draw
 
 IMG_PRIORITIES = ['.png', '.gif', '.bmp', '.jpeg', '.jpg', '.tiff']
 SND_PRIORITIES = ['.wav', '.ogg', '.mp3']
@@ -90,7 +89,7 @@ class ResourceManager(object):
         compatível com o nome dade.'''
 
         path = self.find_path(name, priorities)
-        return open(self.get_data(path), mode, encoding=encoding)
+        return open(self.get_backend_data(path), mode, encoding=encoding)
 
     def find_path(self, name, priorities=None):
         '''Retorna o caminho para o arquivo de maior prioridade com o nome
@@ -109,10 +108,15 @@ class ResourceManager(object):
         '''Retorna a imagem de maior prioridade com o nome compatível com o
         valor fornecido
         '''
-
+        from FGAme import draw
+        return draw.get_texture(self.find_image_path(name))
+        
+    def find_image_path(self, name):
+        '''Retorna o caminho para a imagem de prioridade com o nome compatível 
+        com o valor fornecido'''
+        
         path = self.find_path(name, priorities=IMG_PRIORITIES)
-        abspath = os.path.join(self.root, path)
-        return draw.get_texture(abspath)
+        return os.path.join(self.root, path)
 
     def find_animation(self, name):
         '''Retorna a animação caminho para o arquivo de maior prioridade com o

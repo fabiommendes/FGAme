@@ -248,6 +248,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         '_col_layer', '_col_group_mask',
     ]
 
+    has_physics = True
     DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
     def __init__(self, pos=null2D, vel=null2D, theta=0.0, omega=0.0,

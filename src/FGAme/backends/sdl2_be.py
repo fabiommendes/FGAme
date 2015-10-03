@@ -208,7 +208,7 @@ class SDL2Canvas(Canvas):
             if pil_data.mode not in 'RGBA':
                 pil_data = pil_data.convert('RGBA')
             sdl_texture = self.__convert_PIL_to_SDL(pil_data)
-            texture.set_data(sdl_texture)
+            texture.set_backend_data(sdl_texture)
 
         dx = texture.width 
         dy = texture.height

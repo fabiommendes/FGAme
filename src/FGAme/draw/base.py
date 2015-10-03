@@ -15,6 +15,7 @@ class Drawable(object):
     __slots__ = []
 
     visible = True
+    has_physics = False
 
     def show(self):
         self.visible = True
