@@ -166,7 +166,7 @@ class Pong(World):
         V = self.ball.vel.norm()
         if V < self.max_ball_speed:
             V += 3
-            self.ball.vel = self.ball.vel.normalize() * V
+            self.ball.vel = self.ball.vel.normalized() * V
 
     def check_fail(self):
         '''Checa se o jogador perdeu e acrecenta um hitpoint, em caso

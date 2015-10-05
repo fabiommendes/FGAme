@@ -1,8 +1,7 @@
-# -*- coding: utf8 -*-
-
+import random
 from FGAme import conf
 from FGAme.util import lazy
-from FGAme.mathtools import Vec2
+from FGAme.mathtools import Vec2, pi, ux2D
 
 __all__ = ['pos', 'vel']
 
@@ -146,7 +145,7 @@ class VelObject(GlobalObject):
     # TODO: definir atributos e métodos para as velocidades
     # Velocidades aleatórias ##################################################
     def _random(self, scale, angle):
-        return scale * vec_x.rotate(random.uniform(0, 2 * pi))
+        return scale * ux2D.rotated(random.uniform(0, 2 * pi))
 
     def random(self, angle=None):
         return self._random(self.fair, angle)
@@ -163,10 +162,10 @@ _speeds = dict(
     down=Vec2(0, -1),
     right=Vec2(1, 0),
     left=Vec2(-1, 0),
-    ne=Vec2(1, 1).normalize(),
-    nw=Vec2(-1, 1).normalize(),
-    se=Vec2(1, -1).normalize(),
-    sw=Vec2(-1, -1).normalize(),
+    ne=Vec2(1, 1).normalized(),
+    nw=Vec2(-1, 1).normalized(),
+    se=Vec2(1, -1).normalized(),
+    sw=Vec2(-1, -1).normalized(),
 )
 
 

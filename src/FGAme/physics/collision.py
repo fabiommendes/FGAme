@@ -353,6 +353,26 @@ class Collision(Pair):
             tangent = -tangent
         return tangent
 
+    def cancel(self):
+        '''Cancela a colisão'''
+        
+        self.active = False
+
+    #
+    # Controle de sinais
+    #
+    def pre_collision(self):
+        A, B = self
+        A.trigger_pre_collision(self)
+        B.trigger_pre_collision(self)
+    
+    def post_collision(self):
+        A, B = self
+        A.trigger_post_collision(self)
+        B.trigger_post_collision(self)
+
+
+
     ###########################################################################
     #                       Métodos da API de Collision
     ###########################################################################
@@ -391,13 +411,14 @@ class Collision(Pair):
         delta = self.delta
         if delta > mindelta:
             A, B = self
-            a = A._invmass
-            b = B._invmass
-            beta *= delta / (a + b)
-            a *= beta
-            b *= beta
-            A.move(-a * self.normal)
-            B.move(b * self.normal)
+            delta = 0.5 * delta
+            Z = A.invmass + B.invmass
+            delta_a = delta * A.invmass / Z
+            delta_b = delta * B.invmass / Z
+            if delta_a:
+                A.move(-delta_a * self.normal)
+            if delta_b:
+                B.move(delta_b * self.normal)
 
 
 class ContactOrdered(Collision):

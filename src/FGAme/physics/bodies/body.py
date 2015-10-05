@@ -405,8 +405,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         físico, ex.: Circle, AABB, Poly, etc'''
 
         if self.flags & flags.dirty_any:
-            self._shape = self._baseshape.move(self.pos).rotate(self._theta)
+            self._shape = self._baseshape.displaced(self.pos).rotated(self._theta)
             self.flags &= flags.not_dirty
+        assert self._shape is not None, 'empty shape'
         return self._shape
 
     # Propriedades da caixa de contorno #######################################
@@ -437,7 +438,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
     ###########################################################################
     #                                Sinais
     ###########################################################################
-    collision = signal('collision', num_args=1)
+    pre_collision = signal('pre-collision', num_args=1)
+    post_collision = signal('post-collision', num_args=1)
     frame_enter = signal('frame-enter')
     out_of_bounds = signal('out-of-bounds', num_args=1)
 

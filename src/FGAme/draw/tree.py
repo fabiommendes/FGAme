@@ -342,7 +342,7 @@ class Pen(RenderTree):
         try:
             return self._SPECIAL_DIRECTIONS[self._angle % 360]
         except KeyError:
-            return ux2D.rotate(self.theta)
+            return ux2D.rotated(self.theta)
 
     #
     # Controle de transações

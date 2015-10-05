@@ -44,7 +44,7 @@ class Gas(World):
         '''Aumenta a energia de todas as partículas'''
 
         for bola in self.bolas:
-            bola.vel += 1 * bola.vel.normalize()
+            bola.vel += 1 * bola.vel.normalized()
 
     @listen('long-press', 'a')
     def energy_down(self):

@@ -323,12 +323,16 @@ class Simulation(EventDispatcher):
         narrow_cols = self.narrow_phase(broad_cols)
 
         for col in narrow_cols:
-            col.resolve()
+            col.pre_collision()
+            if col.active:
+                col.resolve()
+                col.post_collision()
 
-        # Estabiliza contatos usando a estabilização de baumgarte
-        #beta = self.beta
-        # for col in narrow_cols:
-        #    col.baumgarte_adjust(beta)
+        # Estabiliza contatos usando a estabilização de Baumgarte
+        beta = self.beta
+        for col in narrow_cols:
+            if col.active:
+                col.baumgarte_adjust(beta)
 
     def get_islands(self, contacts):
         '''Retorna a lista de grupos de colisão fechados no gráfico de

@@ -106,15 +106,6 @@ class ObjectMixin(object):
                 raise ValueError('invalid image reference: %r' % image_reference)
             image.offset = offset
             
-            
-        
-
-
-        
-        
-
-        
-
     @property
     def color(self):
         return self._color

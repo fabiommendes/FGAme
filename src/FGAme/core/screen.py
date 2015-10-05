@@ -146,7 +146,7 @@ class Canvas(Screen):
         '''Desenha a borda de um círculo'''
         raise NotImplementedError
 
-    def draw_raw_aabb_solid(self, poly, color=black):
+    def draw_raw_aabb_solid(self, aabb, color=black):
         '''Desenha uma aabb sólida'''
         raise NotImplementedError
 
@@ -200,7 +200,7 @@ class Canvas(Screen):
 
         if not self._direct:
             raise RuntimeError
-
+        
         if solid:
             self.draw_raw_aabb_solid(aabb, color)
         if line_color is not None and line_width:

@@ -55,7 +55,7 @@ class Poly(Body):
         involver testes de independencia linear relativamente caros.
         '''
 
-        normals = [self.get_normal(i).normalize()
+        normals = [self.get_normal(i).normalized()
                    for i in range(self.num_sides)]
         LI = []
         LI_idx = []
@@ -87,7 +87,7 @@ class Poly(Body):
 
         points = self.vertices
         x, y = points[(i + 1) % self.num_sides] - points[i]
-        return Vec2(y, -x).normalize()
+        return Vec2(y, -x).normalized()
 
     def get_normals(self):
         '''Retorna uma lista com as normais linearmente independentes.'''
@@ -96,7 +96,7 @@ class Poly(Body):
             N = self.num_sides
             points = self.vertices
             segmentos = (points[(i + 1) % N] - points[i] for i in range(N))
-            return [Vec2(y, -x).normalize() for (x, y) in segmentos]
+            return [Vec2(y, -x).normalized() for (x, y) in segmentos]
         else:
             return [self.get_normal(i) for i in self._normals_idxs]
 
@@ -201,7 +201,7 @@ class RegularPoly(Poly):
         b = length / (2 * sin(alpha))
         P0 = Vec2(b, 0)
         pos = Vec2(*pos)
-        return [(P0.rotate(n * theta)) + pos for n in range(N)]
+        return [(P0.rotated(n * theta)) + pos for n in range(N)]
 
 
 class Rectangle(Poly):
