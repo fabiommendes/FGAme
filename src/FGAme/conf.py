@@ -50,6 +50,7 @@ _screen_object = None
 _window_origin = (0, 0)
 _window_shape = None
 _backend = None
+#_backends = ['qt5', 'sdl2', 'pygamegfx', 'pygame', 'sdl2cffi']
 _backends = ['sdl2', 'pygamegfx', 'pygame', 'sdl2cffi']
 _backend_classes = None
 

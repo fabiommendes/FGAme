@@ -14,7 +14,7 @@ import FGAme as mod_current
 from FGAme import conf  # @Reimport
 
 
-#conf.set_backend('empty')
+conf.set_backend('empty')
 print('Starting tests using backend: %s' % conf.get_backend())
 
 

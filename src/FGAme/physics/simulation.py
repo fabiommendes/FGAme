@@ -260,7 +260,7 @@ class Simulation(EventDispatcher):
         angulares de cada objeto.
 
         Para tanto, usa informação tanto de forças globais quanto dos atributos
-        *force* e *torque* de cada objeto.'''
+        *func* e *torque* de cada objeto.'''
 
         IS_SLEEP = BodyFlags.is_sleeping
         t = self.time
@@ -272,8 +272,8 @@ class Simulation(EventDispatcher):
 
             if obj._invmass:
                 obj.init_accel()
-                if obj.force is not None:
-                    obj._accel += obj.force(t) * obj._invmass
+                if obj.func is not None:
+                    obj._accel += obj.func(t) * obj._invmass
 
             # elif obj.flags & ACCEL_STATIC:
             #    obj.init_accel()

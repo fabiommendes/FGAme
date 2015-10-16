@@ -27,6 +27,30 @@ except ImportError:
     from warnings import warn
     warn('PIL not found. FGAme will not be able to render images and textures')
 
+
+#
+# Reference aliases for special points in an AABB
+#
+REFERENCE_NAMES = {
+    'bottom-left': 'pos_sw',
+    'bottom-right': 'pos_se',
+    'top-left': 'pos_nw',
+    'top-right': 'pos_ne',
+    'bottom': 'pos_down',
+    'top': 'pos_up',
+    'down': 'pos_down',
+    'up': 'pos_up',
+    'left': 'pos_left',
+    'right': 'pos_right',
+    'center': 'pos',
+}
+for k, v in list(REFERENCE_NAMES.items()):
+    if '-' in k:
+        k = '-'.join(k.split('-')[::-1])
+        REFERENCE_NAMES[k] = v
+del k, v
+    
+    
 class Texture(object):
     '''Representa uma textura.'''
 
@@ -105,29 +129,9 @@ class Image(AABB):
         if reference is not None:
             self.pos = pos - self.get_reference_point(reference)
             
-
-    REFERENCE_NAMES = {
-        'bottom-left': 'pos_sw',
-        'bottom-right': 'pos_se',
-        'top-left': 'pos_nw',
-        'top-right': 'pos_ne',
-        'bottom': 'pos_down',
-        'top': 'pos_up',
-        'down': 'pos_down',
-        'up': 'pos_up',
-        'left': 'pos_left',
-        'right': 'pos_right',
-        'center': 'pos',
-    }
-    for k, v in list(REFERENCE_NAMES.items()):
-        if '-' in k:
-            k = '-'.join(k.split('-')[::-1])
-            REFERENCE_NAMES[k] = v
-    del k, v
-            
     def get_reference_point(self, ref):
         #TODO: move to HasAABB or something more generic
-        point = getattr(self, self.REFERENCE_NAMES.get(ref, ref))
+        point = getattr(self, REFERENCE_NAMES.get(ref, ref))
         return asvector(point)
 
     def draw(self, screen):
@@ -243,3 +247,4 @@ def __get_texture_from_path(path):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    

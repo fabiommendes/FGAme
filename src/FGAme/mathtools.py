@@ -13,9 +13,9 @@ from generic import set_promotion_rule, set_conversion
 #
 # Apelidos para tipos vetoriais
 #
-Point2 = Point[2, float]
-Point3 = Point[3, float]
-Point4 = Point[4, float]
+#Point2 = Point[2, float]
+#Point3 = Point[3, float]
+#Point4 = Point[4, float]
 
 
 class FGAmeVec(object):

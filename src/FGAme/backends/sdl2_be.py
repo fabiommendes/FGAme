@@ -158,17 +158,6 @@ class SDL2Canvas(Canvas):
             Yc[i] = trunc(height - pt.y)
         return Xc, Yc
 
-    def draw_raw_poly_solid(self, poly, color):
-        N = len(poly)
-        X, Y = self._get_poly_xy(poly)
-        color = Color(color)
-        self._no_error(
-            gfx.aapolygonRGBA(
-                self._renderer, X, Y, N, *color))
-        self._no_error(
-            gfx.filledPolygonRGBA(
-                self._renderer, X, Y, N, *color))
-
     def draw_raw_segment(self, segment, width, color):
         height = self.height
         pt1, pt2 = segment
@@ -192,12 +181,23 @@ class SDL2Canvas(Canvas):
                     trunc(width),
                     *color))
 
+    def draw_raw_poly_solid(self, poly, color):
+        N = len(poly)
+        X, Y = self._get_poly_xy(poly)
+        color = Color(color)
+        self._no_error(
+            gfx.polygonRGBA(
+                self._renderer, X, Y, N, *color))
+        self._no_error(
+            gfx.filledPolygonRGBA(
+                self._renderer, X, Y, N, *color))
+
     def draw_raw_poly_border(self, poly, width, color):
         # TODO: desenhar linhas espessas
         N = len(poly)
         X, Y = self._get_poly_xy(poly)
         self._no_error(
-            gfx.aapolygonRGBA(
+            gfx.polygonRGBA(
                 self._renderer, X, Y, N, *Color(color)))
 
     def draw_raw_texture(self, texture, pos=(0, 0)):

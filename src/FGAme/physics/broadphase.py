@@ -96,7 +96,7 @@ class BroadPhase(AbstractCollisionPhase):
 
     __slots__ = []
 
-    def pairs(self):
+    def immutable_to_mutable_map(self):
         '''Retorna a lista de pares encontradas por update'''
 
         return list(self._data)

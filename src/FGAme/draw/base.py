@@ -12,7 +12,7 @@ class Drawable(object):
 
     '''Classe mãe para todos os objetos que podem ser desenhados na tela'''
 
-    __slots__ = []
+    __slots__ = ()
 
     visible = True
     has_physics = False
@@ -101,7 +101,7 @@ class Segment(shapes.mSegment, Curve):
     '''Um segmento de reta que vai do ponto start até end'''
 
     __init__ = lazy_curve_init
-
+    __slots__ = 'screen_handle'
 
 class Ray(shapes.mRay, Curve):
 
@@ -109,13 +109,14 @@ class Ray(shapes.mRay, Curve):
     específico'''
 
     __init__ = lazy_curve_init
-
+    __slots__ = 'screen_handle'
 
 class Line(shapes.mLine, Curve):
 
     '''Uma linha infinita'''
 
     __init__ = lazy_curve_init
+    __slots__ = 'screen_handle'
 
 
 class Path(shapes.mPath, Curve):
@@ -123,7 +124,8 @@ class Path(shapes.mPath, Curve):
     '''Um caminho formado por uma sequência de pontos'''
 
     __init__ = lazy_curve_init
-
+    __slots__ = 'screen_handle'
+    
 # Objetos sólidos (figuras fechadas) ##########################################
 
 
@@ -196,6 +198,8 @@ class Circle(shapes.mCircle, Shape):
 
     '''Um círculo de raio `radius` e centro em `center`.'''
 
+    __slots__ = 'screen_handle'
+    
     def __init__(self, radius, pos=(0, 0), **kwds):
 
         shapes.mCircle.__init__(self, radius, pos)
@@ -207,21 +211,21 @@ class AABB(shapes.mAABB, Shape):
     '''Caixa de contorno alinhada aos eixos'''
 
     __init__ = lazy_shape_init
-
+    __slots__ = 'screen_handle'
 
 class Sprite(AABB):
 
     '''Define uma image animada. O controle de frames é feito a cada chamada
     do método draw(). Desta forma, caso o método seja chamado duas vezes por
     frame, a velocidade de animação será o dobro da desejada.'''
-
+    
 
 class Circuit(shapes.mCircuit, Shape):
 
     '''Um caminho fechado com um interior bem definido.'''
 
     __init__ = lazy_shape_init
-
+    __slots__ = 'screen_handle'
 
 class Poly(shapes.mPoly, Shape):
 
@@ -229,6 +233,7 @@ class Poly(shapes.mPoly, Shape):
     de vértices.'''
 
     __init__ = lazy_shape_init
+    __slots__ = 'screen_handle'
 
 
 class Rectangle(shapes.mRectangle, Shape):
@@ -240,6 +245,7 @@ class Rectangle(shapes.mRectangle, Shape):
 
     # TODO: não consegue herdar de Poly. Porque?
     __init__ = lazy_shape_init
+    __slots__ = 'screen_handle'
 
     def draw(self, canvas):
         canvas.draw_poly(self, **self._draw_kwds())
@@ -251,6 +257,7 @@ class Triangle(shapes.mTriangle, Shape):
 
     # TODO: não consegue herdar de Poly. Porque?
     __init__ = lazy_shape_init
+    __slots__ = 'screen_handle'
 
     def draw(self, canvas):
         canvas.draw_poly(self, **self._draw_kwds())

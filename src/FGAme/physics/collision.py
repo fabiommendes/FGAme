@@ -281,6 +281,8 @@ class Collision(Pair):
         assert rA.dot(normal) >= 0, 'normal is pointing towards the first body'
 
     def resolve(self):
+        '''Resolve as velocidades dos elementos que participam da colisão'''
+        
         A, B = self
         normal = self.normal
         pos = self.pos
@@ -293,8 +295,7 @@ class Collision(Pair):
             Jvec = J * normal
             pos = self.pos
 
-            # Impulso tangente
-
+            # Aplica impulso total
             A.apply_impulse(Jvec, pos=pos)
             B.apply_impulse(-Jvec, pos=pos)
 

@@ -565,7 +565,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
     ###########################################################################
     #                        Propriedades físicas
     ###########################################################################
-    force = ForceProperty()
+    func = ForceProperty()
 
     def linearK(self):
         '''Energia cinética das variáveis lineares'''
@@ -926,7 +926,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         return Vec2(cos(theta), sin(theta))
 
     def torque(self, t):
-        '''Define uma torque externo análogo ao método .force()'''
+        '''Define uma torque externo análogo ao método .func()'''
 
         return 0.0
 

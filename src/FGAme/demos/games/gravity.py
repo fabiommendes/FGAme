@@ -23,7 +23,7 @@ class Gravity(World):
         # Definimos a força de interação entre ambos
         K = self.K = A.mass
         F = SpringTensorPair(A, B, (K, 2 * K))
-        A.force, B.force = F.forces()
+        A.func, B.func = F.forces()
 
         E0 = F.energyT()
 

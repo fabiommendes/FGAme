@@ -138,11 +138,17 @@ class RenderTree(object):
         else:
             return []
 
-    def update(self, dt):
-        '''Percorre todos os objetos na árvore invocando o método update()'''
+    def screen_update(self, screen):
+        '''Percorre todos os objetos na árvore invocando o método 
+        screen_update() o parâmetro de screen fornecido'''
 
         for obj in self.walk():
-            obj.update(dt)
+            drawable = obj.drawable
+            try:
+                handle = drawable.screen_handle
+            except AttributeError:
+                handle = drawable.screen_handle = screen.get_handle(drawable)
+            screen.update_handle(handle, drawable)
 
     def draw(self, screen):
         '''Percorre todos os objetos na árvore invocando o método

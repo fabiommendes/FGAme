@@ -5,7 +5,7 @@ Forças
 ======
 
 Forças externas podem ser inseridas manualmente nos objetos físicos da FGAme
-através do atributo obj.force das instâncias de `Body()` ou criadas através de
+através do atributo obj.func das instâncias de `Body()` ou criadas através de
 um objeto da classe Force().
 
 No caso mais simples, podemos simplesmente atribuir uma função que retorna o
@@ -13,22 +13,22 @@ vetor de força como função do tempo:
 
 >>> from FGAme import Circle
 >>> obj = Circle(5)
->>> obj.force = lambda t: (4, 3) - obj.pos
+>>> obj.func = lambda t: (4, 3) - obj.pos
 
 Neste caso, podemos simplesmente calcular a força chamando
 
->>> obj.force(0)
+>>> obj.func(0)
 Vec(4, 3)
 
-O attributo obj.force aceita várias regras de composição. A mais útil delas,
+O attributo obj.func aceita várias regras de composição. A mais útil delas,
 de soma de forças, permite aplicar várias forças externas a um mesmo objeto.
 
->>> obj.force += lambda t: (10, 10)
+>>> obj.func += lambda t: (10, 10)
 
 Neste caso, a composição de forças corresponde à adição dos valores de cada
 componente
 
->>> obj.force(0)
+>>> obj.func(0)
 Vec(14, 13)
 
 
@@ -49,9 +49,9 @@ implementam forças conservativas e aquelas que dependem apenas da velocidade.
 
 Para criar uma força de atração gravitacional para o centro da tela, por
 exemplo, basta criar o objeto do tipo Gravity() e atribuir ao atributo
-obj.force:
+obj.func:
 
->>> obj.force = Gravity(obj, G=1e5, pos=(400, 300))
+>>> obj.func = Gravity(obj, G=1e5, pos=(400, 300))
 
 Como conveniência, podemos também usar a função set_force_gravity():
 
@@ -97,7 +97,7 @@ NO_UPDATE = object()
 
 class ForceProperty(object):
 
-    '''Implementa o atributo obj.force dos objetos da classe Body.
+    '''Implementa o atributo obj.func dos objetos da classe Body.
 
     ForceProperty facilita a composição de forças num mesmo objeto e apresenta
     um sintaxe conveniente para especificar as forças atuantes em um objeto.
@@ -108,45 +108,45 @@ class ForceProperty(object):
     Considere uma classe com uma propriedade do tipo ForceProperty()
 
     >>> class HasForce(object):
-    ...     force = ForceProperty()
+    ...     func = ForceProperty()
 
     Criamos um objeto desta classe e atribuimos uma força a ele.
 
     >>> obj = HasForce()
-    >>> obj.force = lambda x: (0, x**2)
-    >>> obj.force(2)
+    >>> obj.func = lambda x: (0, x**2)
+    >>> obj.func(2)
     Vec(0, 4)
 
     Também podemos definir a força utilizando um decorador se for mais
     conveniente
 
-    >>> @obj.force.define
-    ... def force(x):
+    >>> @obj.func.define
+    ... def func(x):
     ...     return (0, x**3)
-    >>> obj.force(2)
+    >>> obj.func(2)
     Vec(0, 8)
 
     O recurso mais importante, no entanto, é a composição de forças. Podemos
     definir uma composição de forças simplesmente adicionando ou subtraindo
     forças ao atributo original
 
-    >>> obj.force += lambda x: (0, x**2)
-    >>> obj.force(2) # => 2**2 + 2**3
+    >>> obj.func += lambda x: (0, x**2)
+    >>> obj.func(2) # => 2**2 + 2**3
     Vec(0, 12)
 
     Outras operações algébricas também estão definidas
 
-    >>> obj.force *= 2
-    >>> obj.force(2)
+    >>> obj.func *= 2
+    >>> obj.func(2)
     Vec(0, 24)
 
     Os decoradores também estão disponíveis para as operações de adição e
     subtração de forças.
 
-    >>> @obj.force.add
-    ... def force(x):
+    >>> @obj.func.add
+    ... def func(x):
     ...     return (0, x**4)
-    >>> obj.force(2)
+    >>> obj.func(2)
     Vec(0, 40)
 
     Notas
@@ -161,17 +161,17 @@ class ForceProperty(object):
     ForceProperty.
 
     O trabalho pesado é feito pela class ForceCtrl. Todos os acessos à
-    obj.force do exemplo anterior simplesmente retornam o valor do atributo
+    obj.func do exemplo anterior simplesmente retornam o valor do atributo
     obj._force_ctl, que é a instância de ForceCtrl que realmente faz a
     coordenação das forças
 
     >>> obj._force_ctrl                                    # doctest: +ELLIPSIS
     <...ForceCtrl object at 0x...>
-    >>> obj.force                                          # doctest: +ELLIPSIS
+    >>> obj.func                                          # doctest: +ELLIPSIS
     <...ForceCtrl object at 0x...>
 
     Lembramos que obj._force é uma função simples que executa mais rapidamente
-    que obj.force pois não precisa passar pelo mecanismo que implementa as
+    que obj.func pois não precisa passar pelo mecanismo que implementa as
     propriedades no Python.
 
     >>> obj._force # doctest: +ELLIPSIS
@@ -229,7 +229,7 @@ class ForceCtrl(object):
     def add(self, force):
         '''Adiciona uma nova força à interação com a partícula.
 
-        O resultado é uma força cujo resultado é a soma de force(t) com as
+        O resultado é uma força cujo resultado é a soma de func(t) com as
         forças já definidas anteriormente.
         '''
 
@@ -368,7 +368,7 @@ class Force(object):
 
     @classmethod
     def setting_force(cls, *args, **kwds):
-        '''Inicializa a força e já registra no atributo obj.force de todos os
+        '''Inicializa a força e já registra no atributo obj.func de todos os
         objetos envolvidos'''
 
         if 'register' in kwds:
@@ -389,26 +389,26 @@ def set_force_single(obj, func, mode):
 
     obj : Body
         Objeto em que a força atua
-    force : callable
+    func : callable
         Uma função que retorna o vetor com a força resultante. A assinatura da
         função depende do argumento `mode`.
     mode : str
         Existem quatro possibilidades. Cada um assume uma assinatura
         específica.
             'none':
-                force() -> F
+                func() -> F
             'time':
-                force(t) -> F
+                func(t) -> F
             'object':
-                force(obj) -> F
+                func(obj) -> F
             'position':
-                force(obj.pos) -> F
+                func(obj.pos) -> F
             'velocity':
-                force(obj.vel) -> F
+                func(obj.vel) -> F
             'all':
-                force(obj.pos, obj.vel, t) -> F
+                func(obj.pos, obj.vel, t) -> F
         O valor padrão é 'time', que corresponde à convenção empregada pelo
-        atributo obj.force dos objetos físicos.
+        atributo obj.func dos objetos físicos.
 
     See also
     --------
@@ -425,35 +425,35 @@ class Single(Force):
 
     Ver `set_force_single()` para descrição dos argumentos.'''
 
-    def __init__(self, obj, force, mode='time', register=False):
+    def __init__(self, obj, func, mode='time', register=False):
         self._obj = obj
-        self._force = force
+        self._force = func
         self._mode = mode
 
-        # Converte force para a assinatura force(t) -> F
+        # Converte func para a assinatura func(t) -> F
         if mode == 'time':
-            self._worker = force
+            self._worker = func
         elif mode == 'none':
-            self._worker = lambda t: force()
+            self._worker = lambda t: func()
         elif mode == 'object':
-            self._worker = lambda t: force(obj)
+            self._worker = lambda t: func(obj)
         elif mode == 'all':
-            self._worker = lambda t: force(obj, t)
+            self._worker = lambda t: func(obj, t)
         elif mode == 'position':
-            self._worker = lambda t: force(obj.pos)
+            self._worker = lambda t: func(obj.pos)
         elif mode == 'velocity':
-            self._worker = lambda t: force(obj.vel)
+            self._worker = lambda t: func(obj.vel)
         else:
             raise ValueError('invalid mode: %r' % mode)
 
         if register:
-            self._obj.force.add(self._worker)
+            self._obj.func.add(self._worker)
 
     def __call__(self, t):
         return self._worker(t)
 
     obj = property(lambda self: self._obj)
-    force = property(lambda self: self._force)
+    func = property(lambda self: self._force)
     mode = property(lambda self: self._mode)
 
 
@@ -467,8 +467,8 @@ class Viscous(Single):
 
     def __init__(self, obj, gamma=0, register=False):
         self.gamma = gamma
-        self._viscous_force = force = lambda v: -gamma * obj.vel
-        super(Viscous, self).__init__(obj, force, 'velocity', register)
+        self._viscous_force = func = lambda v: -gamma * obj.vel
+        super(Viscous, self).__init__(obj, func, 'velocity', register)
 
 
 def set_force_conservative(obj, force, potential):
@@ -478,7 +478,7 @@ def set_force_conservative(obj, force, potential):
     ----------
     obj : Body
         Objeto em que a força atua
-    force : callable
+    func : callable
         Função do vetor posição que retorna a força resultante.
     potential : callable
         Função do vetor posição que retorna a energia potencial.
@@ -498,9 +498,9 @@ class Conservative(Single):
 
     Veja `set_force_conservative()` para descrição dos argumentos.'''
 
-    def __init__(self, obj, force, potential, register=False):
+    def __init__(self, obj, func, potential, register=False):
         super(Conservative, self).__init__(
-            obj, force, 'position', register=register)
+            obj, func, 'position', register=register)
         self._potential = potential
 
     def energyT(self):
@@ -664,24 +664,24 @@ def set_force_pair(A, B, func, mode='time'):
 
     A, B : Object instances
         Objetos em que a força atua
-    force : callable
+    func : callable
         Uma função que retorna o vetor com a força resultante. A assinatura da
         função depende do último argumento `mode`. Por convenção é a força que
         A produz em B (ou força sofrida por B devido à A).
     mode : str
         Existem cinco possibilidades. Cada um assume uma assinatura específica.
             'none':
-                force() -> F
+                func() -> F
             'time':
-                force(t) -> F
+                func(t) -> F
             'object':
-                force(A, B) -> F
+                func(A, B) -> F
             'position':
-                force(A.pos, B.pos) -> F
+                func(A.pos, B.pos) -> F
             'all':
-                force(A.pos, B.pos, t) -> F
+                func(A.pos, B.pos, t) -> F
         O valor padrão é 'time', que corresponde à convenção empregada pelo
-        atributo obj.force dos objetos físicos.
+        atributo obj.func dos objetos físicos.
 
     See also
     --------
@@ -705,7 +705,7 @@ class Pair(Force):
         self._mode = mode
         self._cacheF = None
 
-        # Converte force para a assinatura force(t) -> F
+        # Converte func para a assinatura func(t) -> F
         if mode == 'time':
             self._worker = func
         elif mode == 'none':
@@ -721,13 +721,13 @@ class Pair(Force):
 
         # Registra as forças
         if register:
-            self._A.force.add(self.force_A)
-            self._B.force.add(self.force_B)
+            self._A.func.add(self.force_A)
+            self._B.func.add(self.force_B)
 
     # Atributos somente para leitura
     A = property(lambda self: self._A)
     B = property(lambda self: self._B)
-    force = property(lambda self: self._force)
+    func = property(lambda self: self._force)
     mode = property(lambda self: self._mode)
 
     def force_A(self, t):
@@ -792,13 +792,13 @@ class ConservativePair(Pair):
     Uma força que opera em um par de partículas e possui uma energia potencial
     associada.
 
-    Esta classe é iniciada a partir de uma função force(rA, rB) e de um
+    Esta classe é iniciada a partir de uma função func(rA, rB) e de um
     potencial U(rA, rB).
     '''
 
-    def __init__(self, A, B, force, U, register=False):
+    def __init__(self, A, B, func, U, register=False):
         super(ConservativePair, self).__init__(
-            A, B, force, 'position', register=register)
+            A, B, func, 'position', register=register)
         self._potential = U
 
     def energyT(self):
@@ -977,13 +977,13 @@ class GravityPool(ConservativePool):
 #
 if __name__ == '__main__':
     class HasForce(object):
-        force = ForceProperty()
+        func = ForceProperty()
 
     obj = HasForce()
-    obj.force = lambda t: (2, 4 - t)
-    obj.force(2)
-    obj.force *= 2
-    obj.force(2)
+    obj.func = lambda t: (2, 4 - t)
+    obj.func(2)
+    obj.func *= 2
+    obj.func(2)
 
     import doctest
     doctest.testmod()
@@ -998,8 +998,8 @@ if __name__ == '__main__':
     c3 = Circle(10, pos=(200, 300), vel=(-100, 100))
 
     #k = 1000
-    #c1.force = lambda t: -k * (c1.pos - c2.pos)
-    #c2.force = lambda t: -k * (c2.pos - c1.pos)
+    #c1.func = lambda t: -k * (c1.pos - c2.pos)
+    #c2.func = lambda t: -k * (c2.pos - c1.pos)
 
     G = 1.1e5
     e = 200
@@ -1009,9 +1009,9 @@ if __name__ == '__main__':
 
     set_force_viscous(c1, gamma=1000)
 
-    #c1.force += lambda t: - gamma * c1.vel
-    #c2.force += lambda t: - gamma * c2.vel
-    #c3.force += lambda t: - gamma * c3.vel
+    #c1.func += lambda t: - gamma * c1.vel
+    #c2.func += lambda t: - gamma * c2.vel
+    #c3.func += lambda t: - gamma * c3.vel
 
     world.add([c1, c2, c3])
     world.run()

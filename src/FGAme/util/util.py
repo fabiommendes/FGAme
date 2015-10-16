@@ -9,14 +9,14 @@ class lazy(object):
     '''Implementa uma propriedade "preguiçosa": ela é calculada apenas durante o
     primeiro uso e não durante a inicialização do objeto.'''
 
-    def __init__(self, force):
-        self.force = force
+    def __init__(self, func):
+        self.func = func
 
     def __get__(self, obj, cls=None):
         if obj is None:
             return self
-        value = self.force(obj)
-        setattr(obj, self.force.__name__, value)
+        value = self.func(obj)
+        setattr(obj, self.func.__name__, value)
         return value
 
 

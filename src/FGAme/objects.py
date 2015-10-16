@@ -4,6 +4,7 @@ Re-define os objetos do módulo FGAme.physics e adiciona propriades extras de
 renderização
 '''
 
+import FGAme.draw
 from FGAme import conf
 from FGAme import physics
 from FGAme.mathtools import asvector
@@ -18,7 +19,7 @@ black = Color('black')
 
 
 @EventDispatcherMeta.decorate
-class ObjectMixin(object):
+class PhysicsObject(object):
     _is_mixin_ = True
     _mixin_args = ['color', 'line_color', 'line_width', 
                    'image','animation', 'sprite']
@@ -70,7 +71,6 @@ class ObjectMixin(object):
             self,
             color='black', line_color=None, line_width=1,
             image=None, image_offset=(0, 0), image_reference=None, 
-            animation=None, sprite=None,
             **kwds):
         '''Init visualization parameters'''
 
@@ -80,6 +80,7 @@ class ObjectMixin(object):
         self._color = None
         self._line_color = None
         self._line_width = line_width
+        self._drawshape = None
         self.color = color
         self.line_color = line_color
         
@@ -105,6 +106,10 @@ class ObjectMixin(object):
             elif image_reference not in ['middle', None]:
                 raise ValueError('invalid image reference: %r' % image_reference)
             image.offset = offset
+        else:
+            self._drawshape = self.get_draw_shape(color=color, 
+                                                  line_color=line_color, 
+                                                  line_width=line_width)
             
     @property
     def color(self):
@@ -138,7 +143,11 @@ class ObjectMixin(object):
 
     @property
     def image(self):
-        return self._image
+        img = self._image
+        if img is None:
+            return None
+        img.pos = self.pos + img.offset
+        return img
 
     @image.setter
     def image(self, value):
@@ -146,19 +155,12 @@ class ObjectMixin(object):
             self._image = None
             return
         if isinstance(value, str):
-            value = resources.find_image(value)
             value = Image(value, self.pos)
         self._image = value
 
     @property
     def animation(self):
         return self._animation
-
-    @animation.setter
-    def animation(self, value):
-        if isinstance(value, str):
-            value = resources.find_animation(value)
-        self._animation = value
 
     def show(self):
         self.visible = True
@@ -167,15 +169,31 @@ class ObjectMixin(object):
         self.visible = False
 
     def draw(self, screen):
-        img = self._image
-        if self._image is not None:
+        img = self.image
+        if img is not None:
             img.pos = self.pos + img.offset
             return img.draw(screen)
         else:
             return self.draw_shape(screen)
 
+    @property
+    def drawable(self):
+        return self.image or self.drawshape
+    
+    @property
+    def drawshape(self):
+        if self._drawshape is None:
+            return None
+        self._drawshape.pos = self.pos
+        return self._drawshape
+    
+    def get_draw_shape(self, color=None, line_color=None, line_width=1):
+        bbox = self.bounding_box
+        cls = getattr(FGAme.draw, type(bbox).__name__)
+        return cls(*bbox, color=color, line_color=line_color, line_width=line_width)
+        
 
-class AABB(ObjectMixin, physics.AABB):
+class AABB(PhysicsObject, physics.AABB):
     _init_physics = physics.AABB.__init__
 
     def draw_shape(self, screen):
@@ -188,8 +206,18 @@ class AABB(ObjectMixin, physics.AABB):
             lw, lc = self._line_width, self._line_color
             screen.draw_aabb(self.aabb, False, black, lw, lc)
 
+    @property
+    def drawshape(self):
+        if self._drawshape is None:
+            return None
+        self._drawshape.xmin = self.xmin
+        self._drawshape.xmax = self.xmax
+        self._drawshape.ymin = self.ymin
+        self._drawshape.ymax = self.ymax
+        return self._drawshape
+    
 
-class Circle(ObjectMixin, physics.Circle):
+class Circle(PhysicsObject, physics.Circle):
     _init_physics = physics.Circle.__init__
 
     def draw_shape(self, screen):
@@ -203,7 +231,7 @@ class Circle(ObjectMixin, physics.Circle):
             screen.draw_circle(self.bounding_box, False, black, lw, lc)
 
 
-class Poly(ObjectMixin, physics.Poly):
+class Poly(PhysicsObject, physics.Poly):
     _init_physics = physics.Poly.__init__
 
     def draw_shape(self, screen):
@@ -215,16 +243,29 @@ class Poly(ObjectMixin, physics.Poly):
         elif self._line_width:
             lw, lc = self._line_width, self._line_color
             screen.draw_poly(self.bounding_box, False, black, lw, lc)
+    
+    def get_draw_shape(self, color=None, line_color=None, line_width=1):
+        return FGAme.draw.Poly(self.bounding_box, color=color, line_color=line_color, 
+                         line_width=line_width)
+    
 
-
-class Rectangle(ObjectMixin, Poly, physics.Rectangle):
+class Rectangle(PhysicsObject, Poly, physics.Rectangle):
     _init_physics = physics.Rectangle.__init__
 
+    def get_draw_shape(self, color=None, line_color=None, line_width=1):
+        return FGAme.draw.Poly(self.bounding_box, color=color, line_color=line_color, 
+                         line_width=line_width)
 
-class RegularPoly(ObjectMixin, Poly, physics.RegularPoly):
+    drawable = Poly.drawable
+
+class RegularPoly(PhysicsObject, Poly, physics.RegularPoly):
     _init_physics = physics.RegularPoly.__init__
 
+    def get_draw_shape(self, color=None, line_color=None, line_width=1):
+        return FGAme.draw.Poly(self.bounding_box, color=color, line_color=line_color, 
+                         line_width=line_width)
 
+    drawable = Poly.drawable
 if __name__ == '__main__':
     x = AABB(shape=(100, 200), world=set())
     type(x)

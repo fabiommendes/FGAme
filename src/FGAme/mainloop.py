@@ -134,9 +134,7 @@ class MainLoop(EventDispatcher):
             if maxiter is not None and self.n_iter >= maxiter:
                 break
 
-    def step(self, state, wait=True):
-        '''Realiza um passo de simulação sobre o estado fornecido'''
-
+    def step_start(self):
         start_time = time.time()
         self.trigger_frame_enter()
 
@@ -145,14 +143,21 @@ class MainLoop(EventDispatcher):
         while Q and (self.time > Q[0].time):
             x = Q.popleft()
             x.action(*x.args, **x.kwds)
-
-        # Captura entrada do usuário
-        self.input.poll()  # @UndefinedVariable
-
-        # Atualiza o estado (física e animações) de acordo
+        return start_time
+    
+    def step_input(self, state):
+        '''Processa entradas'''
+        
+        self.input.poll()
+    
+    def step_state(self, state):
+        '''Atualiza o estado fornecido'''
+        
         state.update(self.dt)
-
-        # Desenha os objetos na tela
+    
+    def step_screen(self, state):
+        '''Desenha os objetos na tela'''
+        
         screen = self.screen
         bg_color = getattr(state, 'background', 'white')
         if bg_color is not None:
@@ -161,8 +166,10 @@ class MainLoop(EventDispatcher):
         state.get_render_tree().draw(screen)
         self.trigger_post_draw(screen)
         screen.flip()
-
-        # Finaliza o frame
+        
+    def step_end(self, state, start_time, wait=True):
+        '''Finaliza o frame'''
+        
         time_interval = time.time() - start_time
         self.sleep_time = self.dt - time_interval
         self.trigger_frame_leave()
@@ -171,16 +178,25 @@ class MainLoop(EventDispatcher):
         # alguns ciclos
         time_interval = time.time() - start_time
         self.sleep_time = self.dt - time_interval
-        if wait:
-            if self.sleep_time > 0:
-                time.sleep(self.sleep_time)
-            else:
-                self.n_skip += 1
-                self.trigger_frame_skip(-wait)
-
+        if self.sleep_time < 0:
+            self.n_skip += 1
+            self.trigger_frame_skip(-wait)
+        elif wait:
+            time.sleep(self.sleep_time)
+                
         self.time += self.dt
         self.n_iter += 1
 
+        
+    def step(self, state, wait=True):
+        '''Realiza um passo de simulação sobre o estado fornecido'''
+
+        start_time = self.step_start()
+        self.step_input(state)
+        self.step_state(state)
+        self.step_screen(state)
+        self.step_end(state, start_time, wait)
+        
     def stop(self):
         '''Finaliza o loop principal'''
 

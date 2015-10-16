@@ -26,7 +26,7 @@ class Pong(World):
         pong.move((2 * W - 50, H - Y / 2))
         pong.listen('collision', self.pong_collision)
         pong.mass *= 5
-        pong.force = lambda t: -1000000 * Vec2(pong.pos.x - self.pong_x, 0)
+        pong.func = lambda t: -1000000 * Vec2(pong.pos.x - self.pong_x, 0)
         pong.damping = 10
         self.pong_x = self.pong.pos.x
 
