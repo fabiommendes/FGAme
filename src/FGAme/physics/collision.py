@@ -291,97 +291,47 @@ class Collision(Pair):
 
         if vrel_normal < 0:
             # Impulso normal
-            J = self.effmass * (1 + self.restitution) * vrel_normal
-            Jvec = J * normal
+            Jn = self.effmass * (1 + self.restitution) * vrel_normal
+            Jvec = Jn * normal
             pos = self.pos
+            
+            # Impulso tangencial
+            tangent = self.normal.perp()
+            vrel_tan = vrel.dot(tangent)
+            
+            # inverte a tangente se estiver em oposição à velocidade
+            if vrel_tan < 0: 
+                tangent *= -1
+                vrel_tan *= -1 
+            Jt = self.friction * abs(Jn)
+            Jt = min(self.friction * abs(Jn), vrel_tan * self.effmass)
+            Jvec += Jt * tangent
 
             # Aplica impulso total
             A.apply_impulse(Jvec, pos=pos)
             B.apply_impulse(-Jvec, pos=pos)
-
-    def apply_tangent(self, J):
-        # Aplica incremento no impulso
-        if J <= 0:
-            return
-
-        A, B = self.A, self.B
-        vrel = self.vrel
-        tangent = self.get_tangent()
-
-        # Calcula o impulso tangente máximo
-        vrel_tan = -vrel.dot(tangent)
-        Jtan_max = abs(self.friction * J)
-
-        # Limita a ação do impulso tangente
-        if A._invmass and B._invmass:
-            J = min(Jtan_max, vrel_tan / A._invmass, vrel_tan / B._invmass)
-        elif A._invmass:
-            J = min(Jtan_max, vrel_tan / A._invmass)
-        elif B._invmass:
-            J = min(Jtan_max, vrel_tan / B._invmass)
-        else:
-            J = 0.0
-
-        Jvec = J * tangent
-        if A._invmass:
-            A.apply_impulse(-Jvec)
-            if A._invinertia:
-                A.apply_aimpulse(Jvec.cross(self.rA))
-        if B._invmass:
-            B.apply_impulse(Jvec)
-            if B._invinertia:
-                B.apply_aimpulse(-Jvec.cross(self.rB))
-
-    def finalize(self, clear=True, trigger=True):
-        if self.impulse > 0:
-            self.apply_impulse(self.impulse)
-        # self.apply_tangent(self.impulse)
-
-        if trigger:
-            # TODO: inspect collision triggers
-            # self.A.trigger_collision(self)
-            # self.B.trigger_collision(self)
-            pass
-        if clear:
-            self.A.remove_contact(self)
-            self.B.remove_contact(self)
-
-    def get_tangent(self):
-        # Vetor unitário tangente à colisão
-        n = self.normal
-        tangent = Vec2(-n.y, n.x)
-        if tangent.dot(self.vrel) > 0:
-            tangent = -tangent
-        return tangent
 
     def cancel(self):
         '''Cancela a colisão'''
         
         self.active = False
 
-    #
-    # Controle de sinais
-    #
     def pre_collision(self):
+        '''Dispara sinais antes de resolver a colisão''' 
         A, B = self
         A.trigger_pre_collision(self)
         B.trigger_pre_collision(self)
     
     def post_collision(self):
+        '''Dispara sinais após resolver a colisão'''
         A, B = self
         A.trigger_post_collision(self)
         B.trigger_post_collision(self)
 
-
-
-    ###########################################################################
-    #                       Métodos da API de Collision
-    ###########################################################################
     def is_simple(self):
         '''Retorna True se o contato for o único contato de ambos os objetos
         envolvidos'''
 
-        print('foo')
         return (len(self.A._contacts) <= 1) and (len(self.B._contacts) <= 1)
 
     def remove_overlap(self, beta=1.0):
@@ -396,19 +346,10 @@ class Collision(Pair):
         A.move((-beta * a) * normal)
         B.move((beta * b) * normal)
 
-    def baumgarte(self, beta, dt, mindelta=0.3):
-        delta = self.delta
-        if delta > mindelta:
-            A, B = self
-            a = A._invmass
-            b = B._invmass
-            beta *= delta / (a + b) / dt
-            a *= beta
-            b *= beta
-            A._e_vel -= a * self.normal
-            B._e_vel += b * self.normal
-
-    def baumgarte_adjust(self, beta, mindelta=0.3):
+    def baumgarte(self, beta, mindelta=0.3):
+        '''Realiza o ajuste de baumgarte para remover gradualmente a 
+        superposição entre dois objetos.'''
+        
         delta = self.delta
         if delta > mindelta:
             A, B = self

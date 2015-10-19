@@ -332,7 +332,7 @@ class Simulation(EventDispatcher):
         beta = self.beta
         for col in narrow_cols:
             if col.active:
-                col.baumgarte_adjust(beta)
+                col.baumgarte(beta)
 
     def get_islands(self, contacts):
         '''Retorna a lista de grupos de colisão fechados no gráfico de
