@@ -283,6 +283,14 @@ class Collision(Pair):
     def resolve(self):
         '''Resolve as velocidades dos elementos que participam da colisão'''
         
+        if self.friction:
+            self.__resolve_with_friction()
+        else:
+            self.__resolve_simple()
+    
+    def __resolve_simple(self):
+        '''Resolve colisões simples sem atrito'''
+        
         A, B = self
         normal = self.normal
         pos = self.pos
@@ -293,23 +301,116 @@ class Collision(Pair):
             # Impulso normal
             Jn = self.effmass * (1 + self.restitution) * vrel_normal
             Jvec = Jn * normal
-            pos = self.pos
             
-            # Impulso tangencial
-            tangent = self.normal.perp()
-            vrel_tan = vrel.dot(tangent)
-            
-            # inverte a tangente se estiver em oposição à velocidade
-            if vrel_tan < 0: 
-                tangent *= -1
-                vrel_tan *= -1 
-            Jt = self.friction * abs(Jn)
-            Jt = min(self.friction * abs(Jn), vrel_tan * self.effmass)
-            Jvec += Jt * tangent
-
             # Aplica impulso total
             A.apply_impulse(Jvec, pos=pos)
             B.apply_impulse(-Jvec, pos=pos)
+
+    def __resolve_with_friction(self):
+        '''Resolve colisões simples com atrito'''
+
+        A, B = self
+        normal = self.normal
+        pos = self.pos
+        vrel = B.vpoint(pos) - A.vpoint(pos)
+        vrel_normal = vrel.dot(normal)
+        friction = self.friction  
+        restitution = self.restitution
+        
+        if vrel_normal < 0:
+            # Escolhe o vetor tangente
+            tangent = normal.perp()
+            vrel_tangent = vrel.dot(tangent)
+            if vrel_tangent < 0:
+                vrel_tangent *= -1
+                tangent *= -1
+            
+            # Parâmetros úteis
+            rA = pos - A.pos
+            rB = pos - B.pos
+            rA_n, rA_t = rA.dot(normal), rA.dot(tangent)
+            rB_n, rB_t = rB.dot(normal), rB.dot(tangent)
+
+            # Massas efetivas inversas 
+            invmassN = (A.invmass + A.invinertia * rA.cross(normal)**2 +  
+                        B.invmass + B.invinertia * rB.cross(normal)**2)
+            invmassT = (A.invmass + A.invinertia * rA.cross(tangent)**2 +  
+                        B.invmass + B.invinertia * rB.cross(tangent)**2)
+            invmassD = A.invinertia * rA_n * rA_t + B.invinertia * rB_n * rB_t  
+
+            # Precisamos encontrar o valor do vetor J = Jn * n + Jt * t, onde
+            # as componentes Jn e Jt são desconhecidas.
+            # 
+            # Existem alguns guias para realizar esta tarefa. O primeiro é a 
+            # relação entre as velocidades relativas normais antes e depois
+            # da colisão. Isto é dado pela expressão do coeficiente de 
+            # restituição e resulta em
+            #
+            #     Jn / Mn - Jt / Md = (1 + e) * urel_n 
+            #
+            # Posteriormente, queremos aplicar a lei de Coulomb para o atrito,
+            # que estabelece que a força de atrito máxima carrega a seguinte
+            # relação com a normal 
+            #
+            #     |Ft| = mu * |Fn|,
+            #
+            # o que se traduz imediatamente em uma expressão para os impulsos:
+            #
+            #     |Jt| = mu * |Jn|,
+            #
+            # Sabemos que Jt > 0, pois o vetor de velocidade relativa está 
+            # alinhado ao tangente. A força de atrito produz um impulso na
+            # direção de t para o corpo A e na direção oposta para B. Já Jn < 0,
+            # pois o impulso que o corpo A recebe deve ser necessariamente na
+            # direção oposta à normal. A relação anterior fica portanto
+            #
+            #     Jt = -mu * Jn.
+            #
+            # Onde esperamos obter apenas o valor máximo do impulso devido ao 
+            # atrito. Como então saber se o atrito satura ou se o valor máximo
+            # deve ser utilizado? Usamos o critério de que o sinal da velocidade
+            # relativa tangencial de saída deve permanecer positivo: ou seja,
+            # o atrito é capaz de interromper o deslocamento tangencial, mas 
+            # não de invertê-lo. 
+            #
+            # Assim, usa-se o critério:
+            #
+            #     vrel_tangent' >= 0,
+            #
+            # onde,
+            #
+            #     vrel_tangent' = vrel_tangent - Jn / Md + Jt / Mt
+            #
+            # Caso o critério acima seja violado, igualamos a velocidade 
+            # tangencial a zero e usamos esta condição como condição suplementar
+            # à da definição do coeficiente de restituição.
+            #
+
+            # Primeiramente assumimos o caso não saturado.
+            Jn = (1 + restitution) * vrel_normal / (invmassN - friction * invmassD)
+            Jt = -friction * Jn
+            vrel_tangent_out = vrel_tangent + invmassD * Jn - invmassT * Jt
+            
+            # Verifica o sinal da velocidade de saída. Se for negativo, 
+            # assume que o atrito saturou e que devemos usar o critério
+            # de que a velocidade tangencial de saída deve ser nula.
+            if vrel_tangent_out < 0:
+                denom = invmassT * invmassN - invmassD**2  # <= 0
+                Jn = ((1 + restitution) * vrel_normal * invmassT + 
+                      invmassD * vrel_tangent) / denom
+                Jt = ((1 + restitution) * vrel_normal * invmassD + 
+                      invmassN * vrel_tangent) / denom
+
+                # Roubo?
+                if Jt < 0:
+                    Jn = (1 + restitution) * vrel_normal / invmassN
+                    Jt = 0
+        
+            # Aplica impulso total
+            Jvec = Jn * normal + Jt * tangent
+            A.apply_impulse(Jvec, pos=pos)
+            B.apply_impulse(-Jvec, pos=pos)
+
 
     def cancel(self):
         '''Cancela a colisão'''
