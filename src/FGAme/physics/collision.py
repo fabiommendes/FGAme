@@ -267,19 +267,6 @@ class Collision(Pair):
         self.restitution = sqrt(A.restitution * B.restitution)
         self.friction = sqrt(A.friction * B.friction)
 
-        # Posições e velocidades relativas
-        rA = self.pos - A.pos
-        rB = self.pos - B.pos
-
-        # Massa efetiva
-        invmass = A.invmass + B.invmass
-        invmass += A.invinertia * (rA.cross(normal) ** 2)
-        invmass += B.invinertia * (rB.cross(normal) ** 2)
-        self.effmass = 1.0 / invmass
-
-        # Asserções
-        assert rA.dot(normal) >= 0, 'normal is pointing towards the first body'
-
     def resolve(self):
         '''Resolve as velocidades dos elementos que participam da colisão'''
         
@@ -298,8 +285,18 @@ class Collision(Pair):
         vrel_normal = vrel.dot(normal)
 
         if vrel_normal < 0:
+            # Posições e velocidades relativas
+            rA = self.pos - A.pos
+            rB = self.pos - B.pos
+    
+            # Massa efetiva
+            invmass = A.invmass + B.invmass
+            invmass += A.invinertia * (rA.cross(normal) ** 2)
+            invmass += B.invinertia * (rB.cross(normal) ** 2)
+            effmass = 1.0 / invmass
+    
             # Impulso normal
-            Jn = self.effmass * (1 + self.restitution) * vrel_normal
+            Jn = effmass * (1 + self.restitution) * vrel_normal
             Jvec = Jn * normal
             
             # Aplica impulso total
@@ -419,15 +416,26 @@ class Collision(Pair):
 
     def pre_collision(self):
         '''Dispara sinais antes de resolver a colisão''' 
+    
         A, B = self
         A.trigger_pre_collision(self)
         B.trigger_pre_collision(self)
+        #if self.active:
+        #    if A.invmass:
+        #        A.collisions.append(self)
+        #    if B.invmass:
+        #        B.collisions.append(self)
     
     def post_collision(self):
         '''Dispara sinais após resolver a colisão'''
+        
         A, B = self
         A.trigger_post_collision(self)
         B.trigger_post_collision(self)
+        #if A.invmass:
+        #    A.collisions.remove(self)
+        #if B.invmass:
+        #    B.collisions.remove(self)
 
     def is_simple(self):
         '''Retorna True se o contato for o único contato de ambos os objetos
@@ -475,10 +483,12 @@ class ContactOrdered(Collision):
         super(ContactOrdered, self).__init__(A, B, world, pos, normal, **kwds)
 
 
-class CollisionGroup(object):
+class Island(object):
 
     def __init__(self, collisions):
-        pass
+        self.collisions = collisions
+        
+    
 
 
 if __name__ == '__main__':

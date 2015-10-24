@@ -264,7 +264,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         # Flags de objeto
         self.flags = flags
 
-        # Variáveis de estado #################################################
+        # Variáveis de estado
         self._pos = asvector(pos)
         self._vel = asvector(vel)
         self._e_vel = null2D
@@ -273,8 +273,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         self._omega = float(omega)
         self._accel = null2D
         self._alpha = 0.0
-
-        # Harmoniza massa, inércia e densidade ################################
+        
+        # Harmoniza massa, inércia e densidade
         self._baseshape = self._shape = baseshape
         self._aabb = getattr(baseshape, 'aabb', None)
         if density is not None:
@@ -313,7 +313,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         self._invinertia = 1.0 / inertia
         self._density = float(density)
 
-        # Controle de parâmetros físicos locais ###############################
+        # Controle de parâmetros físicos locais
         self._gravity = null2D
         self._damping = self._adamping = 0.0
         self._friction = 0.0
@@ -329,11 +329,11 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         if friction is not None:
             self.friction = friction
 
-        # Vínculos e contatos #################################################
+        # Vínculos e contatos
         self._contacts = []
         self._joints = []
 
-        # Filtros de colisões #################################################
+        # Filtros de colisões
         # Colide se objetos estão em groupos diferentes (exceto os que estão
         # no grupo 0) e no mesmo layer
         if col_layer:
@@ -358,7 +358,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         else:
             self._col_group_mask = 0
 
-        # Presença em mundo ###################################################
+        # Presença em mundo
         if world is not None:
             self._world.add(self)
 

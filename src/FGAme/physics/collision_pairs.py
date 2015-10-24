@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 from warnings import warn
 from generic import generic
 from FGAme.mathtools import Vec2, dot, ux2D
@@ -33,11 +32,10 @@ def get_collision(A, B):
 
     return collision_circle(A, B)
 
-###############################################################################
-#                      Colisões entre objetos do mesmo tipo
-###############################################################################
 
-
+#
+# Colisões entre objetos do mesmo tipo
+#
 @get_collision.overload([Circle, Circle])
 def collision_circle(A, B):
     '''Testa a colisão pela distância dos centros'''
@@ -62,26 +60,25 @@ def collision_aabb(A, B):
     de contorno alinhadas ao eixo.'''
 
     # Detecta colisão pelas sombras das caixas de contorno
-    rx, ry = B._pos - A._pos
-    shadowx = A._delta_x + B._delta_x - abs(rx)
-    shadowy = A._delta_y + B._delta_y - abs(ry)
-    if shadowx <= 0 or shadowy <= 0:
+    x0, x1 = max(A.xmin, B.xmin), min(A.xmax, B.xmax)
+    y0, y1 = max(A.ymin, B.ymin), min(A.ymax, B.ymax)
+    dx = x1 - x0
+    dy = y1 - y0
+    if x1 < x0 or y1 < y0:
         return None
+    
+    # Elege o centro da aabb de interseção como o ponto de colisão
+    pos = Vec2((x1 + x0) / 2, (y1 + y0) / 2)
 
-    # Calcula ponto de colisão
-    x_col = max(A.xmin, B.xmin) + shadowx / 2.
-    y_col = max(A.ymin, B.ymin) + shadowy / 2.
-    pos_col = Vec2(x_col, y_col)
-
-    # Define sinal dos vetores normais: colisões tipo PONG
-    if shadowx > shadowy:
-        n = Vec2(0, (1 if A.ymin < B.ymin else -1))
-        delta = shadowy
+    # Escolhe a direção da menor superposição e a normal
+    if dy < dx:
+        delta = dy
+        normal = Vec2(0, (1 if A.pos.y < B.pos.y else -1))
     else:
-        n = Vec2((1 if A.xmin < B.xmin else -1), 0)
-        delta = shadowx
-
-    return Collision(A, B, pos=pos_col, normal=n, delta=delta)
+        delta = dx
+        normal = Vec2((1 if A.pos.x < B.pos.x else -1), 0) 
+    
+    return Collision(A, B, pos=pos, normal=normal, delta=delta)
 
 
 @get_collision.overload([Poly, Poly])
@@ -100,8 +97,8 @@ def collision_poly(A, B, directions=None):
     min_shadow = float('inf')
     norm = None
     for u in directions:
-        A_coords = [round(dot(pt, u), 6) for pt in A.vertices]
-        B_coords = [round(dot(pt, u), 6) for pt in B.vertices]
+        A_coords = [dot(pt, u) for pt in A.vertices]
+        B_coords = [dot(pt, u) for pt in B.vertices]
         Amax, Amin = max(A_coords), min(A_coords)
         Bmax, Bmin = max(B_coords), min(B_coords)
         minmax, maxmin = min(Amax, Bmax), max(Amin, Bmin)
@@ -113,7 +110,7 @@ def collision_poly(A, B, directions=None):
             norm = u
 
     # Determina o sentido da normal
-    if dot(A._pos, norm) > dot(B._pos, norm):
+    if dot(A.pos, norm) > dot(B.pos, norm):
         norm = -norm
 
     # Computa o polígono de intersecção e usa o seu centro de massa como ponto
@@ -127,57 +124,13 @@ def collision_poly(A, B, directions=None):
     if area(clipped) == 0:
         return None
     col_pt = center_of_mass(clipped)
+ 
     return Collision(A, B, pos=col_pt, normal=norm, delta=min_shadow)
 
 
-###############################################################################
-#                 Colisões entre objetos de tipos diferentes
-###############################################################################
-
-@get_collision.overload([Circle, AABB])
-def circle_aabb(A, B):
-    # TODO: implementar direito, está utilizando AABBs
-    r = A.cbb_radius
-    x, y = A._pos
-    Axmin, Axmax = x - r, x + r
-    Aymin, Aymax = y - r, y + r
-
-    x, y = B._pos
-    dx, dy = B._delta_x, B._delta_y
-    Bxmin, Bxmax = x - dx, x + dx
-    Bymin, Bymax = y - dy, y + dy
-
-    shadowx = min(Axmax, Bxmax) - max(Axmin, Bxmin)
-    shadowy = min(Aymax, Bymax) - max(Aymin, Bymin)
-    if shadowx < 0 or shadowy < 0:
-        return None
-
-    # Calcula ponto de colisão
-    x_col = max(A.xmin, B.xmin) + shadowx / 2.
-    y_col = max(A.ymin, B.ymin) + shadowy / 2.
-    pos_col = Vec2(x_col, y_col)
-
-    # Define sinal dos vetores normais: colisões tipo PONG
-    if shadowx > shadowy:
-        n = Vec2(0, (1 if A.ymin < B.ymin else -1))
-    else:
-        n = Vec2((1 if A.xmin < B.xmin else -1), 0)
-
-    return Collision(A, B, pos=pos_col, normal=n)
-
-
-@get_collision.overload([AABB, Circle])
-def aabb_circle(A, B):
-    return circle_aabb(B, A)
-
-
-@get_collision.overload([Poly, AABB])
-def poly_aabb(A, B):
-    '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
-
-    return aabb_poly(B, A)
-
-
+#
+# Colisões entre objetos de tipos diferentes
+#
 @get_collision.overload([AABB, Poly])
 def aabb_poly(A, B):
     '''Implementa a colisão entre um polígono arbitrário e uma caixa AABB'''
@@ -188,9 +141,103 @@ def aabb_poly(A, B):
     A_poly = Rectangle(bbox=A.bbox)
     col = collision_poly(A_poly, B)
     if col is not None:
-        return Collision(A, B, pos=col.pos, normal=col.normal)
+        return Collision(A, B, pos=col.pos, normal=col.normal, delta=col.delta)
     else:
         return None
+
+
+@get_collision.overload([Circle, Poly])
+def circle_poly(A, B):
+    '''Implementa a colisão entre um círculo arbitrário um polígono.
+    
+    A normal resultante sempre sai do círculo na direção do polígono.
+    '''
+    
+    # Verifica as AABB
+    if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
+        return None
+
+    # Procura o ponto mais próximo de B
+    vertices = B.vertices
+    N = len(vertices)
+    center = A.pos
+    normals = [(i, v - center, v) for i, v in enumerate(vertices)]
+    idx, _, pos = min(normals, key=lambda x: x[1].norm())
+    
+    # A menor distância para o centro pode ser do tipo vértice-ponto ou 
+    # aresta-ponto. Assumimos o vértice inicialmente.
+    distance = (pos - center).norm()
+    
+    # Agora verificamos cada face
+    P0 = pos
+    P = vertices[(idx - 1) % N]
+    v = center - P
+    u = P0 - P
+    L = u.norm()
+    delta = v.cross(u) / L
+    
+    # Verifica se o ponto mais próximo se encontra no segmento
+    if delta < distance and u.dot(v) < L**2:
+        pos = P + (u.dot(v) / L**2) * u
+        distance = delta
+    
+    # Mesmo teste para a face do ponto posterior
+    P = vertices[(idx + 1) % N]
+    v = center - P
+    u = P0 - P
+    L = u.norm()
+    delta = -v.cross(u) / L
+    if delta < distance and u.dot(v) < L ** 2:
+        pos = P + (u.dot(v) / L ** 2) * u
+        distance = delta
+    
+    # Verificamos se houve colisão ou não na direção esperada
+    delta = A.radius - distance
+    normal = (pos - center).normalized()
+    
+    if delta > 0:
+        return Collision(A, B, pos=pos, normal=normal, delta=delta)
+    else:
+        return None
+    
+    
+    
+
+
+@get_collision.overload([Circle, AABB])
+def circle_aabb(A, B):
+    '''Reutiliza a lógica de Circle/Poly para realizar a colisão com AABBs'''
+    
+    if shadow_x(A, B) < 0 or shadow_y(A, B) < 0:
+        return None
+    
+    B_poly = Rectangle(bbox=B.bbox)
+    col = circle_poly(A, B_poly)
+    if col is not None:
+        return Collision(A, B, pos=col.pos, normal=col.normal, delta=col.delta)
+    else:
+        return None
+
+
+#
+# Colisões recíprocas
+#
+@get_collision.overload([Poly, Circle])
+def poly_circle(A, B):
+    return circle_poly(B, A)
+
+@get_collision.overload([Poly, AABB])
+def poly_aabb(A, B):
+    return aabb_poly(B, A)
+
+@get_collision.overload([AABB, Circle])
+def aabb_circle(A, B):
+    return circle_aabb(B, A)
+
+
+
+
+
 
 if __name__ == '__main__':
     import doctest
