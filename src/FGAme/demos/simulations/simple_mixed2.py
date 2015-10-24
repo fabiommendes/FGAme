@@ -3,10 +3,10 @@ from FGAme import *
 
 # Cria mundo e objetos
 world = World()
-world.add_bounds(width=10, restitution=0.9, friction=0.1)
+world.add_bounds(width=10)
 obj1 = RegularPoly(N=3, length=130, pos=(200, 300),
-                   vel=(500, -10), color='random', omega=2.2)
-obj2 = AABB(shape=(100, 80), pos=(200, 450), color='random')
+                   vel=(200, 200), color='random', omega=2.2)
+obj2 = AABB(shape=(100, 80), pos=(200, 450), color='random', mass='inf')
 obj3 = Circle(40, pos=(600, 300), color='random', mass='inf')
 obj4 = Circle(40, pos=(450, 100), color='random')
 
