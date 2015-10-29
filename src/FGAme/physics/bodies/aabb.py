@@ -128,7 +128,6 @@ class AABB(LinearRigidBody):
         self.pos = self.pos.copy(y=(ymax + ymin) / 2)
         self._delta_y = (ymax - ymin) / 2
 
-    # Propriedades geométricas ################################################
     def area(self):
         return 4 * self._delta_x * self._delta_y
 

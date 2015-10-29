@@ -7,7 +7,7 @@ import sdl2
 import sdl2.ext as sdl2_ext
 import sdl2.sdlgfx as gfx
 
-from FGAme.core.screen import Canvas
+from FGAme.screen import Canvas
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color

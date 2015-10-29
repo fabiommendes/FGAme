@@ -66,7 +66,7 @@ class PhysElementMeta(EventDispatcherMeta):
         slots = ns.setdefault('__slots__', [])
         ns = cls._populate_namespace(name, bases, ns)
 
-        # Remove __slots__ creiados pela EventDispatcher
+        # Remove __slots__ criados pela EventDispatcher
         ns['__slots__'] = slots
 
         # Força EventDispatcher ser a classe mãe na hierarquia

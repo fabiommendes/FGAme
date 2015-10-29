@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import time
 import functools
 from collections import deque, namedtuple
@@ -134,7 +133,9 @@ class MainLoop(EventDispatcher):
             if maxiter is not None and self.n_iter >= maxiter:
                 break
 
-    def step_start(self):
+    def step_framestart(self):
+        '''Inicia o frame'''
+        
         start_time = time.time()
         self.trigger_frame_enter()
 
@@ -167,7 +168,7 @@ class MainLoop(EventDispatcher):
         self.trigger_post_draw(screen)
         screen.flip()
         
-    def step_end(self, state, start_time, wait=True):
+    def step_endframe(self, state, start_time, wait=True):
         '''Finaliza o frame'''
         
         time_interval = time.time() - start_time
@@ -191,11 +192,11 @@ class MainLoop(EventDispatcher):
     def step(self, state, wait=True):
         '''Realiza um passo de simulação sobre o estado fornecido'''
 
-        start_time = self.step_start()
+        start_time = self.step_framestart()
         self.step_input(state)
         self.step_state(state)
         self.step_screen(state)
-        self.step_end(state, start_time, wait)
+        self.step_endframe(state, start_time, wait)
         
     def stop(self):
         '''Finaliza o loop principal'''
@@ -449,35 +450,3 @@ delayed = _make_scheduler('delayed')
 delayed_frames = _make_scheduler('delayed_frames')
 delayed_absolute = _make_scheduler('delayed_absolute')
 unschedule = _make_scheduler('unschedule')
-
-
-if __name__ == '__main__':
-    from FGAme import World, Circle, pos
-    w = World()
-    c1 = Circle(10, world=w)
-    c2 = Circle(10, color='red', world=w)
-    c3 = Circle(10, color='blue', world=w)
-
-    @schedule
-    def move():
-        c2.pos += (1, 1)
-
-    @schedule_iter
-    def move_circle():
-        for _ in range(50):
-            c1.pos += (2, 5)
-            yield
-
-    @periodic(1)
-    def move_c3():
-        c3.pos += (50, 30)
-
-    @delayed(2)
-    def move_circle2():
-        c1.pos += (1, 0)
-
-    @one_shot(3)
-    def move_circle3():
-        c1.pos = pos.middle
-
-    w.run()

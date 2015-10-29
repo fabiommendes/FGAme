@@ -15,6 +15,7 @@ MEDIA_PRIORITIES = IMG_PRIORITIES + SND_PRIORITIES
 
 
 class ResourceManager(object):
+    '''Gerencia os recursos na forma de arquivos.'''
 
     def __init__(self, root=None):
         self._root = root

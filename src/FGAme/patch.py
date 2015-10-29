@@ -1,7 +1,7 @@
 '''
 As funções no módulo patch permitem modificar o comportamento da FGAme de
-maneira arbitrária. A maior parte das funções tem o caráter educativo e
-permitem que estudantes na área de física para jogos reimplementem
+maneira arbitrária. A maior parte das funções tem o caráter didático e
+permitem que estudantes na área de jogos e física para jogos reimplementem
 pedaços específicos de um motor de jogo aproveitando o resto da infraestrutura
 existente.
 

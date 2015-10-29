@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 '''
 A FGAme permite modificar os parâmetros de inicialização utilizando as funções
 do módulo :mod:`FGAme.conf`. Nesta estão funções que controlam a inicialização
@@ -29,7 +28,7 @@ um modo geral, o programa deve ser organizado assim::
     world.run()
 '''
 
-from FGAme.core import log as _log
+from FGAme.logger import log as _log
 from FGAme import backends as _backend_module
 
 # --------------------------------------------------------------------------- #
@@ -163,11 +162,10 @@ def get_backend(force=False):
         return set_backend()
     return _backend
 
+
 #
 # Funções de inicialização
 #
-
-
 def init():
     '''Inicializa todas as classes relevantes do FGAme.
 

@@ -1,5 +1,4 @@
-# -*- coding: utf8 -*-
-
+# EXPERIMENTAL!
 from FGAme.objects import Poly
 
 

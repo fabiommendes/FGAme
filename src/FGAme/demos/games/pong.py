@@ -1,10 +1,9 @@
-# -*- coding: utf8 -*-
 '''
 Implementação do tradicional jogo Pong.
 '''
 
-from FGAme import *
-from random import uniform, choice, random
+from FGAme import World, Circle, AABB, Vec2, draw
+from random import uniform, choice
 
 
 class Pong(World):

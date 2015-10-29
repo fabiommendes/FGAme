@@ -3,7 +3,7 @@
 import string
 import pygame
 from FGAme import conf
-from FGAme.core import Canvas
+from FGAme.screen import Canvas
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
 from FGAme.draw import Color, rgb

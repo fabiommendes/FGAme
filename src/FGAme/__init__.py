@@ -40,22 +40,21 @@ Loop principal
 
 '''
 
-from FGAme.meta import __version__, __author__
-from FGAme import conf
-from FGAme import mathtools as math
-from FGAme.input import *
-from FGAme.mathtools import Vec, pi, asvector
-from FGAme import draw
-from FGAme.events import listen, signal, EventDispatcher
-from FGAme.core import *
-from FGAme import physics
-from FGAme.physics import *
-from FGAme.world import World
-from FGAme.objects import *
-from FGAme.app import *
-from FGAme.extra.orientation_objects import *
-from FGAme.mainloop import *
-del MainLoop
+from .meta import __version__, __author__
+from .logger import *
+from .events import listen, signal, EventDispatcher
+from .input import *
+from .mainloop import *
+from .mathtools import Vec, pi, asvector
+from .physics import *
+from .world import World
+from .objects import *
+from .app import *
+from .extra.orientation_objects import *
+from . import conf
+from . import mathtools as math
+from . import draw
+from . import physics
 
 if __name__ == '__main__':
     import doctest

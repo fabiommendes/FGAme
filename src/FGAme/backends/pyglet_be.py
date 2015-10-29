@@ -1,4 +1,4 @@
-from FGAme.core.screen import Canvas
+from FGAme.screen import Canvas
 
 class PyGletCanvas(Canvas):
     '''Implementa a interface Screen, utilizando a biblioteca Pygame'''

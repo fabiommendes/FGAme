@@ -1,15 +1,11 @@
-# -*- coding: utf8 -*-
 from contextlib import contextmanager
 from FGAme.mathtools import Vec2, shapes
-from FGAme.draw import color_property, Color
+from FGAme.draw import colorproperty, Color
 
 black = Color('black')
 white = Color('white')
 
 
-###############################################################################
-#                          Classe Screen genérica
-###############################################################################
 # TODO: refatorar para ter uma classe de Canvas separada da classe Window?
 class Screen(object):
 
@@ -28,7 +24,7 @@ class Screen(object):
     '''
     __instance = None
     is_canvas = False
-    background = color_property('background')
+    background = colorproperty('background')
 
     def __new__(cls, *args, **kwds):
         if cls.__instance is not None:
@@ -112,12 +108,16 @@ class Canvas(Screen):
         finally:
             self.flip()
 
-    # Objetos primitivos ######################################################
+    #
+    # Objetos primitivos
+    # ------------------
+    #
     # Estas funções desenham objetos primitivos na tela sem se atentar para
-    # transformações de escala, translação e rotação. São as operações
-    # primitivas que devem ser sobrescritas por cada backend suportado.
+    # transformações de escala, translação e rotação. As operações
+    # primitivas devem ser sobrescritas por cada backend suportado.
     # A maior parte das implementações padrão é vazia
-
+    #
+    
     # Entes primitivos
     def draw_raw_pixel(self, pos, color=black):
         '''Desenha um pixel na posição dada'''
@@ -177,11 +177,15 @@ class Canvas(Screen):
 
         raise NotImplementedError
 
-    # Objetos derivados #######################################################
+    #
+    # Objetos derivados
+    # -----------------
+    #
     # Estas são as funções que devem ser utilizadas diretamente pelos usuários
     # da FGAme. Elas desenham um objeto a partir de uma figura primitiva e
     # aplicam automaticamente as transformações de escala, translação e rotação
     # necessárias.
+    #
     def draw_circle(self, circle, solid=None, color=None,
                     line_width=None, line_color=None):
         '''Desenha um círculo na tela.'''
@@ -249,6 +253,8 @@ class Canvas(Screen):
             pt0 = pt1
 
     def draw_image(self, image):
+        '''Desenha uma imagem/animação/sprite na tela'''
+        
         if self._direct:
             self.draw_raw_image(image)
         else:
@@ -258,10 +264,10 @@ class Canvas(Screen):
     # desenhaveis quando implementam o método obj.draw(canvas). O método draw
     # é chamado com um objeto do tipo Canvas como atributo e deve se desenhar
     # a partir de chamadas às funções primitivas de desenho.
-    def draw(self, object):
+    def draw(self, obj):
         '''Desenha objetos do tipo Drawable.
 
         Objetos do tipo Drawable possuem uma função obj.draw(screen) que
         desenha o objeto na tela fornecida como parâmetro de entrada.
         '''
-        object.draw(self)
+        obj.draw(self)

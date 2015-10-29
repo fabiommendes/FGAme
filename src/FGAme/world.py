@@ -4,7 +4,7 @@ from FGAme import conf
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
 from FGAme.events import EventDispatcher, signal
-from FGAme.draw import RenderTree, color_property
+from FGAme.draw import RenderTree, colorproperty
 from FGAme.util import delegate_to
 from FGAme.physics import Body
 from FGAme.util import lazy
@@ -47,7 +47,7 @@ class World(EventDispatcher):
         # Inicia e popula o mundo
         self.init()
 
-    background = color_property('background', 'white')
+    background = colorproperty('background', 'white')
 
     # Propriedades do objeto Simulation #######################################
     gravity = delegate_to('_simulation.gravity')

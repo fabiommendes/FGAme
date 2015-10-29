@@ -1,10 +1,5 @@
-'''
-Created on 01/07/2015
-
-@author: chips
-'''
+# EXPERIMENTAL!
 # TODO: mudar run() para start() e fazer o run() iniciar um shell IPython
-
 import functools as _functools
 from collections import deque as _deque
 import threading as _threading

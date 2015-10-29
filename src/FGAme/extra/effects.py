@@ -1,4 +1,4 @@
-# -*- coding: utf8 -*-
+# EXPERIMENTAL!
 from random import shuffle, random
 from math import sqrt
 from FGAme.objects import Poly

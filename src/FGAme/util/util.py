@@ -1,23 +1,9 @@
 import types
 import functools
+from smallvectors.tools import lazy
 
-__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr', 'lru_cache']
-
-
-class lazy(object):
-
-    '''Implementa uma propriedade "preguiçosa": ela é calculada apenas durante o
-    primeiro uso e não durante a inicialização do objeto.'''
-
-    def __init__(self, func):
-        self.func = func
-
-    def __get__(self, obj, cls=None):
-        if obj is None:
-            return self
-        value = self.func(obj)
-        setattr(obj, self.func.__name__, value)
-        return value
+__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr', 'lru_cache', 
+           'console_here']
 
 
 class delegate_to(property):
@@ -115,6 +101,9 @@ def popattr(obj, attr, value=None):
         return result
 
 
+#
+# A least recently used cache with 512 entries
+#
 try:
     from functools import lru_cache as _lru_cache
     def lru_cache(func):
@@ -139,6 +128,38 @@ except ImportError:
         return decorated
 
 
+#
+# Easy interactive console for debugging
+#
+def console_here():
+    '''Cria um console local para debug'''
+    
+    import code
+    import inspect
+    
+    frame = inspect.currentframe().f_back
+    ns = dict(frame.f_globals)
+    ns.update(frame.f_locals)
+    console = code.InteractiveConsole(ns)
+    console.interact()
+
+def ipython_here():
+    '''Cria um console local para debug usando IPython'''
+    
+    import IPython.terminal.embed
+    import inspect
+    
+    frame = inspect.currentframe().f_back
+    
+    shell = IPython.terminal.embed.InteractiveShellEmbed(
+        argv=["-colors", "NoColor"],
+        locals_ns=frame.f_locals, 
+        globals_ns=frame.f_globals,
+    )
+    shell()
+    
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
+    
+    ipython_here()

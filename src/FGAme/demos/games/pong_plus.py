@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 from FGAme import *
 from random import uniform, choice
 
@@ -24,7 +23,7 @@ class Pong(World):
                                  (-X, 0.66 * Y), (-X, 0.33 * Y), (-X / 3, 0)])
         pong.make_static('angular')
         pong.move((2 * W - 50, H - Y / 2))
-        pong.listen('collision', self.pong_collision)
+        pong.listen('pre-collision', self.pong_collision)
         pong.mass *= 5
         pong.func = lambda t: -1000000 * Vec2(pong.pos.x - self.pong_x, 0)
         pong.damping = 10
@@ -206,7 +205,6 @@ class Pong(World):
         # testa se é uma colisão com a bola ou com as paredes
         if self.ball in col:
             col.resolve()
-            raise
 
             y_ball = self.ball.pos.y
             y_pong = self.pong.pos.y

@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from FGAme.mathtools import Vec2, RotMat2, sin, pi
+from FGAme.mathtools import Vec2, Rotation2d, sin, pi
 from FGAme.mathtools import area, aabb_bbox, center_of_mass, ROG_sqr, shapes
 from . import Body
 
@@ -124,7 +124,7 @@ class Poly(Body):
         if self._theta == self._cache_theta:
             return self._cache_rvertices_last
         else:
-            R = RotMat2(self._theta)
+            R = Rotation2d(self._theta)
             vert = [R * v for v in self._vertices]
             xmin = min(v.x for v in vert)
             xmax = max(v.x for v in vert)

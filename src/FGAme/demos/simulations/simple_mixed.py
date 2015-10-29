@@ -3,7 +3,7 @@ from FGAme import *
 
 # Cria mundo e objetos
 world = World()
-world.add_bounds(width=10, restitution=0.9, friction=0.1)
+world.add_bounds(width=10)
 obj1 = RegularPoly(N=3, length=130, pos=(200, 300),
                    vel=(500, -10), color='random', omega=2.2)
 obj2 = AABB(shape=(100, 80), pos=(200, 450), color='random')

@@ -400,8 +400,9 @@ class Collision(Pair):
 
                 # Roubo?
                 if Jt < 0:
+                    Jtmax = vrel_tangent / (invmassD / friction + invmassT)
                     Jn = (1 + restitution) * vrel_normal / invmassN
-                    Jt = 0
+                    Jt = min(-friction * Jn, Jtmax)
         
             # Aplica impulso total
             Jvec = Jn * normal + Jt * tangent

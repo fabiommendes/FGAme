@@ -1,4 +1,4 @@
-from FGAme.core import Canvas
+from FGAme.screen import Canvas
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop  # @UnusedImport
 

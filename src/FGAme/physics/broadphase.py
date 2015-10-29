@@ -76,10 +76,6 @@ class AbstractCollisionPhase(MutableSequence):
     def sort(self, *args, **kwds):
         self._data.sort(*args, **kwds)
 
-###############################################################################
-#                               Broad phase
-###############################################################################
-
 
 class BroadPhase(AbstractCollisionPhase):
 

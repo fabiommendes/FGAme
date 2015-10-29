@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 # TODO: manter este modelo de renderização?
 import copy
 from FGAme.draw import Color
@@ -85,11 +84,11 @@ class Curve(Drawable):
             self._color = Color(value)
 
     @property
-    def line_color(self):
+    def linecolor(self):
         return self._color
 
-    @line_color.setter
-    def line_color(self, value):
+    @linecolor.setter
+    def linecolor(self, value):
         self._color = Color(value)
 
     def _draw_kwds(self):
@@ -138,25 +137,25 @@ def lazy_shape_init(self, *args, **kwds):
 
     get = kwds.pop
     Shape.__init__(self, get('solid', True), get('color', black),
-                   get('line_width', 0.0), get('line_color', black))
+                   get('linewidth', 0.0), get('linecolor', black))
     type(self).__bases__[0].__init__(self, *args, **kwds)
 
 
 class Shape(Drawable):
 
     '''Classe pai para todas as figuras fechadas. Define as propriedades
-    solid, color, line_width e line_color.'''
+    solid, color, linewidth e linecolor.'''
 
     def __init__(self, solid=True, color=black,
-                 line_width=0.0, line_color=black):
+                 linewidth=0.0, linecolor=black):
 
         if not isinstance(color, Color):
             color = Color(color)
-        if not isinstance(line_color, Color):
-            line_color = Color(color)
+        if not isinstance(linecolor, Color):
+            linecolor = Color(color)
         self._color = color
-        self._line_color = line_color
-        self.line_width = line_width
+        self._linecolor = linecolor
+        self.linewidth = linewidth
         self.solid = bool(solid)
 
     def _init_colors_from_kwds(self, kwds):
@@ -166,9 +165,9 @@ class Shape(Drawable):
 
         solid = kwds.pop('solid', True)
         color = kwds.pop('solid', black)
-        line_color = kwds.pop('solid', black)
+        linecolor = kwds.pop('solid', black)
         line_width = kwds.pop('solid', 0.0)
-        Shape.__init__(self, solid, color, line_width, line_color)
+        Shape.__init__(self, solid, color, line_width, linecolor)
 
     @property
     def color(self):
@@ -179,19 +178,19 @@ class Shape(Drawable):
         self._color = Color(value)
 
     @property
-    def line_color(self):
-        return self._line_color
+    def linecolor(self):
+        return self._linecolor
 
-    @line_color.setter
-    def line_color(self, value):
-        self._line_color = Color(value)
+    @linecolor.setter
+    def linecolor(self, value):
+        self._linecolor = Color(value)
 
     def _draw_kwds(self):
         return dict(
             solid=self.solid,
             color=self.color,
-            line_width=self.line_width,
-            line_color=self.line_color)
+            line_width=self.linewidth,
+            linecolor=self.linecolor)
 
 
 class Circle(shapes.mCircle, Shape):
@@ -234,6 +233,17 @@ class Poly(shapes.mPoly, Shape):
 
     __init__ = lazy_shape_init
     __slots__ = 'screen_handle'
+
+
+class RegularPoly(Poly):
+
+    '''Objetos da classe Poly representam polígonos regulares dados por uma lista
+    de vértices.'''
+    
+    #TODO: implementar
+    
+    def __init__(self, *args, **kwds): 
+        raise NotImplementedError
 
 
 class Rectangle(shapes.mRectangle, Shape):

@@ -1,6 +1,8 @@
-# -*-coding: utf8 -*-
 import random
 from math import sqrt, acos
+
+
+__all__ = ['Color', 'colorproperty', 'rgb', 'rgba']
 
 
 class Color(object):
@@ -239,7 +241,7 @@ class Color(object):
 
         return Color(R, G, B, A)
 
-    # Métodos mágicos #########################################################
+    # Métodos mágicos
     def __repr__(self):
         return 'Color%s' % (tuple(self),)
 
@@ -463,12 +465,11 @@ COLOR_NAMES = [
 for _name, _code in COLOR_NAMES:
     Color._CACHE.setdefault(_name, Color(_code))
 
+
 #
 # Funções e objetos úteis
 #
-
-
-class color_property(property):
+class colorproperty(property):
 
     '''
     Propriedade que converte automaticamente os valores fornecidos como
@@ -478,8 +479,7 @@ class color_property(property):
     '''
 
     def __init__(self, name, default=None):
-        self.name = name
-        self.default = (None if default is None else Color(default))
+        default = (None if default is None else Color(default))
         attr = '_' + name
 
         def fget(self):
@@ -487,15 +487,19 @@ class color_property(property):
 
         def fset(self, value):
             if value is None:
-                fdel(self)
+                setattr(self, attr, default)
+            elif isinstance(value, Color):
+                setattr(self, attr, value)
             else:
                 setattr(self, attr, Color(value))
 
         def fdel(self):
             if hasattr(self, attr):
                 delattr(self, attr)
+            else:
+                raise AttributeError(name)
 
-        super(color_property, self).__init__(fget, fset, fdel)
+        super(colorproperty, self).__init__(fget, fset, fdel)
 
 
 def rgb(color):
@@ -522,10 +526,3 @@ def rgba(color):
 if __name__ == '__main__':
     import doctest
     doctest.testmod()
-
-    print(Color('white'), Color(255, 255, 255), Color(0xffffffff))
-    assert Color('white') == Color(255, 255, 255)
-    assert Color('white') == Color(255, 255, 255, 255)
-    for hexcode in ['#FFF', '#FFFF', '#FFFFFF', '#FFFFFFFF']:
-        assert Color('white') == Color(hexcode)
-    assert Color('white') == Color(0xffffff)

@@ -423,7 +423,7 @@ class step_forward(IntervalAction):
         delta = self.step / n_steps
 
         for _ in range(n_steps):
-            target.pos += Vec2.from_polar(delta, target.theta)
+            target.pos += Vec2.frompolar(delta, target.theta)
 
 
 if __name__ == '__main__':

@@ -9,15 +9,12 @@ import smallvectors as linalg
 from smallshapes import *
 import smallshapes as shapes
 from generic import set_promotion_rule, set_conversion
+from generic.operator import add, sub, mul, truediv
+
 
 #
 # Apelidos para tipos vetoriais
 #
-#Point2 = Point[2, float]
-#Point3 = Point[3, float]
-#Point4 = Point[4, float]
-
-
 class FGAmeVec(object):
     '''A FGAme vector object'''
 
@@ -44,6 +41,12 @@ class FGAmeVec(object):
 
 
 class Vec2(FGAmeVec, Vec[2, float]):
+    '''Vetor bidimensional'''
+    
+class Vec3(FGAmeVec, Vec[3, float]):
+    '''Vetor bidimensional'''
+    
+class Vec4(FGAmeVec, Vec[4, float]):
     '''Vetor bidimensional'''
 
 
@@ -78,8 +81,6 @@ def sub(u, v):
     return Vec2(x - a, y - b)
 
 
-Vec3 = Vec[3, float]
-Vec4 = Vec[4, float]
 Direction2 = Direction[2, float]
 Direction3 = Direction[3, float]
 Direction4 = Direction[4, float]
@@ -100,46 +101,31 @@ null2D = Vec2(0, 0)
 null3D = Vec3(0, 0, 0)
 null4D = Vec4(0, 0, 0, 0)
 
+
 #
 # Criação de vetores e pontos
 #
-
-
 def Vec(*args):
     '''Converte o argumento em um vetor de compontentes do tipo float'''
 
     if len(args) == 1:
         return Vec(*args[0])
     elif len(args) == 2:
-        return Vec2.from_flat(args)
+        return Vec2.fromflat(args)
     elif len(args) == 3:
-        return Vec3.from_flat(args)
+        return Vec3.fromflat(args)
     elif len(args) == 4:
-        return Vec4.from_flat(args)
+        return Vec4.fromflat(args)
     else:
-        return Vec.from_flat(args, dtype=float)
+        return Vec.fromflat(args, dtype=float)
 
 
 def asvector(u):
+    '''Retorna o argumento como vetor'''
     if isinstance(u, (Vec2, Vec3, Vec4)):
         return u
     else:
         return Vec(*u)
-
-
-def point(*args):
-    '''Converte o argumento em um ponto de compontentes do tipo float'''
-
-    if len(args) == 1:
-        return point(*args[0])
-    elif len(args) == 2:
-        return Point2.from_flat(args)
-    elif len(args) == 3:
-        return Point3.from_flat(args)
-    elif len(args) == 4:
-        return Point4.from_flat(args)
-    else:
-        return Point.from_flat(args, dtype=float)
 
 
 def direction(*args):
@@ -147,15 +133,15 @@ def direction(*args):
     tipo float'''
 
     if len(args) == 1:
-        return point(*args[0])
+        return Direction(*args[0])
     elif len(args) == 2:
-        return Direction2.from_flat(args)
+        return Direction2.fromflat(args)
     elif len(args) == 3:
-        return Direction3.from_flat(args)
+        return Direction3.fromflat(args)
     elif len(args) == 4:
-        return Direction4.from_flat(args)
+        return Direction4.fromflat(args)
     else:
-        return Direction.from_flat(args, dtype=float)
+        return Direction.fromflat(args, dtype=float)
 
 
 #
@@ -173,11 +159,3 @@ def shadow_y(A, B):
     tamanho do buraco'''
 
     return min(A.ymax, B.ymax) - max(A.ymin, B.ymin)
-
-
-if __name__ == '__main__':
-    print(Vec(1, 2) + (1, 2))
-    print((1, 2) + Vec(1, 2))
-    print(2 * Vec(1, 2))
-    print(Vec(1, 2) * 2)
-    print(asvector((1, 2)))

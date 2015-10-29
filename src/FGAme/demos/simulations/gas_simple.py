@@ -3,7 +3,7 @@
 Este exemplo mostra um gás de esferas rígidas em um campo gravitacional.
 '''
 
-from FGAme import World, Circle, AABB, Vec2, listen
+from FGAme import World, Circle, AABB, Vec, listen
 from random import uniform
 
 
@@ -37,8 +37,8 @@ class Gas(World):
         for _ in range(self.num_balls):
             Circle(
                 radius=self.radius,
-                vel=Vec2(uniform(-speed, speed), uniform(-speed, speed)),
-                pos=Vec2(uniform(50, 750), uniform(50, 400)),
+                vel=Vec(uniform(-speed, speed), uniform(-speed, speed)),
+                pos=Vec(uniform(50, 750), uniform(50, 400)),
                 color='random',
                 world=self,
             )
