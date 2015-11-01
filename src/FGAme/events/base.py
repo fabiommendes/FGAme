@@ -1,4 +1,5 @@
 import six
+import itertools
 from FGAme.events.util import pyname
 from FGAme.events.signals import Signal, DelegateSignal
 
@@ -20,17 +21,7 @@ class EventDispatcherMeta(type):
     '''
 
     def __new__(cls, name, bases, ns):
-        ns = cls._populate_namespace(name, bases, ns)
-        return type.__new__(cls, name, bases, ns)
-
-    @classmethod
-    def _populate_namespace(cls, name, bases, ns):
-        '''Retorna o namespace ns acrescentado dos métodos trigger_* e
-        listen_* apropriados para a classe em questão'''
-
-        ns = dict(ns)
-
-        # Lê os sinais e monta um dicionário de sinais
+        # Cria dicionário de sinais
         signals = {}
         for C in reversed(bases):
             signals.update(getattr(C, '__signals__', {}))
@@ -38,40 +29,57 @@ class EventDispatcherMeta(type):
             if isinstance(value, Signal):
                 signals[attr] = value
         ns['__signals__'] = signals
+        
+        # Modifica valores de slots, caso necessário
+        if '__slots__' in ns:
+            slots = list(ns['__slots__'])
+            for name, signal in signals.items():
+                if not isinstance(signal, DelegateSignal):
+                    slots.append('_%s_ctl' % name)
+                    slots.append('_%s_book' % name)
+            ns['__slots__'] = slots
 
-        # Cria os métodos do tipo listen_* e tipo trigger_*
-        for signal in signals.values():
-            lname = 'listen_' + pyname(signal.name)
-            tname = 'trigger_' + pyname(signal.name)
-            ns['_' + lname] = signal._factory_listen_method()
-            if lname not in ns:
-                ns[lname] = ns['_' + lname]
-            ns['_' + tname] = signal._factory_trigger_method()
-            if tname not in ns:
-                ns[tname] = ns['_' + tname]
-
+        # Cria objeto
+        new = type.__new__(cls, name, bases, ns)
+        
+        # Cria os métodos do tipo listen_* e tipo trigger_* 
+        methods = itertools.chain(cls.triggers(new, signals.values()), 
+                                  cls.listeners(new, signals.values()))
+        for name, method in methods:
+            if not hasattr(new, name):
+                setattr(new, name, method)
+            else:
+                setattr(new, '_' + name, method)
+        
         # Escaneia todos os métodos decorados com @listen
+        new.__marked_listen__ = cls.autolisten(new) 
+        return new
+
+    @staticmethod
+    def triggers(cls, signals):
+        for signal in signals:
+            name = 'trigger_' + pyname(signal.name)
+            yield name, signal._factory_trigger_method()
+            
+    @staticmethod
+    def listeners(cls, signals):
+        for signal in signals:
+            name = 'listen_' + pyname(signal.name)
+            yield name, signal._factory_listen_method()
+            
+    @staticmethod
+    def autolisten(cls):
         listen = {}
-        for C in reversed(bases):
+        for C in reversed(cls.__bases__):
             listen.update(getattr(C, '__marked_listen__', {}))
-        for attr, value in ns.items():
+        
+        for attr, value in vars(cls).items():
             if hasattr(value, '_listen_args'):
                 for name, args, kwds in getattr(value, '_listen_args'):
                     L = listen.setdefault(name, [])
                     L.append((attr, args, kwds))
 
-        ns['__marked_listen__'] = listen
-
-        # Atribui valores de slots, caso necessário
-        if '__slots__' in ns:
-            slots = list(ns['__slots__'])
-            for signal_name, signal in signals.items():
-                if not isinstance(signal, DelegateSignal):
-                    slots.append('_%s_ctl' % signal_name)
-                    slots.append('_%s_book' % signal_name)
-            ns['__slots__'] = slots
-
-        return ns
+        return listen
 
     @classmethod
     def decorate(cls, ev_type):
@@ -125,7 +133,7 @@ class EventDispatcher(object):
 
     '''Implementa o despachante de eventos da biblioteca FGAme.'''
 
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self):
         for signal in self.__signals__.values():

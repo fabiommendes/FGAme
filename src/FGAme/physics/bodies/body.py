@@ -1,29 +1,28 @@
-# -*- coding: utf8 -*-
 import copy
-import six
-from FGAme.events import EventDispatcher, EventDispatcherMeta, signal
-from FGAme.mathtools import Vec2, asvector, sin, cos, null2D, shapes
-from FGAme.physics.flags import BodyFlags as flags
-from FGAme.physics.forces import ForceProperty
-from FGAme.physics.bodies.body_interfaces import (HasAABB, HasGlobalForces,
-                                                  HasInertia)
+from ...events import EventDispatcher, EventDispatcherMeta, signal
+from ...mathtools import Vec2, asvector, sin, cos, null2D, shapes
+from ..flags import BodyFlags as flags
+from ..forces import ForceProperty
+from ..bodies.interfaces import HasAABB, HasGlobalForces, HasInertia
 
+
+# Constantes
 __all__ = ['Body', 'LinearRigidBody']
-
-
-###############################################################################
-#                              Funções úteis
-###############################################################################
 NOT_IMPLEMENTED = NotImplementedError('must be implemented at child classes')
 INERTIA_SCALE = 1
 INF = float('inf')
 
+def _div(x, y):
+    try:
+        return x / y
+    except ZeroDivisionError:
+        return INF
 
-def flag_property(flag):
+def _flag_property(flag):
     '''Retorna uma propriedade que controla a flag especificada no argumento'''
 
     def fget(self):
-        return self.flags & flag
+        return bool(self.flags & flag)
 
     def fset(self, value):
         if value:
@@ -32,14 +31,12 @@ def flag_property(flag):
             self.flags &= ~flag
     return property(fget, fset)
 
-# TODO: mover para FGAme.util
 
-
-def do_nothing(*args, **kwds):
+def _do_nothing(*args, **kwds):
     '''A handle that does nothing'''
 
 
-def raises_method(exception=NOT_IMPLEMENTED):
+def _raises_method(exception=NOT_IMPLEMENTED):
     '''Returns a method that raises the given exception'''
 
     def method(self, *args, **kwds):
@@ -47,116 +44,16 @@ def raises_method(exception=NOT_IMPLEMENTED):
     return method
 
 
-###############################################################################
-#          Classes Base --- todos objetos físicos derivam delas
-###############################################################################
-Body = None
-
-
-class PhysElementMeta(EventDispatcherMeta):
+class BodyMeta(EventDispatcherMeta):
 
     '''Metaclasse para todas as classes que representam objetos físicos'''
 
-    BLACKLIST = ['_is_mixin_', '__module__', '__doc__', '__module__',
-                 '__dict__', '__weakref__', '__slots__', '__subclasshook__']
-
     def __new__(cls, name, bases, ns):
-        # Aplica transformações da EventDispatcherMeta
-        has_slots = '__slots__' in ns
-        slots = ns.setdefault('__slots__', [])
-        ns = cls._populate_namespace(name, bases, ns)
-
-        # Remove __slots__ criados pela EventDispatcher
-        ns['__slots__'] = slots
-
-        # Força EventDispatcher ser a classe mãe na hierarquia
-        if bases == (object,):
-            bases = (EventDispatcher,)
-
-        # Insere uma cláusula de __slots__ vazia
-        ns.setdefault('__slots__', [])
-
-        # Verifica se existem classes mix-in entre as bases
-        true_bases = tuple(B for B in bases
-                           if not getattr(B, '_is_mixin_', False))
-        if len(bases) != len(true_bases):
-            for i, B in enumerate(bases):
-                if not getattr(B, '_is_mixin_', False):
-                    continue
-
-                # Encontra quais variáveis/métodos foram definidos nas classes
-                # mixin
-                allvars = {attr: getattr(B, attr) for attr in dir(B)}
-                for var in cls.BLACKLIST:
-                    if var in allvars:
-                        del allvars[var]
-                for attr, value in list(allvars.items()):
-                    if hasattr(object, attr):
-                        if getattr(object, attr) is value:
-                            del allvars[attr]
-
-                # Insere as variáveis que não foram definidas em ns nem em
-                # nenhuma base anterior
-                prev_bases = bases[:i]
-                for attr in list(allvars.keys()):
-                    if attr in ns:
-                        del allvars[attr]
-                        continue
-
-                    for B in prev_bases:
-                        if hasattr(B, attr):
-                            del allvars[attr]
-                            break
-
-                # Em Python 2, utiliza o objeto im_func dos métodos, caso ele
-                # exista
-                allvars = {name: getattr(var, 'im_func', var) for (name, var)
-                           in allvars.items()}
-
-                ns.update(allvars)
-
-                # Atualiza a lista de __slots__ utilizando o atributo _slots_
-                # do mixin e toda hierarquia inferior
-                for tt in B.mro():
-                    slots = getattr(tt, '_slots_', [])
-                    ns['__slots__'].extend(slots)
-
-        # Atualiza a lista de propriedades e retira slots repetidos
-        ns['__slots__'] = list(set(ns['__slots__']))
-        if not has_slots:
-            del ns['__slots__']
-        else:
-            if Body is None:
-                ns['__slots__'].append('__dict__')
-        new = type.__new__(cls, name, true_bases, ns)
-
-        # Atualiza as docstrings vazias utilizando as docstrings da primeira
-        # base válida
-        mro = new.mro()[1:-1]
-        for name, method in ns.items():
-            if not callable(method):
-                continue
-
-            doc = getattr(method, '__doc__', '<no docstring>')
-            if not doc:
-                for base in mro:
-                    try:
-                        other = getattr(base, name)
-                    except AttributeError:
-                        continue
-                    if other.__doc__:
-                        # TODO: six it
-                        try:
-                            method.__doc__ = other.__doc__
-                        except AttributeError:
-                            pass
-                    break
-
+        new = type.__new__(cls, name, bases, ns)
         return new
+    
 
-
-@six.add_metaclass(PhysElementMeta)
-class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
+class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=BodyMeta):
 
     '''Classe mãe de todos objetos com propriedades dinâmicas.
 
@@ -242,12 +139,20 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
     '''
 
     __slots__ = [
-        'flags', 'cbb_radius', '_baseshape', '_shape', '_aabb',
-        '_pos', '_vel', '_accel', '_theta', '_omega', '_alpha',
-        '_invmass', '_invinertia', '_e_vel', '_e_omega', '_world',
-        '_col_layer', '_col_group_mask',
+        'flags', '_invmass', '_invinertia', '_pos', '_theta', '_vel', '_omega', 
+        'cbb_radius', '__dict__',
     ]
-
+    
+    # Sinais
+    pre_collision = signal('pre-collision', num_args=1)
+    post_collision = signal('post-collision', num_args=1)
+    frame_enter = signal('frame-enter')
+    out_of_bounds = signal('out-of-bounds', num_args=1)
+    
+    # Propriedades especiais
+    # ...
+    
+    # Constantes de classe
     has_physics = True
     DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
@@ -255,7 +160,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
                  restitution=None, friction=None,
-                 baseshape=None, world=None, col_layer=0, col_group=0,
+                 baseshape=shapes.Circle(0, (0, 0)), 
+                 world=None, 
+                 col_layer=0, col_group=0,
                  flags=DEFAULT_FLAGS):
 
         self._world = world
@@ -263,6 +170,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
 
         # Flags de objeto
         self.flags = flags
+        self.cbb_radius = 0.0
 
         # Variáveis de estado
         self._pos = asvector(pos)
@@ -309,8 +217,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
             else:
                 inertia = float(inertia)
 
-        self._invmass = 1.0 / mass
-        self._invinertia = 1.0 / inertia
+        self._invmass = _div(1.0, mass)
+        self._invinertia = _div(1.0, inertia)
         self._density = float(density)
 
         # Controle de parâmetros físicos locais
@@ -362,10 +270,6 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         if world is not None:
             self._world.add(self)
 
-    ###########################################################################
-    #                            Serviços Python
-    ###########################################################################
-
     def __eq__(self, other):
         return self is other
 
@@ -381,9 +285,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
     # TODO: def __copy__(self): ?
     # TODO: def __getstate__(self): ?
 
-    ###########################################################################
-    #                      Propriedades geométricas
-    ###########################################################################
+    #
+    # Propriedades geométricas
+    #
     @property
     def cbb(self):
         '''Caixa de contorno circular que envolve o objeto'''
@@ -395,12 +299,12 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         '''Caixa de contorno alinhada aos eixos que envolve o objeto'''
 
         if self.flags & flags.dirty_aabb:
-            self._aabb = self.bounding_box.get_aabb()
+            self._aabb = self.bb.aabb
             self.flags &= flags.not_dirty_aabb
         return self._aabb
 
     @property
-    def bounding_box(self):
+    def bb(self):
         '''Retorna um objeto que representa o formato geométrico do corpo
         físico, ex.: Circle, AABB, Poly, etc'''
 
@@ -410,11 +314,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         assert self._shape is not None, 'empty shape'
         return self._shape
 
-    # Propriedades da caixa de contorno #######################################
-
-    ###########################################################################
-    #                          Contatos e vínculos
-    ###########################################################################
+    #
+    # Contatos e vínculos
+    #
     def add_contact(self, contact):
         '''Registra um contato à lista de contatos do objeto'''
 
@@ -435,18 +337,10 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         except ValueError:
             pass
 
-    ###########################################################################
-    #                                Sinais
-    ###########################################################################
-    pre_collision = signal('pre-collision', num_args=1)
-    post_collision = signal('post-collision', num_args=1)
-    frame_enter = signal('frame-enter')
-    out_of_bounds = signal('out-of-bounds', num_args=1)
-
-    ###########################################################################
-    #                            Controle de flags
-    ###########################################################################
-    def set_flag(self, flag, value):
+    #
+    # Controle de flags
+    #
+    def setflag(self, flag, value):
         '''Atribui um valor de verdade para a flag especificada.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
@@ -459,7 +353,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         else:
             self.flags &= ~flag
 
-    def toggle_flag(self, flag):
+    def toggleflag(self, flag):
         '''Inverte o valor da flag.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
@@ -474,7 +368,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         else:
             self.flags &= ~flag
 
-    def get_flag(self, flag):
+    def getflag(self, flag):
         '''Retorna o valor da flag.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
@@ -484,19 +378,16 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
             flag = self._get_flag(flag)
         return bool(self.flags | flag)
 
-    #
-    # Propriedades definidas por flags
-    #
-    can_rotate = flag_property(flags.can_rotate)
-    owns_gravity = flag_property(flags.owns_gravity)
-    owns_damping = flag_property(flags.owns_damping)
-    owns_adamping = flag_property(flags.owns_adamping)
-    owns_restitution = flag_property(flags.owns_restitution)
-    owns_friction = flag_property(flags.owns_friction)
+    owns_gravity = _flag_property(flags.owns_gravity)
+    owns_damping = _flag_property(flags.owns_damping)
+    owns_adamping = _flag_property(flags.owns_adamping)
+    owns_restitution = _flag_property(flags.owns_restitution)
+    owns_friction = _flag_property(flags.owns_friction)
+    can_rotate = _flag_property(flags.can_rotate)
 
-    ###########################################################################
-    #        Controle de criação e destruição e interação com o mundo
-    ###########################################################################
+    #
+    # Controle de criação e destruição e interação com o mundo
+    #
     @property
     def world(self):
         if self._world is None:
@@ -537,9 +428,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
             self._world = world
         return cp
 
-    ###########################################################################
-    #                          Estado dinâmico
-    ###########################################################################
+    #
+    # Estado dinâmico
+    #
     @property
     def omega(self):
         return self._omega
@@ -562,9 +453,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         elif value:
             self._raise_cannot_rotate_error()
 
-    ###########################################################################
-    #                        Propriedades físicas
-    ###########################################################################
+    #
+    # Propriedades físicas
+    #
     func = ForceProperty()
 
     def linearK(self):
@@ -631,8 +522,6 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
 
         >>> b1.momentumL(b1.pos)
         0.0
-
-
         '''
 
         if pos_or_x is None:
@@ -649,9 +538,9 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         else:
             return momentumL
 
-    ###########################################################################
-    #                      Aplicação de forças e torques
-    ###########################################################################
+    #
+    # Aplicação de forças e torques
+    #
     def move(self, delta_or_x, y=None):
         '''Move o objeto por vetor de deslocamento delta'''
 
@@ -672,7 +561,6 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
         else:
             self._vel += Vec2(delta_or_x, y)
 
-    # Resposta a forças, impulsos e atualização da física #####################
     def init_accel(self):
         '''Inicializa o vetor de aceleração com os valores devidos à gravidade
         e ao amortecimento'''
@@ -858,7 +746,6 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia):
             R = R if relative else R - self.pos
             self.aboost(R.cross(impulse) * self._invinertia)
 
-    # Variáveis angulares #####################################################
     def rotate(self, theta):
         '''Rotaciona o objeto por um ângulo _theta'''
 
@@ -986,14 +873,9 @@ def vec_property(slot):
 
 Body.pos = vec_property(Body._pos)
 Body.vel = vec_property(Body._vel)
-Body.accel = vec_property(Body._accel)
 
-###############################################################################
-# Linear rigid bodies
-###############################################################################
+
 # TODO: remover esta classe e se basear no comportamento da flag can_rotate
-
-
 class LinearRigidBody(Body):
 
     '''
@@ -1020,8 +902,4 @@ class LinearRigidBody(Body):
         if float(value) != INF:
             raise ValueError('LinearObjects have infinite inertia, '
                              'got %r' % value)
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    

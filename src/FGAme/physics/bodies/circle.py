@@ -48,7 +48,7 @@ class Circle(Body):
 
     # Caixa de contorno #######################################################
     @property
-    def bounding_box(self):
+    def bb(self):
         return self.cbb
 
     @property

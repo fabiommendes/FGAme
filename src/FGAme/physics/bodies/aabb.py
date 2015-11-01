@@ -82,7 +82,7 @@ class AABB(LinearRigidBody):
     # Torna as os limites da AABB mutáveis ####################################
     @property
     def aabb(self):
-        return self.bounding_box
+        return self.bb
 
     @property
     def xmin(self):

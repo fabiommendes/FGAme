@@ -146,7 +146,7 @@ class PhysicsObject:
             return self.draw_shape(screen)
     
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
-        bbox = self.bounding_box
+        bbox = self.bb
         cls = getattr(draw, type(bbox).__name__)
         return cls(*bbox, color=color, linecolor=linecolor, linewidth=linewidth)
         
@@ -190,11 +190,11 @@ class Circle(PhysicsObject, physics.Circle):
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bounding_box, True, color, lw, lc)
+            screen.draw_circle(self.bb, True, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bounding_box, False, black, lw, lc)
+            screen.draw_circle(self.bb, False, black, lw, lc)
 
 
 class Poly(PhysicsObject, physics.Poly):
@@ -209,14 +209,14 @@ class Poly(PhysicsObject, physics.Poly):
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_poly(self.bounding_box, True, color, lw, lc)
+            screen.draw_poly(self.bb, True, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_poly(self.bounding_box, False, black, lw, lc)
+            screen.draw_poly(self.bb, False, black, lw, lc)
     
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
-        return draw.Poly(self.bounding_box, color=color, linecolor=linecolor, 
+        return draw.Poly(self.bb, color=color, linecolor=linecolor, 
                          linewidth=linewidth)
     
 

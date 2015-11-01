@@ -111,7 +111,7 @@ class Poly(Body):
     #                     Sobrescrita de métodos
     ###########################################################################
     @property
-    def bounding_box(self):
+    def bb(self):
         return shapes.Poly(self.vertices)
 
     @property
