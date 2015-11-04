@@ -27,8 +27,8 @@ class Gas(World):
         # Inicia bolas
         self.bolas = []
         for _ in range(num_balls):
-            pos = Vec2(uniform(20, 780), uniform(20, 400))
-            vel = Vec2(uniform(-speed, speed), uniform(-speed, speed))
+            pos = Vec(uniform(20, 780), uniform(20, 400))
+            vel = Vec(uniform(-speed, speed), uniform(-speed, speed))
             bola = Circle(radius=radius, vel=vel, pos=pos, mass=1,
                           color='random')
             self.bolas.append(bola)
@@ -57,10 +57,10 @@ class Gas(World):
     def toggle_pause(self):
         super(Gas, self).toggle_pause()
 
-    @listen('long-press', 'up', Vec2(0, 9))
-    @listen('long-press', 'down', Vec2(0, -2))
-    @listen('long-press', 'left', Vec2(-4, 0))
-    @listen('long-press', 'right', Vec2(4, 0))
+    @listen('long-press', 'up', Vec(0, 9))
+    @listen('long-press', 'down', Vec(0, -2))
+    @listen('long-press', 'left', Vec(-4, 0))
+    @listen('long-press', 'right', Vec(4, 0))
     def boost(self, Vec):
         for bola in self.bolas:
             bola.vel += Vec

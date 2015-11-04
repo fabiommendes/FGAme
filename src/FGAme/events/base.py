@@ -15,7 +15,7 @@ class EventDispatcherMeta(type):
         __signals__
             Dicionário mapeando todos os nomes de sinais com os seus
             respectivos objetos.
-        __marked_listen__
+        __autolisten__
             Dicionário com todos os métodos que foram marcados com o decorador
             @listen durante a definição da classe.
     '''
@@ -33,10 +33,10 @@ class EventDispatcherMeta(type):
         # Modifica valores de slots, caso necessário
         if '__slots__' in ns:
             slots = list(ns['__slots__'])
-            for name, signal in signals.items():
+            for signame, signal in signals.items():
                 if not isinstance(signal, DelegateSignal):
-                    slots.append('_%s_ctl' % name)
-                    slots.append('_%s_book' % name)
+                    slots.append('_%s_ctl' % signame)
+                    slots.append('_%s_book' % signame)
             ns['__slots__'] = slots
 
         # Cria objeto
@@ -52,7 +52,7 @@ class EventDispatcherMeta(type):
                 setattr(new, '_' + name, method)
         
         # Escaneia todos os métodos decorados com @listen
-        new.__marked_listen__ = cls.autolisten(new) 
+        new.__autolisten__ = cls.autolisten(new) 
         return new
 
     @staticmethod
@@ -71,7 +71,7 @@ class EventDispatcherMeta(type):
     def autolisten(cls):
         listen = {}
         for C in reversed(cls.__bases__):
-            listen.update(getattr(C, '__marked_listen__', {}))
+            listen.update(getattr(C, '__autolisten__', {}))
         
         for attr, value in vars(cls).items():
             if hasattr(value, '_listen_args'):
@@ -81,55 +81,8 @@ class EventDispatcherMeta(type):
 
         return listen
 
-    @classmethod
-    def decorate(cls, ev_type):
-        '''Decora uma classe que não inclui EventDispatcher na hierarquia e
-        insere métodos/propriedades etc para que ela se comporte como um
-        membro de EventDispatcher.
 
-        Esta função pode ser útil quando EventDispatcher não pode ser inserida
-        na hierarquia de classes por um conflito de metaclasses ou por um
-        conflito com o campo __slots__ que previne herança múltipla.
-
-        O método __init__ é renomeado para _init_events para poder se tornar
-        acessível aos membros da classe decorada.
-
-        Observe que classes decoradas desta maneira não são subclasses de
-        EventDispatcher. Deste modo, os mecanismos de criação e registro de
-        novos sinais não funcionarão automaticamente. Caso uma sub-classe
-        queira definir um novo sinal, será necessário decorá-la manualmente.
-        '''
-
-        ev_type._init_events = EventDispatcher.__init__
-        ev_type.listen = EventDispatcher.listen
-        ev_type.trigger = EventDispatcher.trigger
-
-        # TODO: implementar @EventDispatcherMeta.decorate
-        name = ev_type.__name__
-        bases = ev_type.__bases__
-        ns = dict(ev_type.__dict__)
-        ns = cls._populate_namespace(name, bases, ns)
-
-        # Remove read-only attributes
-        blacklist = ['__doc__', '__dict__', '__weakref__']
-        for k in blacklist:
-            ns.pop(k, None)
-
-        # Write new attributes
-        for k, new in ns.items():
-            old = getattr(ev_type, k, None)
-            if old is not new:
-                try:
-                    setattr(ev_type, k, new)
-                except AttributeError:
-                    tname = ev_type.__name__
-                    msg = 'could not write %s=%r for type %s' % (k, new, tname)
-                    raise ValueError(msg)
-        return ev_type
-
-
-@six.add_metaclass(EventDispatcherMeta)
-class EventDispatcher(object):
+class EventDispatcher(object, metaclass=EventDispatcherMeta):
 
     '''Implementa o despachante de eventos da biblioteca FGAme.'''
 
@@ -154,7 +107,7 @@ class EventDispatcher(object):
                     self.listen(signal.name, *args, **kwargs)
 
             # Registra os métodos criados pelo mecanismo @listen
-            marked_listen = self.__marked_listen__.get(signal.name, [])
+            marked_listen = self.__autolisten__.get(signal.name, [])
             for (func_name, args, kwargs) in marked_listen:
                 handler = getattr(self, func_name)
                 filters = (

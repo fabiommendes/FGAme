@@ -29,10 +29,10 @@ class Circle(Body):
     def __init__(self, radius, pos=(0, 0), vel=(0, 0),
                  mass=None, density=None, **kwds):
 
-        self.cbb_radius = float(radius)
+        radius = float(radius)
         super(Circle, self).__init__(
             pos, vel, mass=mass, density=density,
-            baseshape=shapes.Circle(self.cbb_radius, null2D), ** kwds)
+            baseshape=shapes.Circle(radius, null2D), cbb_radius=radius, **kwds)
 
     @property
     def radius(self):

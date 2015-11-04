@@ -1,7 +1,6 @@
-# -*- coding: utf8 -*-
-
+from ...mathtools import sqrt, shapes
 from . import LinearRigidBody
-from FGAme.mathtools import sqrt, shapes
+
 
 __all__ = ['AABB']
 
@@ -66,11 +65,11 @@ class AABB(LinearRigidBody):
         pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
-        self.cbb_radius = sqrt(dx ** 2 + dy ** 2)
         aabb = shapes.AABB(-dx, dx, -dy, dy)
         super(AABB, self).__init__(pos, vel, mass=mass, density=density,
-                                   baseshape=aabb, **kwds)
-
+                                   baseshape=aabb, 
+                                   cbb_radius=sqrt(dx ** 2 + dy ** 2), **kwds)
+        
     def __repr__(self):
         tname = type(self).__name__
         if not self._invmass:
@@ -79,7 +78,6 @@ class AABB(LinearRigidBody):
         data = ', '.join('%.1f' % x for x in self.bbox)
         return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
 
-    # Torna as os limites da AABB mutáveis ####################################
     @property
     def aabb(self):
         return self.bb
@@ -128,6 +126,10 @@ class AABB(LinearRigidBody):
         self.pos = self.pos.copy(y=(ymax + ymin) / 2)
         self._delta_y = (ymax - ymin) / 2
 
+    @property
+    def vertices(self):
+        return self.bb.vertices
+
     def area(self):
         return 4 * self._delta_x * self._delta_y
 
@@ -136,6 +138,8 @@ class AABB(LinearRigidBody):
         b = self._delta_y
         return (a ** 2 + b ** 2) / 3
 
+
+assert AABB.__name__ == 'AABB'
 
 if __name__ == '__main__':
     import doctest

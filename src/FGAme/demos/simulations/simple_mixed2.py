@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 from FGAme import *
 
 # Cria mundo e objetos
@@ -9,6 +8,10 @@ obj1 = RegularPoly(N=3, length=130, pos=(200, 300),
 obj2 = AABB(shape=(100, 80), pos=(200, 450), color='random', mass='inf')
 obj3 = Circle(40, pos=(600, 300), color='random', mass='inf')
 obj4 = Circle(40, pos=(450, 100), color='random')
+
+@obj1.listen('pre-collision')
+def foo(col):
+    print(col)
 
 # Insere objetos e inicia rastreio de energia
 world.register_energy_tracker()

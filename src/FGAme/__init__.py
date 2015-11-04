@@ -41,6 +41,7 @@ Loop principal
 '''
 
 from .meta import __version__, __author__
+from .draw import Color
 from .logger import *
 from .events import listen, signal, EventDispatcher
 from .input import *
@@ -55,6 +56,7 @@ from . import conf
 from . import mathtools as math
 from . import draw
 from . import physics
+
 
 if __name__ == '__main__':
     import doctest

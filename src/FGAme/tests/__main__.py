@@ -3,11 +3,6 @@ Loads all tests in module and run
 '''
 import doctest
 import sys
-try:
-    from unittest2 import main
-except ImportError:
-    from unittest import main
-
 import FGAme as mod_current
 from FGAme import conf  # @Reimport
 conf.set_backend('empty')
@@ -29,4 +24,5 @@ def load_tests(loader, tests, ignore):
 
     return tests
 
-main()
+from pytest import main
+main('-v')

@@ -37,10 +37,6 @@ class Signal(object):
 
         return SignalCtl(self, owner)
 
-    ###########################################################################
-    # Fábrica de funções para os métodos listen_<sinal> e trigger_<sinal>
-    ###########################################################################
-
     def _factory_listen_method(self):
         signal = self  # não confundir com o self da função fabricada!
 

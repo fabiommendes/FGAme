@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 '''
 Implementa o exemplo de "pseudo-gravidade" da documentação.
 '''

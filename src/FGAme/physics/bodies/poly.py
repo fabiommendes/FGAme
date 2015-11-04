@@ -18,6 +18,10 @@ class Poly(Body):
                  pos=None, vel=(0, 0), theta=0.0, omega=0.0,
                  mass=None, density=None, inertia=None, **kwds):
 
+        if isinstance(vertices, int):
+            raise ValueError('must pass a list of vertices. '
+                             'Use RegularPoly to define a polygon by the '
+                             'number of vertices')
         vertices = [Vec2(*pt) for pt in vertices]
         pos_cm = center_of_mass(vertices)
         vertices = [v - pos_cm for v in vertices]
@@ -27,9 +31,9 @@ class Poly(Body):
         self._cache_theta = None
         self._cache_rvertices_last = None
         self._cache_rbbox_last = None
-        self.cbb_radius = max(v.norm() for v in vertices)
         super(Poly, self).__init__(pos_cm, vel, theta, omega,
                                    mass=mass, density=density, inertia=inertia,
+                                   cbb_radius=max(v.norm() for v in vertices),
                                    **kwds)
 
         self.num_sides = len(vertices)
@@ -189,13 +193,13 @@ class RegularPoly(Poly):
                  **kwds):
         '''Cria um polígono regoular com N lados de tamanho "length".'''
 
-        self.length = length
-        vertices = self._vertices(N, length, pos)
+        self.length = float(length)
+        vertices = self._vertices(int(N), pos)
         super(RegularPoly, self).__init__(vertices, None, vel, theta, omega,
                                           **kwds)
 
-    def _vertices(self, N, length, pos):
-        self.length = length
+    def _vertices(self, N, pos):
+        length = self.length
         alpha = pi / N
         theta = 2 * alpha
         b = length / (2 * sin(alpha))

@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 import string
 import pygame
 from FGAme import conf

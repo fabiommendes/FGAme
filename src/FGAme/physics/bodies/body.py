@@ -44,16 +44,7 @@ def _raises_method(exception=NOT_IMPLEMENTED):
     return method
 
 
-class BodyMeta(EventDispatcherMeta):
-
-    '''Metaclasse para todas as classes que representam objetos físicos'''
-
-    def __new__(cls, name, bases, ns):
-        new = type.__new__(cls, name, bases, ns)
-        return new
-    
-
-class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=BodyMeta):
+class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=EventDispatcherMeta):
 
     '''Classe mãe de todos objetos com propriedades dinâmicas.
 
@@ -160,7 +151,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Body
                  mass=None, density=None, inertia=None,
                  gravity=None, damping=None, adamping=None,
                  restitution=None, friction=None,
-                 baseshape=shapes.Circle(0, (0, 0)), 
+                 baseshape=shapes.Circle(0, (0, 0)),
+                 cbb_radius=0.0, 
                  world=None, 
                  col_layer=0, col_group=0,
                  flags=DEFAULT_FLAGS):
@@ -170,7 +162,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Body
 
         # Flags de objeto
         self.flags = flags
-        self.cbb_radius = 0.0
+        self.cbb_radius = cbb_radius + 0.0
 
         # Variáveis de estado
         self._pos = asvector(pos)

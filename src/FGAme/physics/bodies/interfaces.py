@@ -5,11 +5,12 @@ de uma classe enorme e favorece a reutilização e modularização do código.
 
 from FGAme.mathtools import Vec2, sqrt, null2D
 from FGAme.util import popattr
-from smallshapes.interfaces import HasAABB
+from smallshapes import HasAABB
 
 INF = float('inf')
 
-class HasInertia(object):
+
+class HasInertia:
 
     '''Define um objeto que possui propriedades de inércia linear (massa) e
     angular (momento de inércia).'''

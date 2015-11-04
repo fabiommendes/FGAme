@@ -32,11 +32,12 @@ PYSRC = 'src' if sys.version.startswith('3') else 'py2src'
 #
 try:
     if 'PyPy' not in sys.version:
-        from Cython.Build import cythonize
-        from Cython.Distutils import build_ext
-        setup_kwds.update(
-            ext_modules=cythonize('src/generic/*.pyx'),
-            cmdclass={'build_ext': build_ext})
+        #from Cython.Build import cythonize
+        #from Cython.Distutils import build_ext
+        #setup_kwds.update(
+        #    ext_modules=cythonize('src/generic/*.pyx'),
+        #    cmdclass={'build_ext': build_ext})
+        pass
 except ImportError:
     pass
 

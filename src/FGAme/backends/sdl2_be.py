@@ -272,7 +272,7 @@ class SDL2Canvas(Canvas):
             # We do not support CMYK or YCbCr for now
             raise TypeError("unsupported image format")
 
-        pxbuf = image.tostring()
+        pxbuf = image.tobytes()
         surface = sdl2.SDL_CreateRGBSurfaceFrom(pxbuf, width, height,
                                                 depth, pitch, rmask,
                                                 gmask, bmask, amask)

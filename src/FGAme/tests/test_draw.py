@@ -1,8 +1,3 @@
-'''
-Created on 13 de out de 2015
-
-@author: chips
-'''
 from FGAme import draw
 import unittest
 
