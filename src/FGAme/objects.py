@@ -16,7 +16,7 @@ __all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
 black = Color('black')
 
 
-class Body(EventDispatcher):
+class Body(physics.Body):
     long_press = signal(
         'long-press', 'key', delegate_to='_input')
     
@@ -39,23 +39,25 @@ class Body(EventDispatcher):
         'mouse-long-press', 'button', delegate_to='_input')
 
     def __init__(self, *args, **kwds):
-        # Constantes de inicialização referentes a visualização
-        image = {'image': kwds.pop('image', None)}
+        # Extract visualization parameters
+        image = {
+            'image': kwds.pop('image', None)
+            }
         for k in list(kwds):
             if k.startswith('image_'):
                 image[k] = kwds.pop(k)
-                
-        # Inicialização direta
         self.color = kwds.pop('color', black)
         self.linecolor = kwds.pop('linecolor', None)
         self.linewidth = kwds.pop('linewidth', 1)
         self.visible = kwds.pop('visible', True)
-        
-        # Inicializa a superclasse
+
+        # Set the correct world
+        self.world = kwds.pop('world', None)
+
+        # Init physics object and visualization
         super().__init__(*args, **kwds)
-        
-        # Inicializa a visualização                
         self.__init_image(**image)
+
 
 
     def __init_image(self, image, image_offset=(0, 0), image_reference=None, **kwds):
@@ -144,6 +146,10 @@ class Body(EventDispatcher):
             return img.draw(screen)
         else:
             return self.draw_shape(screen)
+
+    def destroy(self):
+        super().destroy()
+        self.world.remove(self)
     
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
         bbox = self.bb

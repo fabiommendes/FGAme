@@ -18,13 +18,13 @@ SLEEP_ANGULAR_VELOCITY = 0.05
 
 class Simulation(EventDispatcher):
 
-    '''Implementa a simulação de física.
+    """Implementa a simulação de física.
 
     Os métodos principais são: add(obj) e remove(obj) para adicionar e remover
     objetos e update(dt) para atualizar o estado da simulação. Verifique a
     documentação do método update() para uma descrição detalhada sobre como
     a física é resolvida em cada etapa de simulação.
-    '''
+    """
 
     def __init__(self, gravity=None, damping=0, adamping=0,
                  restitution=1, friction=0, max_speed=None,
@@ -175,7 +175,7 @@ class Simulation(EventDispatcher):
     #                   Gerenciamento de objetos e colisões
     ###########################################################################
     def add(self, obj):
-        '''Adiciona um novo objeto ao mundo.
+        """Adiciona um novo objeto ao mundo.
 
         Exemplos
         --------
@@ -184,7 +184,7 @@ class Simulation(EventDispatcher):
         >>> obj = AABB(bbox=(-10, 10, -10, 10))
         >>> world = World()
         >>> world.add(obj, layer=1)
-        '''
+        """
 
         flags = BodyFlags
 
@@ -206,8 +206,8 @@ class Simulation(EventDispatcher):
             self.trigger('object-add', obj)
 
     def remove(self, obj):
-        '''Remove um objeto da simulação. Produz um ValueError() caso o objeto
-        não esteja presente na simulação.'''
+        """Remove um objeto da simulação. Produz um ValueError() caso o objeto
+        não esteja presente na simulação."""
 
         try:
             idx = self._objects.index(obj)
@@ -216,10 +216,10 @@ class Simulation(EventDispatcher):
         else:
             del self._objects[idx]
             self.trigger('object-remove', obj)
-            obj.destroy()
+        self._simulation = None
 
     def discard(self, obj):
-        '''Descarta um objeto da simulação.'''
+        """Descarta um objeto da simulação."""
 
         try:
             self.remove(obj)
@@ -230,7 +230,7 @@ class Simulation(EventDispatcher):
     #                     Simulação de Física
     ###########################################################################
     def update(self, dt):
-        '''Rotina principal da simulação de física.'''
+        """Rotina principal da simulação de física."""
 
         self.trigger_frame_enter()
         self._dt = dt = float(dt)
@@ -256,11 +256,11 @@ class Simulation(EventDispatcher):
             self.enforce_max_speed()
 
     def accumulate_accelerations(self, dt):
-        '''Atualiza o vetor interno que mede as acelerações lineares e
+        """Atualiza o vetor interno que mede as acelerações lineares e
         angulares de cada objeto.
 
         Para tanto, usa informação tanto de forças globais quanto dos atributos
-        *force* e *torque* de cada objeto.'''
+        *force* e *torque* de cada objeto."""
 
         IS_SLEEP = BodyFlags.is_sleeping
         t = self.time
@@ -289,8 +289,8 @@ class Simulation(EventDispatcher):
             #    obj.apply_alpha(self._alpha, dt)
 
     def resolve_velocities(self, dt):
-        '''Calcula as novas velocidades em função das acelerações acumuladas no
-        passo accumulate_accelerations'''
+        """Calcula as novas velocidades em função das acelerações acumuladas no
+        passo accumulate_accelerations"""
 
         IS_SLEEP = BodyFlags.is_sleeping
         for obj in self._objects:
@@ -306,7 +306,7 @@ class Simulation(EventDispatcher):
             obj._e_omega = 0.0
 
     def resolve_positions(self, dt):
-        '''Resolve as posições a partir das velocidades'''
+        """Resolve as posições a partir das velocidades"""
 
         IS_SLEEP = BodyFlags.is_sleeping
         for obj in self._objects:
@@ -316,8 +316,8 @@ class Simulation(EventDispatcher):
             obj.rotate((obj.omega + obj._e_omega) * dt)
 
     def resolve_constraints(self, dt):
-        '''Resolve todos os vínculos utilizando o algoritmo de impulsos
-        sequenciais'''
+        """Resolve todos os vínculos utilizando o algoritmo de impulsos
+        sequenciais"""
 
         broad_cols = self.broad_phase(self._objects)
         narrow_cols = self.narrow_phase(broad_cols)
@@ -335,8 +335,8 @@ class Simulation(EventDispatcher):
                 col.baumgarte(beta)
 
     def get_islands(self, contacts):
-        '''Retorna a lista de grupos de colisão fechados no gráfico de
-        colisões'''
+        """Retorna a lista de grupos de colisão fechados no gráfico de
+        colisões"""
 
         contacts = set(contacts)
         groups = defaultdict(list)
@@ -351,7 +351,7 @@ class Simulation(EventDispatcher):
         return list(groups.values())
 
     def can_collide(self, A, B):
-        '''Retorna True se A e B podem colidir'''
+        """Retorna True se A e B podem colidir"""
 
         flags = BodyFlags
 
@@ -375,32 +375,32 @@ class Simulation(EventDispatcher):
     # Cálculo de parâmetros físicos
     #
     def energyK(self):
-        '''Soma da energia cinética de todos os objetos do mundo'''
+        """Soma da energia cinética de todos os objetos do mundo"""
 
         return sum(obj.energyK() for obj in self._objects
                    if (obj._invmass or obj._invinertia))
 
     def energyU(self):
-        '''Soma da energia potencial de todos os objetos do mundo devido à
-        gravidade'''
+        """Soma da energia potencial de todos os objetos do mundo devido à
+        gravidade"""
 
         return sum(obj.energyU() for obj in self._objects if obj._invmass)
 
     def energy_interaction(self):
-        '''Soma da energia de interação entre todos os pares de partículas
-        (Não implementado)'''
+        """Soma da energia de interação entre todos os pares de partículas
+        (Não implementado)"""
 
         return 0.0
 
     def energyT(self):
-        '''Energia total do sistema de partículas (possivelmente excluindo
-        algumas interações entre partículas)'''
+        """Energia total do sistema de partículas (possivelmente excluindo
+        algumas interações entre partículas)"""
 
         return self.energyU() + self.energyK() + self.energy_interaction()
 
     def energy_ratio(self):
-        '''Retorna a razão entre a energia total e a energia inicial calculada
-        no início da simulação'''
+        """Retorna a razão entre a energia total e a energia inicial calculada
+        no início da simulação"""
 
         if self._kinetic0 is None:
             self._init_energy0()
@@ -409,7 +409,7 @@ class Simulation(EventDispatcher):
         return self.energyT() / sum_energies
 
     def _init_energy0(self):
-        '''Chamada para inicializar _kinetic0 e amigos'''
+        """Chamada para inicializar _kinetic0 e amigos"""
 
         self._kinetic0 = self.energyK()
         self._potential0 = self.energyU()
@@ -419,7 +419,7 @@ class Simulation(EventDispatcher):
     # Serviços esporáticos
     #
     def enforce_max_speed(self):
-        '''Força que todos objetos tenham uma velocidade máxima'''
+        """Força que todos objetos tenham uma velocidade máxima"""
 
         if self.max_speed is not None:
             vel = self.max_speed
@@ -430,8 +430,8 @@ class Simulation(EventDispatcher):
                     obj._vel *= vel / obj._vel.norm()
 
     def find_out_of_bounds(self):
-        '''Emite o sinal de "out-of-bounds" para todos os objetos da
-        simulação que deixarem os limites estabelecidos'''
+        """Emite o sinal de "out-of-bounds" para todos os objetos da
+        simulação que deixarem os limites estabelecidos"""
 
         if self.bounds is not None:
             xmin, xmax, ymin, ymax = self.bounds
@@ -459,8 +459,8 @@ class Simulation(EventDispatcher):
                     out.discard(obj)
 
     def burn(self, frames, dt=0.0):
-        '''Executa a simulação por um número específico de frames sem deixar
-        o tempo rodar'''
+        """Executa a simulação por um número específico de frames sem deixar
+        o tempo rodar"""
 
         time = self.time
         for _ in range(frames):
@@ -468,7 +468,7 @@ class Simulation(EventDispatcher):
             self.time = time
 
     def remove_superpositions(self, num_iter=1):
-        '''Remove todas as superposições entre objetos dinâmicos'''
+        """Remove todas as superposições entre objetos dinâmicos"""
 
         self._dt = 0.0
         for _ in range(num_iter):
@@ -483,7 +483,7 @@ class Simulation(EventDispatcher):
 #                              Funções auxiliares
 ###############################################################################
 def normalize_broad_phase(broad_phase, world):
-    '''Escolhe o parâmetro correto na inicialização do broad-phase'''
+    """Escolhe o parâmetro correto na inicialização do broad-phase"""
 
     if broad_phase is None:
         broad_phase = BroadPhaseCBB(world=world)

@@ -11,9 +11,9 @@ from FGAme.util import lazy
 
 class World(EventDispatcher):
 
-    '''Classe Mundo: coordena todos os objetos com uma física definida e
+    """Classe Mundo: coordena todos os objetos com uma física definida e
     resolve a interação entre eles.
-    '''
+    """
 
     def __init__(self, background=None,
                  gravity=None, damping=0, adamping=0,
@@ -43,7 +43,7 @@ class World(EventDispatcher):
         self.is_paused = False
         super(World, self).__init__()
 
-        # Inicia e popula o mundo
+        # Populate world with user-customizable init
         self.init()
 
     background = colorproperty('background', 'white')
@@ -56,7 +56,7 @@ class World(EventDispatcher):
 
     # Gerenciamento de objetos ################################################
     def add(self, obj, layer=0):
-        '''Adiciona um novo objeto ao mundo.
+        """Adiciona um novo objeto ao mundo.
 
         Exemplos
         --------
@@ -70,36 +70,39 @@ class World(EventDispatcher):
         Os objetos podem ser removidos com o método remove()
 
         >>> world.remove(obj)
-        '''
-
-        # Verifica se trata-se de uma lista de objetos
-        if isinstance(obj, (tuple, list)):
-            for obj in obj:
-                self.add(obj, layer=layer)
-            return
+        """
 
         # Objetos que implementam update_world()
-        elif hasattr(obj, 'update_world'):
+        if hasattr(obj, 'update_world'):
             obj.update_world(self, layer=layer)
-            return
 
-        # Adiciona na lista de renderização
-        self._render_tree.add(obj, layer)
-        if isinstance(obj, Body):
-            self._simulation.add(obj)
+        # Verifica se trata-se de uma lista de objetos
+        elif isinstance(obj, (tuple, list)):
+            for obj in obj:
+                self.add(obj, layer=layer)
+
+        else:
+            self._render_tree.add(obj, layer)
+            if isinstance(obj, Body):
+                self._simulation.add(obj)
+                obj.world = self
 
     def remove(self, obj):
-        '''Descarta um objeto do mundo'''
+        """Descarta um objeto do mundo"""
 
-        self._render_tree.remove(obj)
-        if isinstance(obj, Body):
+        if getattr(obj, 'world', None) is self:
+            if obj in self._render_tree:
+                self._render_tree.remove(obj)
             self._simulation.remove(obj)
+            obj.world = None
+        else:
+            self._render_tree.remove(obj)
 
     def init(self):
-        '''Método executado após a inicialização do objeto World(). Normalmente
+        """Método executado após a inicialização do objeto World(). Normalmente
         é sobrescrito pelas sub-classes para popular o mundo com objetos e
         realizar outras operações de inicialização. A implementação padrão não
-        faz nada.'''
+        faz nada."""
 
     def __contains__(self, obj):
         return obj in self._render_tree or obj in self._simulation
@@ -131,22 +134,22 @@ class World(EventDispatcher):
 
     # Simulação de Física #####################################################
     def pause(self):
-        '''Pausa a simulação de física'''
+        """Pausa a simulação de física"""
 
         self.is_paused = True
 
     def unpause(self):
-        '''Resume a simulação de física'''
+        """Resume a simulação de física"""
 
         self.is_paused = False
 
     def toggle_pause(self):
-        '''Alterna o estado de pausa da simulação'''
+        """Alterna o estado de pausa da simulação"""
 
         self.is_paused = not self.is_paused
 
     def update(self, dt):
-        '''Rotina principal da simulação de física.'''
+        """Rotina principal da simulação de física."""
 
         self.trigger('frame-enter')
         if not self.is_paused:
@@ -158,15 +161,15 @@ class World(EventDispatcher):
         return conf.get_mainloop()
 
     def run(self, timeout=None, real_time=True, **kwds):
-        '''Roda a simulação de física durante o tempo 'timeout' especificado.
+        """Roda a simulação de física durante o tempo 'timeout' especificado.
 
         O parâmetro `real_time` especifica se o tempo considerado consiste no
-        tempo real ou no tempo de simulação.'''
+        tempo real ou no tempo de simulação."""
 
         self._mainloop.run(self, timeout=timeout, **kwds)
 
     def start(self, **kwds):
-        '''Inicia a simulação em um thread separado'''
+        """Inicia a simulação em um thread separado"""
         
         if hasattr(self, '_thread'):
             try:
@@ -177,7 +180,7 @@ class World(EventDispatcher):
         self._thread.start()  
     
     def stop(self):
-        '''Finaliza o laço principal de simulação'''
+        """Finaliza o laço principal de simulação"""
 
         # force thread to stop
         try:
@@ -188,7 +191,7 @@ class World(EventDispatcher):
         self._mainloop.stop()
         
     def set_next_state(self, value):
-        '''Passa a simulação para o próximo estado'''
+        """Passa a simulação para o próximo estado"""
 
         pass
 
@@ -199,12 +202,12 @@ class World(EventDispatcher):
     #                     Criação de objetos especiais
     ###########################################################################
     def add_bounds(self, *args, **kwds):
-        '''Cria um conjunto de AABB's que representa uma região fechada.
+        """Cria um conjunto de AABB's que representa uma região fechada.
 
         Parameters
         ----------
 
-        '''
+        """
 
         # Processa argumentos
         hard = kwds.pop('hard', True)
@@ -264,7 +267,7 @@ class World(EventDispatcher):
     ###########################################################################
     def register_energy_tracker(self, auto_connect=True, ratio=True,
                                 raise_on_change=None):
-        '''Retorna uma função que rastreia a energia total do mundo a cada
+        """Retorna uma função que rastreia a energia total do mundo a cada
         frame e imprime sempre que houver mudança na energia total.
 
         O comportamento padrão é imprimir a razão entre a energia inicial e a
@@ -273,7 +276,7 @@ class World(EventDispatcher):
 
         A função resultante é conectada automaticamente ao evento
         "frame-enter", a não ser que ``auto_conect=False``.
-        '''
+        """
 
         last_data = [None]
         if raise_on_change is None:

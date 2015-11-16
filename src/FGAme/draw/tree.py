@@ -1,6 +1,6 @@
 class RenderTree(object):
 
-    '''Representa uma árvore de objetos que serão desenhados na tela
+    """Representa uma árvore de objetos que serão desenhados na tela
 
     Exemplos
     --------
@@ -23,7 +23,7 @@ class RenderTree(object):
     >>> tree.remove('bar');
     >>> 'bar' in tree, 'foo' in tree
     (False, True)
-    '''
+    """
 
     is_tree = True
     visible = True
@@ -38,7 +38,6 @@ class RenderTree(object):
         self._data = []
         self.parent = None
 
-    # Métodos mágicos #########################################################
     def __contains__(self, obj):
         return any(obj in L for _, L in self._data)
 
@@ -54,10 +53,9 @@ class RenderTree(object):
                 return obj
         raise IndexError(idx)
 
-    # Controle de objetos #####################################################
     def add(self, obj, layer=0):
-        '''Adiciona um objeto ou um galho (outro elemento de RenderTree) na
-        camada especificada'''
+        """Adiciona um objeto ou um galho (outro elemento de RenderTree) na
+        camada especificada"""
 
         for i, (layer_idx, data) in enumerate(list(self._data)):
             if layer == layer_idx:
@@ -70,7 +68,7 @@ class RenderTree(object):
             self._data.append((layer, [obj]))
 
     def remove(self, value):
-        '''Remove a primeira ocorrência de um valor.'''
+        """Remove a primeira ocorrência de um valor."""
 
         for _, L in self._data:
             if value in L:
@@ -80,16 +78,24 @@ class RenderTree(object):
             raise ValueError('object %r not in RenderTree' % value)
 
     def remove_all(self, value):
-        '''Remove todas as ocorrências do valor dado.'''
+        """Remove todas as ocorrências do valor dado."""
 
         for _, L in self._data:
             while value in L:
                 L.remove(value)
 
+    def count(self, value):
+        """Count the number of occurrences of the given value"""
+
+        count = 0
+        for obj in self.walk():
+            count += bool(obj == value)
+        return count
+
     def walk(self, reverse=False):
-        '''Percorre sobre todos os objetos na ordem correta. Se reverse=True,
+        """Percorre sobre todos os objetos na ordem correta. Se reverse=True,
         percorre os objetos na ordem contrária.
-        '''
+        """
 
         if reverse:
             for _, L in reversed(self._data):
@@ -101,8 +107,8 @@ class RenderTree(object):
                     yield obj
 
     def iter_layers(self, skip_empty=True):
-        '''Itera sobre as camadas retornando a lista de objetos em cada
-        camada'''
+        """Itera sobre as camadas retornando a lista de objetos em cada
+        camada"""
 
         if skip_empty:
             for (_, L) in self._data:
@@ -120,7 +126,7 @@ class RenderTree(object):
                         yield []
 
     def get_layer(self, idx):
-        '''Retorna uma lista com os objetos da i-ésima camada'''
+        """Retorna uma lista com os objetos da i-ésima camada"""
 
         for i, L in self._data:
             if i == idx:
@@ -129,8 +135,8 @@ class RenderTree(object):
             return []
 
     def screen_update(self, screen):
-        '''Percorre todos os objetos na árvore invocando o método 
-        screen_update() o parâmetro de screen fornecido'''
+        """Percorre todos os objetos na árvore invocando o método 
+        screen_update() o parâmetro de screen fornecido"""
 
         for obj in self.walk():
             drawable = obj.drawable
@@ -141,8 +147,8 @@ class RenderTree(object):
             screen.update_handle(handle, drawable)
 
     def draw(self, screen):
-        '''Percorre todos os objetos na árvore invocando o método
-        `obj.paint(screen)`'''
+        """Percorre todos os objetos na árvore invocando o método
+        `obj.paint(screen)`"""
 
         for obj in self.walk():
             if obj.visible:
@@ -153,8 +159,8 @@ class RenderTree(object):
                     raise
 
     def linearize(self, layer=0):
-        '''Retorna uma versão linearizada da árvore de renderização onde
-        todos os objetos são recolocados na mesma camada'''
+        """Retorna uma versão linearizada da árvore de renderização onde
+        todos os objetos são recolocados na mesma camada"""
 
         data = (layer, list(self.walk()))
         new = RenderTree(parent=self.parent)

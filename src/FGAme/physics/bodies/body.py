@@ -19,7 +19,7 @@ def _div(x, y):
         return INF
 
 def _flag_property(flag):
-    '''Retorna uma propriedade que controla a flag especificada no argumento'''
+    """Retorna uma propriedade que controla a flag especificada no argumento"""
 
     def fget(self):
         return bool(self.flags & flag)
@@ -33,11 +33,11 @@ def _flag_property(flag):
 
 
 def _do_nothing(*args, **kwds):
-    '''A handle that does nothing'''
+    """A handle that does nothing"""
 
 
 def _raises_method(exception=NOT_IMPLEMENTED):
-    '''Returns a method that raises the given exception'''
+    """Returns a method that raises the given exception"""
 
     def method(self, *args, **kwds):
         raise exception
@@ -46,7 +46,7 @@ def _raises_method(exception=NOT_IMPLEMENTED):
 
 class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=EventDispatcherMeta):
 
-    '''Classe mãe de todos objetos com propriedades dinâmicas.
+    """Classe mãe de todos objetos com propriedades dinâmicas.
 
     Attributes
     ----------
@@ -127,7 +127,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         pertence. O valor padrão é zero. Apenas objetos que estão na mesma
         camada colidem entre si. `col_layer` pode ser uma sequência de valores
         caso o objeto participe de várias camadas.
-    '''
+    """
 
     __slots__ = [
         'flags', '_invmass', '_invinertia', '_pos', '_theta', '_vel', '_omega', 
@@ -153,11 +153,11 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
                  restitution=None, friction=None,
                  baseshape=shapes.Circle(0, (0, 0)),
                  cbb_radius=0.0, 
-                 world=None, 
+                 simulation=None,
                  col_layer=0, col_group=0,
                  flags=DEFAULT_FLAGS):
 
-        self._world = world
+        self._simulation = simulation
         EventDispatcher.__init__(self)
 
         # Flags de objeto
@@ -259,8 +259,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self._col_group_mask = 0
 
         # Presença em mundo
-        if world is not None:
-            self._world.add(self)
+        if simulation is not None:
+            self._simulation.add(self)
 
     def __eq__(self, other):
         return self is other
@@ -282,13 +282,13 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     #
     @property
     def cbb(self):
-        '''Caixa de contorno circular que envolve o objeto'''
+        """Caixa de contorno circular que envolve o objeto"""
 
         return shapes.Circle(self.cbb_radius, self.pos)
 
     @property
     def aabb(self):
-        '''Caixa de contorno alinhada aos eixos que envolve o objeto'''
+        """Caixa de contorno alinhada aos eixos que envolve o objeto"""
 
         if self.flags & flags.dirty_aabb:
             self._aabb = self.bb.aabb
@@ -297,8 +297,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
 
     @property
     def bb(self):
-        '''Retorna um objeto que representa o formato geométrico do corpo
-        físico, ex.: Circle, AABB, Poly, etc'''
+        """Retorna um objeto que representa o formato geométrico do corpo
+        físico, ex.: Circle, AABB, Poly, etc"""
 
         if self.flags & flags.dirty_any:
             self._shape = self._baseshape.displaced(self.pos).rotated(self._theta)
@@ -310,7 +310,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     # Contatos e vínculos
     #
     def add_contact(self, contact):
-        '''Registra um contato à lista de contatos do objeto'''
+        """Registra um contato à lista de contatos do objeto"""
 
         L = self._contacts
         invmass = contact.A._invmass
@@ -322,7 +322,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             L.append(contact)
 
     def remove_contact(self, contact):
-        '''Remove um contato da lista de contatos do objeto'''
+        """Remove um contato da lista de contatos do objeto"""
 
         try:
             self._contacts.remove(contact)
@@ -333,10 +333,10 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     # Controle de flags
     #
     def setflag(self, flag, value):
-        '''Atribui um valor de verdade para a flag especificada.
+        """Atribui um valor de verdade para a flag especificada.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
-        associada à flag'''
+        associada à flag"""
 
         if isinstance(flag, str):
             flag = self._get_flag(flag)
@@ -346,10 +346,10 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self.flags &= ~flag
 
     def toggleflag(self, flag):
-        '''Inverte o valor da flag.
+        """Inverte o valor da flag.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
-        associada à flag'''
+        associada à flag"""
 
         if isinstance(flag, str):
             flag = self._get_flag(flag)
@@ -361,10 +361,10 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self.flags &= ~flag
 
     def getflag(self, flag):
-        '''Retorna o valor da flag.
+        """Retorna o valor da flag.
 
         O argumento pode ser uma string ou a constante em FGAme.physics.flags
-        associada à flag'''
+        associada à flag"""
 
         if isinstance(flag, str):
             flag = self._get_flag(flag)
@@ -381,43 +381,42 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     # Controle de criação e destruição e interação com o mundo
     #
     @property
-    def world(self):
-        if self._world is None:
+    def simulation(self):
+        if self._simulation is None:
             raise ValueError('trying to access rogue object')
         else:
-            return self._world
+            return self._simulation
 
     def set_active(self, value):
-        '''Determina o estado ativo do objeto'''
+        """Determina o estado ativo do objeto"""
 
         if value:
             self.flags &= flags.not_active
         else:
-            self.world.set_active(self)
+            self.simulation.set_active(self)
             self.flags |= flags.active
 
     def is_rogue(self):
-        '''Retorna True se o objeto não estiver associado a uma simulação'''
+        """Retorna True se o objeto não estiver associado a uma simulação"""
 
-        return (self._world is None)
+        return (self._simulation is None)
 
     def destroy(self):
-        '''Destrói o objeto físico'''
+        """Destrói o objeto físico"""
 
         if not self.is_rogue():
-            if self in self.world:
-                self.world.remove(self)
+            self.simulation.remove(self)
 
         # TODO: desaloca todos os sinais
 
     def copy(self):
-        '''Cria uma cópia do objeto'''
+        """Cria uma cópia do objeto"""
 
         try:
-            world, self._world = self._world, None
+            world, self._simulation = self._simulation, None
             cp = copy.copy(self)
         finally:
-            self._world = world
+            self._simulation = world
         return cp
 
     #
@@ -451,7 +450,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     force = ForceProperty()
 
     def linearK(self):
-        '''Energia cinética das variáveis lineares'''
+        """Energia cinética das variáveis lineares"""
 
         if self._invmass:
             return self._vel.norm_sqr() / (2 * self._invmass)
@@ -459,7 +458,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             return 0.0
 
     def angularK(self):
-        '''Energia cinética das variáveis angulares'''
+        """Energia cinética das variáveis angulares"""
 
         if self._invinertia:
             return self._omega ** 2 / (2 * self._invinertia)
@@ -467,22 +466,22 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             return 0.0
 
     def energyK(self):
-        '''Energia cinética total'''
+        """Energia cinética total"""
 
         return self.linearK() + self.angularK()
 
     def energyU(self):
-        '''Energia potencial associada à gravidade e às forças externas'''
+        """Energia potencial associada à gravidade e às forças externas"""
 
         return -self.gravity.dot(self._pos) / self._invmass
 
     def energy(self):
-        '''Energia total do objeto'''
+        """Energia total do objeto"""
 
         return self.energyK() + self.energyU()
 
     def momentumP(self):
-        '''Momentum linear'''
+        """Momentum linear"""
 
         try:
             return self._vel / self._invmass
@@ -490,7 +489,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             return Vec2(float('inf'), float('inf'))
 
     def momentumL(self, pos_or_x=None, y=None):
-        '''Momentum angular em torno do ponto dado (usa o centro de massa
+        """Momentum angular em torno do ponto dado (usa o centro de massa
         como padrão)
 
         Examples
@@ -514,7 +513,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
 
         >>> b1.momentumL(b1.pos)
         0.0
-        '''
+        """
 
         if pos_or_x is None:
             momentumL = 0.0
@@ -534,7 +533,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     # Aplicação de forças e torques
     #
     def move(self, delta_or_x, y=None):
-        '''Move o objeto por vetor de deslocamento delta'''
+        """Move o objeto por vetor de deslocamento delta"""
 
         if y is None:
             if delta_or_x is null2D:
@@ -546,7 +545,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         self.flags |= flags.dirty_any
 
     def boost(self, delta_or_x, y=None):
-        '''Adiciona um valor vetorial delta à velocidade linear'''
+        """Adiciona um valor vetorial delta à velocidade linear"""
 
         if y is None:
             self._vel += delta_or_x
@@ -554,8 +553,8 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self._vel += Vec2(delta_or_x, y)
 
     def init_accel(self):
-        '''Inicializa o vetor de aceleração com os valores devidos à gravidade
-        e ao amortecimento'''
+        """Inicializa o vetor de aceleração com os valores devidos à gravidade
+        e ao amortecimento"""
 
         if self._damping:
             a = self._vel
@@ -569,7 +568,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         self._accel = a
 
     def apply_force(self, force, dt, pos=None, relative=False):
-        '''Aplica uma força linear durante um intervalo de tempo dt'''
+        """Aplica uma força linear durante um intervalo de tempo dt"""
 
         if force is None:
             if self._invmass:
@@ -585,7 +584,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self.apply_torque(tau, dt)
 
     def apply_accel(self, a, dt, method=None):
-        '''Aplica uma aceleração linear durante um intervalo de tempo dt.
+        """Aplica uma aceleração linear durante um intervalo de tempo dt.
 
         Tem efeito em objetos cinemáticos.
 
@@ -643,7 +642,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         energia tende a fornecer energia espúria ao sistema. Deste modo, a
         acurácia ficaria reduzida, mas a simulação ainda manteria alguma
         credibilidade.
-        '''
+        """
         a = asvector(a)
 
         if method is None or method == 'euler-semi-implicit':
@@ -658,7 +657,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             raise ValueError('invalid method: %r' % method)
 
     def apply_impulse(self, impulse_or_x, y=None, pos=None, relative=False):
-        '''Aplica um impulso linear ao objeto. Isto altera sua velocidade
+        """Aplica um impulso linear ao objeto. Isto altera sua velocidade
         linear com relação ao centro de massa.
 
         Se for chamado com dois agumentos aplica o impulso em um ponto
@@ -725,7 +724,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         True
         >>> b1.momentumL(Rcm) + b2.momentumL(Rcm) == L0
         True
-        '''
+        """
 
         if y is None:
             impulse = asvector(impulse_or_x)
@@ -739,19 +738,19 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
             self.aboost(R.cross(impulse) * self._invinertia)
 
     def rotate(self, theta):
-        '''Rotaciona o objeto por um ângulo _theta'''
+        """Rotaciona o objeto por um ângulo _theta"""
 
         self._theta += theta
         if theta != 0.0:
             self.flags |= flags.dirty_any
 
     def aboost(self, delta):
-        '''Adiciona um valor delta à velocidade angular'''
+        """Adiciona um valor delta à velocidade angular"""
 
         self._omega += delta
 
     def vpoint(self, pos_or_x, y=None, relative=False):
-        '''Retorna a velocidade linear de um ponto preso rigidamente ao
+        """Retorna a velocidade linear de um ponto preso rigidamente ao
         objeto.
 
         Se o parâmetro `relative` for verdadeiro, o vetor de entrada é
@@ -784,7 +783,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
 
         >>> b1.vpoint(0, 0, relative=True), b1.vpoint(1, 1, relative=True)
         (Vec(1, 1), Vec(0, 2))
-        '''
+        """
 
         if y is None:
             pos = asvector(pos_or_x)
@@ -797,33 +796,33 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         return self._vel + pos.perp() * self._omega
 
     def orientation(self, theta=0.0):
-        '''Retorna um vetor unitário na direção em que o objeto está orientado.
+        """Retorna um vetor unitário na direção em que o objeto está orientado.
         Pode aplicar um ângulo adicional a este vetor fornecendo o parâmetro
-        _theta.'''
+        _theta."""
 
         theta += self._theta
         return Vec2(cos(theta), sin(theta))
 
     def torque(self, t):
-        '''Define uma torque externo análogo ao método .func()'''
+        """Define uma torque externo análogo ao método .func()"""
 
         return 0.0
 
     def init_alpha(self):
-        '''Inicializa o vetor de aceleração angular com os valores devido ao
-        amortecimento'''
+        """Inicializa o vetor de aceleração angular com os valores devido ao
+        amortecimento"""
 
         self._alpha = - self._adamping * self._omega
 
     def apply_torque(self, torque, dt):
-        '''Aplica um torque durante um intervalo de tempo dt.'''
+        """Aplica um torque durante um intervalo de tempo dt."""
 
         self.apply_alpha(torque * self._invinertia, dt)
 
     def apply_alpha(self, alpha, dt):
-        '''Aplica uma aceleração angular durante um intervalo de tempo dt.
+        """Aplica uma aceleração angular durante um intervalo de tempo dt.
 
-        Tem efeito em objetos cinemáticos.'''
+        Tem efeito em objetos cinemáticos."""
 
         if alpha is None:
             alpha = self._alpha
@@ -831,18 +830,18 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
         self.rotate(self._omega * dt + alpha * dt ** 2 / 2.)
 
     def apply_aimpulse(self, angular_delta):
-        '''Aplica um impulso angular ao objeto.
+        """Aplica um impulso angular ao objeto.
 
         O parâmetro de entrada corresponde à variação do momento angular do
         objeto.
-        '''
+        """
 
         self.aboost(angular_delta * self._invinertia)
 
 
 def vec_property(slot):
-    '''Fabrica um slot que força a conversão de uma variável para a classe
-    vetor.'''
+    """Fabrica um slot que força a conversão de uma variável para a classe
+    vetor."""
 
     getter = slot.__get__
     setter = slot.__set__
@@ -870,9 +869,9 @@ Body.vel = vec_property(Body._vel)
 # TODO: remover esta classe e se basear no comportamento da flag can_rotate
 class LinearRigidBody(Body):
 
-    '''
+    """
     Classe que implementa corpos rígidos sem dinâmica angular.
-    '''
+    """
 
     __slots__ = []
     DEFAULT_FLAGS = Body.DEFAULT_FLAGS & (flags.full ^ flags.can_rotate)

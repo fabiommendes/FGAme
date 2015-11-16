@@ -254,7 +254,7 @@ class NarrowPhase(AbstractCollisionPhase):
             if col is not None:
                 A.add_contact(col)
                 B.add_contact(col)
-                col.world = self.world
+                col.simulation = self.world
                 cols.append(col)
 
     def get_groups(self, cols=None):
