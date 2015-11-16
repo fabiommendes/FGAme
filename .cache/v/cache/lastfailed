@@ -1,1 +1,3 @@
-{}
+{
+  "src/FGAme/events/test_events.py::test_subclass_signals": true
+}

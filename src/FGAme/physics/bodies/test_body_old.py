@@ -1,5 +1,5 @@
+import unittest
 from FGAme.physics.bodies import Body, Circle, AABB, Poly, RegularPoly, Rectangle
-from FGAme.tests.base import unittest
 
 def assert_simeq(L1, L2, delta=None, places=7):
     L1 = list(L1)
@@ -48,12 +48,10 @@ class BodyTestBase(unittest.TestCase):
         obj.move(10, 10)
         #FIXME: self.assertEqual(bb.displaced(10, 10), obj.aabb)
 
-
 class CircleTest(BodyTestBase):
     args = (5,)
     kwds = {}
     cls = Circle
-
 
 class AABBTest(BodyTestBase):
     kwds = {'shape': (10, 10)}
@@ -73,6 +71,10 @@ class PolyTest(BodyTestBase):
     cls = Poly
 
 
+def test_poly_creation():
+    assert Poly([(0, 0), (10, 0), (0, 10)])
+
 
 if __name__ == '__main__':
-    unittest.main()
+    from pytest import main
+    main('test_body.py -v')

@@ -8,7 +8,7 @@ from FGAme import physics
 from FGAme.mathtools import asvector
 from FGAme.util import lazy
 from FGAme.draw import Color, colorproperty, Image
-from FGAme.events import signal
+from FGAme.events import signal, EventDispatcher
 from FGAme import draw
 
 # Constantes
@@ -16,7 +16,7 @@ __all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
 black = Color('black')
 
 
-class PhysicsObject:
+class Body(EventDispatcher):
     long_press = signal(
         'long-press', 'key', delegate_to='_input')
     
@@ -151,7 +151,7 @@ class PhysicsObject:
         return cls(*bbox, color=color, linecolor=linecolor, linewidth=linewidth)
         
 
-class AABB(PhysicsObject, physics.AABB):
+class AABB(Body, physics.AABB):
     '''Objeto com a caixa de contorno de colisões dada por uma AABB.
     
     Objetos do tipo AABB não pode realizar rotações e possuem um momento
@@ -162,11 +162,11 @@ class AABB(PhysicsObject, physics.AABB):
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_aabb(self.aabb, True, color, lw, lc)
+            screen.draw_aabb(self.aabb, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_aabb(self.aabb, False, black, lw, lc)
+            screen.draw_aabb(self.aabb, black, lw, lc)
 
     @property
     def drawshape(self):
@@ -179,7 +179,7 @@ class AABB(PhysicsObject, physics.AABB):
         return self._drawshape
     
 
-class Circle(PhysicsObject, physics.Circle):
+class Circle(Body, physics.Circle):
     '''Objeto com a caixa de contorno circular.
     
     Círculos possuem rotação, apesar da mesma não ser renderizada na tela. Para
@@ -190,14 +190,14 @@ class Circle(PhysicsObject, physics.Circle):
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bb, True, color, lw, lc)
+            screen.draw_circle(self.bb, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bb, False, black, lw, lc)
+            screen.draw_circle(self.bb, black, lw, lc)
 
 
-class Poly(PhysicsObject, physics.Poly):
+class Poly(Body, physics.Poly):
     '''Objeto com a caixa de contorno poligonal.
     
     Polígonos são as caixas de contorno mais versáteis que a FGAme suporta. 
@@ -209,11 +209,11 @@ class Poly(PhysicsObject, physics.Poly):
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_poly(self.bb, True, color, lw, lc)
+            screen.draw_poly(self.bb, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_poly(self.bb, False, black, lw, lc)
+            screen.draw_poly(self.bb, black, lw, lc)
     
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
         return draw.Poly(self.bb, color=color, linecolor=linecolor, 
@@ -230,6 +230,11 @@ class Rectangle(Poly, physics.Rectangle):
 class RegularPoly(Poly, physics.RegularPoly):
     '''Semelhante a Poly, mas restrito a polígonos regulares.'''
 
+    
+class Group(Body, physics.Group):
+    def draw(self, screen):
+        for obj in self:
+            obj.draw(screen) 
     
 if __name__ == '__main__':
     x = AABB(shape=(100, 200), world=set())

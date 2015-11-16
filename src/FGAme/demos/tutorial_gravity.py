@@ -13,8 +13,13 @@ class GravityWorld(World):
 
         # Definimos a força de interação entre ambos
         K = self.K = A.mass
-        self.A.func = lambda t: -K * (A.pos - B.pos)
-        self.B.func = lambda t: -K * (B.pos - A.pos)
+        self.A.force = lambda t: -K * (A.pos - B.pos)
+        self.B.force = lambda t: -K * (B.pos - A.pos)
+
+        def func(t):
+            raise TypeError
+        self.A.func = func
+        self.B.func = func
 
         # Redefinimos a constante de amortecimento
         self.damping = 0.5

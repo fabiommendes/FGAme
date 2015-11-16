@@ -1,5 +1,4 @@
-# -*- coding: utf8 -*-
-
+import threading
 from FGAme import conf
 from FGAme.objects import AABB, Rectangle
 from FGAme.physics import Simulation
@@ -166,11 +165,28 @@ class World(EventDispatcher):
 
         self._mainloop.run(self, timeout=timeout, **kwds)
 
+    def start(self, **kwds):
+        '''Inicia a simulação em um thread separado'''
+        
+        if hasattr(self, '_thread'):
+            try:
+                self._thread.join(0)
+            except TimeoutError:
+                pass
+        self._thread = threading.Thread(target=self.run, kwargs=kwds)
+        self._thread.start()  
+    
     def stop(self):
         '''Finaliza o laço principal de simulação'''
 
+        # force thread to stop
+        try:
+            self._thread.join(0)
+            del self._thread
+        except (AttributeError, TimeoutError):
+            pass
         self._mainloop.stop()
-
+        
     def set_next_state(self, value):
         '''Passa a simulação para o próximo estado'''
 

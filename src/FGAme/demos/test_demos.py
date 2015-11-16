@@ -1,5 +1,5 @@
+import unittest
 import FGAme
-from FGAme.tests import unittest
 FGAme.conf.DEBUG = True
 
 

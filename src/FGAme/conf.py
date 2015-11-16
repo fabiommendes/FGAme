@@ -28,6 +28,7 @@ um modo geral, o programa deve ser organizado assim::
     world.run()
 '''
 
+import os
 from FGAme.logger import log as _log
 from FGAme import backends as _backend_module
 
@@ -109,7 +110,12 @@ def set_backend(backend=None):
     # Função chamada sem argumentos
     if backend is None:
         if _backend is None:
-            backend = _backends
+            if 'FGAME_BACKEND' in os.environ:
+                env_be = os.environ['FGAME_BACKEND']
+                backend = env_be.split(',')
+                _log.info('using backend defined by environ: %s' % env_be)
+            else:
+                backend = _backends
         else:
             return  # backend já configurado!
 

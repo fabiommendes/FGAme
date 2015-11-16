@@ -1,4 +1,4 @@
-import weakref
+import functools
 from collections import namedtuple
 from FGAme.events.util import pyname, wrap_handler
 
@@ -298,10 +298,39 @@ class DelegateSignal(Signal):
             return self
 
 
-###############################################################################
-#                           Controle de sinais
-###############################################################################
-class SignalCtl(object):
+#
+# Controle de sinais
+#
+class Handler:
+    '''
+    Controls a handler to a signal.
+
+    This is a convenience object returned by listerners that can can 
+    '''
+    def __init__(self, func, args=None, kwargs=None, controller=None):
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+        self.controller = controller
+        if args or kwargs:
+            self.trigger = functools.partial(func, *args, **kwargs)
+        else:
+            self.trigger = func
+    
+    def cancel(self):
+        pass
+    
+    def pause(self):
+        pass
+    
+    def resume(self):
+        pass
+    
+    def __call__(self, *args, **kwds):
+        return self.trigger(*args, **kwds)
+
+    
+class SignalCtl:
 
     '''A classe SignalCtl implementa uma interface para gerenciar os handlers
     registrados para um determinado sinal'''
@@ -312,6 +341,9 @@ class SignalCtl(object):
         self._runner = []
         #self._instance = weakref.ref(instance)
         self._instance = instance
+
+    def __repr__(self):
+        return '<Signal(%s) with %s handlers>' % (self.name, len(self.handlers))
 
     @property
     def instance(self):

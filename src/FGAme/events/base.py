@@ -1,4 +1,3 @@
-import six
 import itertools
 from FGAme.events.util import pyname
 from FGAme.events.signals import Signal, DelegateSignal
@@ -52,7 +51,12 @@ class EventDispatcherMeta(type):
                 setattr(new, '_' + name, method)
         
         # Escaneia todos os métodos decorados com @listen
-        new.__autolisten__ = cls.autolisten(new) 
+        new.__autolisten__ = cls.autolisten(new)
+        signal_names = [sig.name for sig in new.__signals__.values()]
+        delta = set(new.__autolisten__) - set(signal_names)
+        if delta:
+            fmt = new.__name__, delta.pop() 
+            raise ValueError('invalid signal in %s class definition: %s' % fmt) 
         return new
 
     @staticmethod
@@ -74,11 +78,11 @@ class EventDispatcherMeta(type):
             listen.update(getattr(C, '__autolisten__', {}))
         
         for attr, value in vars(cls).items():
-            if hasattr(value, '_listen_args'):
-                for name, args, kwds in getattr(value, '_listen_args'):
+            if hasattr(value, '__autolisten__'):
+                for name, args, kwds in getattr(value, '__autolisten__'):
                     L = listen.setdefault(name, [])
                     L.append((attr, args, kwds))
-
+        
         return listen
 
 
@@ -131,6 +135,8 @@ class EventDispatcher(object, metaclass=EventDispatcherMeta):
 
         A assinatura correta para esta função depende do tipo de sinal
         considerado. Para sinais simples, basta utilizar::
+
+
 
             obj.listen(<nome do sinal>, <handler>)
 

@@ -54,9 +54,9 @@ def listen(name, *args, **kwds):
 
     def decorator(func):
         try:
-            L = func._listen_args
+            L = func.__autolisten__
         except AttributeError:
-            L = func._listen_args = []
+            L = func.__autolisten__ = []
         finally:
             L.append((name, args, kwds))
         return func

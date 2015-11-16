@@ -56,9 +56,9 @@ class Screen(object):
         return self.width, self.height
 
 
-###############################################################################
-#     Classe Canvas: backends baseados em renderização do tipo "pintura"
-###############################################################################
+#
+# Canvas: backends baseados em renderização do tipo "pintura"
+#
 class Canvas(Screen):
 
     '''Sub-classes implementam a metáfora de "pintura" para a renderização das
@@ -84,7 +84,6 @@ class Canvas(Screen):
 
         raise NotImplementedError
 
-    # Context managers ########################################################
     @contextmanager
     def autoflip(self):
         '''Ao sair do bloco `with`, executa automaticamente o método flip()'''
@@ -186,61 +185,59 @@ class Canvas(Screen):
     # aplicam automaticamente as transformações de escala, translação e rotação
     # necessárias.
     #
-    def draw_circle(self, circle, solid=None, color=None,
-                    line_width=None, line_color=None):
+    def draw_circle(self, circle, fillcolor=None, linecolor=None, linewidth=1):
         '''Desenha um círculo na tela.'''
 
         if not self._direct:
             raise RuntimeError
 
-        if solid:
-            self.draw_raw_circle_solid(circle, color)
-        if line_color is not None and line_width:
-            self.draw_raw_circle_border(circle, line_width, line_color)
+        if fillcolor is not None:
+            self.draw_raw_circle_solid(circle, fillcolor)
+        if linecolor is not None and linewidth:
+            self.draw_raw_circle_border(circle, linewidth, linecolor)
 
-    def draw_aabb(self, aabb, solid=True, color=black,
-                  line_width=0.0, line_color=black):
+    def draw_aabb(self, aabb, fillcolor=None, linecolor=None, linewidth=1):
         '''Desenha uma AABB na tela.'''
 
         if not self._direct:
             raise RuntimeError
         
-        if solid:
-            self.draw_raw_aabb_solid(aabb, color)
-        if line_color is not None and line_width:
-            self.draw_raw_aabb_border(aabb, line_width, line_color)
+        if fillcolor is not None:
+            self.draw_raw_aabb_solid(aabb, fillcolor)
+        if linecolor is not None and linewidth:
+            self.draw_raw_aabb_border(aabb, linewidth, linecolor)
 
-    def draw_poly(self, poly, solid=True, color=black,
-                  line_width=0.0, line_color=black):
+    def draw_poly(self, poly, fillcolor=None, linecolor=None, linewidth=1):
         '''Desenha um polígono na tela.'''
 
         if not self._direct:
             raise RuntimeError
 
-        if solid:
-            self.draw_raw_poly_solid(poly, color)
-        if line_color is not None and line_width:
-            self.draw_raw_poly_border(poly, line_width, line_color)
+        if fillcolor is not None:
+            self.draw_raw_poly_solid(poly, fillcolor)
+        if linecolor is not None and linewidth:
+            self.draw_raw_poly_border(poly, linewidth, linecolor)
 
-    def draw_segment(self, segment, width=0.0, color=black):
+    def draw_segment(self, segment, linecolor=black, linewidth=1):
         '''Desenha um segmento de reta.'''
 
         if not self._direct:
             raise RuntimeError
 
-        self.draw_raw_segment(segment, width, color)
+        if linecolor is not None and linewidth:
+            self.draw_raw_segment(segment, linewidth, linecolor)
 
-    def draw_ray(self, ray, width=0.0, color=black):
+    def draw_ray(self, ray, linecolor=black, linewidth=1):
         '''Desenha um raio (reta semi-finita)'''
 
         raise NotImplementedError
 
-    def draw_line(self, ray, width=0.0, color=black):
+    def draw_line(self, ray, linecolor=black, linewidth=1):
         '''Desenha uma reta infinita'''
 
         raise NotImplementedError
 
-    def draw_path(self, path, width=0.0, color=black):
+    def draw_path(self, path, linecolor=black, linewidth=1):
         '''Desenha um caminho formado por vários pontos.'''
 
         if not self._direct:
@@ -249,7 +246,7 @@ class Canvas(Screen):
         points = iter(path)
         pt0 = next(points)
         for pt1 in points:
-            self.draw_raw_segment(shapes.Segment(pt0, pt1), width, color)
+            self.draw_raw_segment(shapes.Segment(pt0, pt1), linewidth, linecolor)
             pt0 = pt1
 
     def draw_image(self, image):

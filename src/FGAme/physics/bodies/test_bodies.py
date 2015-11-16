@@ -3,6 +3,7 @@ from FGAme.physics import get_collision
 
 CLASSES = [Circle, AABB, Poly, Rectangle, RegularPoly, Body]
 
+
 def test_subclasses_have_has_triggers():
     for cls in CLASSES:
         methods = dir(cls)
@@ -10,9 +11,10 @@ def test_subclasses_have_has_triggers():
         assert 'trigger_frame_enter' in methods
         assert 'trigger_out_of_bounds' in methods
 
+
 def test_body_subclass_names():
-    assert Body.__name__ == 'Body'
-    assert Circle.__name__ == 'Circle'
+    assert Body.__name__ == 'Body'  # @UndefinedVariable
+    assert Circle.__name__ == 'Circle'  # @UndefinedVariable
 
 #
 # Collision tests
@@ -25,6 +27,7 @@ def test_circle_collision():
     assert get_collision(c2, c3) is not None
     assert get_collision(c1, c3) is None
 
+
 def test_aabb_collision():
     a = AABB(0, 10, 0, 10)
     b = AABB(5, 15, 5, 15)
@@ -32,6 +35,7 @@ def test_aabb_collision():
     assert get_collision(a, b) is not None
     assert get_collision(b, c) is not None
     assert get_collision(a, c) is None
+
 
 def test_poly_collision():
     a = Poly(AABB(0, 10, 0, 10).vertices)
@@ -68,5 +72,5 @@ def test_cbb_radius_is_not_null():
 
 if __name__ == '__main__':
     from pytest import main 
-    main('test_physics_bodies.py -q')
+    main('test_bodies.py -q')
 

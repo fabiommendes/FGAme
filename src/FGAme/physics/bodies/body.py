@@ -448,7 +448,7 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     #
     # Propriedades físicas
     #
-    func = ForceProperty()
+    force = ForceProperty()
 
     def linearK(self):
         '''Energia cinética das variáveis lineares'''

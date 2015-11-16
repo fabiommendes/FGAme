@@ -256,8 +256,11 @@ class Color(object):
                 (self._blue == other._blue) and
                 (self._alpha == other._alpha))
         except (AttributeError, TypeError):
-            if len(self) == len(other):
+            if len(other) == 4:
                 return all(x == y for (x, y) in zip(self, other))
+            elif len(other) == 3:
+                return ((self._alpha == 255) and 
+                        all(x == y for (x, y) in zip(self, other)))
             return False
 
     def __iter__(self):

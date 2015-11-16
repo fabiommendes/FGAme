@@ -9,6 +9,7 @@ ambiente Windows.
 
 Temos a seguinte lista de dependências:
 
+    * Python >= 3.4
     * cython >= 0.22
     * six
     * smallvectors (versão de desenvolvimento)
@@ -16,10 +17,16 @@ Temos a seguinte lista de dependências:
     * pygeneric (versão de desenvolvimento)
     * pysdl2 (ou pygame)
 
-Todas estas bibliotecas, incluindo o FGAme, possuem suporte para Python2 e
-Python3. Caso você não tenha nenhum motivo particular para escolher entre uma
+Todas estas bibliotecas, incluindo o FGAme, possuem suporte para Python3.
+O FGAme provavelmente funciona em versões do Python 3 abaixo de 3.4. O suporte
+para Python 2, no entanto, está incompleto. Existem planos para implementar
+isto no futuro já que atualmente existe muito pouco suporte para Python 3 em 
+smartphones.
+  
+Caso você não tenha nenhum motivo particular para escolher entre uma
 das duas versões do Python, escolha a última, que é mais moderna e bem
 suportada.
+
 
 Linux
 =====
@@ -50,10 +57,8 @@ distribuição para a outra.
     Execute::
 
         $ sudo pacman -S python-pip cython python-pysdl2
-        $ sudo pip3 install FGAme -U
-
-   
-
+        $ sudo pip3 install FGAme -U   
+        
 
 Windows
 =======

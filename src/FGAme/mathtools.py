@@ -1,4 +1,3 @@
-#-*- coding: utf8 -*-
 '''
 Importa as funções matemáticas do módulo mathutils.
 '''
@@ -9,7 +8,7 @@ import smallvectors as linalg
 from smallshapes import *
 import smallshapes as shapes
 from generic import set_promotion_rule, set_conversion
-from generic.operator import add, sub, mul, truediv
+from generic.op import add, sub, mul, truediv
 
 
 #
@@ -24,31 +23,14 @@ class FGAmeVec(object):
             data = [x[:-2] for x in data]
         return 'Vec(%s)' % (', '.join(data))
 
-    def __radd__(self, other):
-        return type(self)(*(y + x for (x, y) in zip(self, other)))
-
-    def __rsub__(self, other):
-        return type(self)(*(y - x for (x, y) in zip(self, other)))
-
-    def __rmul__(self, other):
-        return type(self)(*(x * other for x in self))
-
-    def __mul__(self, other):
-        return type(self)(*(x * other for x in self))
-
-    def __rtruediv__(self, other):
-        return type(self)(*(x / other for x in self))
-
-
 class Vec2(FGAmeVec, Vec[2, float]):
     '''Vetor bidimensional'''
-    
+   
 class Vec3(FGAmeVec, Vec[3, float]):
     '''Vetor bidimensional'''
     
 class Vec4(FGAmeVec, Vec[4, float]):
     '''Vetor bidimensional'''
-
 
 @set_conversion(list, Vec2)
 @set_conversion(tuple, Vec2)
@@ -111,13 +93,16 @@ def Vec(*args):
     if len(args) == 1:
         return Vec(*args[0])
     elif len(args) == 2:
-        return Vec2.fromflat(args)
+        x, y = args
+        return Vec2(x + 0.0, y + 0.0)
     elif len(args) == 3:
-        return Vec3.fromflat(args)
+        x, y, z = args
+        return Vec3(x + 0.0, y + 0.0, z + 0.0)
     elif len(args) == 4:
-        return Vec4.fromflat(args)
+        x, y, z, w = args
+        return Vec4(x + 0.0, y + 0.0, z + 0.0, w + 0.0)
     else:
-        return Vec.fromflat(args, dtype=float)
+        raise TypeError
 
 
 def asvector(u):

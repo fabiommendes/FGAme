@@ -86,7 +86,7 @@ class PyGameCanvas(Canvas):
             if pil_data.mode not in 'RGB' or 'RGBA':
                 pil_data = pil_data.convert('RGBA')
             pg_texture = pygame.image.fromstring(
-                pil_data.tostring(),
+                pil_data.tobytes(),
                 texture.shape, pil_data.mode)
             texture.set_backend_data(pg_texture)
 

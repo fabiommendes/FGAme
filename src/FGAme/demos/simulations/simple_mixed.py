@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 from FGAme import *
 
 # Cria mundo e objetos

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Install FGAme
+# Install
 python setup.py install --user
 echo ""
 echo "------------------------------------------------------------------------"

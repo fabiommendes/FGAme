@@ -16,11 +16,11 @@ Instalação
 A FGAme pode ser instalada utilizando a rotina padrão do Python. Descompacte o
 pacote `.zip` e execute o comando abaixo a partir da pasta resultante::
 
-    $ python setup.py build
-    $ sudo python setup.py install
+    $ python3 setup.py build
+    $ sudo python3 setup.py install
 
 Se você quiser desenvolver em cima da árvore de código fonte aqui disponível, é
 necessário compilar as extensões em Cython. Neste caso, execute::
 
-    $ python setup.py build_ext --inplace
+    $ python3 setup.py build_ext --inplace
 

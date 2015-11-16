@@ -48,6 +48,7 @@ from .input import *
 from .mainloop import *
 from .mathtools import Vec, pi, asvector
 from .physics import *
+from .physics.bodies.group import Group
 from .world import World
 from .objects import *
 from .app import *

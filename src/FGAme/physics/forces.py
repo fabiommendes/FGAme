@@ -13,22 +13,22 @@ vetor de força como função do tempo:
 
 >>> from FGAme import Circle
 >>> obj = Circle(5)
->>> obj.func = lambda t: (4, 3) - obj.pos
+>>> obj.force = lambda t: (4, 3) - obj.pos
 
 Neste caso, podemos simplesmente calcular a força chamando
 
->>> obj.func(0)
+>>> obj.force(0)
 Vec(4, 3)
 
-O attributo obj.func aceita várias regras de composição. A mais útil delas,
+O attributo obj.force aceita várias regras de composição. A mais útil delas,
 de soma de forças, permite aplicar várias forças externas a um mesmo objeto.
 
->>> obj.func += lambda t: (10, 10)
+>>> obj.force += lambda t: (10, 10)
 
 Neste caso, a composição de forças corresponde à adição dos valores de cada
 componente
 
->>> obj.func(0)
+>>> obj.force(0)
 Vec(14, 13)
 
 
@@ -49,9 +49,9 @@ implementam forças conservativas e aquelas que dependem apenas da velocidade.
 
 Para criar uma força de atração gravitacional para o centro da tela, por
 exemplo, basta criar o objeto do tipo Gravity() e atribuir ao atributo
-obj.func:
+obj.force:
 
->>> obj.func = Gravity(obj, G=1e5, pos=(400, 300))
+>>> obj.force = Gravity(obj, G=1e5, pos=(400, 300))
 
 Como conveniência, podemos também usar a função set_force_gravity():
 
@@ -97,7 +97,7 @@ NO_UPDATE = object()
 
 class ForceProperty(object):
 
-    '''Implementa o atributo obj.func dos objetos da classe Body.
+    '''Implementa o atributo obj.force dos objetos da classe Body.
 
     ForceProperty facilita a composição de forças num mesmo objeto e apresenta
     um sintaxe conveniente para especificar as forças atuantes em um objeto.
@@ -108,45 +108,45 @@ class ForceProperty(object):
     Considere uma classe com uma propriedade do tipo ForceProperty()
 
     >>> class HasForce(object):
-    ...     func = ForceProperty()
+    ...     force = ForceProperty()
 
     Criamos um objeto desta classe e atribuimos uma força a ele.
 
     >>> obj = HasForce()
-    >>> obj.func = lambda x: (0, x**2)
-    >>> obj.func(2)
+    >>> obj.force = lambda x: (0, x**2)
+    >>> obj.force(2)
     Vec(0, 4)
 
     Também podemos definir a força utilizando um decorador se for mais
     conveniente
 
-    >>> @obj.func.define
-    ... def func(x):
+    >>> @obj.force.define
+    ... def force(x):
     ...     return (0, x**3)
-    >>> obj.func(2)
+    >>> obj.force(2)
     Vec(0, 8)
 
     O recurso mais importante, no entanto, é a composição de forças. Podemos
     definir uma composição de forças simplesmente adicionando ou subtraindo
     forças ao atributo original
 
-    >>> obj.func += lambda x: (0, x**2)
-    >>> obj.func(2) # => 2**2 + 2**3
+    >>> obj.force += lambda x: (0, x**2)
+    >>> obj.force(2) # => 2**2 + 2**3
     Vec(0, 12)
 
     Outras operações algébricas também estão definidas
 
-    >>> obj.func *= 2
-    >>> obj.func(2)
+    >>> obj.force *= 2
+    >>> obj.force(2)
     Vec(0, 24)
 
     Os decoradores também estão disponíveis para as operações de adição e
     subtração de forças.
 
-    >>> @obj.func.add
-    ... def func(x):
+    >>> @obj.force.add
+    ... def force(x):
     ...     return (0, x**4)
-    >>> obj.func(2)
+    >>> obj.force(2)
     Vec(0, 40)
 
     Notas
@@ -161,17 +161,17 @@ class ForceProperty(object):
     ForceProperty.
 
     O trabalho pesado é feito pela class ForceCtrl. Todos os acessos à
-    obj.func do exemplo anterior simplesmente retornam o valor do atributo
+    obj.force do exemplo anterior simplesmente retornam o valor do atributo
     obj._force_ctl, que é a instância de ForceCtrl que realmente faz a
     coordenação das forças
 
     >>> obj._force_ctrl                                    # doctest: +ELLIPSIS
     <...ForceCtrl object at 0x...>
-    >>> obj.func                                          # doctest: +ELLIPSIS
+    >>> obj.force                                          # doctest: +ELLIPSIS
     <...ForceCtrl object at 0x...>
 
     Lembramos que obj._force é uma função simples que executa mais rapidamente
-    que obj.func pois não precisa passar pelo mecanismo que implementa as
+    que obj.force pois não precisa passar pelo mecanismo que implementa as
     propriedades no Python.
 
     >>> obj._force # doctest: +ELLIPSIS
@@ -368,7 +368,7 @@ class Force(object):
 
     @classmethod
     def setting_force(cls, *args, **kwds):
-        '''Inicializa a força e já registra no atributo obj.func de todos os
+        '''Inicializa a força e já registra no atributo obj.force de todos os
         objetos envolvidos'''
 
         if 'register' in kwds:
@@ -408,7 +408,7 @@ def set_force_single(obj, func, mode):
             'all':
                 func(obj.pos, obj.vel, t) -> F
         O valor padrão é 'time', que corresponde à convenção empregada pelo
-        atributo obj.func dos objetos físicos.
+        atributo obj.force dos objetos físicos.
 
     See also
     --------
@@ -447,7 +447,7 @@ class Single(Force):
             raise ValueError('invalid mode: %r' % mode)
 
         if register:
-            self._obj.func.add(self._worker)
+            self._obj.force.add(self._worker)
 
     def __call__(self, t):
         return self._worker(t)
@@ -681,7 +681,7 @@ def set_force_pair(A, B, func, mode='time'):
             'all':
                 func(A.pos, B.pos, t) -> F
         O valor padrão é 'time', que corresponde à convenção empregada pelo
-        atributo obj.func dos objetos físicos.
+        atributo obj.force dos objetos físicos.
 
     See also
     --------
@@ -721,8 +721,8 @@ class Pair(Force):
 
         # Registra as forças
         if register:
-            self._A.func.add(self.force_A)
-            self._B.func.add(self.force_B)
+            self._A.force.add(self.force_A)
+            self._B.force.add(self.force_B)
 
     # Atributos somente para leitura
     A = property(lambda self: self._A)
@@ -980,10 +980,10 @@ if __name__ == '__main__':
         func = ForceProperty()
 
     obj = HasForce()
-    obj.func = lambda t: (2, 4 - t)
-    obj.func(2)
-    obj.func *= 2
-    obj.func(2)
+    obj.force = lambda t: (2, 4 - t)
+    obj.force(2)
+    obj.force *= 2
+    obj.force(2)
 
     import doctest
     doctest.testmod()
@@ -998,8 +998,8 @@ if __name__ == '__main__':
     c3 = Circle(10, pos=(200, 300), vel=(-100, 100))
 
     #k = 1000
-    #c1.func = lambda t: -k * (c1.pos - c2.pos)
-    #c2.func = lambda t: -k * (c2.pos - c1.pos)
+    #c1.force = lambda t: -k * (c1.pos - c2.pos)
+    #c2.force = lambda t: -k * (c2.pos - c1.pos)
 
     G = 1.1e5
     e = 200
@@ -1009,9 +1009,9 @@ if __name__ == '__main__':
 
     set_force_viscous(c1, gamma=1000)
 
-    #c1.func += lambda t: - gamma * c1.vel
-    #c2.func += lambda t: - gamma * c2.vel
-    #c3.func += lambda t: - gamma * c3.vel
+    #c1.force += lambda t: - gamma * c1.vel
+    #c2.force += lambda t: - gamma * c2.vel
+    #c3.force += lambda t: - gamma * c3.vel
 
     world.add([c1, c2, c3])
     world.run()

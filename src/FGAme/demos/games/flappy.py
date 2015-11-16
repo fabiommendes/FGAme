@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 '''
 Flappy Triangle on 18/11/2014
 '''
@@ -33,12 +32,11 @@ class Flappy(Poly):
         if self.receiving_input:
             self.omega += delta
 
-    @listen('collision')
+    @listen('pre-collision')
     def block_input(self, col=None):
         '''Bloqueia a entrada do usuário'''
 
         self.receiving_input = False
-
 
 class Game(World):
 
@@ -90,7 +88,6 @@ class Game(World):
         '''Game over'''
 
         self.stop()
-
 
 if __name__ == '__main__':
     game = Game()

@@ -25,7 +25,7 @@ class Pong(World):
         pong.move((2 * W - 50, H - Y / 2))
         pong.listen('pre-collision', self.pong_collision)
         pong.mass *= 5
-        pong.func = lambda t: -1000000 * Vec2(pong.pos.x - self.pong_x, 0)
+        pong.func = lambda t: -1000000 * Vec(pong.pos.x - self.pong_x, 0)
         pong.damping = 10
         self.pong_x = self.pong.pos.x
 
@@ -209,7 +209,7 @@ class Pong(World):
             y_ball = self.ball.pos.y
             y_pong = self.pong.pos.y
             delta_y = y_ball - y_pong
-            delta_vel = Vec2(0, delta_y * 10)
+            delta_vel = Vec(0, delta_y * 10)
 
             # Edita a velocidade
             vel = self.ball.vel

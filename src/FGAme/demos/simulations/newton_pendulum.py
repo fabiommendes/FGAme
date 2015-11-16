@@ -47,9 +47,6 @@ if 'rects' in stacks:
                         shape=(40, 40), color='red', vel=(200, 0)))
 
 
-#world.add(Circle(10, pos=(30, 30), vel=(300, 400)))
-#world.add(Circle(10, pos=(30, 30), vel=(400, 300)))
-
 # Registra energias
 world.register_energy_tracker()
 

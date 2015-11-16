@@ -507,6 +507,5 @@ TYPENAMES = {None: None}
 for name in 'AABB Circle Poly RegularPoly Rectangle'.split():
     TYPENAMES[name] = getattr(_, name)
     TYPENAMES['draw.' + name] = getattr(_.draw, name)
-
-for name in 'Line Segment Ray'.split():
+for name in 'Path Segment'.split():
     TYPENAMES['draw.' + name] = getattr(_.draw, name)

@@ -23,13 +23,13 @@ class PyGletCanvas(Canvas):
     #===========================================================================
     # Desenho
     #===========================================================================
-    def draw_circle(self, pos, radius, color=(0, 0, 0), solid=True):
+    def draw_circle(self, pos, radius, fillcolor=(0, 0, 0), solid=True):
         pos = self._map_point(pos)
-        #pygame.draw.circle(self._screen, color, pos, trunc(radius))
+        #pygame.draw.circle(self._screen, fillcolor, pos, trunc(radius))
 
-    def draw_poly(self, points, color=(0, 0, 0), solid=True):
+    def draw_poly(self, points, fillcolor=(0, 0, 0), solid=True):
         points = [ self._map_point(pt) for pt in points ]
-        #pygame.draw.polygon(self._screen, color, points)
+        #pygame.draw.polygon(self._screen, fillcolor, points)
 
     def draw_rect(self, pos, shape, color=(0, 0, 0), solid=True):
         x, y = self._map_point(pos)

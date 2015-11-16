@@ -2,6 +2,7 @@
 import os
 import sys
 import setuptools
+import warnings
 from setuptools import setup
 
 #
@@ -26,20 +27,32 @@ setup_kwds = {}
 #
 PYSRC = 'src' if sys.version.startswith('3') else 'py2src'
 
+#
+# Cython stuff (for the future)
+#
+if 'PyPy' not in sys.version:
+    try:
+        from Cython.Build import cythonize
+        from Cython.Distutils import build_ext
+    except ImportError:
+        warnings.warn('Please install Cython to compile faster versions of FGAme modules')
+    else:
+        try:
+            setup_kwds.update(
+                ext_modules=cythonize('src/generic/*.pyx'),
+                cmdclass={'build_ext': build_ext})
+        except ValueError:
+            pass
 
 #
-# Cython stuff
+# Configure backend
 #
 try:
-    if 'PyPy' not in sys.version:
-        #from Cython.Build import cythonize
-        #from Cython.Distutils import build_ext
-        #setup_kwds.update(
-        #    ext_modules=cythonize('src/generic/*.pyx'),
-        #    cmdclass={'build_ext': build_ext})
-        pass
+    import pygame
+    BACKEND = ''
 except ImportError:
-    pass
+    BACKEND = 'pysdl2>=0.5'
+
 
 #
 # Main configuration script
@@ -65,14 +78,15 @@ setup(
     packages=setuptools.find_packages(PYSRC),
     license='GPL',
 
-    install_requires=[
-        'pysdl2>=0.5',  # or 'pygame>=1.9.*'
-        'cython>=0.21',
-        'pillow',
-        'six',
-        'smallshapes>=%s' % VERSION_BIG,
-        'smallvectors>=%s' % VERSION_BIG,
-        'pygeneric>=0.1.1',
-    ],
+    install_requires='''
+        # cython>=0.21
+        %s
+        pillow
+        six
+        smallshapes>=%s
+        smallvectors>=%s
+        pygeneric>=0.1.1
+    ''' % (BACKEND, VERSION_BIG, VERSION_BIG),
+    zip_safe=False,
     **setup_kwds
 )
