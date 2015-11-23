@@ -25,7 +25,7 @@ setup_kwds = {}
 #
 # Choose the default Python3 branch or the code converted by 3to2
 #
-PYSRC = 'src' if sys.version.startswith('3') else 'py2src'
+PYSRC = 'src' if sys.version_info[0] == 3 else 'py2src'
 
 #
 # Cython stuff (for the future)

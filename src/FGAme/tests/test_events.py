@@ -49,7 +49,6 @@ def test_subclass_can_add_signals(A):
 
 def test_subclass_signals(A):
     print(A.foo)
-    assert False
 
 if __name__ == '__main__':
     import os 

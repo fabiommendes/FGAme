@@ -53,6 +53,7 @@ from .world import World
 from .objects import *
 from .app import *
 from .extra.orientation_objects import *
+from .screen import camera
 from . import conf
 from . import mathtools as math
 from . import draw

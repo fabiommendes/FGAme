@@ -1,4 +1,4 @@
-'''
+"""
 ======================
 Declaração de cenários
 ======================
@@ -23,7 +23,7 @@ Um arquivo de declaração possui uma estrutura definida por indentação::
         brick2@draw.AABB: brick
             pos: (50, 20)
 
-'''
+"""
 
 import re
 from collections import namedtuple, deque
@@ -38,8 +38,8 @@ Token = namedtuple('Token', ['typ', 'value', 'line', 'column', 'indent'])
 
 
 class Deferred:
-    '''Fábrica de atributos que devem ser calculados durante a criação por 
-    algum tipo de função.'''
+    """Fábrica de atributos que devem ser calculados durante a criação por 
+    algum tipo de função."""
     
     def __init__(self, func):
         self.func = func
@@ -48,16 +48,16 @@ class Deferred:
         return self.func()
     
 def getvalue(x):
-    '''Retorna x ou executa um deferred'''
+    """Retorna x ou executa um deferred"""
     
     return (x() if isinstance(x, Deferred) else x)
 
 
 class ObjectFactory:
-    '''Fábrica de um único objeto.
+    """Fábrica de um único objeto.
     
     Normalmente criada a partir de um arquivo de declarações para ser inserida
-    em um GroupFactory.'''
+    em um GroupFactory."""
     
     def __init__(self, name, cls=None, 
                  args=(), kwargs=None, 
@@ -70,13 +70,13 @@ class ObjectFactory:
         self.istemplate = istemplate
 
     def addtemplate(self, template):
-        '''Registra um template ao objeto'''
+        """Registra um template ao objeto"""
         
         self.templates.append(template)
     
     def updatetemplate(self, name, concrete):
-        '''Atualiza um template definido por string por sua realização 
-        concreta'''
+        """Atualiza um template definido por string por sua realização 
+        concreta"""
         
         if name in self.templates:
             idx = self.templates.index(name)
@@ -100,7 +100,7 @@ class ObjectFactory:
             D.update(self.kwargs)
             self.kwargs = D
         
-        self.templates.clear()
+        del self.templates[:]
     
     def new(self):
         args = map(getvalue, self.args)
@@ -109,9 +109,9 @@ class ObjectFactory:
     
 
 class GroupFactory:
-    '''Fábrica de um grupo de objetos.
+    """Fábrica de um grupo de objetos.
     
-    Normalmente criada a partir de um arquivo de declarações'''
+    Normalmente criada a partir de um arquivo de declarações"""
     
     def __init__(self, name):
         self.name = name
@@ -147,7 +147,7 @@ class GroupFactory:
 
 
 class DeclarationParser:
-    '''Parse a declaration file'''
+    """Parse a declaration file"""
     
     
     def __init__(self, source):
@@ -160,13 +160,13 @@ class DeclarationParser:
         self.lines = source.splitlines()
         
     def tokenize(self, source):
-        '''Tokenize source file.
+        """Tokenize source file.
         
         This special generator responds to commands that can be sent through 
         the iterator.send() function. If the argument is 'skipline', it returns
         the next source line verbatim as a LINE token. One can also push back
         tokens to the iterator by sending token instances.
-        '''
+        """
         
         # Inspired on example at: https://docs.python.org/3/library/re.html
         
@@ -289,7 +289,7 @@ class DeclarationParser:
         
         
     def parse(self):
-        '''Parse object's source'''
+        """Parse object's source"""
         
         ignore_types = {'NEWLINE', 'COMMENT', None}
         tokens = iter(self.tokenize(self.source))
@@ -319,7 +319,7 @@ class DeclarationParser:
         return blocks
             
     def parse_group(self, tk, tokens):
-        '''Parse a group of object definitions'''
+        """Parse a group of object definitions"""
         
         self.__assure_block_start(tk, tokens)
         group = GroupFactory(tk.value)
@@ -329,7 +329,7 @@ class DeclarationParser:
         return group
     
     def parse_object(self, tk, tokens):
-        '''Parse a template block and return the corresponding object factory.'''
+        """Parse a template block and return the corresponding object factory."""
         
         self.__assure_colon(tk, tokens)
         if tk.typ == 'NAME':
@@ -347,7 +347,7 @@ class DeclarationParser:
                              istemplate=False)
     
     def parse_template(self, tk, tokens):
-        '''Parse a template block and return the corresponding object factory.'''
+        """Parse a template block and return the corresponding object factory."""
         
         self.__assure_block_start(tk, tokens)
         name, type_ = tk.value
@@ -359,9 +359,9 @@ class DeclarationParser:
                              istemplate=True)
         
     def parse_block_contents(self, indent, tokens):
-        '''Parse the contents of a template or object definition block.
+        """Parse the contents of a template or object definition block.
         
-        Return a tuple with (args, kwargs, transforms)'''
+        Return a tuple with (args, kwargs, transforms)"""
         
         args = ()
         kwargs = {}
@@ -383,8 +383,8 @@ class DeclarationParser:
         return (args, kwargs, transforms)
     
     def parse_expression(self, tokens, ctx=None):
-        '''Parse the contents of an assignment expression of the type 
-        ``name: data``.'''
+        """Parse the contents of an assignment expression of the type 
+        ``name: data``."""
         
         self.__assure_colon('var', tokens)
         data = self.tkline(tokens)
@@ -403,7 +403,7 @@ class DeclarationParser:
     # Utility functions
     #
     def tkline(self, tokens):
-        '''Fetch all tokens until find a NEWLINE'''
+        """Fetch all tokens until find a NEWLINE"""
         
         out = []
         for tk in tokens:
@@ -441,17 +441,17 @@ class DeclarationParser:
 # Public API
 #   
 def parse_declaration(source):
-    '''Processa um arquivo de declarações e retorna o GroupFactory 
-    correspondente.'''
+    """Processa um arquivo de declarações e retorna o GroupFactory 
+    correspondente."""
     
     parser = DeclarationParser(source)
     return parser.parse()
 
 def populate(world, source, groups=None):
-    '''Popula o mundo com a declaração de objetos fornecida.
+    """Popula o mundo com a declaração de objetos fornecida.
     
     O usuário pode passar uma string, arquivo de declarações ou um objeto do 
-    tipo GroupFactory'''
+    tipo GroupFactory"""
     
     if isinstance(source, GroupFactory):
         if groups:
@@ -475,7 +475,7 @@ def populate(world, source, groups=None):
 # Utility functions
 #
 def _gettype(T):
-    '''Return type from name'''
+    """Return type from name"""
     
     if isinstance(T, type):
         return T

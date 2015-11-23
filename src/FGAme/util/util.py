@@ -2,8 +2,36 @@ import types
 import functools
 from smallvectors.tools import lazy
 
-__all__ = ['lazy', 'delegate_to', 'autodoc', 'popattr', 'lru_cache', 
-           'console_here']
+__all__ = [
+    'CachingProxy', 'caching_proxy_factory',
+    'lazy', 'delegate_to', 'autodoc', 'popattr', 'lru_cache',
+    'console_here']
+
+
+class CachingProxy:
+    """A proxy object that caches all attribute access for faster
+    re-evaluation.
+
+    Delegate can be intialized by an object or by a factory."""
+
+    def __init__(self, obj=None, factory=None):
+        self.__data = obj
+        self.__factory = factory
+
+    def __getattr__(self, attr):
+        if self.__data is None:
+            self.__data = self.__factory()
+
+        value = getattr(self.__data, attr)
+        setattr(self, attr, value)
+        return value
+
+
+def caching_proxy_factory(func):
+    """Decorator that initializes a CachingProxy object by setting its factory
+    function."""
+
+    return CachingProxy(factory=func)
 
 
 class delegate_to(property):

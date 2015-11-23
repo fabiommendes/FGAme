@@ -5,7 +5,7 @@ from FGAme.events.signals import Signal, DelegateSignal
 
 class EventDispatcherMeta(type):
 
-    '''Meta-classe para EventDispatcher.
+    """Meta-classe para EventDispatcher.
 
     Fabrica e registra automaticamente os métodos listen_* e trigger_*.
     Atualiza os __slots__ caso a classe filho os utilize. Finalmente salva
@@ -17,7 +17,7 @@ class EventDispatcherMeta(type):
         __autolisten__
             Dicionário com todos os métodos que foram marcados com o decorador
             @listen durante a definição da classe.
-    '''
+    """
 
     def __new__(cls, name, bases, ns):
         # Cria dicionário de sinais
@@ -27,8 +27,7 @@ class EventDispatcherMeta(type):
         for attr, value in ns.items():
             if isinstance(value, Signal):
                 signals[attr] = value
-        ns['__signals__'] = signals
-        
+
         # Modifica valores de slots, caso necessário
         if '__slots__' in ns:
             slots = list(ns['__slots__'])
@@ -37,10 +36,9 @@ class EventDispatcherMeta(type):
                     slots.append('_%s_ctl' % signame)
                     slots.append('_%s_book' % signame)
             ns['__slots__'] = slots
-
-        # Cria objeto
         new = type.__new__(cls, name, bases, ns)
-        
+        new.__signals__ = signals
+
         # Cria os métodos do tipo listen_* e tipo trigger_* 
         methods = itertools.chain(cls.triggers(new, signals.values()), 
                                   cls.listeners(new, signals.values()))
@@ -88,7 +86,7 @@ class EventDispatcherMeta(type):
 
 class EventDispatcher(object, metaclass=EventDispatcherMeta):
 
-    '''Implementa o despachante de eventos da biblioteca FGAme.'''
+    """Implementa o despachante de eventos da biblioteca FGAme."""
 
     __slots__ = ()
 
@@ -125,13 +123,13 @@ class EventDispatcher(object, metaclass=EventDispatcherMeta):
                 self.listen(signal.name, *args, **kwargs)
 
     def trigger(self, signal, *args, **kwds):
-        '''Aciona o sinal com os argumentos fornecidos.'''
+        """Aciona o sinal com os argumentos fornecidos."""
 
         implementation = getattr(self, 'trigger_' + pyname(signal))
         return implementation(*args, **kwds)
 
     def listen(self, signal, *args, **kwds):
-        '''Registra um handler para um determinado sinal.
+        """Registra um handler para um determinado sinal.
 
         A assinatura correta para esta função depende do tipo de sinal
         considerado. Para sinais simples, basta utilizar::
@@ -148,16 +146,16 @@ class EventDispatcher(object, metaclass=EventDispatcherMeta):
         Opcionalmente, é possível acrescentar argumentos por nome ou posição
         que serão passados automaticamente para o handler quando o sinal for
         acionado.
-        '''
+        """
 
         implementation = getattr(self, 'listen_' + pyname(signal))
         return implementation(*args, **kwds)
 
     def destroy_handlers(self, signal=None):
-        '''Destroy todos os handlers associados ao sinal dado.
+        """Destroy todos os handlers associados ao sinal dado.
 
         Retorna um dicionário que mapeia o nome dos sinais à lista de handlers
-        removidos.'''
+        removidos."""
 
         if signal is None:
             out = {}

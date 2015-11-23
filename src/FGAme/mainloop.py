@@ -9,7 +9,7 @@ TimedAction = namedtuple('TimedAction', ['time', 'action', 'args', 'kwds'])
 
 class MainLoop(EventDispatcher):
 
-    '''Implementa o loop principal de jogo.
+    """Implementa o loop principal de jogo.
 
     Tarefas do Loop principal:
         * Realizar a leitura de entradas do usuário (mouse, teclado, etc) e
@@ -71,7 +71,7 @@ class MainLoop(EventDispatcher):
         um determinado frame gastou 0.15s, então o callback é acionado com 0.05
         no argumentoframe
 
-    '''
+    """
 
     pre_draw = signal('pre-draw', num_args=1)
     post_draw = signal('post-draw', num_args=1)
@@ -99,7 +99,7 @@ class MainLoop(EventDispatcher):
             MainLoop._instance = self
 
     def run(self, state, timeout=None, maxiter=None, wait=True):
-        '''Roda o loop principal.
+        """Roda o loop principal.
 
         Parameters
         ----------
@@ -116,7 +116,7 @@ class MainLoop(EventDispatcher):
             Se wait=False, renderiza e atualiza cada frame imediatamente após
             o outro. Isto desabilita o controle de frame-rate e é utilizado
             apenas para depuração.
-        '''
+        """
 
         timeout = float('inf') if timeout is None else float(timeout)
         timeout += self.time
@@ -134,7 +134,7 @@ class MainLoop(EventDispatcher):
                 break
 
     def step_framestart(self):
-        '''Inicia o frame'''
+        """Inicia o frame"""
         
         start_time = time.time()
         self.trigger_frame_enter()
@@ -147,29 +147,29 @@ class MainLoop(EventDispatcher):
         return start_time
     
     def step_input(self, state):
-        '''Processa entradas'''
+        """Processa entradas"""
         
         self.input.poll()
     
     def step_state(self, state):
-        '''Atualiza o estado fornecido'''
+        """Atualiza o estado fornecido"""
         
         state.update(self.dt)
     
     def step_screen(self, state):
-        '''Desenha os objetos na tela'''
+        """Desenha os objetos na tela"""
         
         screen = self.screen
         bg_color = getattr(state, 'background', 'white')
         if bg_color is not None:
             screen.clear_background(bg_color)
         self.trigger_pre_draw(screen)
-        state.get_render_tree().draw(screen)
+        state.get_render_tree().draw(screen.camera)
         self.trigger_post_draw(screen)
         screen.flip()
         
     def step_endframe(self, state, start_time, wait=True):
-        '''Finaliza o frame'''
+        """Finaliza o frame"""
         
         time_interval = time.time() - start_time
         self.sleep_time = self.dt - time_interval
@@ -190,7 +190,7 @@ class MainLoop(EventDispatcher):
 
         
     def step(self, state, wait=True):
-        '''Realiza um passo de simulação sobre o estado fornecido'''
+        """Realiza um passo de simulação sobre o estado fornecido"""
 
         start_time = self.step_framestart()
         self.step_input(state)
@@ -199,15 +199,15 @@ class MainLoop(EventDispatcher):
         self.step_endframe(state, start_time, wait)
         
     def stop(self):
-        '''Finaliza o loop principal'''
+        """Finaliza o loop principal"""
 
         self._running = False
 
     def one_shot(self, time, function=None, *args, **kwds):
-        '''Agenda a execução da ação dada para acontecer imediatamente após
+        """Agenda a execução da ação dada para acontecer imediatamente após
         transcorridos o número de segundos fornecidos. A ação será executada
         logo após o fim de cada passo, antes de iniciar o frame seguinte.
-        '''
+        """
 
         # Decorator form
         if function is None or function is Ellipsis:
@@ -220,22 +220,22 @@ class MainLoop(EventDispatcher):
         self._action_queue = deque(sorted(Q, key=lambda x: x.time))
 
     def one_shot_frames(self, n_frames, function=None, *args, **kwds):
-        '''Similar a one_shot, mas agenda a execução para ocorrer em um número
+        """Similar a one_shot, mas agenda a execução para ocorrer em um número
         de frames especificado
-        '''
+        """
 
         return self.one_shot(n_frames * self.dt, function, *args, **kwds)
 
     def one_shot_absolute(self, time, function=None, *args, **kwds):
-        '''Similar a one_shot, mas agenda a execução para ocorrer em um valor
+        """Similar a one_shot, mas agenda a execução para ocorrer em um valor
         absoluto na linha de tempo e não após transcorrido o intervalo dado.
-        '''
+        """
 
         return self.one_shot(time - self.time, function, *args, **kwds)
 
     def periodic(self, time_interval, function=None, *args, **kwds):
-        '''Similar à one_shot, mas agenda a simulação para ocorrer
-        repetidamente cada vez que passar o intervalo de tempo fornecido.'''
+        """Similar à one_shot, mas agenda a simulação para ocorrer
+        repetidamente cada vez que passar o intervalo de tempo fornecido."""
 
         # Decorador
         if function is None or function is Ellipsis:
@@ -250,13 +250,13 @@ class MainLoop(EventDispatcher):
         self.one_shot(0, recursive_action, *args, **kwds)
 
     def periodic_frames(self, n_frames, function=None, *args, **kwds):
-        '''Similar à periodic(), mas agenda o intervalo de execução em frames
-        ao invés de segundos'''
+        """Similar à periodic(), mas agenda o intervalo de execução em frames
+        ao invés de segundos"""
 
         self.periodic(n_frames * self.dt, function, *args, **kwds)
 
     def schedule(self, function=None, *args, **kwds):
-        '''Agenda função para ser executada em cada frame.
+        """Agenda função para ser executada em cada frame.
 
         Parameters
         ----------
@@ -274,7 +274,7 @@ class MainLoop(EventDispatcher):
             Se for uma tupla (x, y), o primeiro valor representa o intervalo
             e o segundo representa quantos frames é necessário esperar para
             iniciar a execução.
-'''
+"""
 
         # Decorator form
         if function is None or function is Ellipsis:
@@ -292,20 +292,20 @@ class MainLoop(EventDispatcher):
             return self.frame_leave.listen(function, *args, **kwds)
 
     def schedule_dt(self, function=None, *args, **kwds):
-        '''Similar à `schedule()`, mas utiliza uma função que recebe o
+        """Similar à `schedule()`, mas utiliza uma função que recebe o
         intervalo de tempo `dt` transcorrido entre cada frame como primeiro
         parâmetro.
-        '''
+        """
 
         return self.schedule(function, self.dt, *args, **kwds)
 
     def schedule_optional(self, function, *args, **kwds):
-        '''Agenda ação para executar ao final de cada frame se o mesmo não
+        """Agenda ação para executar ao final de cada frame se o mesmo não
         tiver estourado o tempo limite.
 
         Útil para executar ações de manutenção que podem ser adiadas para
         quando a CPU estiver mais livre.
-        '''
+        """
 
         mainloop = MainLoop._instance
 
@@ -316,15 +316,15 @@ class MainLoop(EventDispatcher):
         return self.schedule(optional_action, start=False)
 
     def schedule_optional_dt(self, function, *args, **kwds):
-        '''Similar à `schedule_optional()`, mas utiliza uma função que recebe o
+        """Similar à `schedule_optional()`, mas utiliza uma função que recebe o
         intervalo de tempo `dt` transcorrido entre cada frame como primeiro
         parâmetro.
-        '''
+        """
 
         self.schedule_optional(function, self.dt, *args, **kwds)
 
     def schedule_iter(self, iterator, *args, **kwds):
-        '''Agenda a execução de um iterador ou gerador em um passo a cada frame.
+        """Agenda a execução de um iterador ou gerador em um passo a cada frame.
 
         Quando o gerador for totalmente consumido, ele é eliminado do loop de
         execução.
@@ -339,7 +339,7 @@ class MainLoop(EventDispatcher):
             Determina se a ação será executada no início ou no fim do frame.
         skip : int
             Executa as ações a cada skip (padrão skip=1) frames.
-        '''
+        """
 
         start = kwds.pop('start', True)
         skip = kwds.pop('skip', 1)
@@ -370,16 +370,16 @@ class MainLoop(EventDispatcher):
         return action_id
 
     def schedule_iter_dt(self, iterator, *args, **kwds):
-        '''Similar à `schedule_iter()`, mas utiliza uma função que recebe o
+        """Similar à `schedule_iter()`, mas utiliza uma função que recebe o
         intervalo de tempo `dt` transcorrido entre cada frame como primeiro
         parâmetro.
-        '''
+        """
 
         self.schedule_iter(iterator, self.dt, *args, **kwds)
 
     def delayed(self, time, function=None, *args, **kwds):
-        '''Semelhante à schedule, mas atrasa a execução da função pelo tempo
-        especificado'''
+        """Semelhante à schedule, mas atrasa a execução da função pelo tempo
+        especificado"""
 
         # Decorador
         if function is None:
@@ -393,19 +393,19 @@ class MainLoop(EventDispatcher):
         return self.one_shot(time, do_schedule)
 
     def delayed_frames(self, n_frames, function=None, *args, **kwds):
-        '''Semelhante à delayed(), mas especifica um número de frames ao invés
-        do intervalo de tempo'''
+        """Semelhante à delayed(), mas especifica um número de frames ao invés
+        do intervalo de tempo"""
 
         return self.delayed(self.dt * n_frames, function, *args, **kwds)
 
     def delayed_absolute(self, time, function=None, *args, **kwds):
-        '''Semelhante à delayed(), mas inicia após a simulação atingir um valor
-        absoluto de tempo.'''
+        """Semelhante à delayed(), mas inicia após a simulação atingir um valor
+        absoluto de tempo."""
 
         return self.delayed(time - self.time, function, *args, **kwds)
 
     def unschedule(self, handler):
-        '''Remove uma ação da execução'''
+        """Remove uma ação da execução"""
 
         # TODO: make everything cancellable!
         mainloop = MainLoop._instance
@@ -421,8 +421,8 @@ class MainLoop(EventDispatcher):
 # Global schedulers
 #
 def _make_scheduler(name):
-    '''Cria uma função tipo "scheduler" que delega a ação para o objeto
-    mainloop principal'''
+    """Cria uma função tipo "scheduler" que delega a ação para o objeto
+    mainloop principal"""
 
     @functools.wraps(getattr(MainLoop, name))
     def scheduler_function(*args, **kwds):

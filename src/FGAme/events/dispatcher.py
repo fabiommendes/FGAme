@@ -5,10 +5,10 @@ from FGAme.events.signals import DelegateSignal
 
 class GlobalEventDispatcher(EventDispatcher):
 
-    '''
+    """
     Classe cria uma única instância em FGAme.dispatcher que controla os eventos
     globais da FGAme.
-    '''
+    """
     __instance = None
 
     def __new__(cls):
@@ -22,7 +22,7 @@ class GlobalEventDispatcher(EventDispatcher):
             return cls.__instance
 
     def new_signal(self, name, *filters, **kwds):
-        '''Cria um novo sinal para o evento global.
+        """Cria um novo sinal para o evento global.
 
         Possui uma assinatura variável onde o tipo de sinal é escolhido
         automaticamente a partir dos argumentos
@@ -35,7 +35,7 @@ class GlobalEventDispatcher(EventDispatcher):
 
         signal('foo', delegate_to=obj)
             Delega sinal 'foo' para o objeto fornecido em *delegate_to*
-        '''
+        """
 
         cls = type(self)
         attr = pyname(name)

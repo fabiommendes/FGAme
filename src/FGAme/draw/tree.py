@@ -146,14 +146,14 @@ class RenderTree(object):
                 handle = drawable.screen_handle = screen.get_handle(drawable)
             screen.update_handle(handle, drawable)
 
-    def draw(self, screen):
+    def draw(self, painter):
         """Percorre todos os objetos na árvore invocando o método
         `obj.paint(screen)`"""
 
         for obj in self.walk():
             if obj.visible:
                 try:
-                    obj.draw(screen)
+                    obj.draw(painter)
                 except Exception:
                     print('debug: error drawing %s' % obj)
                     raise

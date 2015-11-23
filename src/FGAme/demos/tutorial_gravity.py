@@ -65,5 +65,9 @@ class GravityWorld(World):
         self.circle.boost(4 * self.line.direction)
 
 if __name__ == '__main__':
+    from FGAme import camera
+    camera.panright(100)
+    camera.panup(100)
+
     world = GravityWorld()
     world.run()

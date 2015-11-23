@@ -20,30 +20,30 @@ __all__ = [
 
 class Drawable(object):
 
-    '''Classe mãe para todos os objetos que podem ser desenhados na tela'''
+    """Classe mãe para todos os objetos que podem ser desenhados na tela"""
 
     visible = True
     __slots__ = ('__dict__',)
 
     def show(self):
-        '''Marca a propriedade `visible` como verdadeira e renderiza o 
-        objeto na tela.'''
+        """Marca a propriedade `visible` como verdadeira e renderiza o 
+        objeto na tela."""
         
         self.visible = True
 
     def hide(self):
-        '''Marca a propriedade `visible` como falsa e para de renderizar o 
-        objeto na tela.'''
+        """Marca a propriedade `visible` como falsa e para de renderizar o 
+        objeto na tela."""
         
         self.visible = False
 
     def copy(self):
-        '''Retorna uma cópia do objeto'''
+        """Retorna uma cópia do objeto"""
 
         return copy.copy(self)
 
     def draw(self, canvas):
-        '''Desenha objeto na tela'''
+        """Desenha objeto na tela"""
 
         raise NotImplementedError
     
@@ -54,19 +54,24 @@ class Drawable(object):
 
 
 class CurveOrShape(Drawable):
-    '''Base class for Curve and Shape objects'''
+    """Base class for Curve and Shape objects"""
     
     _linewidth = 1
     _linecolor = None
     _fillcolor = None
-    def __init__(self, *args, linecolor=None, fillcolor=None, linewidth=0, **kwds):
+
+    def __init__(self, *args, **kwds):
+        linecolor = kwds.pop('linecolor', None)
+        fillcolor = kwds.pop('fillcolor', None)
+        linewidth = kwds.pop('linewidth', 0)
+
         if linecolor is not None:
             self._linecolor = Color(linecolor)
         if linewidth is not None:
             self._linewidth = float(linewidth)
         if fillcolor is not None:
             self._fillcolor = Color(fillcolor)
-        super().__init__(*args, **kwds)
+        super(CurveOrShape, self).__init__(*args, **kwds)
     
     @property
     def linecolor(self):
@@ -84,18 +89,23 @@ class CurveOrShape(Drawable):
     def linewidth(self, value):
         self._linewidth = float(value)
 
+
 #
 # Curve
 #
 class Curve(CurveOrShape):
 
-    '''Classe pai para todos os objetos geométricos que definem uma curva
+    """Classe pai para todos os objetos geométricos que definem uma curva
     aberta.
-    '''
+    """
 
-    def __init__(self, *args, linewidth=1, linecolor=None, color=black, **kwds):
+    def __init__(self, *args, **kwds):
+        linewidth = kwds.pop('linewidth', 1)
+        linecolor = kwds.pop('linecolor', None)
+        color = kwds.pop('color', black)
         linecolor = color if linecolor is None else linecolor
-        super().__init__(*args, linewidth=linewidth, linecolor=linecolor, **kwds)
+        kwds.update(linewidth=linewidth, linecolor=linecolor)
+        super(Curve, self).__init__(*args, **kwds)
 
     color = CurveOrShape.linecolor
     
@@ -114,13 +124,13 @@ class Curve(CurveOrShape):
 
 class Segment(Curve, shapes.mSegment):
 
-    '''Um segmento de reta que vai do ponto start até end'''
+    """Um segmento de reta que vai do ponto start até end"""
 
 
 class Ray(Curve, shapes.mRay):
 
-    '''Um segmento de reta semi-finito que inicia em um ponto start
-    específico'''
+    """Um segmento de reta semi-finito que inicia em um ponto start
+    específico"""
 
     def __init__(self, *args, **kwds):
         raise RuntimeError('lines are not supported, perhaps you mean Segment?')
@@ -128,7 +138,7 @@ class Ray(Curve, shapes.mRay):
 
 class Line(Curve, shapes.mLine):
 
-    '''Uma linha infinita'''
+    """Uma linha infinita"""
 
     def __init__(self, *args, **kwds):
         raise RuntimeError('lines are not supported, perhaps you mean Segment?')
@@ -136,7 +146,7 @@ class Line(Curve, shapes.mLine):
 
 class Path(Curve, shapes.mPath):
 
-    '''Um caminho formado por uma sequência de pontos'''
+    """Um caminho formado por uma sequência de pontos"""
 
 
 #
@@ -144,11 +154,14 @@ class Path(Curve, shapes.mPath):
 #
 class Shape(CurveOrShape):
 
-    '''Classe pai para todas as figuras fechadas. Define as propriedades
-    color, fillcolor, linewidth e linecolor.'''
+    """Classe pai para todas as figuras fechadas. Define as propriedades
+    color, fillcolor, linewidth e linecolor."""
 
-    def __init__(self, *args, color=black, fillcolor=None, linecolor=None,
-                 linewidth=None, **kwds):
+    def __init__(self, *args, **kwds):
+        linewidth = kwds.pop('linewidth', None)
+        linecolor = kwds.pop('linecolor', None)
+        fillcolor = kwds.pop('fillcolor', None)
+        color = kwds.pop('color', black)
 
         if linewidth is None:
             linewidth = 0 if fillcolor is not None else 1
@@ -157,8 +170,10 @@ class Shape(CurveOrShape):
         if linecolor is None:
             linecolor = color
         fillcolor = color if fillcolor is None else fillcolor
-        super().__init__(*args, fillcolor=fillcolor, 
-                         linecolor=linecolor, linewidth=linewidth, **kwds) 
+
+        kwds.update(fillcolor=fillcolor,
+                    linecolor=linecolor, linewidth=linewidth)
+        super(Shape, self).__init__(*args, **kwds)
 
     @property
     def fillcolor(self):
@@ -182,41 +197,42 @@ class Shape(CurveOrShape):
         lw = self.linewidth
         return self._canvas_func(self, color, lc, lw)
 
+
 class Circle(Shape, shapes.mCircle):
 
-    '''Um círculo de raio `radius` e centro em `center`.'''
+    """Um círculo de raio `radius` e centro em `center`."""
 
 
 class AABB(Shape, shapes.mAABB):
 
-    '''Caixa de contorno alinhada aos eixos'''
+    """Caixa de contorno alinhada aos eixos"""
 
 
 class Circuit(Shape, shapes.mCircuit):
 
-    '''Um caminho fechado com um interior bem definido.'''
+    """Um caminho fechado com um interior bem definido."""
 
 
 class Poly(Shape, shapes.mPoly):
 
-    '''Objetos da classe Poly representam polígonos dados por uma lista
-    de vértices.'''
+    """Objetos da classe Poly representam polígonos dados por uma lista
+    de vértices."""
 
 
 class RegularPoly(Poly, shapes.mRegularPoly):
 
-    '''Objetos da classe Poly representam polígonos regulares dados por uma lista
-    de vértices.'''
+    """Objetos da classe Poly representam polígonos regulares dados por uma lista
+    de vértices."""
     
 
 class Rectangle(Poly, shapes.mRectangle):
 
-    '''Especialização de Poly para representar retângulos.
+    """Especialização de Poly para representar retângulos.
 
     Pode ser inicializado como uma AABB, mas com um parâmetro extra `theta`
-    para definir um ângulo de rotação.'''
+    para definir um ângulo de rotação."""
 
 
 class Triangle(Poly, shapes.mTriangle):
 
-    '''Especialização de Poly para representar triângulos.'''
+    """Especialização de Poly para representar triângulos."""

@@ -21,7 +21,7 @@ HAS_INIT_SDL_VIDEO = False
 
 class SDL2Canvas(Canvas):
 
-    '''Implementa a interface Screen, utilizando a biblioteca Pygame'''
+    """Implementa a interface Screen, utilizando a biblioteca Pygame"""
 
     # Local class-based caches
     _gfx = gfx
@@ -145,8 +145,8 @@ class SDL2Canvas(Canvas):
                 safe_operator(gfx.aacircleRGBA(renderer, x, y, r, *color))
 
     def _get_poly_xy(self, poly):
-        '''Implementação comum que cria lista de posições x e y para passsar
-        para draw_raw_poly_solid e draw_raw_poly_border'''
+        """Implementação comum que cria lista de posições x e y para passsar
+        para draw_raw_poly_solid e draw_raw_poly_border"""
 
         N = len(poly)
         height = self.height
@@ -301,7 +301,7 @@ class SDL2Canvas(Canvas):
 
 class SDL2Input(Input):
 
-    '''Objetos do tipo listener.'''
+    """Objetos do tipo listener."""
 
     # Keyboard key codes
     _key_transformations = {}
@@ -359,4 +359,4 @@ class SDL2Input(Input):
 
 class SDL2MainLoop(MainLoop):
 
-    '''The SDL2 main loop'''
+    """The SDL2 main loop"""
