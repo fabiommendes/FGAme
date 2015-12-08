@@ -6,6 +6,7 @@ from FGAme.events import EventDispatcher, signal
 from FGAme.physics.flags import BodyFlags
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
 
+
 ###############################################################################
 #                                Simulação
 # ----------------------------------------------------------------------------
@@ -68,18 +69,15 @@ class Simulation(EventDispatcher):
         self.num_steps = 0
         self.time = 0
 
-    ###########################################################################
-    #                           Serviços Python
-    ###########################################################################
     def __iter__(self):
         return iter(self._objects)
 
     def __contains__(self, obj):
         return obj in self._objects
 
-    ###########################################################################
-    #                               Sinais
-    ###########################################################################
+    #
+    # Sinais
+    #
     frame_enter = signal('frame-enter')
     collision = signal('collision', num_args=1)
     object_add = signal('object-add', num_args=1)
@@ -90,9 +88,9 @@ class Simulation(EventDispatcher):
     restitution_change = signal('restitution-change', num_args=2)
     friction_change = signal('friction-change', num_args=2)
 
-    ###########################################################################
-    #                       Propriedades físicas
-    ###########################################################################
+    #
+    # Propriedades físicas
+    #
     @property
     def gravity(self):
         return self._gravity
@@ -171,9 +169,9 @@ class Simulation(EventDispatcher):
                 obj._friction = value
         self.trigger('friction-change', old, self._friction)
 
-    ###########################################################################
-    #                   Gerenciamento de objetos e colisões
-    ###########################################################################
+    #
+    # Gerenciamento de objetos e colisões
+    #
     def add(self, obj):
         """Adiciona um novo objeto ao mundo.
 
@@ -226,9 +224,9 @@ class Simulation(EventDispatcher):
         except ValueError:
             pass
 
-    ###########################################################################
-    #                     Simulação de Física
-    ###########################################################################
+    #
+    # Simulação de Física
+    #
     def update(self, dt):
         """Rotina principal da simulação de física."""
 
@@ -297,9 +295,9 @@ class Simulation(EventDispatcher):
             if obj.flags & IS_SLEEP:
                 continue
 
-            if obj._invmass:
+            if obj.invmass:
                 obj.boost(obj._accel * dt)
-            if obj._invinertia:
+            if obj.invinertia:
                 obj.aboost(obj._alpha * dt)
 
             obj._e_vel = null2D
@@ -479,9 +477,9 @@ class Simulation(EventDispatcher):
                 col.adjust_overlap()
 
 
-###############################################################################
-#                              Funções auxiliares
-###############################################################################
+#
+# Funções auxiliares
+#
 def normalize_broad_phase(broad_phase, world):
     """Escolhe o parâmetro correto na inicialização do broad-phase"""
 

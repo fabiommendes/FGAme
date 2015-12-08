@@ -1,4 +1,4 @@
-'''
+"""
 A FGAme possui um método de armazenar e acessar imagens
 ...
 
@@ -15,7 +15,7 @@ Isto criará uma imagem
 
     
   
-'''
+"""
 import os
 from FGAme.resources import resources
 from FGAme.draw import AABB
@@ -52,7 +52,7 @@ del k, v
     
     
 class Texture(object):
-    '''Representa uma textura.'''
+    """Representa uma textura."""
 
     def __init__(self, path):
         if not os.path.isabs(path):
@@ -63,7 +63,7 @@ class Texture(object):
         
     @classmethod
     def from_image(cls, image):
-        '''Load texture from image object'''
+        """Load texture from image object"""
         
         if isinstance(image, PIL.Image.Image):
             return Texture.from_pil_image(image)
@@ -94,17 +94,17 @@ class Texture(object):
         return self._pil.mode
 
     def get_pil_data(self):
-        '''Return the PIL.Image data for the Texture object'''
+        """Return the PIL.Image data for the Texture object"""
 
         return self._pil
 
     def set_backend_data(self, value):
-        '''Saves the backend-specific representation of the texture'''
+        """Saves the backend-specific representation of the texture"""
         
         self.data = value
 
     def get_backend_data(self, value):
-        '''Returns the backend-specific representation of the texture'''
+        """Returns the backend-specific representation of the texture"""
         try:
             return self.data
         except AttributeError:
@@ -112,8 +112,9 @@ class Texture(object):
 
 
 class Image(AABB):
+    """Imagem/pixmap não-animado com uma posição dada no mundo."""
 
-    '''Imagem/pixmap não-animado com uma posição dada no mundo.'''
+    __slots__ = ('texture')
 
     def __init__(
             self, path_or_texture, pos=(0, 0), 
@@ -134,6 +135,10 @@ class Image(AABB):
         point = getattr(self, REFERENCE_NAMES.get(ref, ref))
         return asvector(point)
 
+    @classmethod
+    def _constructor(cls, xmin, xmax, ymin, ymax):
+        return super()._constructor(xmin, xmax, ymin, ymax)
+
     def draw(self, screen):
         screen.draw_image(self)
 
@@ -143,21 +148,21 @@ class Image(AABB):
         return new
 
     def crop(self, rect=None, bbox=None):
-        '''Return a cropped copy of image to the specified `rect` or bounding 
-        box `bbox`.'''
+        """Return a cropped copy of image to the specified `rect` or bounding 
+        box `bbox`."""
         
         new = self.copy()
         new.__crop(rect, bbox)
         return new 
     
     def rescale(self, scale, method=None):
-        '''Return a rescaled copy of image.
+        """Return a rescaled copy of image.
         
         Accept one of the following methods: "nearest", "linear", "cubic", or 
         "lanczos". "fastest" is an alias to "nearest", which is indeed the 
         fastest method and "best" is an alias to "lanczos", which is slower but
         usually yields the results with least artifacts. 
-        '''
+        """
         
         new = self.copy()
         new.__rescale(scale, method)
@@ -192,7 +197,7 @@ class Image(AABB):
         self.texture._pil = img
         
     def __rescale(self, scale, resample):
-        '''Rescale image to the given scale factor *inplace*'''
+        """Rescale image to the given scale factor *inplace*"""
         
         if scale == 1:
             return
@@ -231,7 +236,7 @@ class TileSheet(object):
 # Utility functions
 #
 def get_texture(texture_or_path, theta=0, scale=1):
-    '''Return texture from path or object holding image data.'''
+    """Return texture from path or object holding image data."""
     
     if isinstance(texture_or_path, str):
         return __get_texture_from_path(texture_or_path)

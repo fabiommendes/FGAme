@@ -33,7 +33,7 @@ def draw_sprite(screen):
     idx += 0.1
 
     dx, dy = box.shape
-    screen.draw_circle(shapes.Circle(40, Vec2(400, 300)))
+    camera.draw_circle(shapes.Circle(40, Vec(400, 300)))
 
     # Recupera o Surface para utilizar manualmente as funções do pygame
     pg_screen = screen.get_pygame_screen()

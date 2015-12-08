@@ -83,10 +83,10 @@ setup(
         %s
         pillow
         six
-        smallshapes>=%s
-        smallvectors>=%s
-        pygeneric>=0.1.1
-    ''' % (BACKEND, VERSION_BIG, VERSION_BIG),
+        smallshapes
+        smallvectors
+        pygeneric
+    ''' % BACKEND,
     zip_safe=False,
     **setup_kwds
 )

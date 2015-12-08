@@ -312,14 +312,15 @@ class Body(EventDispatcher, HasAABB, HasGlobalForces, HasInertia, metaclass=Even
     def add_contact(self, contact):
         """Registra um contato à lista de contatos do objeto"""
 
-        L = self._contacts
-        invmass = contact.A._invmass
-        for i, C in enumerate(L):
-            if invmass < C.A._invmass:
-                L.insert(i, C)
-                break
-        else:
-            L.append(contact)
+        # TODO: make proper contact management
+        # L = self._contacts
+        # invmass = contact.A._invmass
+        # for i, C in enumerate(L):
+        #    if invmass < C.A._invmass:
+        #        L.insert(i, C)
+        #        break
+        # else:
+        #    L.append(contact)
 
     def remove_contact(self, contact):
         """Remove um contato da lista de contatos do objeto"""

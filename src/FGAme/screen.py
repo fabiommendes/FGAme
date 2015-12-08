@@ -99,6 +99,26 @@ class Camera:
 
         self.pan(0, -px)
 
+    @property
+    def shape(self):
+        return self.width, self.height
+
+    @property
+    def width(self):
+        return self.canvas.width
+
+    @property
+    def height(self):
+        return self.canvas.height
+
+    @property
+    def xmin(self):
+        return -self.displacement.x
+
+    @property
+    def xmax(self):
+        return -self.displacement.x + self.width
+
 
     #
     # Drawing functions
@@ -284,7 +304,9 @@ class Canvas(Screen):
 
     def draw_raw_aabb_border(self, aabb, width=1.0, color=black):
         """Desenha a borda de uma aabb"""
-        raise NotImplementedError
+
+        poly = shapes.Poly(aabb.vertices)
+        self.draw_raw_poly_border(poly, width=width, color=color)
 
     def draw_raw_poly_solid(self, poly, color=black):
         """Desenha um polígono sólido"""

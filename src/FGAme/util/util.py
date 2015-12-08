@@ -1,6 +1,7 @@
 import types
 import functools
 from smallvectors.tools import lazy
+import types
 
 __all__ = [
     'CachingProxy', 'caching_proxy_factory',
@@ -23,7 +24,8 @@ class CachingProxy:
             self.__data = self.__factory()
 
         value = getattr(self.__data, attr)
-        setattr(self, attr, value)
+        if isinstance(value, types.MethodType):
+            setattr(self, attr, value)
         return value
 
 

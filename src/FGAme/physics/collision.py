@@ -1,4 +1,3 @@
-# -*- coding: utf8 -*-
 from math import sqrt
 from FGAme.mathtools import Vec2, asvector
 
@@ -7,8 +6,7 @@ from FGAme.mathtools import Vec2, asvector
 # Pontos de Contato/Manifolds
 #
 class ContactPoint(Vec2):
-
-    '''Representa um ponto de contato com um certo nível de penetração'''
+    """Representa um ponto de contato com um certo nível de penetração"""
 
     __slots__ = ['depth']
 
@@ -18,17 +16,15 @@ class ContactPoint(Vec2):
 
 
 class BaseContactManifold(object):
-
-    '''Classe mãe para ContactManifold restitution SimpleContactManifold'''
+    """Classe mãe para ContactManifold restitution SimpleContactManifold"""
 
     def __iter__(self):
         return iter(self.points)
 
 
 class ContactManifold(BaseContactManifold):
-
-    '''Representa uma lista de pontos de contato associados a uma única
-    normal.'''
+    """Representa uma lista de pontos de contato associados a uma única
+    normal."""
 
     __slots__ = ['normal', 'points']
 
@@ -38,8 +34,7 @@ class ContactManifold(BaseContactManifold):
 
 
 class SimpleContactManifold(BaseContactManifold):
-
-    '''Representa um contato simples com apenas um ponto'''
+    """Representa um contato simples com apenas um ponto"""
 
     __slots__ = ['normal', 'point']
 
@@ -59,29 +54,43 @@ class SimpleContactManifold(BaseContactManifold):
 # Contatos abstratos
 #
 class Pair(object):
+    """Representa alguma ligação, conexão ou agrupamento de dois objetos"""
 
-    '''Representa alguma ligação, conexão ou agrupamento de dois objetos'''
+    # Weak refs
+    # __slots__ = ('_A', '_B')
+    #
+    # def __init__(self, A, B):
+    #    self._A = ref(A)
+    #    self._B = ref(B)
+    #
+    # @property
+    # def A(self):
+    #    return self._A()
+    #
+    # @property
+    # def B(self):
+    #    return self._B()
 
-    __slots__ = ('A', 'B')
+    __slots__ = ('_A', '_B')
 
     def __init__(self, A, B):
         self.A = A
         self.B = B
 
     def swap(self):
-        '''Troca os dois objetos do par *INPLACE*'''
+        """Troca os dois objetos do par *INPLACE*"""
 
         self.B, self.A = self.A, self.B
 
     def swapped(self):
-        '''Retorna um par com os elementos trocados'''
+        """Retorna um par com os elementos trocados"""
 
         new = self.copy()
         new.swap()
         return new
 
     def other(self, obj):
-        '''Se for chamada com o objeto A, retorna o objeto B e vice-versa'''
+        """Se for chamada com o objeto A, retorna o objeto B e vice-versa"""
 
         if obj is self.A:
             return self.B
@@ -91,14 +100,14 @@ class Pair(object):
             raise ValueError('object does not participate in the connection')
 
     def isvalid(self):
-        '''Retorna True caso o contato ainda seja válido ou False caso já tenha
-        sido desfeito.'''
+        """Retorna True caso o contato ainda seja válido ou False caso já tenha
+        sido desfeito."""
 
         raise NotImplementedError
 
     def update(self):
-        '''Recalcula todas as propriedades que modem ser modificadas de um
-        frame para o outro'''
+        """Recalcula todas as propriedades que modem ser modificadas de um
+        frame para o outro"""
 
         raise NotImplementedError
 
@@ -145,28 +154,25 @@ class Pair(object):
 
 
 class BroadContact(Pair):
-
-    '''Representa um contato na Broad phase'''
+    """Representa um contato na Broad phase"""
 
     def get_collision(self):
-        '''Retorna o objecto de collisão associado ao contato. Caso não haja
-        colisão, retorna None'''
+        """Retorna o objecto de collisão associado ao contato. Caso não haja
+        colisão, retorna None"""
 
         raise NotImplementedError
 
 
 class CBBContact(BroadContact):
-
-    '''Representa um par de objetos com caixas de contorno circulares que
-    se sobrepõem'''
+    """Representa um par de objetos com caixas de contorno circulares que
+    se sobrepõem"""
 
     pass
 
 
 class AABBContact(BroadContact):
-
-    '''Representa um par de objetos com caixas de contorno alinhadas ao eixo
-    que se sobrepõem'''
+    """Representa um par de objetos com caixas de contorno alinhadas ao eixo
+    que se sobrepõem"""
 
     pass
 
@@ -181,8 +187,7 @@ class AABBContact(BroadContact):
 
 
 class Collision(Pair):
-
-    '''Representa a colisão entre dois objetos.
+    """Representa a colisão entre dois objetos.
 
     Subclasses de Collision devem implementar o método .resolve() que resolve
     a colisão entre os dois objetos.
@@ -254,7 +259,7 @@ class Collision(Pair):
     0.5
     Vec(1, 0)
     -1.0
-    '''
+    """
 
     def __init__(self, A, B, normal=None, pos=None, delta=0.0):
         super(Collision, self).__init__(A, B)
@@ -268,7 +273,7 @@ class Collision(Pair):
         self.friction = sqrt(A.friction * B.friction)
 
     def resolve(self):
-        '''Resolve as velocidades dos elementos que participam da colisão'''
+        """Resolve as velocidades dos elementos que participam da colisão"""
         
         if self.friction:
             self.__resolve_with_friction()
@@ -276,7 +281,7 @@ class Collision(Pair):
             self.__resolve_simple()
     
     def __resolve_simple(self):
-        '''Resolve colisões simples sem atrito'''
+        """Resolve colisões simples sem atrito"""
         
         A, B = self
         normal = self.normal
@@ -304,7 +309,7 @@ class Collision(Pair):
             B.apply_impulse(-Jvec, pos=pos)
 
     def __resolve_with_friction(self):
-        '''Resolve colisões simples com atrito'''
+        """Resolve colisões simples com atrito"""
 
         A, B = self
         normal = self.normal
@@ -409,14 +414,13 @@ class Collision(Pair):
             A.apply_impulse(Jvec, pos=pos)
             B.apply_impulse(-Jvec, pos=pos)
 
-
     def cancel(self):
-        '''Cancela a colisão'''
+        """Cancela a colisão"""
         
         self.active = False
 
     def pre_collision(self):
-        '''Dispara sinais antes de resolver a colisão''' 
+        """Dispara sinais antes de resolver a colisão""" 
     
         A, B = self
         A.trigger_pre_collision(self)
@@ -428,7 +432,7 @@ class Collision(Pair):
         #        B.collisions.append(self)
     
     def post_collision(self):
-        '''Dispara sinais após resolver a colisão'''
+        """Dispara sinais após resolver a colisão"""
         
         A, B = self
         A.trigger_post_collision(self)
@@ -439,14 +443,14 @@ class Collision(Pair):
         #    B.collisions.remove(self)
 
     def is_simple(self):
-        '''Retorna True se o contato for o único contato de ambos os objetos
-        envolvidos'''
+        """Retorna True se o contato for o único contato de ambos os objetos
+        envolvidos"""
 
         return (len(self.A._contacts) <= 1) and (len(self.B._contacts) <= 1)
 
     def remove_overlap(self, beta=1.0):
-        '''Remove a superposição entre os objetos movendo cada objeto por uma
-        fração inversamente proporcional às respectivas massas'''
+        """Remove a superposição entre os objetos movendo cada objeto por uma
+        fração inversamente proporcional às respectivas massas"""
 
         normal = self.normal
         A, B = self
@@ -457,8 +461,8 @@ class Collision(Pair):
         B.move((beta * b) * normal)
 
     def baumgarte(self, beta, mindelta=0.3):
-        '''Realiza o ajuste de baumgarte para remover gradualmente a 
-        superposição entre dois objetos.'''
+        """Realiza o ajuste de baumgarte para remover gradualmente a 
+        superposição entre dois objetos."""
         
         delta = self.delta
         if delta > mindelta:
@@ -474,9 +478,8 @@ class Collision(Pair):
 
 
 class ContactOrdered(Collision):
-
-    '''Um objeto de contato em que o primeiro objeto é sempre mais pesado que
-    o segundo'''
+    """Um objeto de contato em que o primeiro objeto é sempre mais pesado que
+    o segundo"""
 
     def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
         if A._invmass > B._invmass:

@@ -4,27 +4,28 @@ from FGAme import *
 class GravityWorld(World):
 
     def init(self):
-        # Criamos dois objetos
-        A = Circle(20, pos=pos.from_middle(100, 0), vel=(100, 300),
+        # criamos dois objetos
+        a = Circle(20, pos=pos.from_middle(100, 0), vel=(100, 300),
                    color='red')
-        B = Circle(20, pos=pos.from_middle(-100, 0), vel=(-100, -300))
-        self.A, self.B = A, B
-        self.add([A, B])
+        b = Circle(20, pos=pos.from_middle(-100, 0), vel=(-100, -300))
+        self.a, self.b = a, b
+        self.add([a, b])
 
-        # Definimos a força de interação entre ambos
-        K = self.K = A.mass
-        self.A.force = lambda t: -K * (A.pos - B.pos)
-        self.B.force = lambda t: -K * (B.pos - A.pos)
+        # definimos a força de interação entre ambos
+        k = self.k = a.mass
+        self.a.force = lambda t: -k * (a.pos - b.pos)
+        self.b.force = lambda t: -k * (b.pos - a.pos)
 
         def func(t):
             raise TypeError
-        self.A.func = func
-        self.B.func = func
 
-        # Redefinimos a constante de amortecimento
+        self.a.func = func
+        self.b.func = func
+
+        # redefinimos a constante de amortecimento
         self.damping = 0.5
 
-        # Definimos uma margem de 10px de espessura
+        # definimos uma margem de 10px de espessura
         self.add_bounds(width=10)
 
     @listen('key-down', 'space')
@@ -66,8 +67,5 @@ class GravityWorld(World):
 
 if __name__ == '__main__':
     from FGAme import camera
-    camera.panright(100)
-    camera.panup(100)
-
     world = GravityWorld()
     world.run()

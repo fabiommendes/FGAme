@@ -1,5 +1,3 @@
-# -*- coding: utf8 -*-
-
 from collections import MutableSequence
 from FGAme.mathtools import shadow_y
 from FGAme.physics import CBBContact, AABBContact
@@ -8,8 +6,7 @@ from FGAme.physics.flags import BodyFlags
 
 
 class AbstractCollisionPhase(MutableSequence):
-
-    '''Base para BroadPhase e NarrowPhase'''
+    """Base para BroadPhase e NarrowPhase"""
 
     __slots__ = ['world', '_data']
 
@@ -27,13 +24,13 @@ class AbstractCollisionPhase(MutableSequence):
         return '%s(%r)' % (tname, self._data)
 
     def update(self, objects):
-        '''Atualiza a lista de pares utilizando a lista de objetos dada.'''
+        """Atualiza a lista de pares utilizando a lista de objetos dada."""
 
         raise NotImplementedError
 
     def objects(self):
-        '''Iterador sobre a lista com todos os objetos obtidos na fase de
-        colisão'''
+        """Iterador sobre a lista com todos os objetos obtidos na fase de
+        colisão"""
 
         objs = set()
         for A, B in self._data:
@@ -41,7 +38,6 @@ class AbstractCollisionPhase(MutableSequence):
             objs.add(B)
         return iter(objs)
 
-    # MutableSequence interface ###############################################
     def __len__(self):
         return len(self._data)
 
@@ -78,8 +74,7 @@ class AbstractCollisionPhase(MutableSequence):
 
 
 class BroadPhase(AbstractCollisionPhase):
-
-    '''Controla a broad-phase do loop de detecção de colisões de uma
+    """Controla a broad-phase do loop de detecção de colisões de uma
     simulação.
 
     Um objeto do tipo BroadPhase possui uma interface simples que define dois
@@ -88,20 +83,19 @@ class BroadPhase(AbstractCollisionPhase):
         bf.update(L) -> executa algoritmo em lista de objetos L
         iter(bf)     -> itera sobre todos os pares gerados no passo anterior
 
-    '''
+    """
 
     __slots__ = []
 
     def immutable_to_mutable_map(self):
-        '''Retorna a lista de pares encontradas por update'''
+        """Retorna a lista de pares encontradas por update"""
 
         return list(self._data)
 
 
 class BroadPhaseAABB(BroadPhase):
-
-    '''Implementa a broad-phase detectando todos os pares de AABBs que estão
-    em contato no frame'''
+    """Implementa a broad-phase detectando todos os pares de AABBs que estão
+    em contato no frame"""
 
     __slots__ = []
 
@@ -144,9 +138,8 @@ class BroadPhaseAABB(BroadPhase):
 
 
 class BroadPhaseCBB(BroadPhase):
-
-    '''Implementa a broad-phase detectando todos os pares de CBBs que estão
-    em contato no frame'''
+    """Implementa a broad-phase detectando todos os pares de CBBs que estão
+    em contato no frame"""
 
     __slots__ = []
 
@@ -181,9 +174,8 @@ class BroadPhaseCBB(BroadPhase):
 
 
 class BroadPhaseMixed(BroadPhase):
-
-    '''Implementa a broad-phase detectando todos os pares de CBBs que estão
-    em contato no frame'''
+    """Implementa a broad-phase detectando todos os pares de CBBs que estão
+    em contato no frame"""
 
     __slots__ = []
 
@@ -229,26 +221,23 @@ class BroadPhaseMixed(BroadPhase):
                     self._data.append(AABBContact(A, B))
 
 
-###############################################################################
-#                               Narrow phase
-###############################################################################
+#
+# Narrow phase
+#
 class NarrowPhase(AbstractCollisionPhase):
-
-    '''Implementa a fase fina da detecção de colisão'''
+    """Implementa a fase fina da detecção de colisão"""
 
     __slots__ = []
 
     def update(self, broad_cols):
-        '''Escaneia a lista de colisões grosseiras e detecta quais delas
-        realmente aconteceram'''
+        """Escaneia a lista de colisões grosseiras e detecta quais delas
+        realmente aconteceram"""
 
         # Detecta colisões e atualiza as listas internas de colisões de
         # cada objeto
         self._data = cols = []
 
         for A, B in broad_cols:
-            if A._invmass > B._invmass:
-                A, B = B, A
             col = get_collision(A, B)
 
             if col is not None:
@@ -258,7 +247,7 @@ class NarrowPhase(AbstractCollisionPhase):
                 cols.append(col)
 
     def get_groups(self, cols=None):
-        '''Retorna uma lista com todos os grupos de colisões fechados'''
+        """Retorna uma lista com todos os grupos de colisões fechados"""
 
         if cols is None:
             cols = self

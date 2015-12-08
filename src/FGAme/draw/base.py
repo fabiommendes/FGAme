@@ -207,6 +207,8 @@ class AABB(Shape, shapes.mAABB):
 
     """Caixa de contorno alinhada aos eixos"""
 
+    __slots__ = ()
+
 
 class Circuit(Shape, shapes.mCircuit):
 
