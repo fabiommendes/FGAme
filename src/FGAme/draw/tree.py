@@ -1,5 +1,4 @@
 class RenderTree(object):
-
     """Representa uma árvore de objetos que serão desenhados na tela
 
     Exemplos
@@ -170,4 +169,5 @@ class RenderTree(object):
 
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()

@@ -5,7 +5,6 @@ Modifique a função resolve_collision(col) abaixo para que ela implemente a
 transferência de impulso usando as fórmulas aprendidas em sala de aula.
 '''
 
-from FGAme import *
 from FGAme import patch
 
 
@@ -42,4 +41,3 @@ def resolve_collision(col):
 
 # Aqui chamamos uma simulação já pronta para testar nosso método de resolução
 # de colisões.
-from FGAme.demos.simulations import gas_polys

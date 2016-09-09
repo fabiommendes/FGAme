@@ -1,54 +1,50 @@
-'''
-Realiza o logging do funcionamento do FGAme
-===========================================
+"""
+Logging
+=======
 
-Diferentes níveis estão disponíveis : `trace`, `debug`, `info`, `warning`, `error`
-e `critical`.
+The following debug levels are available: `debug`, `info`, `warning`, `error`
+and `critical`.
 
-Exemplos::
+Examples::
 
     from FGAme.core import log
 
-    log.info('título: Essa é uma mensagem informativa.')
-    log.debug('título: Essa é uma mensagem de debug.')
+    log.info('message: This is an info message.')
+    log.debug('message: This is a debug message.')
 
     try:
-        raise Exception('bleh')
+        raise Exception('foo')
     except Exception:
-        log.exception('Something happened!')
+        log.error('Something happened!')
 
-A mensagem passada para o logger é dividia em duas partes separadas por dois
-pontos (:). A primeira parte corresponde ao título e a segunda à mensagem
-propriamente dita.
+The message itself consists of two parts split by a colon: a title and a body.
+Usually the title part consists of the python path to where the logging event
+occurs::
 
-    log.info('FGAme.app: Este é um teste')
+    log.info('FGAme.app: This is a test')
 
-    # aparece como
+This appears as::
 
-    [INFO   ] [FGAme.app   ] Este é um teste
+    [INFO   ] [FGAme.app   ] This is a test.
 
-História
---------
+Log history
+-----------
 
-Mesmo com o logger desabilitado, você tem acesso às últimas 100 mensagens::
+Even with logging disabled, you have access to the last 100 messages.
 
-    from FGAme.core import log_history
+    from FGAme.logger import log_history
     print(log_history.history)
 
-'''
-#
+"""
 # This code is based in the logger module from Kivy
-#
 import logging
 import os
 import sys
-from functools import partial
-
 
 __all__ = ('log', 'log_history')
-sysstderr = sys.stderr
+sys_stderr = sys.stderr
 
-# Sequências que marcam saída colorida
+# Colorful output
 RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[1;%dm"
 BOLD_SEQ = "\033[1m"
@@ -64,7 +60,6 @@ COLORS = {
 
 logging.TRACE = 9
 LOG_LEVELS = {
-    'trace': logging.TRACE,  # @UndefinedVariable
     'debug': logging.DEBUG,
     'info': logging.INFO,
     'warning': logging.WARNING,
@@ -73,8 +68,6 @@ LOG_LEVELS = {
 
 
 def formatter_message(message, use_color=True):
-    '''Formata a mensagem para saída colorida e formatada.'''
-    
     if use_color:
         message = message.replace("$RESET", RESET_SEQ)
         message = message.replace("$BOLD", BOLD_SEQ)
@@ -84,7 +77,6 @@ def formatter_message(message, use_color=True):
 
 
 class LoggerHistory(logging.Handler):
-
     history = []
 
     def emit(self, message):
@@ -92,21 +84,19 @@ class LoggerHistory(logging.Handler):
 
 
 class ConsoleHandler(logging.StreamHandler):
-
     def filter(self, record):
         try:
             msg = record.msg
             k = msg.split(':', 1)
             if k[0] == 'stderr' and len(k) == 2:
-                sysstderr.write(k[1] + '\n')
+                sys_stderr.write(k[1] + '\n')
                 return False
-        except:
+        except IndexError:
             pass
         return True
 
 
 class ColoredFormatter(logging.Formatter):
-
     def __init__(self, msg, use_color=True):
         logging.Formatter.__init__(self, msg)
         self.use_color = use_color
@@ -116,12 +106,9 @@ class ColoredFormatter(logging.Formatter):
             msg = record.msg.split(':', 1)
             if len(msg) == 2:
                 record.msg = '[%-12s]%s' % (msg[0], msg[1])
-        except:
+        except IndexError:
             pass
         levelname = record.levelname
-        if record.levelno == logging.TRACE:  # @UndefinedVariable
-            levelname = 'TRACE'
-            record.levelname = levelname
         if self.use_color and levelname in COLORS:
             levelname_color = (
                 COLOR_SEQ % (30 + COLORS[levelname]) + levelname + RESET_SEQ)
@@ -129,12 +116,9 @@ class ColoredFormatter(logging.Formatter):
         return logging.Formatter.format(self, record)
 
 
-#
-# Cria logger principal na variável log
-#
+# Main logger is saved into the .log variable
 log = logging.getLogger('FGAme')
 log.logfile_activated = None
-log.trace = partial(log.log, logging.TRACE)  # @UndefinedVariable
 logging.root = log
 log.addHandler(LoggerHistory())
 use_color = os.environ.get('TERM') in ('xterm', 'rxvt', 'rxvt-unicode')

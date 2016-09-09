@@ -2,7 +2,6 @@ from FGAme import conf
 from FGAme import draw
 
 screen = conf.init_screen(800, 600)
-assert screen is conf.get_screen()
 screen.show()
 
 circle = draw.Circle(100, color='red')

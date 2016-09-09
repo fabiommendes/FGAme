@@ -44,9 +44,9 @@ def explode(obj, world, energy=0, prob_rec=0.5):
 
     # Processa os novos objetos criados
     for i, new in enumerate(new_objects):
-        # Calcula a direção radial da explosão e move o objeto
-        norm = (new.pos - obj.pos).normalized()
-        new.move(norm)
+        # Calcula a direção radial da explosão e imove o objeto
+        norm = (new.pos - obj.pos).normalize()
+        new.imove(norm)
 
         # Adiciona velocidade de acordo com a velocidade original e com a
         # contribuição de energia

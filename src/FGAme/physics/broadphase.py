@@ -1,8 +1,8 @@
 from collections import MutableSequence
+
 from FGAme.mathtools import shadow_y
-from FGAme.physics import CBBContact, AABBContact
-from FGAme.physics import get_collision
-from FGAme.physics.flags import BodyFlags
+from FGAme.physics import flags
+from FGAme.physics.collision import CBBContact, AABBContact, get_collision
 
 
 class AbstractCollisionPhase(MutableSequence):
@@ -100,7 +100,7 @@ class BroadPhaseAABB(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        IS_SLEEP = BodyFlags.is_sleeping
+        IS_SLEEP = flags.is_sleeping
         can_collide = self.world.can_collide
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.xmin)
@@ -180,7 +180,7 @@ class BroadPhaseMixed(BroadPhase):
     __slots__ = []
 
     def update(self, L):
-        IS_SLEEP = BodyFlags.is_sleeping
+        IS_SLEEP = flags.is_sleeping
         can_collide = self.world.can_collide
         col_idx = 0
         objects = sorted(L, key=lambda obj: obj.pos.x - obj.cbb_radius)
@@ -230,8 +230,10 @@ class NarrowPhase(AbstractCollisionPhase):
     __slots__ = []
 
     def update(self, broad_cols):
-        """Escaneia a lista de colisões grosseiras e detecta quais delas
-        realmente aconteceram"""
+        """
+        Escaneia a lista de colisões grosseiras e detecta quais delas
+        realmente aconteceram.
+        """
 
         # Detecta colisões e atualiza as listas internas de colisões de
         # cada objeto
@@ -241,21 +243,17 @@ class NarrowPhase(AbstractCollisionPhase):
             col = get_collision(A, B)
 
             if col is not None:
-                A.add_contact(col)
-                B.add_contact(col)
+                # A.add_contact(col)
+                # B.add_contact(col)
                 col.simulation = self.world
                 cols.append(col)
 
     def get_groups(self, cols=None):
-        """Retorna uma lista com todos os grupos de colisões fechados"""
+        """
+        Retorna uma lista com todos os grupos de colisões fechados.
+        """
 
         if cols is None:
             cols = self
 
         meta_cols = BroadPhaseAABB(cols)
-        print(meta_cols)
-
-
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()

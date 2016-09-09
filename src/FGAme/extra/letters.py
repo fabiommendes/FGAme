@@ -132,8 +132,8 @@ def add_word(word, world, scale=1, color='black', pos=(0, 0), **kwds):
         if not letters:
             return
         last = letters[-1]
-        letter.move((last.xmax, 0))
-        letter.move(
+        letter.imove((last.xmax, 0))
+        letter.imove(
             (KERNING.get(
                 last.char +
                 letter.char,
@@ -150,7 +150,7 @@ def add_word(word, world, scale=1, color='black', pos=(0, 0), **kwds):
         letters.append(letter)
 
     for letter in letters:
-        letter.move(pos)
+        letter.imove(pos)
         world.add(letter)
 
     return letters

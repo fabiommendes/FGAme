@@ -1,31 +1,31 @@
 import ctypes
-from math import trunc
 import sys
+from math import trunc
 from warnings import warn
 
 import sdl2
 import sdl2.ext as sdl2_ext
 import sdl2.sdlgfx as gfx
 
-from FGAme.screen import Canvas
+from FGAme import conf
+from FGAme.draw import Color
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
-from FGAme.draw import Color
-from FGAme import conf
+from FGAme.screen import Canvas
 
-#
-# Module constants
-#
 HAS_INIT_SDL_VIDEO = False
 
 
 class SDL2Canvas(Canvas):
-
-    """Implementa a interface Screen, utilizando a biblioteca Pygame"""
-
-    # Local class-based caches
     _gfx = gfx
     _sdl2 = sdl2
+    _window = None
+    _surface = None
+    _renderer = None
+    _screen_rect = None
+    _bg_color = None
+    _LP_short = None
+    _black = (0, 0, 0)
 
     def show(self):
         # Init video
@@ -45,7 +45,7 @@ class SDL2Canvas(Canvas):
                 self.height,
                 sdl2.SDL_WINDOW_SHOWN))
         self._surface = sdl2.SDL_GetWindowSurface(self._window)
-        
+
         # Create a renderer
         # flags = sdl2.SDL_RENDERER_SOFTWARE
         # flags = sdl2.SDL_RENDERER_ACCELERATED
@@ -74,7 +74,7 @@ class SDL2Canvas(Canvas):
 
     def _map_point(self, point):
         x, y = point
-        return (trunc(x), trunc(self.height - y))
+        return trunc(x), trunc(self.height - y)
 
     def _sdl_error(self):
         msg = sdl2.SDL_GetError()
@@ -99,12 +99,9 @@ class SDL2Canvas(Canvas):
             raise RuntimeError('SDL error (%s): %s' % (value, msg))
         return value
 
-    #
-    # Desenho de figuras geométricas primitivas
-    #
-    def draw_raw_aabb_solid(self, aabb, color):
+    def raw_aabb_solid(self, aabb, color=None):
         Y = self.height
-        R, G, B, A = color
+        R, G, B, A = color or self._black
         if gfx.boxRGBA(
                 self._renderer,
                 trunc(aabb.xmin),
@@ -114,13 +111,13 @@ class SDL2Canvas(Canvas):
                 R, G, B, A) != 0:
             self._sdl_error()
 
-    def draw_raw_circle_solid(self, circle, color):
+    def raw_circle_solid(self, circle, color=None):
         self._no_error(
             gfx.filledCircleRGBA(
                 self._renderer,
                 trunc(circle.x),
                 trunc(self.height - circle.y),
-                trunc(circle.radius), *color))
+                trunc(circle.radius), *(color or self._black)))
 
         self._no_error(
             gfx.aacircleRGBA(
@@ -129,7 +126,7 @@ class SDL2Canvas(Canvas):
                 trunc(self.height - circle.y),
                 trunc(circle.radius), *color))
 
-    def draw_raw_circle_border(self, circle, width, color):
+    def raw_circle_border(self, circle, width=1.0, color=None):
         safe_operator = self._no_error
         x, y = trunc(circle.x), trunc(self.height - circle.y)
         renderer = self._renderer
@@ -144,6 +141,7 @@ class SDL2Canvas(Canvas):
             for r in range(min_r, max_r):
                 safe_operator(gfx.aacircleRGBA(renderer, x, y, r, *color))
 
+    # noinspection PyCallingNonCallable
     def _get_poly_xy(self, poly):
         """Implementação comum que cria lista de posições x e y para passsar
         para draw_raw_poly_solid e draw_raw_poly_border"""
@@ -158,7 +156,7 @@ class SDL2Canvas(Canvas):
             Yc[i] = trunc(height - pt.y)
         return Xc, Yc
 
-    def draw_raw_segment(self, segment, width, color):
+    def raw_segment(self, segment, width=1.0, color=None):
         height = self.height
         pt1, pt2 = segment
         if width == 1:
@@ -181,7 +179,7 @@ class SDL2Canvas(Canvas):
                     trunc(width),
                     *color))
 
-    def draw_raw_poly_solid(self, poly, color):
+    def raw_poly_solid(self, poly, color=None):
         N = len(poly)
         X, Y = self._get_poly_xy(poly)
         color = Color(color)
@@ -192,15 +190,15 @@ class SDL2Canvas(Canvas):
             gfx.filledPolygonRGBA(
                 self._renderer, X, Y, N, *color))
 
-    def draw_raw_poly_border(self, poly, width, color):
-        # TODO: desenhar linhas espessas
+    def raw_poly_border(self, poly, width=1.0, color=None):
+        # TODO: draw thick lines
         N = len(poly)
         X, Y = self._get_poly_xy(poly)
         self._no_error(
             gfx.polygonRGBA(
                 self._renderer, X, Y, N, *Color(color)))
 
-    def draw_raw_texture(self, texture, pos=(0, 0)):
+    def raw_texture(self, texture, pos=(0, 0)):
         try:
             sdl_texture = texture.data
         except AttributeError:
@@ -210,19 +208,14 @@ class SDL2Canvas(Canvas):
             sdl_texture = self.__convert_PIL_to_SDL(pil_data)
             texture.set_backend_data(sdl_texture)
 
-        dx = texture.width 
+        dx = texture.width
         dy = texture.height
         x, y = pos
         y = self.height - y - dy
         rect_src = sdl2.SDL_Rect(0, 0, dx, dy)
         rect_dest = sdl2.SDL_Rect(int(x), int(y), dx, dy)
-        sdl2.SDL_RenderCopy(
-            self._renderer,  # renderer
-            sdl_texture,     # source
-            rect_src,        # source rect
-            rect_dest,       # destination rect
-        )
-            
+        source = sdl_texture
+        sdl2.SDL_RenderCopy(self._renderer, source, rect_src, rect_dest)
 
     def __convert_PIL_to_SDL(self, image):
         # Copied from sdl2.ext.image.load_image()
@@ -237,7 +230,7 @@ class SDL2Canvas(Canvas):
             # "P" = palette-based, 8-bit
             pitch = width
             depth = 8
-        
+
         elif mode == "RGB":
             # 3x8-bit, 24bpp
             if endian.SDL_BYTEORDER == endian.SDL_LIL_ENDIAN:
@@ -250,7 +243,7 @@ class SDL2Canvas(Canvas):
                 bmask = 0x0000FF
             depth = 24
             pitch = width * 3
-        
+
         elif mode in ("RGBA", "RGBX"):
             # RGBX: 4x8-bit, no alpha
             # RGBA: 4x8-bit, alpha
@@ -277,10 +270,7 @@ class SDL2Canvas(Canvas):
                                                 depth, pitch, rmask,
                                                 gmask, bmask, amask)
         return sdl2.SDL_CreateTextureFromSurface(self._renderer, surface)
-        
 
-    
-    
     def clear_background(self, color=None):
         renderer = self._renderer
         sdl2.SDL_RenderClear(renderer)
@@ -297,12 +287,10 @@ class SDL2Canvas(Canvas):
         if ret != 0:
             msg = sdl2.SDL_GetError()
             raise RuntimeError('SDL error: %s' % msg)
+        return ret
 
 
 class SDL2Input(Input):
-
-    """Objetos do tipo listener."""
-
     # Keyboard key codes
     _key_transformations = {}
     _key_conversions = {}
@@ -358,5 +346,4 @@ class SDL2Input(Input):
 
 
 class SDL2MainLoop(MainLoop):
-
-    """The SDL2 main loop"""
+    pass

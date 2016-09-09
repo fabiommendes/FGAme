@@ -1,22 +1,20 @@
 import string
+
 import pygame
+
 from FGAme import conf
-from FGAme.screen import Canvas
+from FGAme.draw import Color, rgb
 from FGAme.input import Input
 from FGAme.mainloop import MainLoop
-from FGAme.draw import Color, rgb
-from FGAme.util import autodoc
-pygame.init()  # @UndefinedVariable
+from FGAme.screen import Canvas
+
+pygame.init()
 
 black = Color('black')
 white = Color('white')
 
 
-@autodoc
 class PyGameCanvas(Canvas):
-
-    '''Implementa a interface Canvas utilizando a biblioteca pygame'''
-
     _pg_draw_circle = pygame.draw.circle
     _pg_draw_rect = pygame.draw.rect
     _pg_draw_poly = pygame.draw.polygon
@@ -32,53 +30,42 @@ class PyGameCanvas(Canvas):
     def flip(self):
         pygame.display.update()
 
-    #
-    # Funções de desenho - chama as funções de pygame.draw
-    #
-    def draw_raw_aabb_solid(self, aabb, color=black):
-        self.draw_raw_aabb_border(aabb, 0, color)
+    def raw_aabb_solid(self, aabb, color=black):
+        self.raw_aabb_border(aabb, 0, color)
 
-    def draw_raw_aabb_border(self, aabb, width=1.0, color=black):
+    def raw_aabb_border(self, aabb, width=1.0, color=black):
         Y = self.height
         x, x_, y, y_ = map(int, aabb)
         rect = (x, Y - y_, x_ - x, y_ - y)
-        self._pg_draw_rect(
-            self._screen,
-            color,       # color
-            rect,        # rect
-            int(width))  # line width
+        line_width = int(width)
+        self._pg_draw_rect(self._screen, color, rect, line_width)
 
-    def draw_raw_circle_solid(self, circle, color=black):
-        self.draw_raw_circle_border(circle, 0, color)
+    def raw_circle_solid(self, circle, color=black):
+        self.raw_circle_border(circle, 0, color)
 
-    def draw_raw_circle_border(self, circle, width=1.0, color=black):
+    def raw_circle_border(self, circle, width=1.0, color=black):
         Y = self.height
         x, y = circle.pos
-        self._pg_draw_circle(
-            self._screen,
-            color,                 # line color
-            (int(x), Y - int(y)),  # center
-            int(circle.radius),    # radius
-            int(width))            # line width
+        center = (int(x), Y - int(y))
+        radius = int(circle.radius)
+        lw = int(width)
+        self._pg_draw_circle(self._screen, color, center, radius, lw)
 
-    def draw_raw_poly_solid(self, poly, color=black):
-        self.draw_raw_poly_border(poly, 0, color)
+    def raw_poly_solid(self, poly, color=black):
+        self.raw_poly_border(poly, 0, color)
 
-    def draw_raw_poly_border(self, poly, width=1.0, color=black):
+    def raw_poly_border(self, poly, width=1.0, color=black):
         Y = self.height
         vertices = [(int(x), int(Y - y)) for (x, y) in poly]
-        self._pg_draw_poly(
-            self._screen,
-            color,        # line color
-            vertices,     # center
-            int(width))   # line width
+        line_width = int(width)
+        self._pg_draw_poly(self._screen, color, vertices, line_width)
 
-    def draw_raw_segment(self, segment, width=1.0, color=black):
+    def raw_segment(self, segment, width=1.0, color=black):
         Y = self.height
         pt1, pt2 = [(int(x), int(Y - y)) for (x, y) in segment]
         self._pg_segment(self._screen, color, pt1, pt2, int(width))
 
-    def draw_raw_texture(self, texture, pos=(0, 0)):
+    def raw_texture(self, texture, pos=(0, 0)):
         try:
             pg_texture = texture.data
         except AttributeError:
@@ -97,9 +84,6 @@ class PyGameCanvas(Canvas):
 
     def paint_pixel(self, pos, color=Color(0, 0, 0)):
         x, y = self._map_point(*pos)
-        # TODO: talvez use pygame.display.get_surface() para obter a tela
-        # correta
-        # http://stackoverflow.com/questions/10354638/pygame-draw-single-pixel
         self._screen.set_at(x, y, rgb(color))
 
     def clear_background(self, color=None):
@@ -112,9 +96,6 @@ class PyGameCanvas(Canvas):
 
 
 class PyGameInput(Input):
-
-    '''Implementa a interface Input através do Pygame.'''
-
     def __init__(self):
         super(PyGameInput, self).__init__()
         _pg = pygame
@@ -127,7 +108,7 @@ class PyGameInput(Input):
         )
         D['return'] = _pg.K_RETURN
 
-        # Adiciona as letras e números
+        # Add letters and numbers
         for c in '0123456789' + string.ascii_lowercase:
             D[c] = getattr(_pg, 'K_' + c)
 
@@ -140,7 +121,6 @@ class PyGameInput(Input):
             5: 'wheel-down'
         }
 
-    # Laço principal de escuta de eventos #####################################
     def poll(self):
         key_get = self._key_conversions.get
         mouse_button_get = self._mouse_conversions.get

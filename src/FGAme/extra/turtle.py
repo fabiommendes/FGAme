@@ -236,7 +236,7 @@ def _animate_move_factory(method):
     return animated
 
 G = globals()
-for name in ['fwd', 'forward', 'back', 'backwards', 'move', 'goto']:
+for name in ['fwd', 'forward', 'back', 'backwards', 'imove', 'goto']:
     G[name] = _animate_move_factory(name)
 del G, name
 

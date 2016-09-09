@@ -1,13 +1,10 @@
-from ...mathtools import sqrt, shapes
-from . import LinearRigidBody
-
-
-__all__ = ['AABB']
+from FGAme.mathtools import sqrt, shapes, Vec2
+from FGAme.physics.bodies.body import LinearRigidBody
+from FGAme.physics.collision import get_collision, Collision
 
 
 class AABB(LinearRigidBody):
-
-    '''Define um objeto físico que responde a colisões como uma caixa de
+    """Define um objeto físico que responde a colisões como uma caixa de
     contorno alinhada aos eixos.
 
     Deve ser inicializada ou por uma tupla com os valores (xmin, xmax, ymin,
@@ -48,35 +45,32 @@ class AABB(LinearRigidBody):
         >>> A.mass, A.inertia  # 20.000 == 200 x 100
         (20000.0, inf)
 
-    '''
+    """
 
-    __slots__ = []
+    __slots__ = ()
 
     def __init__(self, xmin=None, xmax=None, ymin=None, ymax=None,
-                 pos=None, vel=(0, 0), mass=None, density=None,
-                 bbox=None, shape=None, rect=None, **kwds):
-
-        # Define as propriedades das caixas de contorno
-        xmin, xmax, ymin, ymax = shapes.aabb_bbox(bbox=bbox, rect=rect,
-                                                  shape=shape, pos=pos,
-                                                  xmin=xmin, xmax=xmax,
-                                                  ymin=ymin, ymax=ymax)
+                 pos=None, vel=(0, 0), shape=None, rect=None, **kwds):
+        xmin, xmax, ymin, ymax = shapes.aabb_coords(
+            xmin, xmax, ymin, ymax,
+            rect=rect, shape=shape, pos=pos
+        )
 
         pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
         aabb = shapes.AABB(-dx, dx, -dy, dy)
-        super(AABB, self).__init__(pos, vel, mass=mass, density=density,
-                                   baseshape=aabb, 
+        super(AABB, self).__init__(pos, vel,
+                                   base_shape=aabb,
                                    cbb_radius=sqrt(dx ** 2 + dy ** 2), **kwds)
-        
+
     def __repr__(self):
         tname = type(self).__name__
         if not self._invmass:
             tname += '*'
         vel = ', '.join('%.1f' % x for x in self._vel)
-        data = ', '.join('%.1f' % x for x in self.bbox)
-        return '%s(bbox=[%s], vel=(%s))' % (tname, data, vel)
+        data = ', '.join('%.1f' % x for x in self.rect_coords)
+        return '%s(%s, vel=(%s))' % (tname, data, vel)
 
     @property
     def aabb(self):
@@ -139,8 +133,25 @@ class AABB(LinearRigidBody):
         return (a ** 2 + b ** 2) / 3
 
 
-assert AABB.__name__ == 'AABB'
+@get_collision.overload([AABB, AABB])
+def collision_aabb(A, B):
+    # Detects collision using bounding box shadows.
+    x0, x1 = max(A.xmin, B.xmin), min(A.xmax, B.xmax)
+    y0, y1 = max(A.ymin, B.ymin), min(A.ymax, B.ymax)
+    dx = x1 - x0
+    dy = y1 - y0
+    if x1 < x0 or y1 < y0:
+        return None
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+    # Chose collision center as the center point in the intersection
+    pos = Vec2((x1 + x0) / 2, (y1 + y0) / 2)
+
+    # Normal is the direction with smallest penetration
+    if dy < dx:
+        delta = dy
+        normal = Vec2(0, (1 if A.pos.y < B.pos.y else -1))
+    else:
+        delta = dx
+        normal = Vec2((1 if A.pos.x < B.pos.x else -1), 0)
+
+    return Collision(A, B, pos=pos, normal=normal, delta=delta)

@@ -161,10 +161,10 @@ source = '''
         foo: bar
 
         @long-press(up):
-            self.move(0, 10)
+            self.imove(0, 10)
 
         @long-press(down):
-            self.move(0, -10)
+            self.imove(0, -10)
 
     bar:
         sdfsdfsd sdfsdf

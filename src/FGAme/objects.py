@@ -1,94 +1,74 @@
-'''
+"""
 Re-define os objetos do módulo FGAme.physics e adiciona propriades extras de
 renderização
-'''
+"""
 
 from FGAme import conf
-from FGAme import physics
-from FGAme.mathtools import asvector
-from FGAme.util import lazy
-from FGAme.draw import Color, colorproperty, Image
-from FGAme.events import signal, EventDispatcher
 from FGAme import draw
+from FGAme import physics
+from FGAme.draw import Color, colorproperty, Image
+from FGAme.mathtools import asvector
+from FGAme.utils import lazy
 
-# Constantes
-__all__ = ['AABB', 'Circle', 'Poly', 'RegularPoly', 'Rectangle']
+__all__ = [
+    'AABB', 'Circle',  'Poly', 'RegularPoly', 'Rectangle',
+]
 black = Color('black')
 
 
 class Body(physics.Body):
-    long_press = signal(
-        'long-press', 'key', delegate_to='_input')
-    
-    key_up = signal(
-        'key-up', 'key', delegate_to='_input')
-    
-    key_down = signal(
-        'key-down', 'key', delegate_to='_input')
-    
-    mouse_motion = signal(
-        'mouse-motion', delegate_to='_input')
-    
-    mouse_button_up = signal(
-        'mouse-button-up', 'button', delegate_to='_input')
-    
-    mouse_button_down = signal(
-        'mouse-button-down', 'button', delegate_to='_input')
-    
-    mouse_long_press = signal(
-        'mouse-long-press', 'button', delegate_to='_input')
-
-    def __init__(self, *args, **kwds):
-        # Extract visualization parameters
+    def __init__(self, *args, **kwargs):
+        # Visualization parameters
         image = {
-            'image': kwds.pop('image', None)
-            }
-        for k in list(kwds):
+            'image': kwargs.pop('image', None)
+        }
+        for k in list(kwargs):
             if k.startswith('image_'):
-                image[k] = kwds.pop(k)
-        self.color = kwds.pop('color', black)
-        self.linecolor = kwds.pop('linecolor', None)
-        self.linewidth = kwds.pop('linewidth', 1)
-        self.visible = kwds.pop('visible', True)
+                image[k] = kwargs.pop(k)
+        self.color = kwargs.pop('color', black)
+        self.linecolor = kwargs.pop('linecolor', None)
+        self.linewidth = kwargs.pop('linewidth', 1)
+        self.visible = kwargs.pop('visible', True)
 
         # Set the correct world
-        self.world = kwds.pop('world', None)
+        self.world = kwargs.pop('world', None)
 
         # Init physics object and visualization
-        super().__init__(*args, **kwds)
+        super().__init__(*args, **kwargs)
         self.__init_image(**image)
 
-
-
-    def __init_image(self, image, image_offset=(0, 0), image_reference=None, **kwds):
+    def __init_image(self, image, image_offset=(0, 0), image_reference=None,
+                     **kwargs):
         self._image = None
         self._drawshape = None
-        
+
         if image is not None:
             # Get all image parameters
-            img_kwds = {}
-            for k, v in kwds.items():
+            img_kwargs = {}
+            for k, v in kwargs.items():
                 if k.startswith('image_'):
-                    img_kwds[k[6:]] = v 
-            
+                    img_kwargs[k[6:]] = v
+
             if isinstance(image, str):
-                image = Image(image, self.pos, **img_kwds)
+                image = Image(image, self.pos, **img_kwargs)
             else:
                 raise NotImplementedError
             self._image = image
-            
+
             offset = asvector(image_offset)
-            if image_reference in ['pos_ne', 'pos_nw', 'pos_se', 'pos_sw', 
-                                   'pos_left', 'pos_right', 'pos_up', 'pos_down']:
+            if image_reference in ['pos_ne', 'pos_nw', 'pos_se', 'pos_sw',
+                                   'pos_left', 'pos_right', 'pos_up',
+                                   'pos_down']:
                 pos_ref = getattr(self, image_reference)
                 pos_img_ref = getattr(image, image_reference)
                 offset += pos_ref - pos_img_ref
             elif image_reference not in ['middle', None]:
-                raise ValueError('invalid image reference: %r' % image_reference)
+                raise ValueError(
+                    'invalid image reference: %r' % image_reference)
             image.offset = offset
         else:
-            self._drawshape = self._init_drawshape(color=self.color or black, 
-                                                   linecolor=self.linecolor, 
+            self._drawshape = self._init_drawshape(color=self.color or black,
+                                                   linecolor=self.linecolor,
                                                    linewidth=self.linewidth)
 
     @lazy
@@ -118,7 +98,7 @@ class Body(physics.Body):
     @property
     def drawable(self):
         return self.image or self.drawshape
-    
+
     @property
     def drawshape(self):
         if self._drawshape is None:
@@ -127,19 +107,26 @@ class Body(physics.Body):
         return self._drawshape
 
     def show(self):
-        '''Torna o objeto visível no mundo'''
-        
+        """
+        Makes object visible.
+        """
+
         self.visible = True
 
     def hide(self):
-        '''Desativa a renderização do objeto. O objeto ainda interage com os 
-        outros objetos do mundo, somente não é mostrado na tela.'''
-        
+        """
+        Makes object invisible.
+
+        It keeps interacting with the wold, but it is not shown on the screen.
+        """
+
         self.visible = False
 
     def draw(self, screen):
-        '''Desenha objeto em uma tela do tipo "canvas".'''
-        
+        """
+        Draw object in a canvas-like screen.
+        """
+
         img = self.image
         if img is not None:
             img.pos = self.pos + img.offset
@@ -147,32 +134,41 @@ class Body(physics.Body):
         else:
             return self.draw_shape(screen)
 
+    def draw_shape(self, screen):
+        """
+        Draw a shape identical to the object's bounding box.
+        """
+
+        raise NotImplementedError('must be implemented on subclass.')
+
     def destroy(self):
         super().destroy()
         self.world.remove(self)
-    
+
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
         bbox = self.bb
         cls = getattr(draw, type(bbox).__name__)
         return cls(*bbox, color=color, linecolor=linecolor, linewidth=linewidth)
-        
+
 
 class AABB(Body, physics.AABB):
-    '''Objeto com a caixa de contorno de colisões dada por uma AABB.
-    
-    Objetos do tipo AABB não pode realizar rotações e possuem um momento
-    de inércia infinito.
-    '''
+    """
+    Object with an axis aligned bounding box.
+
+    AABB objects cannot rotate and thus have an infinite inertia.
+    """
 
     def draw_shape(self, screen):
+        bb = self.bb
+
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_aabb(self.aabb, color, lw, lc)
+            screen.draw_aabb(bb, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_aabb(self.aabb, black, lw, lc)
+            screen.draw_aabb(bb, black, lw, lc)
 
     @property
     def drawshape(self):
@@ -183,33 +179,29 @@ class AABB(Body, physics.AABB):
         self._drawshape.ymin = self.ymin
         self._drawshape.ymax = self.ymax
         return self._drawshape
-    
+
 
 class Circle(Body, physics.Circle):
-    '''Objeto com a caixa de contorno circular.
-    
-    Círculos possuem rotação, apesar da mesma não ser renderizada na tela. Para
-    criar um círculo irrotacional, é necessário iniciar com o momento de inércia
-    infinito.'''
+    """
+    Object with a circular bounding box.
+    """
 
     def draw_shape(self, screen):
+        bb = self.bb
         if self._color is not None:
             color = self._color
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bb, color, lw, lc)
+            screen.draw_circle(bb, color, lw, lc)
 
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
-            screen.draw_circle(self.bb, black, lw, lc)
+            screen.draw_circle(bb, black, lw, lc)
 
 
 class Poly(Body, physics.Poly):
-    '''Objeto com a caixa de contorno poligonal.
-    
-    Polígonos são as caixas de contorno mais versáteis que a FGAme suporta. 
-    Observe que a poligonal deve ser convexa e definida no sentido anti-
-    horário. Apesar da versatilidade, colisões do tipo polígono-polígono são 
-    as mais caras de processar.'''
+    """
+    Object with a convex polygonal bounding box.
+    """
 
     def draw_shape(self, screen):
         if self._color is not None:
@@ -220,29 +212,24 @@ class Poly(Body, physics.Poly):
         elif self.linewidth:
             lw, lc = self.linewidth, self._linecolor
             screen.draw_poly(self.bb, black, lw, lc)
-    
+
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
-        return draw.Poly(self.bb, color=color, linecolor=linecolor, 
+        return draw.Poly(self.bb,
+                         color=color, linecolor=linecolor,
                          linewidth=linewidth)
-    
+
 
 class Rectangle(Poly, physics.Rectangle):
-    '''Semelhante a Poly, mas restrito a retângulos.
-    
-    Caso o usuário deseje trabalhar com retângulos, esta classe torna-se mais
-    conveniente de trabalhar que a classe genérica Poly.'''
+    """
+    Similar to Poly, but all instances are rectangles.
+
+    This is useful if you want an AABB that needs to rotate.
+    """
 
 
 class RegularPoly(Poly, physics.RegularPoly):
-    '''Semelhante a Poly, mas restrito a polígonos regulares.'''
+    """
+    Similar to Poly, but restricted to regular polygons.
+    """
 
-    
-class Group(Body, physics.Group):
-    def draw(self, screen):
-        for obj in self:
-            obj.draw(screen) 
-    
-if __name__ == '__main__':
-    x = AABB(shape=(100, 200), world=set())
-    type(x)
-    print(x.mass)
+

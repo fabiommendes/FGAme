@@ -7,8 +7,10 @@ GLOBAL_INFO = None
 
 
 def get_info():
-    '''Retorna um dicionário mapeando cada backend com um dicionário que
-    mapeia 'input', 'screen' e 'mainloop' nos nomes das respectivas classes'''
+    """
+    Retorna um dicionário mapeando cada backend com um dicionário que
+    mapeia 'input', 'screen' e 'mainloop' nos nomes das respectivas classes.
+    """
 
     global GLOBAL_INFO
 
@@ -32,7 +34,7 @@ def get_info():
 
 
 def get_backend_classes(backend):
-    '''Retorna um dicionário mapeando 'input', 'screen' e 'mainloop' nas
+    """Retorna um dicionário mapeando 'input', 'screen' e 'mainloop' nas
     respectivas classes para o backend selecionado.
 
     Exemplos
@@ -44,7 +46,7 @@ def get_backend_classes(backend):
     ...       'mainloop': pygame_be.PyGameMainLoop,
     ...       'screen':   pygame_be.PyGameCanvas}
     True
-    '''
+    """
 
     get_info()[backend]
     classes = ('input', 'mainloop', 'screen')
@@ -52,7 +54,7 @@ def get_backend_classes(backend):
 
 
 def _get_class_worker(cls, backend):
-    '''Implementa as funções get_screen, get_input, get_mainloop, etc'''
+    """Implementa as funções get_screen, get_input, get_mainloop, etc"""
 
     D = get_info()[backend]
     module = importlib.import_module('FGAme.backends.%s_be' % backend)
@@ -60,25 +62,25 @@ def _get_class_worker(cls, backend):
 
 
 def get_screen_class(backend):
-    '''Retorna a classe de screen para o backend selecionado'''
+    """Retorna a classe de screen para o backend selecionado"""
 
     return _get_class_worker('screen', backend)
 
 
 def get_input_class(backend):
-    '''Retorna a classe de input para o backend selecionado'''
+    """Retorna a classe de input para o backend selecionado"""
 
     return _get_class_worker('input', backend)
 
 
 def get_mainloop_class(backend):
-    '''Retorna a classe de mainloop para o backend selecionado'''
+    """Retorna a classe de mainloop para o backend selecionado"""
 
     return _get_class_worker('mainloop', backend)
 
 
 def supports_backend(backend):
-    '''Retorna True caso o backend fornecido seja suportado'''
+    """Retorna True caso o backend fornecido seja suportado"""
 
     imports = get_info()[backend]['imports']
     try:

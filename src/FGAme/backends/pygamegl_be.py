@@ -1,11 +1,10 @@
 from FGAme.backends.pygame import PyGameCanvas
 
-class PyGameGLCanvas(PyGameCanvas):
-    '''Implementa a interface Screen, utilizando a biblioteca Pygame'''
 
+class PyGameGLCanvas(PyGameCanvas):
     def __init__(self, w, h, *args, **kwds):
         kwds['set_mode_args'] = [HWSURFACE|OPENGL|DOUBLEBUF]
-        super(PyGameGLScreen, self).__init__(w, h, *args, **kwds)
+        super().__init__(w, h, *args, **kwds)
 
     def show(self):
         pygame.display.flip()

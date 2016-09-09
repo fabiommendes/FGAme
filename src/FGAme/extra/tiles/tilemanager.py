@@ -130,7 +130,7 @@ class TileManager(object):
                 raise ValueError('%r is not a valid tile name' % name)
 
         tile = tile.copy()
-        tile.move(x0 + i * dx, y0 + j * dy)
+        tile.imove(x0 + i * dx, y0 + j * dy)
         self.tiles.append(TileSpec(tile, layer))
 
     def add_tilemap(self, data):

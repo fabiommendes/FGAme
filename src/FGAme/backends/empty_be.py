@@ -1,15 +1,12 @@
 from FGAme.screen import Canvas
 from FGAme.input import Input
-from FGAme.mainloop import MainLoop  # @UnusedImport
+from FGAme.mainloop import MainLoop
 
 
 class EmptyCanvas(Canvas):
-
-    '''Um canvas que não faz nada. Útil para testar outros subsistemas da
-    FGAme'''
-
     def __do_nothing(self, *args, **kwds):
         pass
+
     show = flip = \
         draw_raw_aabb_solid = draw_raw_aabb_border = \
         draw_raw_circle_solid = draw_raw_circle_border = \
@@ -21,6 +18,5 @@ class EmptyCanvas(Canvas):
 
 
 class EmptyInput(Input):
-
     def poll(self):
         pass

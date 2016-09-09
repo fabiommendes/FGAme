@@ -1,23 +1,34 @@
-from math import sqrt
-from FGAme.mathtools import Vec2, asvector
+import copy
+from _warnings import warn
+from math import sqrt, pi
+
+from generic import generic
+
+from FGAme.mathtools import Vec2, asvector, ux2D
+
+DEFAULT_DIRECTIONS = [ux2D.rotate(n * pi / 12) for n in
+                      [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11]]
 
 
-#
-# Pontos de Contato/Manifolds
-#
+class CollisionError(Exception):
+    """
+    Error during collision detection.
+    """
+
+
 class ContactPoint(Vec2):
-    """Representa um ponto de contato com um certo nível de penetração"""
+    """
+    A contact point with a level of penetration.
+    """
 
-    __slots__ = ['depth']
+    __slots__ = ('depth',)
 
     def __init__(self, x, y, depth):
-        super(Vec2, self).__init__(x, y)
+        super().__init__(x, y)
         self.depth = depth
 
 
 class BaseContactManifold(object):
-    """Classe mãe para ContactManifold restitution SimpleContactManifold"""
-
     def __iter__(self):
         return iter(self.points)
 
@@ -26,10 +37,10 @@ class ContactManifold(BaseContactManifold):
     """Representa uma lista de pontos de contato associados a uma única
     normal."""
 
-    __slots__ = ['normal', 'points']
+    __slots__ = ('normal', 'points')
 
     def __init__(self, normal, points):
-        self.normal = normal.normalized()
+        self.normal = normal.normalize()
         self.points = list(points)
 
 
@@ -50,26 +61,10 @@ class SimpleContactManifold(BaseContactManifold):
         yield self.point
 
 
-#
-# Contatos abstratos
-#
 class Pair(object):
-    """Representa alguma ligação, conexão ou agrupamento de dois objetos"""
-
-    # Weak refs
-    # __slots__ = ('_A', '_B')
-    #
-    # def __init__(self, A, B):
-    #    self._A = ref(A)
-    #    self._B = ref(B)
-    #
-    # @property
-    # def A(self):
-    #    return self._A()
-    #
-    # @property
-    # def B(self):
-    #    return self._B()
+    """
+    A pair of physical objects.
+    """
 
     __slots__ = ('_A', '_B')
 
@@ -77,60 +72,6 @@ class Pair(object):
         self.A = A
         self.B = B
 
-    def swap(self):
-        """Troca os dois objetos do par *INPLACE*"""
-
-        self.B, self.A = self.A, self.B
-
-    def swapped(self):
-        """Retorna um par com os elementos trocados"""
-
-        new = self.copy()
-        new.swap()
-        return new
-
-    def other(self, obj):
-        """Se for chamada com o objeto A, retorna o objeto B e vice-versa"""
-
-        if obj is self.A:
-            return self.B
-        elif obj is self.B:
-            return self.A
-        else:
-            raise ValueError('object does not participate in the connection')
-
-    def isvalid(self):
-        """Retorna True caso o contato ainda seja válido ou False caso já tenha
-        sido desfeito."""
-
-        raise NotImplementedError
-
-    def update(self):
-        """Recalcula todas as propriedades que modem ser modificadas de um
-        frame para o outro"""
-
-        raise NotImplementedError
-
-    #
-    # Propriedades físicas
-    #
-    def center_of_mass(self):
-        A, B = self
-        return (A. mass * A.pos + B.mass * B.pos) / (A.mass + B.mass)
-
-    def energyK(self):
-        return self.A.energyK() + self.B.energyK()
-
-    def momentumP(self):
-        return self.A.momentumP() + self.B.momentumP()
-
-    def momentumL(self):
-        pos = (0, 0)
-        return self.A.momentumL(pos) + self.B.momentumL(pos)
-
-    #
-    # Magic methods
-    #
     def __eq__(self, other):
         return self is other
 
@@ -152,113 +93,102 @@ class Pair(object):
     def __contains__(self, element):
         return element is self.A or element is self.B
 
+    def iswap(self):
+        """
+        Swap objects *INPLACE*.
+        """
+
+        self.B, self.A = self.A, self.B
+
+    def swap(self):
+        """
+        Return a new pair of swap objects.
+        """
+
+        new = self.copy()
+        new.iswap()
+        return new
+
+    def other(self, obj):
+        """
+        Return the other object in the pair.
+
+        Raises ValueError if obj is not in the pair.
+        """
+
+        if obj is self.A:
+            return self.B
+        elif obj is self.B:
+            return self.A
+        else:
+            raise ValueError('object does not participate in the connection')
+
+    def copy(self):
+        """
+        Return a copy of pair
+        """
+
+        return copy.copy(self)
+
+    def center_of_mass(self):
+        """
+        Center of mass of the two objects.
+        """
+
+        A, B = self
+        return (A.mass * A.pos + B.mass * B.pos) / (A.mass + B.mass)
+
+    def energyK(self):
+        """
+        Total kinetic energy.
+        """
+        return self.A.energyK() + self.B.energyK()
+
+    def momentumP(self):
+        """
+        Total linear momentum.
+        """
+        return self.A.momentumP() + self.B.momentumP()
+
+    def momentumL(self):
+        """
+        Total angular momentum.
+        """
+
+        pos = (0, 0)
+        return self.A.momentumL(pos) + self.B.momentumL(pos)
+
 
 class BroadContact(Pair):
-    """Representa um contato na Broad phase"""
+    """
+    Contact in broad phase.
+
+    Objects are close to each other and might or might not be touching.
+    """
 
     def get_collision(self):
-        """Retorna o objecto de collisão associado ao contato. Caso não haja
-        colisão, retorna None"""
+        """
+        Return the collision object if there is superposition.
+        """
 
         raise NotImplementedError
 
 
 class CBBContact(BroadContact):
-    """Representa um par de objetos com caixas de contorno circulares que
-    se sobrepõem"""
-
-    pass
+    """
+    Broad phase contact using circular bounding boxes.
+    """
 
 
 class AABBContact(BroadContact):
-    """Representa um par de objetos com caixas de contorno alinhadas ao eixo
-    que se sobrepõem"""
-
-    pass
-
-
-###############################################################################
-#                         Classe Colisão
-# ----------------------------------------------------------------------------
-#
-# Representa uma colisão entre dois objetos.  Resolve a colisão sob demanda.
-#
-###############################################################################
+    """
+    Broad phase contact using AABBs.
+    """
 
 
 class Collision(Pair):
-    """Representa a colisão entre dois objetos.
-
-    Subclasses de Collision devem implementar o método .resolve() que resolve
-    a colisão entre os dois objetos.
-
-    Example
-    -------
-
-    Considere a colisão unidimensional entre dois círculos
-
-    >>> from FGAme.physics import Circle, flags
-    >>> A = Circle(1, pos=(0, 1), mass=1, vel=(1, 0))
-    >>> B = Circle(1, pos=(2, 1), mass=1)
-
-    A colisão unidimensional de dois objetos de mesma massa simplesmente troca
-    as velocidades. Antes disso, no entanto, é necessário passar os parâmetros
-    de colisão para que se possa calcular os resultados.
-
-    >>> col = Collision(A, B,
-    ...                 pos=(1, 1),    # ponto de colisão
-    ...                 normal=(1, 0)) # normal da colisão
-
-    Podemos investigar as propriedades físicas da colisão restitution verificar
-    que as leis de conservação são preservadas
-
-    >>> col.energyK(); col.momentumP(); col.momentumL()
-    0.5
-    Vec(1, 0)
-    -1.0
-
-    Podemos resolver a colisão utilizando ou o método step() ou o resolve(). O
-    segundo é chamado apenas uma vez restitution já aciona os sinais de
-    colisão. O método step() é utilizado em resoluções iterativas com vários
-    objetos colidindo simultaneamente.
-
-    >>> col.resolve()
-
-    Agora investigamos os valores finais restitution vemos que as leis de
-    conservação foram satisfeitas.
-
-    >>> col.energyK(); col.momentumP(); col.momentumL()
-    0.5
-    Vec(1, 0)
-    -1.0
-
-    Investigando as propriedades, verificamos que de fato a velocidade dos dois
-    objetos foi invertida
-
-    >>> A.vel; B.vel
-    Vec(0, 0)
-    Vec(1, 0)
-
-
-    Suponha agora que a colisão não se deu no ponto selecionado anteriormente.
-
-    >>> A.vel, B.vel = (1, 0), (0, 0)
-    >>> col = Collision(A, B,
-    ...                 pos=(0, 0),    # ponto de colisão
-    ...                 normal=(1, 0)) # normal da colisão
-
-    Esta posição induz a uma velocidade de rotação e transferência de energia
-    de movimento linear para angular.
-
-    >>> col.resolve()
-    >>> A.linearK() + B.linearK(), A.angularK() + B.angularK(), col.energyK()
-    (0.2777777777777778, 0.2222222222222222, 0.5)
-
-    As leis de conservação continuam sendo satisfeitas
-    >>> col.energyK(); col.momentumP(); col.momentumL()
-    0.5
-    Vec(1, 0)
-    -1.0
+    """
+    Collision between two overlapping objects.
     """
 
     def __init__(self, A, B, normal=None, pos=None, delta=0.0):
@@ -266,79 +196,87 @@ class Collision(Pair):
         self.normal = normal = asvector(normal)
         self.pos = pos = asvector(pos)
         self.delta = delta = float(delta)
-        self.active = True
-
-        # Obtêm parâmetros da colisão
         self.restitution = sqrt(A.restitution * B.restitution)
         self.friction = sqrt(A.friction * B.friction)
+        self.active = True
+
+    def iswap(self):
+        super().iswap()
+        self.normal *= -1
 
     def resolve(self):
-        """Resolve as velocidades dos elementos que participam da colisão"""
-        
+        """
+        Solve for velocities of each element in the collision pair.
+        """
+
         if self.friction:
             self.__resolve_with_friction()
         else:
             self.__resolve_simple()
-    
+
     def __resolve_simple(self):
-        """Resolve colisões simples sem atrito"""
-        
+        """
+        Solve frictionless collision.
+        """
+
         A, B = self
-        normal = self.normal
         pos = self.pos
+        normal = self.normal
         vrel = B.vpoint(pos) - A.vpoint(pos)
         vrel_normal = vrel.dot(normal)
 
         if vrel_normal < 0:
-            # Posições e velocidades relativas
-            rA = self.pos - A.pos
-            rB = self.pos - B.pos
-    
-            # Massa efetiva
+            # Relative positions
+            rA = pos - A.pos
+            rB = pos - B.pos
+
+            # Effective mass
             invmass = A.invmass + B.invmass
             invmass += A.invinertia * (rA.cross(normal) ** 2)
             invmass += B.invinertia * (rB.cross(normal) ** 2)
             effmass = 1.0 / invmass
-    
-            # Impulso normal
+
+            # Normal impulse
             Jn = effmass * (1 + self.restitution) * vrel_normal
             Jvec = Jn * normal
-            
-            # Aplica impulso total
-            A.apply_impulse(Jvec, pos=pos)
-            B.apply_impulse(-Jvec, pos=pos)
+
+            # Total impulse
+            A.apply_impulse_at(Jvec, pos)
+            B.apply_impulse_at(-Jvec, pos)
 
     def __resolve_with_friction(self):
-        """Resolve colisões simples com atrito"""
+        """
+        Solve collision with friction.
+        """
 
         A, B = self
         normal = self.normal
         pos = self.pos
         vrel = B.vpoint(pos) - A.vpoint(pos)
         vrel_normal = vrel.dot(normal)
-        friction = self.friction  
+        friction = self.friction
         restitution = self.restitution
-        
+
         if vrel_normal < 0:
-            # Escolhe o vetor tangente
+            # Tangent vector
             tangent = normal.perp()
             vrel_tangent = vrel.dot(tangent)
             if vrel_tangent < 0:
                 vrel_tangent *= -1
                 tangent *= -1
-            
-            # Parâmetros úteis
+
+            # Relative positions
             rA = pos - A.pos
             rB = pos - B.pos
             rA_n, rA_t = rA.dot(normal), rA.dot(tangent)
             rB_n, rB_t = rB.dot(normal), rB.dot(tangent)
 
-            # Massas efetivas inversas 
-            invmassN = (A.invmass + A.invinertia * rA.cross(normal)**2 +  
-                        B.invmass + B.invinertia * rB.cross(normal)**2)
-            invmassT = (A.invmass + A.invinertia * rA.cross(tangent)**2 +  
-                        B.invmass + B.invinertia * rB.cross(tangent)**2)
-            invmassD = A.invinertia * rA_n * rA_t + B.invinertia * rB_n * rB_t  
+            # Inverse effective masses
+            invmassN = (A.invmass + A.invinertia * rA.cross(normal) ** 2 +
+                        B.invmass + B.invinertia * rB.cross(normal) ** 2)
+            invmassT = (A.invmass + A.invinertia * rA.cross(tangent) ** 2 +
+                        B.invmass + B.invinertia * rB.cross(tangent) ** 2)
+            invmassD = A.invinertia * rA_n * rA_t + B.invinertia * rB_n * rB_t
 
             # Precisamos encontrar o valor do vetor J = Jn * n + Jt * t, onde
             # as componentes Jn e Jt são desconhecidas.
@@ -388,69 +326,80 @@ class Collision(Pair):
             # à da definição do coeficiente de restituição.
             #
 
-            # Primeiramente assumimos o caso não saturado.
-            Jn = (1 + restitution) * vrel_normal / (invmassN - friction * invmassD)
+            # Firstly, assume the non-saturated case.
+            Jn = (1 + restitution) * vrel_normal / (
+                invmassN - friction * invmassD)
             Jt = -friction * Jn
             vrel_tangent_out = vrel_tangent + invmassD * Jn - invmassT * Jt
-            
+
             # Verifica o sinal da velocidade de saída. Se for negativo, 
             # assume que o atrito saturou e que devemos usar o critério
             # de que a velocidade tangencial de saída deve ser nula.
             if vrel_tangent_out < 0:
-                denom = invmassT * invmassN - invmassD**2  # <= 0
-                Jn = ((1 + restitution) * vrel_normal * invmassT + 
+                denom = invmassT * invmassN - invmassD ** 2  # <= 0
+                Jn = ((1 + restitution) * vrel_normal * invmassT +
                       invmassD * vrel_tangent) / denom
-                Jt = ((1 + restitution) * vrel_normal * invmassD + 
+                Jt = ((1 + restitution) * vrel_normal * invmassD +
                       invmassN * vrel_tangent) / denom
 
-                # Roubo?
+                # Is it fair?
                 if Jt < 0:
                     Jtmax = vrel_tangent / (invmassD / friction + invmassT)
                     Jn = (1 + restitution) * vrel_normal / invmassN
                     Jt = min(-friction * Jn, Jtmax)
-        
-            # Aplica impulso total
+
+            # Total impulse
             Jvec = Jn * normal + Jt * tangent
-            A.apply_impulse(Jvec, pos=pos)
-            B.apply_impulse(-Jvec, pos=pos)
+            A.apply_impulse_at(Jvec, pos=pos)
+            B.apply_impulse_at(-Jvec, pos=pos)
 
     def cancel(self):
-        """Cancela a colisão"""
-        
+        """
+        Cancel collision resolution.
+        """
+
         self.active = False
 
     def pre_collision(self):
-        """Dispara sinais antes de resolver a colisão""" 
-    
+        """
+        Executed before solving collisions.
+        """
+
         A, B = self
-        A.trigger_pre_collision(self)
-        B.trigger_pre_collision(self)
-        #if self.active:
-        #    if A.invmass:
-        #        A.collisions.append(self)
-        #    if B.invmass:
-        #        B.collisions.append(self)
-    
+        # A.trigger_pre_collision(self)
+        # B.trigger_pre_collision(self)
+        if self.active:
+            if A.invmass:
+                A.collisions.append(self)
+            if B.invmass:
+                B.collisions.append(self)
+
     def post_collision(self):
-        """Dispara sinais após resolver a colisão"""
-        
+        """
+        Executed after solving collisions.
+        """
+
         A, B = self
-        A.trigger_post_collision(self)
-        B.trigger_post_collision(self)
-        #if A.invmass:
-        #    A.collisions.remove(self)
-        #if B.invmass:
-        #    B.collisions.remove(self)
+        # A.trigger_post_collision(self)
+        # B.trigger_post_collision(self)
+        if A.invmass:
+            A.collisions.remove(self)
+        if B.invmass:
+            B.collisions.remove(self)
 
     def is_simple(self):
-        """Retorna True se o contato for o único contato de ambos os objetos
-        envolvidos"""
+        """
+        Return True if the current collision is the only contact for both
+        objects.
+        """
 
         return (len(self.A._contacts) <= 1) and (len(self.B._contacts) <= 1)
 
     def remove_overlap(self, beta=1.0):
-        """Remove a superposição entre os objetos movendo cada objeto por uma
-        fração inversamente proporcional às respectivas massas"""
+        """
+        Remove superposition between both objects by moving each one to a
+        distance inversely proportional to their masses.
+        """
 
         normal = self.normal
         A, B = self
@@ -461,9 +410,11 @@ class Collision(Pair):
         B.move((beta * b) * normal)
 
     def baumgarte(self, beta, mindelta=0.3):
-        """Realiza o ajuste de baumgarte para remover gradualmente a 
-        superposição entre dois objetos."""
-        
+        """
+        Baumgarte correction that gradually removes superposition between two
+        objects.
+        """
+
         delta = self.delta
         if delta > mindelta:
             A, B = self
@@ -478,8 +429,11 @@ class Collision(Pair):
 
 
 class ContactOrdered(Collision):
-    """Um objeto de contato em que o primeiro objeto é sempre mais pesado que
-    o segundo"""
+    """
+    Ordered collision object in which the first object is always heavier.
+
+    It might swap A and B during creation.
+    """
 
     def __init__(self, A, B, world=None, pos=None, normal=None, **kwds):
         if A._invmass > B._invmass:
@@ -488,13 +442,22 @@ class ContactOrdered(Collision):
 
 
 class Island(object):
-
     def __init__(self, collisions):
         self.collisions = collisions
-        
-    
 
 
-if __name__ == '__main__':
-    import doctest
-    doctest.testmod()
+@generic
+def get_collision(A, B, collision_class=Collision):
+    """
+    Return a collision object between A and B or None if there is no
+    superposition.
+
+    This is a multi-dispatch function. Derived classes must implement each
+    collision pair or else objects will not collide.
+    """
+
+    tA = type(A).__name__
+    tB = type(B).__name__
+    warn('no collision defined for: (%s, %s)' % (tA, tB))
+
+    return None

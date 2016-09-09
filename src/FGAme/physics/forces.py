@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-'''
+"""
 ======
 Forças
 ======
@@ -87,17 +87,16 @@ de `Pool` ou de `ConservativePool`
 
 .. autoclass::GravityPool
 .. autoclass::SpringPool
-'''
+"""
 
-from FGAme.mathtools import Vec2, null2D, asvector
+from FGAme.mathtools import Vec2, null2D
 
 EMPTY_FORCE = lambda t: null2D
 NO_UPDATE = object()
 
 
 class ForceProperty(object):
-
-    '''Implementa o atributo obj.force dos objetos da classe Body.
+    """Implementa o atributo obj.force dos objetos da classe Body.
 
     ForceProperty facilita a composição de forças num mesmo objeto e apresenta
     um sintaxe conveniente para especificar as forças atuantes em um objeto.
@@ -180,7 +179,7 @@ class ForceProperty(object):
     Caso não possua nenhuma força registrada no objeto, é garantido que o
     atributo obj._force possui a identidade da função EMPTY_FORCE, que recebe
     um argumento temporal e retorna sempre o vetor nulo.
-    '''
+    """
 
     def __get__(self, obj, cls):
         if obj is None:
@@ -205,41 +204,51 @@ class ForceProperty(object):
 
 
 class ForceCtrl(object):
-
-    '''
+    """
     Controla as operações com forças em um objeto. Pode ser chamado com um
     argumento numérico para calcular a força. Também aceita o idioma de
     composição de forças descrito na classe ForceProperty
-    '''
+    """
 
     def __init__(self, obj):
         self._funcs = []
         self._obj = obj
         self._fast = EMPTY_FORCE
 
-    def define(self, force):
-        '''Limpa todas as forças anteriores e redefine o objeto de força.
+    def __call__(self, t):
+        return self._fast(t)
 
-        Pode ser chamado como um decorador.'''
+    def __iadd__(self, other):
+        self.add(other)
+        return NO_UPDATE
+
+    def __imul__(self, other):
+        self.mul(other)
+        return NO_UPDATE
+
+    def define(self, force):
+        """Limpa todas as forças anteriores e redefine o objeto de força.
+
+        Pode ser chamado como um decorador."""
 
         self.clear()
         self.add(force)
         return force
 
     def add(self, force):
-        '''Adiciona uma nova força à interação com a partícula.
+        """Adiciona uma nova força à interação com a partícula.
 
         O resultado é uma força cujo resultado é a soma de func(t) com as
         forças já definidas anteriormente.
-        '''
+        """
 
         self._funcs.append((None, force))
         self._update_fast()
         return force
 
     def mul(self, factor):
-        '''Multiplica todas as forças já definidas por uma constante
-        multiplicativa. A constante deve ser um número.'''
+        """Multiplica todas as forças já definidas por uma constante
+        multiplicativa. A constante deve ser um número."""
 
         assert not callable(factor)
         L = self._funcs
@@ -249,17 +258,16 @@ class ForceCtrl(object):
         self._update_fast()
 
     def clear(self):
-        '''Limpa todas as forças que atuam no objeto'''
+        """Limpa todas as forças que atuam no objeto"""
 
         self._funcs = []
         self._update_fast()
 
-    # Funções privadas -------------------------------------------------------
     def _update_fast(self):
-        '''Atualiza a função que calcula a força de acordo com os tipos de
+        """Atualiza a função que calcula a força de acordo com os tipos de
         transformações presentes até o momento.
 
-        Atualiza o método de acesso rápido do objeto em questão.'''
+        Atualiza o método de acesso rápido do objeto em questão."""
         if self._funcs:
             # Monta hierarquia de funções rápidas
             adds = [f for (k, f) in self._funcs if k is None]
@@ -299,8 +307,8 @@ class ForceCtrl(object):
             self._obj._force = EMPTY_FORCE
 
     def _make_fast_adds(self, adds):
-        '''Cria função que retorna a força como a soma de todas as forças na
-        lista adds'''
+        """Cria função que retorna a força como a soma de todas as forças na
+        lista adds"""
 
         adds = tuple(adds)
         assert None not in adds, adds
@@ -310,11 +318,12 @@ class ForceCtrl(object):
             for func in adds:
                 F += func(t)
             return F
+
         return fast_func
 
     def _make_fast_nmuls(self, nmuls):
-        '''Cria função que retorna a força como a soma do produto de cada
-        constante k com a força f presente como as tuplas (k, f) em nmuls'''
+        """Cria função que retorna a força como a soma do produto de cada
+        constante k com a força f presente como as tuplas (k, f) em nmuls"""
 
         nmuls = tuple(nmuls)
 
@@ -328,11 +337,12 @@ class ForceCtrl(object):
                     x, y = Fi
                     F += Vec2(k * x, k * y)
             return F
+
         return fast_func
 
     def _make_fast_fmuls(self, fmuls):
-        '''Cria função que retorna a força como a soma do produto de cada
-        constante k(t) com a força f presente como as tuplas (k, f) em fmuls'''
+        """Cria função que retorna a força como a soma do produto de cada
+        constante k(t) com a força f presente como as tuplas (k, f) em fmuls"""
 
         fmuls = tuple(fmuls)
 
@@ -347,29 +357,17 @@ class ForceCtrl(object):
                     x, y = Fi
                     F += Vec2(k * x, k * y)
             return F
+
         return fast_func
-
-    # Métodos mágicos --------------------------------------------------------
-    def __call__(self, t):
-        return self._fast(t)
-
-    def __iadd__(self, other):
-        self.add(other)
-        return NO_UPDATE
-
-    def __imul__(self, other):
-        self.mul(other)
-        return NO_UPDATE
 
 
 class Force(object):
-
-    '''Implementa uma força que atua em um conjunto de objetos.'''
+    """Implementa uma força que atua em um conjunto de objetos."""
 
     @classmethod
     def setting_force(cls, *args, **kwds):
-        '''Inicializa a força e já registra no atributo obj.force de todos os
-        objetos envolvidos'''
+        """Inicializa a força e já registra no atributo obj.force de todos os
+        objetos envolvidos"""
 
         if 'register' in kwds:
             raise TypeError('invalid argument: register')
@@ -382,7 +380,7 @@ class Force(object):
 #         Implementações de forças específicas -- forças de 1 objeto
 ###############################################################################
 def set_force_single(obj, func, mode):
-    '''Define uma força simples sobre a partícula `obj`.
+    """Define uma força simples sobre a partícula `obj`.
 
     Parameters
     ----------
@@ -414,16 +412,15 @@ def set_force_single(obj, func, mode):
     --------
 
     `Single`
-    '''
+    """
 
     return Single.setting_force(obj, func, mode)
 
 
 class Single(Force):
+    """Força simples aplicada a um objeto.
 
-    '''Força simples aplicada a um objeto.
-
-    Ver `set_force_single()` para descrição dos argumentos.'''
+    Ver `set_force_single()` para descrição dos argumentos."""
 
     def __init__(self, obj, func, mode='time', register=False):
         self._obj = obj
@@ -458,13 +455,12 @@ class Single(Force):
 
 
 def set_force_viscous(obj, gamma):
-    ''''''
+    """"""
     # TODO: documente-me!
     return Viscous.setting_force(obj, gamma)
 
 
 class Viscous(Single):
-
     def __init__(self, obj, gamma=0, register=False):
         self.gamma = gamma
         self._viscous_force = func = lambda v: -gamma * obj.vel
@@ -472,7 +468,7 @@ class Viscous(Single):
 
 
 def set_force_conservative(obj, force, potential):
-    '''Força conservativa que atua em um único objeto.
+    """Força conservativa que atua em um único objeto.
 
     Parameters
     ----------
@@ -488,15 +484,14 @@ def set_force_conservative(obj, force, potential):
 
     `Conservative`
 
-    '''
+    """
     return Conservative.setting_force(obj, force, potential)
 
 
 class Conservative(Single):
+    """Força conservativa que atua em um único objeto.
 
-    '''Força conservativa que atua em um único objeto.
-
-    Veja `set_force_conservative()` para descrição dos argumentos.'''
+    Veja `set_force_conservative()` para descrição dos argumentos."""
 
     def __init__(self, obj, func, potential, register=False):
         super(Conservative, self).__init__(
@@ -504,17 +499,17 @@ class Conservative(Single):
         self._potential = potential
 
     def energyT(self):
-        '''Energia total do par de partículas'''
+        """Energia total do par de partículas"""
 
         return self.obj.energyK() + self.energyU()
 
     def energyK(self):
-        '''Energia cinética do par de partículas'''
+        """Energia cinética do par de partículas"""
 
         return self.obj.energyK()
 
     def energyU(self):
-        '''Energia potencial do par de partículas'''
+        """Energia potencial do par de partículas"""
 
         return self.U(self.obj.pos)
 
@@ -522,7 +517,7 @@ class Conservative(Single):
 
 
 def set_force_gravity(obj, G, M=None, epsilon=0, pos=(0, 0)):
-    '''Força de gravitacional produzida por um objeto de massa "M" fixo na
+    """Força de gravitacional produzida por um objeto de massa "M" fixo na
     posição "pos".
 
     A expressão para o potencial gravitacional é
@@ -559,17 +554,16 @@ def set_force_gravity(obj, G, M=None, epsilon=0, pos=(0, 0)):
     --------
 
     `Gravity`
-    '''
+    """
 
     return Gravity.setting_force(obj, G=G, M=M, epsilon=epsilon, pos=pos)
 
 
 class Gravity(Conservative):
-
-    '''Força de gravitacional produzida por um objeto de massa "M" fixo na
+    """Força de gravitacional produzida por um objeto de massa "M" fixo na
     posição "pos".
 
-    Veja `set_force_gravity()` para descrição dos argumentos.'''
+    Veja `set_force_gravity()` para descrição dos argumentos."""
 
     def __init__(self, obj, G, M=None, epsilon=0, pos=(0, 0), register=False):
         if M is None:
@@ -616,10 +610,9 @@ def set_force_spring_tensor(obj, k, pos=(0, 0)):
 
 
 class SpringTensor(Conservative):
-
-    '''Implementa uma força devido a uma mola com constante elástica k fixa na
+    """Implementa uma força devido a uma mola com constante elástica k fixa na
     posição r0. Consulte a documentação de SpringTensorPair() para verificar
-    como configurar a anisotropia e parâmetros da mola.'''
+    como configurar a anisotropia e parâmetros da mola."""
 
     def __init__(self, obj, k, pos=(0, 0), register=False):
         self._k = k
@@ -656,7 +649,7 @@ class SpringTensor(Conservative):
 #        Implementações de forças específicas -- forças de 2 objetos
 ###############################################################################
 def set_force_pair(A, B, func, mode='time'):
-    '''
+    """
     Força que opera em um par de partículas respeitando a lei de ação e reação.
 
     Parameters
@@ -687,16 +680,15 @@ def set_force_pair(A, B, func, mode='time'):
     --------
 
     `Pair`
-    '''
+    """
     return Pair.setting_force(A, B, func, mode, True)
 
 
 class Pair(Force):
-
-    '''
+    """
     Força que opera em um par de partículas respeitando a lei de ação e reação.
 
-    Veja `set_force_pair()` para descrição dos argumentos.'''
+    Veja `set_force_pair()` para descrição dos argumentos."""
 
     def __init__(self, A, B, func, mode='time', register=False):
         self._A = A
@@ -731,7 +723,7 @@ class Pair(Force):
     mode = property(lambda self: self._mode)
 
     def force_A(self, t):
-        '''Função que calcula a força sobre o objeto A no instante t'''
+        """Função que calcula a força sobre o objeto A no instante t"""
 
         if self._cacheF is None:
             res = self._worker(t)
@@ -743,7 +735,7 @@ class Pair(Force):
             return res
 
     def force_B(self, t):
-        '''Função que calcula a força sobre o objeto B no instante t'''
+        """Função que calcula a força sobre o objeto B no instante t"""
 
         if self._cacheF is None:
             res = self._worker(t)
@@ -755,12 +747,12 @@ class Pair(Force):
             return res
 
     def accel_A(self, t):
-        '''Função que calcula a aceleração sobre o objeto A no instante t'''
+        """Função que calcula a aceleração sobre o objeto A no instante t"""
 
         return self.force_A(t) / self._A.mass
 
     def accel_B(self, t):
-        '''Função que calcula a aceleração sobre o objeto B no instante t'''
+        """Função que calcula a aceleração sobre o objeto B no instante t"""
 
         return self.force_A(t) / self._A.mass
 
@@ -769,13 +761,13 @@ class Pair(Force):
         yield self.force_B
 
     def forces(self):
-        '''Itera sobre as funções [force_A, force_B]'''
+        """Itera sobre as funções [force_A, force_B]"""
 
         yield self.force_A
         yield self.force_B
 
     def accels(self):
-        '''Itera sobre as acelerações [accel_A, accel_B]'''
+        """Itera sobre as acelerações [accel_A, accel_B]"""
 
         yield self.accel_A
         yield self.accel_B
@@ -787,14 +779,13 @@ def set_force_conservative_pair(A, B, force, U):
 
 
 class ConservativePair(Pair):
-
-    '''
+    """
     Uma força que opera em um par de partículas e possui uma energia potencial
     associada.
 
     Esta classe é iniciada a partir de uma função func(rA, rB) e de um
     potencial U(rA, rB).
-    '''
+    """
 
     def __init__(self, A, B, func, U, register=False):
         super(ConservativePair, self).__init__(
@@ -802,17 +793,17 @@ class ConservativePair(Pair):
         self._potential = U
 
     def energyT(self):
-        '''Energia total do par de partículas'''
+        """Energia total do par de partículas"""
 
         return self.A.energyK() + self.B.energyK() + self.energyU()
 
     def energyK(self):
-        '''Energia cinética do par de partículas'''
+        """Energia cinética do par de partículas"""
 
         return self.A.energyK + self.B.energyK
 
     def energyU(self):
-        '''Energia potencial do par de partículas'''
+        """Energia potencial do par de partículas"""
 
         return self.U(self.A.pos, self.B.pos)
 
@@ -826,7 +817,7 @@ class SpringPair(Conservative):
 
 
 def set_force_spring_tensor_pair(A, B, k):
-    '''
+    """
     Liga as duas partículas por uma força de Hooke com uma constante de mola
     anisotrópica.
 
@@ -854,17 +845,16 @@ def set_force_spring_tensor_pair(A, B, k):
     --------
 
     `SpringTensorPair`
-    '''
+    """
     return SpringTensorPair.setting_force(A, B, k)
 
 
 class SpringTensorPair(ConservativePair):
-
-    '''
+    """
     Liga as duas partículas por uma força de Hooke com uma constante de mola
     anisotrópica.
 
-    Veja `set_force_string_tensor_pair()` para descrição dos argumentos.'''
+    Veja `set_force_string_tensor_pair()` para descrição dos argumentos."""
 
     def __init__(self, A, B, k, register=False):
         kxy = 0
@@ -898,8 +888,7 @@ def set_force_gravity_pair(A, B, G, epsilon=0):
 
 
 class GravityPair(ConservativePair):
-
-    '''
+    """
     Implementa a força de gravidade "amaciada" com um parâmetro epsilon.
 
     A energia potencial desta força é dada por
@@ -911,7 +900,7 @@ class GravityPair(ConservativePair):
     é zero e o usuário deve ponderar sobre valores adequados caso a caso. Na
     prática epsilon limita o valor máximo que a força gravitacional pode
     assumir.
-    '''
+    """
 
     def __init__(self, A, B, G, epsilon=0, register=False):
         self._G = G = float(G)
@@ -938,27 +927,26 @@ class GravityPair(ConservativePair):
 # Implementações de forças específicas -- forças aplicadas a grupos de objetos
 ###############################################################################
 class Pool(Force):
-
-    '''Força que atua em um grupo arbitrariamente grande de objetos'''
+    """Força que atua em um grupo arbitrariamente grande de objetos"""
 
     def __init__(self, objects, register=False):
         self.objects = list(objects)
 
 
 class ConservativePool(Pool):
-
-    '''Sistema de partículas com força conservativa'''
+    """Sistema de partículas com força conservativa"""
 
 
 class GravityPool(ConservativePool):
-
-    '''Força gravitacional entre um grupo arbitrariamente grande de objetos.'''
+    """Força gravitacional entre um grupo arbitrariamente grande de objetos."""
 
     def get_force(self, obj, mutable=True):
         pass
 
     def get_all_forces(self, mutable=True):
         return [self.get_force(obj, mutable) for obj in self.objects]
+
+
 #
 #
 #
@@ -979,6 +967,7 @@ if __name__ == '__main__':
     class HasForce(object):
         func = ForceProperty()
 
+
     obj = HasForce()
     obj.force = lambda t: (2, 4 - t)
     obj.force(2)
@@ -986,6 +975,7 @@ if __name__ == '__main__':
     obj.force(2)
 
     import doctest
+
     doctest.testmod()
 
     from math import cos
@@ -997,9 +987,9 @@ if __name__ == '__main__':
     c2 = Circle(10, pos=(500, 400), vel=(-100, 100))
     c3 = Circle(10, pos=(200, 300), vel=(-100, 100))
 
-    #k = 1000
-    #c1.force = lambda t: -k * (c1.pos - c2.pos)
-    #c2.force = lambda t: -k * (c2.pos - c1.pos)
+    # k = 1000
+    # c1.force = lambda t: -k * (c1.pos - c2.pos)
+    # c2.force = lambda t: -k * (c2.pos - c1.pos)
 
     G = 1.1e5
     e = 200
@@ -1009,9 +999,9 @@ if __name__ == '__main__':
 
     set_force_viscous(c1, gamma=1000)
 
-    #c1.force += lambda t: - gamma * c1.vel
-    #c2.force += lambda t: - gamma * c2.vel
-    #c3.force += lambda t: - gamma * c3.vel
+    # c1.force += lambda t: - gamma * c1.vel
+    # c2.force += lambda t: - gamma * c2.vel
+    # c3.force += lambda t: - gamma * c3.vel
 
     world.add([c1, c2, c3])
     world.run()

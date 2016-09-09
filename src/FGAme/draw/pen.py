@@ -1,7 +1,9 @@
 import contextlib
+
+from . import Color
 from .tree import RenderTree
-from .color import Color
 from ..mathtools import pi, Vec2, Direction2, ux2D, uy2D
+
 rad = pi / 180  # Conversão de graus para radianos
 
 __all__ = ['Pen']
@@ -9,8 +11,7 @@ black = Color('black')
 
 
 class Pen(RenderTree):
-
-    '''Uma RenderTree que constroi objetos usando uma metáfora parecida com o
+    """Uma RenderTree que constroi objetos usando uma metáfora parecida com o
     módulo turtle do Python.
 
     Diferentemente do resto da FGAme, utiliza graus (e não radianos) como
@@ -51,7 +52,7 @@ class Pen(RenderTree):
 
 
 
-    '''
+    """
 
     # Vetores em direções especiais
     _SPECIAL_DIRECTIONS = {
@@ -115,7 +116,7 @@ class Pen(RenderTree):
     # Controle de movimento da caneta
     #
     def up(self):
-        '''Levanta a caneta e para de desenhar'''
+        """Levanta a caneta e para de desenhar"""
 
         if self._pen_down:
             self._assure_can_move_pen_z()
@@ -123,7 +124,7 @@ class Pen(RenderTree):
             self._pen_down = False
 
     def down(self):
-        '''Abaixa a caneta e desenha'''
+        """Abaixa a caneta e desenha"""
 
         if not self._pen_down:
             self._assure_can_move_pen_z()
@@ -131,7 +132,7 @@ class Pen(RenderTree):
             self._pen_down = True
 
     def move(self, x_or_delta, y=None):
-        '''Move o objeto pelo vetor de deslocamento dado'''
+        """Move o objeto pelo vetor de deslocamento dado"""
 
         if y is not None:
             return self.move(Vec2(x_or_delta, y))
@@ -140,7 +141,7 @@ class Pen(RenderTree):
         self.pos += x_or_delta
 
     def goto(self, x_or_delta, y=None):
-        '''Vai até a posição especificada na tela'''
+        """Vai até a posição especificada na tela"""
 
         if y is not None:
             return self.goto(Vec2(x_or_delta, y))
@@ -148,49 +149,49 @@ class Pen(RenderTree):
         self.move(x_or_delta - self._pos)
 
     def left(self, angle=90):
-        '''Rota à esquerda pelo ângulo especificado em graus'''
+        """Rota à esquerda pelo ângulo especificado em graus"""
 
         self.angle += angle
 
     def right(self, angle=90):
-        '''Rota à direita pelo ângulo especificado em graus'''
+        """Rota à direita pelo ângulo especificado em graus"""
 
         self.left(-angle)
 
     def forward(self, length):
-        '''Move para frente pelo comprimento especificado em pixels'''
+        """Move para frente pelo comprimento especificado em pixels"""
 
         self.move(self.direction() * length)
 
     def fwd(self, length):
-        '''Atalho para `obj.forward(length)`'''
+        """Atalho para `obj.forward(length)`"""
 
         self.forward(length)
 
     def backwards(self, length):
-        '''Move para trás pelo comprimento especificado em pixels'''
+        """Move para trás pelo comprimento especificado em pixels"""
 
         self.forward(-length)
 
     def back(self, length):
-        '''Atalho para `obj.backwards(length)`'''
+        """Atalho para `obj.backwards(length)`"""
 
         self.backwards(length)
 
     def direction(self):
-        '''Retorna um vetor unitário na direção especificada'''
+        """Retorna um vetor unitário na direção especificada"""
 
         # Casos especiais, para obter direções precisas
         try:
             return self._SPECIAL_DIRECTIONS[self._angle % 360]
         except KeyError:
-            return ux2D.rotated(self.theta)
+            return ux2D.irotate(self.theta)
 
     #
     # Controle de transações
     #
     def commit(self):
-        '''Insere linha que estava sendo desenha na árvore'''
+        """Insere linha que estava sendo desenha na árvore"""
 
         if len(self._current) > 1:
             self.add(
@@ -199,7 +200,7 @@ class Pen(RenderTree):
         self.clear()
 
     def clear(self):
-        '''Remove última linha que estava sendo desenhada'''
+        """Remove última linha que estava sendo desenhada"""
 
         self._current = [self._pos]
 
@@ -208,7 +209,7 @@ class Pen(RenderTree):
     #
     @contextlib.contextmanager
     def lock_pen_z(self):
-        '''Tranca o movimento da caneta no eixo z'''
+        """Tranca o movimento da caneta no eixo z"""
 
         # Set up
         can_move = self._can_move_pen_z
@@ -222,7 +223,7 @@ class Pen(RenderTree):
 
     @contextlib.contextmanager
     def lock_pen_xy(self):
-        '''Tranca o movimento da caneta no plano'''
+        """Tranca o movimento da caneta no plano"""
 
         # Set up
         can_move = self._can_move_pen_xy
@@ -236,8 +237,8 @@ class Pen(RenderTree):
 
     @contextlib.contextmanager
     def rect(self, line_color=None, **kwds):
-        '''Gerenciador de contexto que inicia o desenho de uma AABB cujos
-        limites se encontram no ponto inicial e no ponto final do caminho.'''
+        """Gerenciador de contexto que inicia o desenho de uma AABB cujos
+        limites se encontram no ponto inicial e no ponto final do caminho."""
 
         # TODO: fatorar para mover implementação comum a outras figuras
         # geométricas para o mesmo método.
@@ -261,24 +262,24 @@ class Pen(RenderTree):
         self.add(draw.AABB(*limits, line_color=line_color, **kwds))
 
     def circle(self, **kwds):
-        '''Gerenciador de contexto que inicia o desenho de um círculo cujo
-        centro está no ponto inicial e o raio vai até o ponto final'''
+        """Gerenciador de contexto que inicia o desenho de um círculo cujo
+        centro está no ponto inicial e o raio vai até o ponto final"""
 
         raise NotImplementedError
 
     def aabb(self, **kwds):
-        '''Gerenciador de contexto que inicia o desenho de uma AABB que
-        envolve todos os pontos da trajetória realizada.'''
+        """Gerenciador de contexto que inicia o desenho de uma AABB que
+        envolve todos os pontos da trajetória realizada."""
 
     def cbb(self, **kwds):
-        '''Gerenciador de contexto que desenha o menor círculo que envolve
-        todos os pontos da trajetória realizada'''
+        """Gerenciador de contexto que desenha o menor círculo que envolve
+        todos os pontos da trajetória realizada"""
 
         raise NotImplementedError
 
     def poly(self, **kwds):
-        '''Gerenciador de contexto que inicia o desenho de um polígono
-        fechado'''
+        """Gerenciador de contexto que inicia o desenho de um polígono
+        fechado"""
 
         raise NotImplementedError
 
@@ -309,7 +310,7 @@ class Pen(RenderTree):
         return kwds
 
     def _add_first(self, obj):
-        '''Adiciona obj e retorna seu valor'''
+        """Adiciona obj e retorna seu valor"""
 
         self.add(obj)
         return obj
@@ -318,54 +319,54 @@ class Pen(RenderTree):
     # Adiciona objetos
     #
     def _add_solid(self, constructor, args, kwds):
-        '''Worker para as funções do tipo add_*solid*()'''
+        """Worker para as funções do tipo add_*solid*()"""
 
         kwds.setdefault('pos', self.pos)
         kwds = self._solid_kwds(kwds)
         return self._add_first(constructor(*args, **kwds))
 
     def add_aabb(self, *args, **kwds):
-        '''Adiciona um círculo ao desenho'''
+        """Adiciona um círculo ao desenho"""
 
         return self._add_solid(draw.AABB, args, kwds)
 
     def add_circle(self, radius, pos=None, **kwds):
-        '''Adiciona um círculo ao desenho'''
+        """Adiciona um círculo ao desenho"""
 
         kwds = self._solid_kwds(kwds)
         return self._add_first(draw.Circle(radius, pos or self.pos, **kwds))
 
     def add_poly(self, vertices, pos=None, **kwds):
-        '''Adiciona um polígono ao desenho'''
+        """Adiciona um polígono ao desenho"""
 
         return self._add_first(draw.Poly(vertices, pos or self.pos, **kwds))
 
     def add_rectangle(self, *args, **kwds):
-        '''Adiciona um retângulo ao desenho'''
+        """Adiciona um retângulo ao desenho"""
 
         return self._add_solid(draw.Rectangle, args, kwds)
 
     def add_triangle(self, *args, **kwds):
-        '''Adiciona um triângulo ao desenho'''
+        """Adiciona um triângulo ao desenho"""
 
         return self._add_solid(draw.Triangle, args, kwds)
 
     def add_segment(self, p1, p2=None, **kwds):
-        '''Adiciona um segmento de reta ao desenho.
+        """Adiciona um segmento de reta ao desenho.
 
         Se somente um ponto for fornecido, utiliza a posição inicial como
-        ponto inicial e o ponto dado como posição final.'''
+        ponto inicial e o ponto dado como posição final."""
 
         if p2 is None:
             p1, p2 = self.pos, p1
         self._add(draw.Segment(p1, p2, **kwds))
 
     def add_ray(self, arg1, direction=None, **kwds):
-        '''Adiciona um raio (reta semi-finita) ao desenho.
+        """Adiciona um raio (reta semi-finita) ao desenho.
 
         Pode ser chamada como `pen.add_ray(direction)` para iniciar um raio a
         partir do ponto inicial ou `pen.add_ray(point, direction) para
-        especificar tanto o ponto inicial como a direção. '''
+        especificar tanto o ponto inicial como a direção. """
 
         if direction is None:
             p0, direction = self.pos, arg1
@@ -374,8 +375,8 @@ class Pen(RenderTree):
         self._add(draw.Ray(p0, direction, **kwds))
 
     def add_line(self, arg1, direction=None, **kwds):
-        '''Adiciona uma reta infinita ao desenho. A assinatura é igual à
-        função `pen.add_ray()`'''
+        """Adiciona uma reta infinita ao desenho. A assinatura é igual à
+        função `pen.add_ray()`"""
 
         if direction is None:
             p0, direction = self.pos, arg1
@@ -384,14 +385,14 @@ class Pen(RenderTree):
         return self._add(draw.Line(p0, direction, **kwds))
 
     def add_path(self, *points, **kwds):
-        '''Desenha uma linha seguindo a sequencia de pontos partindo do ponto
+        """Desenha uma linha seguindo a sequencia de pontos partindo do ponto
         atual.
 
         Pode ser chamada com um único argumento posicional que representa uma
         sequência de pontos ou por vários argumentos que representam pontos
         individuais. Se o primeiro argumento for None ou uma Elipisis (...),
         adiciona o ponto atual ao começo da lista.
-        '''
+        """
 
         # Checa entradas
         if not points:
@@ -403,4 +404,3 @@ class Pen(RenderTree):
             points = list(points)
             points[0] = self.pos
         return self._add(draw.Path(points, **kwds))
-

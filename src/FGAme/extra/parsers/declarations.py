@@ -29,9 +29,8 @@ import re
 from collections import namedtuple, deque
 from ...mathtools import Vec
 from ... import pos
-from ...draw import color
 from .texttools import normalize_tabs, normalize_blank_lines
-
+from colortools import COLOR_NAMES
 
 __all__ = ['parse_declaration', 'populate', 'GroupFactory', 'ObjectFactory'] 
 Token = namedtuple('Token', ['typ', 'value', 'line', 'column', 'indent'])
@@ -496,7 +495,7 @@ CTX_VEL = dict(
     CTX_DEFAULT,
 )
 CTX_COLOR = dict(CTX_DEFAULT, random='random')
-CTX_COLOR.update(dict(color.COLOR_NAMES))
+CTX_COLOR.update(dict(COLOR_NAMES))
 
 # Map variable names to their respective contexts
 CTX_VAR = dict(pos=CTX_POS, vel=CTX_VEL, color=CTX_COLOR, colorline=CTX_COLOR)
@@ -504,7 +503,7 @@ CTX_VAR = dict(pos=CTX_POS, vel=CTX_VEL, color=CTX_COLOR, colorline=CTX_COLOR)
 # Map type names into types
 import FGAme as _
 TYPENAMES = {None: None} 
-for name in 'AABB Circle Poly RegularPoly Rectangle'.split():
+for name in 'AABB Circle'.split():
     TYPENAMES[name] = getattr(_, name)
     TYPENAMES['draw.' + name] = getattr(_.draw, name)
 for name in 'Path Segment'.split():

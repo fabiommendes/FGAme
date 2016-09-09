@@ -1,26 +1,18 @@
-# -*- coding: utf8 -*-
-'''
-Este exemplo ilustra a simulação de um gás de caixas alinhadas aos eixos
-'''
 from FGAme import *
-from random import uniform, choice
+from random import uniform
 
-# Constantes da simulação
+# Define constants
 SPEED = 300
 RADIUS = 15
-N = 50
+PARTICLES = 50
 
-# Inicializa o mundo
-world = World()
-world.add_bounds(width=10)
-
-# Preenche o mundo
-for _ in range(N):
+# Fill world
+world.add.margin(10)
+for _ in range(PARTICLES):
     pos = Vec(uniform(30, 770), uniform(30, 570))
     vel = Vec(uniform(-SPEED, SPEED), uniform(-SPEED, SPEED))
-    aabb = Circle(RADIUS, vel=vel, pos=pos, color=(200, 0, 0))
-    world.add(aabb)
+    world.add.circle(RADIUS, vel=vel, pos=pos, color='random')
 
-# Inicia a simulação
-world.register_energy_tracker()
-world.run()
+# Start simulation
+world.track.energy()
+run()

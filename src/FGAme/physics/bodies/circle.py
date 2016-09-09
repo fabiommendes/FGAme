@@ -1,52 +1,41 @@
-# -*- coding: utf8 -*-
-
-from FGAme.mathtools import null2D, shapes
-from . import Body
-
-__all__ = ['Circle']
+from FGAme.mathtools import null2D, shapes, shadow_x, shadow_y, uy2D, ux2D, Vec2
+from FGAme.physics.bodies import Body, AABB
+from FGAme.physics.collision import get_collision, Collision
 
 
 class Circle(Body):
+    """
+    Object with a circular bounding box.
 
-    '''Define um círculo e implementa a detecção de colisão comparando a
-    distância entre os centros com a soma dos raios.
+    Examples:
+        Circle instances are initialized by passing a radius and any optional
+        Body parameters.
 
+        >>> c1 = Circle(10, pos=(10, 0))     # radius 10 and center at (10, 10)
+        >>> c2 = Circle(10, density=2)       # radius 10 in the origin
+        >>> c2.area()
+        314.1592653589793
+    """
 
-    Examples
-    --------
+    __slots__ = ()
 
-    Os círculos devem ser inicializados fornecendo o raio e opcionalmente a
-    posição, velocidade e massa ou densidade.
-
-    >>> c1 = Circle(10, (10, 0))     # raio 10 e centro em (10, 10)
-    >>> c2 = Circle(10, density=2)   # raio 10 e densidade de 2
-    >>> c2.area()
-    314.1592653589793
-    '''
-
-    __slots__ = []
-
-    def __init__(self, radius, pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None, **kwds):
-
+    def __init__(self, radius, pos=(0, 0), vel=(0, 0), **kwds):
         radius = float(radius)
         super(Circle, self).__init__(
-            pos, vel, mass=mass, density=density,
-            baseshape=shapes.Circle(radius, null2D), cbb_radius=radius, **kwds)
+            pos, vel,
+            base_shape=shapes.Circle(radius, null2D),
+            cbb_radius=radius,
+            **kwds
+        )
 
     @property
     def radius(self):
         return self.cbb_radius
 
-    @radius.setter
-    def radius(self, value):
-        self.cbb_radius = value
-
     def rescale(self, scale, update_physics=False):
         self.cbb_radius *= scale
         super(Circle, self).rescale(scale, update_physics)
 
-    # Caixa de contorno #######################################################
     @property
     def bb(self):
         return self.cbb
@@ -75,6 +64,65 @@ class Circle(Body):
             tname, pos, vel, self.radius)
 
 
-if __name__ == '__main__':
-    from doctest import testmod
-    testmod()
+@get_collision.overload([Circle, Circle])
+def collision_circle(A, B, collision_class=Collision):
+    """
+    Circle-to-circle collision.
+    """
+
+    rA = A.radius
+    rB = B.radius
+    normal = B.pos - A.pos
+    distance = normal.norm()
+
+    if distance < rA + rB:
+        normal /= distance
+        delta = rA + rB - distance
+        pos = A.pos + (rA - delta / 2) * normal
+        col = collision_class(A, B, pos=pos, normal=normal, delta=delta)
+        return col
+    else:
+        return None
+
+
+@get_collision.overload([Circle, AABB])
+def circle_aabb(A, B, collision_class=Collision):
+    cx, cx_, cy, cy_ = A.rect_coords
+    ax, ax_, ay, ay_ = B.rect_coords
+    dx = min(cx_, ax_) - max(cx, ax)
+    dy = min(cy_, ay_) - max(cy, ay)
+    if dy < 0 or dx < 0:
+        return None
+
+    x, y = pos = A.pos
+    if dx < dy:
+        # Circle is right at the bottom/top of AABB
+        if ay <= y <= ay_:
+            left = x < ax
+            pos = Vec2(ax if left else ax_, y)
+            normal = Vec2(1 if left else -1, 0)
+            delta = dx / 2
+            return collision_class(A, B, pos=pos, normal=normal, delta=delta)
+    else:
+        # Circle is right at the bottom/top of AABB
+        if ax <= x <= ax_:
+            bottom = y < ay
+            pos = Vec2(x, ay if bottom else ay_)
+            normal = Vec2(0, 1 if bottom else -1)
+            delta = dy / 2
+            return collision_class(A, B, pos=pos, normal=normal, delta=delta)
+
+    # If we reached this point, the circle encountered the AABB at a vertex.
+    # We must find the vertex that is closest to the center and define the
+    # normal vector using it.
+    vertex = min(B.vertices, key=lambda v: abs(v - pos))
+    normal = (vertex - pos).normalize()
+    delta = A.radius - (pos - vertex).norm()
+    return collision_class(A, B, pos=vertex, normal=normal, delta=delta)
+
+
+@get_collision.overload([AABB, Circle])
+def aabb_circle(A, B, collision_class=Collision):
+    col = circle_aabb(B, A, collision_class=collision_class)
+    if col is not None:
+        return col.swap()

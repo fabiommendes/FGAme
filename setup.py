@@ -1,70 +1,39 @@
-#-*- coding: utf8 -*-
+# -*- coding: utf8 -*-
+#
+# This file were created by Python Boilerplate. Use boilerplate to start simple
+# usable and best-practices compliant Python projects.
+#
+# Learn more about it at: http://github.com/fabiommendes/boilerplate/
+#
+
 import os
-import sys
-import setuptools
-import warnings
-from setuptools import setup
-
-#
-# Read VERSION from file and write it in the appropriate places
-#
-AUTHOR = 'Fábio Macêdo Mendes'
-BASE, _ = os.path.split(__file__)
-with open(os.path.join(BASE, 'VERSION')) as F:
-    VERSION = F.read().strip()
-with open(os.path.join(BASE, 'src', 'FGAme', 'meta.py'), 'w') as F:
-    F.write(
-        '# Auto-generated file. Please do not edit\n'
-        '__version__ = %r\n' % VERSION +
-        '__author__ = %r\n' % AUTHOR)
-
-VERSION_BIG = VERSION.rpartition('.')[0]
-IS_PYPY = 'PyPy' in sys.version
-setup_kwds = {}
-
-#
-# Choose the default Python3 branch or the code converted by 3to2
-#
-PYSRC = 'src' if sys.version_info[0] == 3 else 'py2src'
-
-#
-# Cython stuff (for the future)
-#
-if 'PyPy' not in sys.version:
-    try:
-        from Cython.Build import cythonize
-        from Cython.Distutils import build_ext
-    except ImportError:
-        warnings.warn('Please install Cython to compile faster versions of FGAme modules')
-    else:
-        try:
-            setup_kwds.update(
-                ext_modules=cythonize('src/generic/*.pyx'),
-                cmdclass={'build_ext': build_ext})
-        except ValueError:
-            pass
-
-#
-# Configure backend
-#
-try:
-    import pygame
-    BACKEND = ''
-except ImportError:
-    BACKEND = 'pysdl2>=0.5'
+from setuptools import setup, find_packages
 
 
-#
-# Main configuration script
-#
+# Meta information
+name = 'FGAme'
+project = 'FGAme'
+author = 'Fábio Macêdo Mendes'
+version = open('VERSION').read().strip()
+dirname = os.path.dirname(__file__)
+
+# Save version and author to __meta__.py
+file_name = os.path.join(dirname, 'src', project, '__meta__.py')
+with open(file_name, 'w', encoding='utf-8') as F:
+    F.write('__version__ = %r\n'
+            '__author__ = %r\n' % (version, author))
+
 setup(
-    name='FGAme',
-    version=VERSION,
-    description='A game engine for 2D physics',
-    author='Fábio Macêdo Mendes',
+    # Basic info
+    name=name,
+    version=version,
+    author=author,
     author_email='fabiomacedomendes@gmail.com',
-    url='https://github.com/fabiommendes/FGAme',
-    long_description=open(os.path.join(BASE, 'README.txt')).read(),
+    url='',
+    description='A short description for your project.',
+    long_description=open('README.rst').read(),
+
+    # Classifiers (see https://pypi.python.org/pypi?%3Aaction=list_classifiers)
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -74,19 +43,24 @@ setup(
         'Topic :: Software Development :: Libraries',
     ],
 
-    package_dir={'': PYSRC},
-    packages=setuptools.find_packages(PYSRC),
-    license='GPL',
+    # Packages and dependencies
+    package_dir={'': 'src'},
+    packages=find_packages('src'),
+    install_requires=[
+        'smallshapes>=0.6',
+        'smallvectors>=0.6',
+        'colortools>=0.1.1',
+        'pygame',
+    ],
+    extras_require={
+        'dev': [
+            'cython',
+            'pytest',
+            'python-boilerplate',
+        ],
+    },
 
-    install_requires='''
-        # cython>=0.21
-        %s
-        pillow
-        six
-        smallshapes
-        smallvectors
-        pygeneric
-    ''' % BACKEND,
+    # Other configurations
     zip_safe=False,
-    **setup_kwds
+    platforms='any',
 )

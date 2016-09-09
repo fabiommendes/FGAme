@@ -1,4 +1,4 @@
-'''
+"""
 As funções no módulo patch permitem modificar o comportamento da FGAme de
 maneira arbitrária. A maior parte das funções tem o caráter didático e
 permitem que estudantes na área de jogos e física para jogos reimplementem
@@ -7,27 +7,27 @@ existente.
 
 As funções neste módulo também servem para testar implementações alternativas
 ou experimentais.
-'''
+"""
 from types import MethodType
 
 
 def set_collision_class(cls):
-    '''Define qual é a classe encarregada de resolver colisões no lugar de
-    FGAme.physics.Collision.'''
+    """Define qual é a classe encarregada de resolver colisões no lugar de
+    FGAme.physics.Collision."""
 
     from FGAme.physics import collision_pairs
     collision_pairs.Collision = cls
 
 
 def restore_collision_class():
-    '''Restaura a classe de colisão para o valor padrão'''
+    """Restaura a classe de colisão para o valor padrão"""
 
     from FGAme.physics import Collision
     set_collision_class(Collision)
 
 
 def set_resolve_collision(func):
-    '''Decorador que determina qual é a função encarregada de resolver colisões
+    """Decorador que determina qual é a função encarregada de resolver colisões
     entre duas partículas. A função recebe um objeto de colisão como argumento.
 
         >>> @set_resolve_collision
@@ -37,7 +37,7 @@ def set_resolve_collision(func):
 
     Note que é possível invocar a implementação original do método de colisão
     utilizando o método col.resolve().
-    '''
+    """
 
     from FGAme.physics import Collision
 
@@ -60,6 +60,6 @@ def set_resolve_collision(func):
 
 
 def restore_defaults():
-    '''Restaura a FGAme para o comportamento padrão'''
+    """Restaura a FGAme para o comportamento padrão"""
 
     restore_collision_class()
