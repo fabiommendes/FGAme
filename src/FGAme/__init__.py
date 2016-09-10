@@ -6,6 +6,7 @@ from .world import World, world, pos, vel
 from .objects import *
 from . import mathtools as math
 from . import draw
+from .draw import Color
 from . import physics
 from .zero import run, start
 from .mathtools import Vec, asvector, vec, direction, asdirection, pi

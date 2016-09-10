@@ -3,63 +3,9 @@ from collections import defaultdict
 from FGAme.mathtools import Vec2, null2D
 from FGAme.physics import flags
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
-from FGAme.signals import global_signal
-
-# Signals
-pre_collision_signal = global_signal(
-    'pre-collision', ['simulation'], ['col'],
-    help_text='Triggered when a collision between two objects occurs. This'
-              'signal is resolved before collision.'
-)
-post_collision_signal = global_signal(
-    'post-collision', ['simulation'], ['col'],
-    help_text='Like pre-collision, but it is triggered just *after* collision '
-              'is resolved.'
-)
-object_added_signal = global_signal(
-    'object-added', ['simulation', 'object'], [],
-    help_text='Triggered when an object is added to the simulation.'
-)
-object_removed_signal = global_signal(
-    'object-removed', ['simulation', 'object'], [],
-    help_text='Triggered when an object is removed from simulation.'
-)
-gravity_changed_signal = global_signal(
-    'gravity-changed', ['simulation'], ['old', 'new'],
-    help_text='Triggered when the simulation gravity changes.'
-)
-damping_changed_signal = global_signal(
-    'damping-changed', ['simulation'], ['old', 'new'],
-    help_text='Triggered when the global damping changes.'
-)
-adamping_changed_signal = global_signal(
-    'adamping-changed', ['simulation'], ['old', 'new'],
-    help_text='Triggered when the global angular damping changes.'
-)
-friction_changed_signal = global_signal(
-    'friction-changed', ['simulation'], ['old', 'new'],
-    help_text='Triggered when friction coefficient changes.'
-)
-restitution_changed_signal = global_signal(
-    'restitution-changed', ['simulation'], ['old', 'new'],
-    help_text='Triggered when restitution coefficient changes.'
-)
-out_of_bounds_signal = global_signal(
-    'out-of-bounds', ['simulation', 'object'], [],
-    help_text='Triggered when an object leaves the simulation bounds.'
-)
-max_speed_signal = global_signal(
-    'max-speed', ['simulation', 'object'], [],
-    help_text='Trigerred when an object reaches the maximum simulation speed.'
-)
-sleep_signal = global_signal(
-    'sleep', ['simulation', 'object'],
-    help_text='Triggered when object starts sleeping.'
-)
-wake_up_signal = global_signal(
-    'wake-up', ['simulation', 'object'],
-    help_text='Triggered when object leaves sleeping state.'
-)
+from FGAme.physics.signals import object_removed_signal, \
+    gravity_changed_signal, damping_changed_signal, adamping_changed_signal, \
+    friction_changed_signal, restitution_changed_signal
 
 
 class Simulation:
@@ -213,21 +159,7 @@ class Simulation:
         if obj not in self._objects:
             self._objects.append(obj)
             self._active.append(obj)
-
-            obj._simulation = self
-            oflags = obj.flags
-            if not oflags & flags.owns_gravity:
-                obj._gravity = self.gravity
-            if not oflags & flags.owns_damping:
-                obj._damping = self.damping
-            if not oflags & flags.owns_adamping:
-                obj._adamping = self.adamping
-            if not oflags & flags.owns_restitution:
-                obj._restitution = self.restitution
-            if not oflags & flags.owns_friction:
-                obj._friction = self.friction
-
-            object_added_signal.trigger(self, obj)
+            obj.set_simulation(self)
 
     def remove(self, obj):
         """
@@ -360,10 +292,10 @@ class Simulation:
         narrow_cols = self.narrow_phase(broad_cols)
 
         for col in narrow_cols:
-            col.pre_collision()
+            col.pre_collision(self)
             if col.active:
                 col.resolve()
-                col.post_collision()
+                col.post_collision(self)
 
         # Baumgarte stabilization
         beta = self.beta

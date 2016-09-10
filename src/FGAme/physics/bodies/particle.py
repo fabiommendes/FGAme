@@ -4,7 +4,7 @@ import smallshapes.core.locatable
 from FGAme.signals import Listener
 from FGAme.mathtools import null2D, asvector, Vec2, ux2D
 from FGAme.utils import popattr
-from FGAme.physics import flags
+from FGAme.physics import flags, object_added_signal
 from FGAme.physics.bodies.utils import flag_property, accept_vec_args, \
     vec_property
 from FGAme.physics.forces import ForceProperty
@@ -224,7 +224,6 @@ class Particle(smallshapes.core.locatable.mLocatable,
         # World
         if simulation is not None:
             self._simulation.add(self)
-        self.autoconnect()
 
     def __eq__(self, other):
         return self is other
@@ -440,6 +439,30 @@ class Particle(smallshapes.core.locatable.mLocatable,
 
         self.apply_accel(null2D, dt, method=method)
 
+    # Collisions
+    def signal_filters(self):
+        return {
+            'object': self,
+            'simulation': self.simulation,
+        }
+
+    def pre_collision(self, col):
+        """
+        Sub-classes can override to control the behavior prior to a collision
+        resolution. The pre-collision handler can disable collision by calling
+        col.cancel().
+
+        Default implementation does nothing.
+        """
+
+    def post_collision(self, col):
+        """
+        Sub-classes can override to call take any additional action just
+        *after* the collision has been resolved.
+
+        Default implementation does nothing.
+        """
+
     # Dynamic vs. kinematic vs. static objects
     def is_dynamic(self, what=None):
         """
@@ -620,6 +643,27 @@ class Particle(smallshapes.core.locatable.mLocatable,
         raise ValueError('Cannot change angular variables with disabled '
                          '`can_rotate` flag')
 
+    # Simulation
+    def set_simulation(self, simulation):
+        """
+        Changes the simulation associated with object.
+        """
+
+        self._simulation = self
+        oflags = self.flags
+        if not oflags & flags.owns_gravity:
+            self._gravity = simulation.gravity
+        if not oflags & flags.owns_damping:
+            self._damping = simulation.damping
+        if not oflags & flags.owns_adamping:
+            self._adamping = simulation.adamping
+        if not oflags & flags.owns_restitution:
+            self._restitution = simulation.restitution
+        if not oflags & flags.owns_friction:
+            self._friction = simulation.friction
+
+        self.autoconnect()
+        object_added_signal.trigger(simulation, self)
 
 Particle.pos = vec_property(Particle._pos)
 Particle.vel = vec_property(Particle._vel)

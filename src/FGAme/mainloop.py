@@ -336,7 +336,7 @@ class MainLoop:
     #
     #     iterator :
     #         Qualquer iterador ou gerador. O loop principal chamará
-    #         repetidamente next(iterator) para cada frame executado.
+    #         repetidamente next_level(iterator) para cada frame executado.
     #     start : bool
     #         Determina se a ação será executada no início ou no fim do frame.
     #     skip : int
@@ -359,7 +359,7 @@ class MainLoop:
     #     def step():
     #         try:
     #             if idx[0] % skip == 0:
-    #                 next(iterator)
+    #                 next_level(iterator)
     #         except StopIteration:
     #             mainloop = MainLoop._instance
     #             if start:

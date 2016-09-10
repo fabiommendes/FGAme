@@ -163,7 +163,7 @@ class DeclarationParser:
         
         This special generator responds to commands that can be sent through 
         the iterator.send() function. If the argument is 'skipline', it returns
-        the next source line verbatim as a LINE token. One can also push back
+        the next_level source line verbatim as a LINE token. One can also push back
         tokens to the iterator by sending token instances.
         """
         

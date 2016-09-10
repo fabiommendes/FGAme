@@ -2,6 +2,7 @@ import inspect
 from functools import partial
 from types import FunctionType
 
+import sys
 from lazyutils import lazy
 
 REGISTERED_SIGNALS = {}
@@ -73,6 +74,10 @@ class Handler:
 
     def __call__(self, *args, **kwargs):
         return self.callback(*args, **kwargs)
+
+    def __repr__(self):
+        data = ', '.join('%s=%r' for x in self.filters.items())
+        return '%s(%s)' % (self.function.__name__, data)
 
     def accept(self, *args, **kwargs):
         """
@@ -258,7 +263,16 @@ class Signal:
         """
         for handler in self.handlers:
             if handler.accept(*args, **kwargs):
-                handler.callback(*args, **kwargs)
+                try:
+                    handler.callback(*args, **kwargs)
+                except Exception:
+                    print(
+                        'Error processing %r signal:' % self.name,
+                        '    %s callback raised an exception' % handler,
+                        '-' * 70,
+                        sep='\n', file=sys.stderr
+                    )
+                    raise
 
     def disconnect(self, handler, silent=False):
         """

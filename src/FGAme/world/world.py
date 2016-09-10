@@ -86,8 +86,6 @@ class World(Listener):
         if isinstance(obj, (tuple, list)):
             for obj in obj:
                 self.add(obj, layer=layer)
-        elif hasattr(obj, 'update_world'):
-            obj.update_world(self, layer=layer)
         else:
             self._render_tree.add(obj, layer)
             if isinstance(obj, Body):

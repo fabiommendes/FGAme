@@ -30,12 +30,15 @@ class Body(physics.Body):
         self.linewidth = kwargs.pop('linewidth', 1)
         self.visible = kwargs.pop('visible', True)
 
-        # Set the correct world
         self.world = kwargs.pop('world', None)
 
         # Init physics object and visualization
         super().__init__(*args, **kwargs)
         self.__init_image(**image)
+
+        # Set world
+        if self.world is not None:
+            self.world.add(self)
 
     def __init_image(self, image, image_offset=(0, 0), image_reference=None,
                      **kwargs):

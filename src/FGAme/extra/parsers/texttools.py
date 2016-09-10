@@ -83,7 +83,7 @@ def lwhitespace(st):
 
 
 def next_block(lineiter):
-    '''Return an iterator over all lines in the next indentation block from the 
+    '''Return an iterator over all lines in the next_level indentation block from the
     given iterable over (lineno, line) objects. Line strings do not have a 
     trailing newline.'''
     

@@ -5,6 +5,7 @@ from math import sqrt, pi
 from generic import generic
 
 from FGAme.mathtools import Vec2, asvector, ux2D
+from FGAme.physics import pre_collision_signal, post_collision_signal
 
 DEFAULT_DIRECTIONS = [ux2D.rotate(n * pi / 12) for n in
                       [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 11]]
@@ -360,28 +361,30 @@ class Collision(Pair):
 
         self.active = False
 
-    def pre_collision(self):
+    def pre_collision(self, simulation):
         """
         Executed before solving collisions.
         """
 
         A, B = self
-        # A.trigger_pre_collision(self)
-        # B.trigger_pre_collision(self)
+        A.pre_collision(self)
+        B.pre_collision(self)
+        pre_collision_signal.trigger(simulation, self)
         if self.active:
             if A.invmass:
                 A.collisions.append(self)
             if B.invmass:
                 B.collisions.append(self)
 
-    def post_collision(self):
+    def post_collision(self, simulation):
         """
         Executed after solving collisions.
         """
 
         A, B = self
-        # A.trigger_post_collision(self)
-        # B.trigger_post_collision(self)
+        A.post_collision(self)
+        B.post_collision(self)
+        post_collision_signal.trigger(simulation, self)
         if A.invmass:
             A.collisions.remove(self)
         if B.invmass:

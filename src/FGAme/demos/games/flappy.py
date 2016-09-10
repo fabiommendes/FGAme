@@ -38,7 +38,7 @@ class Flappy(Poly):
         if self.receiving_input:
             self.omega += delta
 
-    def pre_collision_event(self, col=None):
+    def pre_collision(self, col=None):
         """
         Block user input (the bird is dead).
         """
