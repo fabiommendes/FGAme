@@ -206,12 +206,12 @@ class RegularPoly(Poly):
 
 class Rectangle(Poly):
     """
-    Rectangle specified similarly to an AABB.
+    A rotational version of an AABB.
 
     Example:
         >>> r = Rectangle(shape=(200, 100))
-        >>> r.irotate(pi/4)
-        >>> r.bbox                                          # doctest: +ELLIPSIS
+        >>> r.rotate(pi/4)
+        >>> r.rect_coords                                   # doctest: +ELLIPSIS
         (-106.066..., 106.066..., -106.066..., 106.066...)
     """
 

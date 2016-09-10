@@ -48,9 +48,10 @@ def _speed_prop(name, scale, Vec):
     return property(prop)
 
 
-class GlobalObject(object):
+class StateObject(object):
     """
-    Base class for PosObject and VelObject."""
+    Base class for PosObject and VelObject.
+    """
 
     @lazy
     def _globals(self):
@@ -67,7 +68,7 @@ class GlobalObject(object):
         return Vec2(0, 0)
 
 
-class PosObject(GlobalObject):
+class PosObject(StateObject):
     """
     Implements the global ``pos`` object in FGAme.
     """
@@ -92,8 +93,16 @@ class PosObject(GlobalObject):
     from_south_west, from_south_east, from_north_east, from_north_west = \
         from_sw, from_se, from_ne, from_nw
 
+    def random(self):
+        """
+        Return random position in the visible screen.
+        """
 
-class VelObject(GlobalObject):
+        w, h = self._shape
+        return Vec2(random.uniform(0, w), random.uniform(0, h)) + self._origin
+
+
+class VelObject(StateObject):
     """
     Implements global ``vel`` object.
     """

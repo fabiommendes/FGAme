@@ -5,33 +5,17 @@ from FGAme import conf
 from FGAme.draw import RenderTree, colorproperty
 from FGAme.objects import Body
 from FGAme.physics import Simulation
+from FGAme.signals import Listener
 from FGAme.utils import delegate_to
 from FGAme.utils import lazy
 from FGAme.world.factory import ObjectFactory
 from FGAme.world.tracker import Tracker
 
 
-class World:
+class World(Listener):
     """
     Combines physical simulation with display.
     """
-
-    # Events
-    # long_press = signal('long-press', 'key', delegate_to='_input')
-    # key_up = signal('key-up', 'key', delegate_to='_input')
-    # key_down = signal('key-down', 'key', delegate_to='_input')
-    # mouse_motion = signal('mouse-motion', delegate_to='_input')
-    # mouse_button_up = \
-    #     signal('mouse-button-up', 'button', delegate_to='_input')
-    # mouse_button_down = \
-    #     signal('mouse-button-down', 'button', delegate_to='_input')
-    # mouse_long_press = \
-    #     signal('mouse-long-press', 'button', delegate_to='_input')
-    # pre_draw = signal('pre-draw', num_args=1, delegate_to='_mainloop')
-    # post_draw = signal('post-draw', num_args=1, delegate_to='_mainloop')
-    # frame_enter = signal('frame-enter')
-    # frame_skip = signal('frame-skip', num_args=1)
-    # collision = signal('collision', num_args=1)
 
     # Simulation properties
     background = colorproperty('background', 'white')
@@ -88,12 +72,15 @@ class World:
         # Saves instance
         self._last_instances.append(weakref.ref(self))
 
+        # Connect signals
+        self.autoconnect()
+
     def __contains__(self, obj):
         return obj in self._render_tree or obj in self._simulation
 
     def _add(self, obj, layer=0):
         """
-        Add object to the world.
+        Adds object to the world.
         """
 
         if isinstance(obj, (tuple, list)):
@@ -138,7 +125,7 @@ class World:
 
     def resume(self):
         """
-        Resume physics simulation.
+        Resume paused physics simulation.
         """
 
         self.is_paused = False
@@ -160,7 +147,7 @@ class World:
 
     def run(self, timeout=None, **kwds):
         """
-        Run simulation until the given timeout expires.
+        Runs simulation until the given timeout expires.
 
         Args:
             timeout (float):

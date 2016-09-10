@@ -12,6 +12,34 @@ class Group(Body):
 
     __slots__ = ()
 
+    @Body.mass.setter
+    def mass(self, value):
+        total = self.mass
+        ratio = value / total
+        for obj in self:
+            obj.mass *= ratio
+        super().mass = value
+
+    @property
+    def bb(self):
+        return None
+
+    @property
+    def xmin(self):
+        return self.pos.x - self.cbb_radius
+
+    @property
+    def xmax(self):
+        return self.pos.x + self.cbb_radius
+
+    @property
+    def ymin(self):
+        return self.pos.y - self.cbb_radius
+
+    @property
+    def ymax(self):
+        return self.pos.y + self.cbb_radius
+
     def __init__(self, objects, pos=(0, 0), vel=(0, 0), theta=0, mass=None,
                  **kwds):
 
@@ -62,41 +90,3 @@ class Group(Body):
 
     def add(self, obj):
         raise NotImplementedError
-
-    @Body.mass.setter
-    def mass(self, value):
-        total = self.mass
-        ratio = value / total
-        for obj in self:
-            obj.mass *= ratio
-        super().mass = value
-
-    @property
-    def bb(self):
-        return None
-
-    @property
-    def xmin(self):
-        return self.pos.x - self.cbb_radius
-
-    @property
-    def xmax(self):
-        return self.pos.x + self.cbb_radius
-
-    @property
-    def ymin(self):
-        return self.pos.y - self.cbb_radius
-
-    @property
-    def ymax(self):
-        return self.pos.y + self.cbb_radius
-
-
-if __name__ == '__main__':
-    from doctest import testmod
-
-    testmod()
-    from FGAme import Group, Circle
-
-    L = [Circle(10), Circle(10, pos=(10, 10), color='red')]
-    g = Group(L)

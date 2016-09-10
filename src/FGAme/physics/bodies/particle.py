@@ -1,17 +1,24 @@
 import copy
 
-import smallshapes as shapes
 import smallshapes.core.locatable
-from FGAme.mathtools import null2D, asvector, Vec2
+from FGAme.signals import Listener
+from FGAme.mathtools import null2D, asvector, Vec2, ux2D
+from FGAme.utils import popattr
 from FGAme.physics import flags
 from FGAme.physics.bodies.utils import flag_property, accept_vec_args, \
     vec_property
 from FGAme.physics.forces import ForceProperty
 from FGAme.physics.utils import normalize_flag_value
-from FGAme.utils import popattr
 
 
-class Particle(smallshapes.core.locatable.mLocatable):
+class ParticleMeta(type(smallshapes.core.mLocatable)):
+    def __init__(self, name, bases, ns):
+        super().__init__(name, bases, ns)
+
+
+class Particle(smallshapes.core.locatable.mLocatable,
+               Listener,
+               metaclass=ParticleMeta):
     """
     Basic particle physics simulation.
 
@@ -27,11 +34,134 @@ class Particle(smallshapes.core.locatable.mLocatable):
         '__dict__',
     ]
 
-    # pre_collision = signal('pre-collision', num_args=1)
-    # post_collision = signal('post-collision', num_args=1)
-    # frame_enter = signal('frame-enter')
-    # out_of_bounds = signal('out-of-margin', num_args=1)
+    # Dynamic variables
+    @property
+    def pos(self):
+        return self._pos
+
+    @property
+    def x(self):
+        return self._pos.x
+
+    @x.setter
+    def x(self, value):
+        self.move_to(value, self._pos.y)
+
+    @property
+    def y(self):
+        return self._pos.y
+
+    @y.setter
+    def y(self, value):
+        self.move_to(self._pos.x, value)
+
+    @property
+    def vx(self):
+        return self._vel.x
+
+    @vx.setter
+    def vx(self, value):
+        self._vel = Vec2(value, self._vel.y)
+
+    @property
+    def vy(self):
+        return self._vel.y
+
+    @vy.setter
+    def vy(self, value):
+        self._vel = Vec2(self._vel.x, value)
+
+    @property
+    def speed(self):
+        return self._vel.norm()
+
+    @speed.setter
+    def speed(self, value):
+        norm = self._vel.norm()
+        if norm == 0:
+            self._vel = ux2D.rotate(getattr(self, '_theta', 0)) * value
+        else:
+            self._vel = self._vel.clamp(value)
+
+    # Inertia variables
+    @property
+    def invmass(self):
+        return self._invmass
+
+    @property
+    def invinertia(self):
+        return self._invinertia
+
+    @property
+    def mass(self):
+        try:
+            return 1.0 / self._invmass
+        except ZeroDivisionError:
+            return float('inf')
+
+    @mass.setter
+    def mass(self, value):
+        self._invmass = 1.0 / value
+
+    # External forces
+    force = ForceProperty()
+
+    @property
+    def gravity(self):
+        return self._gravity
+
+    @gravity.setter
+    def gravity(self, value):
+        try:
+            self._gravity = Vec2(*value)
+        except TypeError:
+            self._gravity = Vec2(0, -value)
+        self.owns_gravity = True
+
+    @property
+    def damping(self):
+        return self._damping
+
+    @damping.setter
+    def damping(self, value):
+        self._damping = float(value)
+        self.owns_damping = True
+
+    @property
+    def restitution(self):
+        return self._restitution
+
+    @restitution.setter
+    def restitution(self, value):
+        self._restitution = float(value)
+        self.owns_restitution = True
+
+    @property
+    def friction(self):
+        return self._friction
+
+    @friction.setter
+    def friction(self, value):
+        self._friction = float(value)
+        self.owns_friction = True
+
+    # Interaction with physics simulation.
     has_physics = True
+
+    @property
+    def simulation(self):
+        if self._simulation is None:
+            raise ValueError('object is not linked with any simulation')
+        else:
+            return self._simulation
+
+    # Flags
+    owns_gravity = flag_property(flags.owns_gravity)
+    owns_damping = flag_property(flags.owns_damping)
+    owns_adamping = flag_property(flags.owns_adamping)
+    owns_restitution = flag_property(flags.owns_restitution)
+    owns_friction = flag_property(flags.owns_friction)
+    can_rotate = flag_property(flags.can_rotate)
     DEFAULT_FLAGS = 0 | flags.dirty_shape | flags.dirty_aabb
 
     def __init__(self,
@@ -94,6 +224,7 @@ class Particle(smallshapes.core.locatable.mLocatable):
         # World
         if simulation is not None:
             self._simulation.add(self)
+        self.autoconnect()
 
     def __eq__(self, other):
         return self is other
@@ -144,81 +275,6 @@ class Particle(smallshapes.core.locatable.mLocatable):
         else:
             self.flags &= ~flag
 
-    owns_gravity = flag_property(flags.owns_gravity)
-    owns_damping = flag_property(flags.owns_damping)
-    owns_adamping = flag_property(flags.owns_adamping)
-    owns_restitution = flag_property(flags.owns_restitution)
-    owns_friction = flag_property(flags.owns_friction)
-    can_rotate = flag_property(flags.can_rotate)
-
-    # Mass properties
-    @property
-    def invmass(self):
-        return self._invmass
-
-    @property
-    def invinertia(self):
-        return self._invinertia
-
-    @property
-    def mass(self):
-        try:
-            return 1.0 / self._invmass
-        except ZeroDivisionError:
-            return float('inf')
-
-    @mass.setter
-    def mass(self, value):
-        self._invmass = 1.0 / value
-
-    # Global forces
-    @property
-    def gravity(self):
-        return self._gravity
-
-    @gravity.setter
-    def gravity(self, value):
-        try:
-            self._gravity = Vec2(*value)
-        except TypeError:
-            self._gravity = Vec2(0, -value)
-        self.owns_gravity = True
-
-    @property
-    def damping(self):
-        return self._damping
-
-    @damping.setter
-    def damping(self, value):
-        self._damping = float(value)
-        self.owns_damping = True
-
-    @property
-    def restitution(self):
-        return self._restitution
-
-    @restitution.setter
-    def restitution(self, value):
-        self._restitution = float(value)
-        self.owns_restitution = True
-
-    @property
-    def friction(self):
-        return self._friction
-
-    @friction.setter
-    def friction(self, value):
-        self._friction = float(value)
-        self.owns_friction = True
-
-    # Interaction with physics simulation.
-    @property
-    def simulation(self):
-        if self._simulation is None:
-            raise ValueError('object is not linked with any simulation')
-        else:
-            return self._simulation
-
     def destroy(self):
         """
         Destroy object.
@@ -240,8 +296,6 @@ class Particle(smallshapes.core.locatable.mLocatable):
         return cp
 
     # Physical properties
-    force = ForceProperty()
-
     def linearK(self):
         """
         Kinetic energy of linear movement.
@@ -284,38 +338,6 @@ class Particle(smallshapes.core.locatable.mLocatable):
             return Vec2(float('inf'), float('inf'))
 
     # Position and movement
-    @property
-    def pos(self):
-        return self._pos
-
-    @property
-    def x(self):
-        return self._pos.x
-
-    @x.setter
-    def x(self, value):
-        self.move_to()
-
-    @property
-    def y(self):
-        return self._pos.y
-
-    @property
-    def vx(self):
-        return self._vel.x
-
-    @vx.setter
-    def vx(self, value):
-        self._vel = Vec2(value, self._vel.y)
-
-    @property
-    def vy(self):
-        return self._vel.y
-
-    @vy.setter
-    def vy(self, value):
-        self._vel = Vec2(self._vel.x, value)
-
     def move_vec(self, vec):
         self._pos += vec
         self.flags |= flags.dirty_aabb

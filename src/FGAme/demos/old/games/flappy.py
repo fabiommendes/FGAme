@@ -26,7 +26,7 @@ class Flappy(Poly):
         """
 
         if self.receiving_input:
-            self.boost((0, 150))
+            self.boost((0, 175))
 
     @listen('key-down', 'left', delta=0.2)
     @listen('key-down', 'right', delta=-0.2)
@@ -38,8 +38,7 @@ class Flappy(Poly):
         if self.receiving_input:
             self.omega += delta
 
-    @listen('pre-collision')
-    def block_input(self, col=None):
+    def pre_collision_event(self, col=None):
         """
         Block user input (the bird is dead).
         """
@@ -84,8 +83,7 @@ class Game(World):
                               mass='inf', vel=(-speed, 0), world=self)
         self.obstacles.append([lower, upper])
 
-    @listen('frame-enter')
-    def detect_exit(self):
+    def frame_enter_event(self):
         """
         Detects if obstacle had left the screen.
         """

@@ -19,15 +19,6 @@ class Circle(Body):
 
     __slots__ = ()
 
-    def __init__(self, radius, pos=(0, 0), vel=(0, 0), **kwds):
-        radius = float(radius)
-        super(Circle, self).__init__(
-            pos, vel,
-            base_shape=shapes.Circle(radius, null2D),
-            cbb_radius=radius,
-            **kwds
-        )
-
     @property
     def radius(self):
         return self.cbb_radius
@@ -55,6 +46,15 @@ class Circle(Body):
     @property
     def ymax(self):
         return self._pos.y + self.cbb_radius
+
+    def __init__(self, radius, pos=(0, 0), vel=(0, 0), **kwds):
+        radius = float(radius)
+        super(Circle, self).__init__(
+            pos, vel,
+            base_shape=shapes.Circle(radius, null2D),
+            cbb_radius=radius,
+            **kwds
+        )
 
     def __repr__(self):
         tname = type(self).__name__

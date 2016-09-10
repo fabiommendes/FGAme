@@ -1,5 +1,5 @@
-from .orientation_objects import PosObject as _pos_class
-from .orientation_objects import VelObject as _vel_class
+from .state_objects import PosObject as _pos_class
+from .state_objects import VelObject as _vel_class
 from .world import World
 
 world = World()

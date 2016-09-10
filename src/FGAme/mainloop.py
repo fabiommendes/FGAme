@@ -230,28 +230,31 @@ class MainLoop:
             return self.schedule(time - self.time, function, args, kwargs,
                                  **passed_kwargs)
 
-    # def periodic(self, time_interval, function=None, *args, **kwds):
-    #     """Similar à one_shot, mas agenda a simulação para ocorrer
-    #     repetidamente cada vez que passar o intervalo de tempo fornecido."""
-    #
-    #     # Decorador
-    #     if function is None or function is Ellipsis:
-    #         def decorator(func):
-    #             return self.periodic(time_interval, func, *args, **kwds)
-    #
-    #         return decorator
-    #
-    #     def recursive_action(*r_args, **r_kwds):
-    #         function(*r_args, **r_kwds)
-    #         self.one_shot(time_interval, recursive_action, *args, **kwds)
-    #
-    #     self.one_shot(0, recursive_action, *args, **kwds)
-    #
-    # def periodic_frames(self, n_frames, function=None, *args, **kwds):
-    #     """Similar à periodic(), mas agenda o intervalo de execução em frames
-    #     ao invés de segundos"""
-    #
-    #     self.periodic(n_frames * self.dt, function, *args, **kwds)
+    def periodic(self, delta_t, function=None, args=None, kwargs=None, **passed_kwargs):
+        """
+        Schedule function to execute every delta_t seconds.
+
+
+        """
+
+        # Decorador
+        if function is None or function is Ellipsis:
+            def decorator(func):
+                return self.periodic(delta_t, func, *args, **kwds)
+
+            return decorator
+
+        def recursive_action(*r_args, **r_kwds):
+            function(*r_args, **r_kwds)
+            self.one_shot(delta_t, recursive_action, *args, **kwds)
+
+        self.schedule(0, recursive_action, *args, **kwds)
+
+    def periodic_steps(self, n_frames, function=None, *args, **kwds):
+        """Similar à periodic(), mas agenda o intervalo de execução em frames
+        ao invés de segundos"""
+
+        self.periodic(n_frames * self.dt, function, *args, **kwds)
     #
     # def schedule_every_frame(self, function=None, *args, **kwds):
     #     """Agenda função para ser executada em cada frame.

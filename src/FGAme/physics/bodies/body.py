@@ -40,6 +40,127 @@ class Body(Solid, Particle):
         '_theta', '_omega', '_alpha',
     )
 
+    # Angular state
+    @property
+    def omega(self):
+        """
+        Angular velocity (rad/sec).
+        """
+
+        return self._omega
+
+    @omega.setter
+    def omega(self, value):
+        if self.flags & flags.can_rotate:
+            self._omega = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
+
+    @property
+    def theta(self):
+        """
+        Rotation angle (rad)
+        """
+
+        return self._theta
+
+    @theta.setter
+    def theta(self, value):
+        if self.flags & flags.can_rotate:
+            self._theta = value + 0.0
+        elif value:
+            self._raise_cannot_rotate_error()
+
+    # Forces and torques
+    @property
+    def adamping(self):
+        return self._adamping
+
+    @adamping.setter
+    def adamping(self, value):
+        self._adamping = float(value)
+        self.owns_adamping = True
+
+    # Inertia
+    def _mass_setter(self, value):
+        value = float(value)
+
+        if value <= 0:
+            raise ValueError('mass cannot be null or negative')
+        elif value != INF:
+            self._density = value / self.area()
+            if self._invinertia:
+                inertia = value * self.ROG_sqr()
+                self._invinertia = 1.0 / inertia
+            self._invmass = 1.0 / value
+        else:
+            self._invmass = 0.0
+            self._invinertia = 0.0
+
+    @property
+    def inertia(self):
+        try:
+            return 1.0 / self._invinertia
+        except ZeroDivisionError:
+            return INF
+
+    @inertia.setter
+    def inertia(self, value):
+        value = float(value)
+
+        if self.can_rotate:
+            if value <= 0:
+                raise ValueError('inertia cannot be null or negative')
+            elif value != INF:
+                self._invinertia = 1.0 / value
+            else:
+                self._invinertia = 0.0
+        else:
+            self._raise_cannot_rotate_error()
+
+    @property
+    def density(self):
+        return self._density
+
+    @density.setter
+    def density(self, value):
+        rho = float(value)
+        self._density = rho
+        if self._invmass:
+            self._invmass = 1.0 / (self.area() * rho)
+        if self._invinertia:
+            self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
+
+    # Geometric properties
+    @property
+    def cbb(self):
+        return shapes.Circle(self.cbb_radius, self.pos)
+
+    @property
+    def aabb(self):
+        if self.flags & flags.dirty_aabb:
+            self._aabb = self.bb.aabb
+            self.flags &= flags.not_dirty_aabb
+        return self._aabb
+
+    @property
+    def bb(self):
+        """
+        Bounding box around object.
+
+        Can be of any primitive shape such as AABB, Circle, Poly, etc.
+        """
+
+        shape = self.base_shape.move(self.pos)
+        if self._theta:
+            shape = shape.rotate(self._theta)
+        return shape
+
+    xmin = delegate_to('bb')
+    xmax = delegate_to('bb')
+    ymin = delegate_to('bb')
+    ymax = delegate_to('bb')
+
     DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 
     def __init__(self,
@@ -104,36 +225,6 @@ class Body(Solid, Particle):
         self._invinertia = safe_div(1.0, inertia)
         self._density = float(density)
 
-    # Geometric properties
-    @property
-    def cbb(self):
-        return shapes.Circle(self.cbb_radius, self.pos)
-
-    @property
-    def aabb(self):
-        if self.flags & flags.dirty_aabb:
-            self._aabb = self.bb.aabb
-            self.flags &= flags.not_dirty_aabb
-        return self._aabb
-
-    @property
-    def bb(self):
-        """
-        Bounding box around object.
-
-        Can be of any primitive shape such as AABB, Circle, Poly, etc.
-        """
-
-        shape = self.base_shape.move(self.pos)
-        if self._theta:
-            shape = shape.rotate(self._theta)
-        return shape
-
-    xmin = delegate_to('bb')
-    xmax = delegate_to('bb')
-    ymin = delegate_to('bb')
-    ymax = delegate_to('bb')
-
     def area(self):
         """
         Object surface area.
@@ -166,37 +257,6 @@ class Body(Solid, Particle):
         """
 
         return self._sqrt(self.ROG_sqr())
-
-    # Angular state
-    @property
-    def omega(self):
-        """
-        Angular velocity (rad/sec).
-        """
-
-        return self._omega
-
-    @omega.setter
-    def omega(self, value):
-        if self.flags & flags.can_rotate:
-            self._omega = value + 0.0
-        elif value:
-            self._raise_cannot_rotate_error()
-
-    @property
-    def theta(self):
-        """
-        Rotation angle (rad)
-        """
-
-        return self._theta
-
-    @theta.setter
-    def theta(self, value):
-        if self.flags & flags.can_rotate:
-            self._theta = value + 0.0
-        elif value:
-            self._raise_cannot_rotate_error()
 
     # Physical properties
     def angularK(self):
@@ -259,65 +319,6 @@ class Body(Solid, Particle):
             return momentumL + self.omega * self.inertia
         else:
             return momentumL
-
-    # Forces and torques
-    @property
-    def adamping(self):
-        return self._adamping
-
-    @adamping.setter
-    def adamping(self, value):
-        self._adamping = float(value)
-        self.owns_adamping = True
-
-    def _mass_setter(self, value):
-        value = float(value)
-
-        if value <= 0:
-            raise ValueError('mass cannot be null or negative')
-        elif value != INF:
-            self._density = value / self.area()
-            if self._invinertia:
-                inertia = value * self.ROG_sqr()
-                self._invinertia = 1.0 / inertia
-            self._invmass = 1.0 / value
-        else:
-            self._invmass = 0.0
-            self._invinertia = 0.0
-
-    @property
-    def inertia(self):
-        try:
-            return 1.0 / self._invinertia
-        except ZeroDivisionError:
-            return INF
-
-    @inertia.setter
-    def inertia(self, value):
-        value = float(value)
-
-        if self.can_rotate:
-            if value <= 0:
-                raise ValueError('inertia cannot be null or negative')
-            elif value != INF:
-                self._invinertia = 1.0 / value
-            else:
-                self._invinertia = 0.0
-        else:
-            self._raise_cannot_rotate_error()
-
-    @property
-    def density(self):
-        return self._density
-
-    @density.setter
-    def density(self, value):
-        rho = float(value)
-        self._density = rho
-        if self._invmass:
-            self._invmass = 1.0 / (self.area() * rho)
-        if self._invinertia:
-            self._invinertia = 1.0 / (self.area() * rho * self.ROG_sqr())
 
     def apply_force_at(self, force, pos, dt, method=None):
         """
@@ -453,17 +454,8 @@ class LinearRigidBody(Body):
     This is the subclass of all rigid bodies that do not support rotations.
     """
 
-    __slots__ = []
+    __slots__ = ()
     DEFAULT_FLAGS = Body.DEFAULT_FLAGS & (flags.full ^ flags.can_rotate)
-
-    def __init__(self, pos=(0, 0), vel=(0, 0),
-                 mass=None, density=None, **kwargs):
-        super(LinearRigidBody, self).__init__(
-            pos, vel, 0.0, 0.0,
-            mass=mass, density=density,
-            inertia='inf',
-            flags=self.DEFAULT_FLAGS, **kwargs
-        )
 
     @property
     def theta(self):
@@ -486,3 +478,12 @@ class LinearRigidBody(Body):
         if float(value) != INF:
             raise ValueError('LinearObjects have infinite inertia, '
                              'got %r' % value)
+
+    def __init__(self, pos=(0, 0), vel=(0, 0),
+                 mass=None, density=None, **kwargs):
+        super(LinearRigidBody, self).__init__(
+            pos, vel, 0.0, 0.0,
+            mass=mass, density=density,
+            inertia='inf',
+            flags=self.DEFAULT_FLAGS, **kwargs
+        )

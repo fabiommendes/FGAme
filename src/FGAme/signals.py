@@ -1,5 +1,9 @@
 import inspect
 from functools import partial
+from types import FunctionType
+
+from lazyutils import lazy
+
 REGISTERED_SIGNALS = {}
 
 
@@ -39,9 +43,9 @@ class Handler:
     A signal handler.
     """
 
-    def __init__(self, handler, signal, filters, args=None, kwargs=None,
+    def __init__(self, function, signal, filters, args=None, kwargs=None,
                  active=True, connected=False):
-        self.handler = handler
+        self.function = function
         self.signal = signal
         self.connected = connected
         self.active = active
@@ -58,13 +62,13 @@ class Handler:
         # We now decide what is the optimal way of normalizing the callback
         # function. This function is saved on the .callback attribute
         if self.args or self.kwargs:
-            handler = partial(handler, *self.args, **self.kwargs)
+            function = partial(function, *self.args, **self.kwargs)
 
         # Simple cases: no filters
         if not filters:
-            self.callback = handler
+            self.callback = function
         else:
-            self.callback = _ignoring_function_factory(handler, signal.filters,
+            self.callback = _ignoring_function_factory(function, signal.filters,
                                                        set(self.filters))
 
     def __call__(self, *args, **kwargs):
@@ -72,7 +76,7 @@ class Handler:
 
     def accept(self, *args, **kwargs):
         """
-        Return true if the handle should accept to handle the given call.
+        Return true if the handler should accept to handle the given call.
         """
 
         accept = self._accept
@@ -80,7 +84,7 @@ class Handler:
             for arg, name in zip(args, self.signal.filters):
                 kwargs[name] = arg
             for name, value in self.filters.items():
-                if kwargs[name] != value:
+                if kwargs.get(name, value) != value:
                     return False
             return True
         else:
@@ -153,18 +157,20 @@ class Signal:
         # Equality is identity.
         return self is other
 
-    def connect(self, handler, *filters, args=None, kwargs=None,
-                **filter_kwargs):
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, self.name)
+
+    def connect(self, function, *filters, args=None, kwargs=None, **extra_args):
         """
         Connects handler to the signal.
 
         Args:
-            handler:
+            function:
                 A function handler with the correct signature
-            args:
+            args (tuple):
                 Any positional arguments that must be applied to the handler
                 function.
-            kwargs:
+            kwargs (dict):
                 Any keyword arguments that must be applied to the handler
                 function.
 
@@ -177,27 +183,20 @@ class Signal:
         how the function handler is connected to the signal.
         """
 
-        # Merge positional and keyword arguments using information from
-        # self.argnames
-        num_args = len(self.filters)
-        if len(filters) + len(filter_kwargs) > num_args:
-            raise TypeError('signal binds to %s parameters at most' % num_args)
-
-        for name, value in zip(self.filters, filters):
-            if name in filter_kwargs:
-                raise TypeError('duplicated argument: %r' % name)
-            filter_kwargs[name] = value
-
-        # Now we check if there is any invalid argument in kwargs
-        for name in filter_kwargs:
-            if name not in self.filters:
-                raise TypeError('invalid argument: %r' % name)
+        named_filters = {}
+        for k, v in list(extra_args.items()):
+            if k in self.filters:
+                named_filters[k] = extra_args.pop(k)
+        filters = normalize_filters(self, filters, named_filters)
+        kwargs = dict(kwargs or {}, **extra_args)
+        filters_map = {self.filters[i]: value for i, value in
+                       enumerate(filters)}
 
         # Now we create a handler and attach to the list of handlers
         handler = Handler(
-            handler,
+            function,
             signal=self,
-            filters=filter_kwargs,
+            filters=filters_map,
             args=args,
             kwargs=kwargs,
             connected=True
@@ -275,6 +274,129 @@ class Signal:
             filtered[0].connected = False
 
 
+class Listener:
+    """
+    Base class for objects that implement the listener interface.
+    """
+
+    __slots__ = ()
+
+    @lazy
+    def _connected_handlers(self):
+        return []
+
+    @lazy
+    def _instance_signals(self):
+        return {}
+
+    def _as_signal(self, signal):
+        if isinstance(signal, Signal):
+            return signal
+        try:
+            return self._instance_signals[signal]
+        except KeyError:
+            return as_signal(signal)
+
+    def autoconnect(self):
+        """
+        Auto-connect all signals to handlers.
+        """
+
+        cls = type(self)
+        for attr in dir(cls):
+            if attr.startswith('_'):
+                continue
+            cls_value = getattr(cls, attr)
+            if isinstance(cls_value, FunctionType):
+                value = getattr(self, attr)
+            else:
+                continue
+
+            if attr.endswith('_event'):
+                signal_name = attr[:-6].replace('_', '-')
+                self.listen(signal_name, function=value)
+
+            if hasattr(value, '__method_signals__'):
+                L = value.__method_signals__
+                for (signal, filters, args, kwargs, extra_args) in L:
+                    self.listen(signal, *filters, args=args, kwargs=kwargs,
+                                function=value, **extra_args)
+
+    def new_signal(self, name, filters=(), extra_args=(), help_text=''):
+        """
+        Create a new signal bound to an specific instance.
+        """
+
+        signal = Signal(name, filters, extra_args, help_text)
+        self._instance_signals[name] = signal
+        return signal
+
+    def signal_filters(self):
+        """
+        Return a dictionary mapping filter names with their corresponding
+        values.
+        """
+
+        return {}
+
+    def listen(self, signal, *filters, args=None, kwargs=None, function=None,
+               **extra_args):
+        """
+        Connect function with the given signal.
+
+        It is similar to the global listen() decorator, associate the filters
+        with the current instance.
+        """
+
+        signal = self._as_signal(signal)
+        named_filters = self.signal_filters()
+        for k, v in list(extra_args.items()):
+            if k in signal.filters:
+                if k in named_filters:
+                    raise TypeError('duplicated argument: %r' % k)
+                named_filters[k] = extra_args.pop(k)
+        filters = normalize_filters(signal, filters, named_filters)
+
+        if function is not None:
+            handler = listen(signal, *filters, args=args, kwargs=kwargs,
+                             function=function, **extra_args)
+            self._connected_handlers.append(function)
+        else:
+            def decorator(func):
+                decorator = listen(signal, *filters, args=args, kwargs=kwargs,
+                                   **extra_args)
+                decorated = decorator(func)
+                self._connected_handlers.append(decorated.handlers[-1])
+                return decorated
+
+            return decorator
+
+    def disconnect_signals(self):
+        """
+        Disconnect all signal handlers associated with the current object.
+        """
+
+        for handler in self._connected_handlers:
+            handler.disconnect()
+
+    def pause_signals(self):
+        """
+        Temporarily disable all signal handlers associated with the current
+        object.
+        """
+
+        for handler in self._connected_handlers:
+            handler.pause()
+
+    def resume_signals(self):
+        """
+        Re-enable all paused signal handlers associated with the current object.
+        """
+
+        for handler in self._connected_handlers:
+            handler.resume()
+
+
 def global_signal(name, *args, **kwargs):
     """
     Create signal and register in the REGISTERED_SIGNALS dictionary.
@@ -294,11 +416,21 @@ def is_method(func):
     return args and args[0] == 'self'
 
 
-def listen(signal, *args, **kwargs):
+def listen(signal, *filters,
+           function=None, args=None, kwargs=None, **extra_kwargs):
     """
     Decorator function
     """
 
+    def get_handler(signal, function):
+        if not callable(function):
+            raise TypeError('must be callable, got %r' % function)
+        return signal.connect(function, *filters, args=args, kwargs=kwargs,
+                              **extra_kwargs)
+
+    if function is not None:
+        signal = as_signal(signal)
+        return get_handler(signal, function)
     signal_input = signal
 
     def decorator(func):
@@ -307,27 +439,18 @@ def listen(signal, *args, **kwargs):
                 args_list = func.__method_signals__
             except AttributeError:
                 args_list = func.__method_signals__ = []
-            args_list.append((signal_input, args, kwargs))
+            args_list.append((signal_input, filters, args, kwargs, extra_kwargs))
             return func
 
-        if isinstance(signal_input, str):
-            try:
-                signal = REGISTERED_SIGNALS[signal_input]
-            except KeyError:
-                raise ValueError('invalid signal name: %s' % signal_input)
-        else:
-            signal = signal_input
-
         # Connect function
-        fargs = kwargs.pop('args', None)
-        handler = signal.connect(func, *args, args=fargs, kwargs=kwargs)
+        signal = as_signal(signal_input)
+        handler = get_handler(signal, func)
 
         # We register a few attributes to make the func.disconnect(),
         # func.pause(), etc functions work.
         signals = getattr(func, '_connected_signals', set())
         signals.add(signal)
         func._connected_signals = signals
-
         handlers = getattr(func, '_signal_handlers', [])
         handlers.append(handler)
         func._signal_handlers = handlers
@@ -456,19 +579,59 @@ def trigger(signal, *args, **kwargs):
     Triggers signal with the given positional and keyword arguments.
     """
 
-    if isinstance(signal, str):
-        try:
-            signal = REGISTERED_SIGNALS[signal]
-        except KeyError:
-            raise ValueError('invalid signal name: %s' % signal)
-
+    signal = as_signal(signal)
     signal.trigger(*args, **kwargs)
 
 
-# Physics events
-collision_pair_signal = global_signal('collision-pair', [], ['collision'])
-collision_signal = global_signal('collision', ['object'], ['collision'])
-detach_signal = global_signal('detach-signal', ['object'])
-out_of_bounds_signal = global_signal('out-of-margin', ['object'])
-max_speed_signal = global_signal('max-speed', ['object'])
-sleep_signal = global_signal('sleep', ['object'])
+def as_signal(signal):
+    """
+    Return signal name as a signal instance.
+    """
+
+    if isinstance(signal, str):
+        try:
+            return REGISTERED_SIGNALS[signal]
+        except KeyError:
+            raise ValueError('invalid signal name: %s' % signal)
+    elif isinstance(signal, Signal):
+        return signal
+    else:
+        raise TypeError('not a signal')
+
+
+def normalize_filters(signal, values, named_filters):
+    """
+    Return a list of filter values from filters passed by position and filters
+    passed by name.
+    """
+
+    # Create an empty list of filter values
+    empty = object()
+    result = [empty] * len(signal.filters)
+
+    # Save named values
+    for name, value in named_filters.items():
+        if name in signal.filters:
+            idx = signal.filters.index(name)
+            result[idx] = value
+
+    # Save positional values
+    values = list(reversed(values))
+    idx = 0
+    while values:
+        value = result[idx]
+        if value is empty:
+            result[idx] = values.pop()
+        elif idx == len(values) - 1:
+            raise ValueError('too many filter arguments!')
+        else:
+            idx += 1
+
+    # Remove trailing empty values
+    while result and result[-1] is empty:
+        result.pop()
+    if empty in result:
+        idx = result.index(empty)
+        name = signal.filters[idx]
+        raise TypeError('missing %s argument!' % name)
+    return result

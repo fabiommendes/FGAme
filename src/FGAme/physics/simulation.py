@@ -3,6 +3,63 @@ from collections import defaultdict
 from FGAme.mathtools import Vec2, null2D
 from FGAme.physics import flags
 from FGAme.physics.broadphase import BroadPhase, BroadPhaseCBB, NarrowPhase
+from FGAme.signals import global_signal
+
+# Signals
+pre_collision_signal = global_signal(
+    'pre-collision', ['simulation'], ['col'],
+    help_text='Triggered when a collision between two objects occurs. This'
+              'signal is resolved before collision.'
+)
+post_collision_signal = global_signal(
+    'post-collision', ['simulation'], ['col'],
+    help_text='Like pre-collision, but it is triggered just *after* collision '
+              'is resolved.'
+)
+object_added_signal = global_signal(
+    'object-added', ['simulation', 'object'], [],
+    help_text='Triggered when an object is added to the simulation.'
+)
+object_removed_signal = global_signal(
+    'object-removed', ['simulation', 'object'], [],
+    help_text='Triggered when an object is removed from simulation.'
+)
+gravity_changed_signal = global_signal(
+    'gravity-changed', ['simulation'], ['old', 'new'],
+    help_text='Triggered when the simulation gravity changes.'
+)
+damping_changed_signal = global_signal(
+    'damping-changed', ['simulation'], ['old', 'new'],
+    help_text='Triggered when the global damping changes.'
+)
+adamping_changed_signal = global_signal(
+    'adamping-changed', ['simulation'], ['old', 'new'],
+    help_text='Triggered when the global angular damping changes.'
+)
+friction_changed_signal = global_signal(
+    'friction-changed', ['simulation'], ['old', 'new'],
+    help_text='Triggered when friction coefficient changes.'
+)
+restitution_changed_signal = global_signal(
+    'restitution-changed', ['simulation'], ['old', 'new'],
+    help_text='Triggered when restitution coefficient changes.'
+)
+out_of_bounds_signal = global_signal(
+    'out-of-bounds', ['simulation', 'object'], [],
+    help_text='Triggered when an object leaves the simulation bounds.'
+)
+max_speed_signal = global_signal(
+    'max-speed', ['simulation', 'object'], [],
+    help_text='Trigerred when an object reaches the maximum simulation speed.'
+)
+sleep_signal = global_signal(
+    'sleep', ['simulation', 'object'],
+    help_text='Triggered when object starts sleeping.'
+)
+wake_up_signal = global_signal(
+    'wake-up', ['simulation', 'object'],
+    help_text='Triggered when object leaves sleeping state.'
+)
 
 
 class Simulation:
@@ -11,13 +68,93 @@ class Simulation:
     solve their time evolution.
     """
 
+    # Physical properties and global forces
+    @property
+    def gravity(self):
+        return self._gravity
+
+    @gravity.setter
+    def gravity(self, value):
+        owns_prop = flags.owns_gravity
+        old = self._gravity
+        try:
+            gravity = self._gravity = Vec2(*value)
+        except TypeError:
+            gravity = self._gravity = Vec2(0, -value)
+
+        for obj in self._objects:
+            if not obj.flags & owns_prop:
+                obj._gravity = gravity
+                gravity_changed_signal.trigger(self, old, self._gravity)
+
+    @property
+    def damping(self):
+        return self._damping
+
+    @damping.setter
+    def damping(self, value):
+        owns_prop = flags.owns_damping
+        old = self._damping
+        value = self._damping = float(value)
+
+        for obj in self._objects:
+            if not obj.flags & owns_prop:
+                obj._damping = value
+                damping_changed_signal.trigger(self, old, self._damping)
+
+    @property
+    def adamping(self):
+        return self._adamping
+
+    @adamping.setter
+    def adamping(self, value):
+        owns_prop = flags.owns_adamping
+        old = self._adamping
+        value = self._adamping = float(value)
+
+        for obj in self._objects:
+            if not obj.flags & owns_prop:
+                obj._adamping = value
+                adamping_changed_signal.trigger(self, old, self._adamping)
+
+    @property
+    def restitution(self):
+        return self._restitution
+
+    @restitution.setter
+    def restitution(self, value):
+        owns_prop = flags.owns_restitution
+        old = self._restitution
+        value = self._restitution = float(value)
+
+        for obj in self._objects:
+            if not obj.flags & owns_prop:
+                obj._restitution = value
+                restitution_changed_signal.trigger(self, old, self._restitution)
+
+    @property
+    def friction(self):
+        return self._friction
+
+    @friction.setter
+    def friction(self, value):
+        owns_prop = flags.owns_friction
+        old = self._friction
+        value = self._friction = float(value)
+
+        for obj in self._objects:
+            if not obj.flags & owns_prop:
+                obj._friction = value
+                friction_changed_signal.trigger(self, old, self._friction)
+
     def __init__(self,
                  gravity=None,
                  damping=0, adamping=0,
                  restitution=1, friction=0,
                  sleep_speed=3, sleep_angular_speed=0.05, max_speed=None,
                  bounds=None, broad_phase=None,
-                 niter=5, beta=0.0):
+                 niter=5, beta=0.0,
+                 collision_check=None):
 
         super(Simulation, self).__init__()
 
@@ -35,8 +172,9 @@ class Simulation:
         self.sleep_angular_speed = sleep_angular_speed
 
         # Collision detection algorithms
+        self.collision_check = collision_check or can_collide
         self.broad_phase = normalize_broad_phase(broad_phase, self)
-        self.narrow_phase = NarrowPhase(world=self)
+        self.narrow_phase = NarrowPhase(simulation=self)
 
         # Global forces and physical parameters
         self._kinetic0 = None
@@ -66,96 +204,6 @@ class Simulation:
     def __contains__(self, obj):
         return obj in self._objects
 
-    # Sinais
-    # frame_enter = signal('frame-enter')
-    # collision = signal('collision', num_args=1)
-    # object_add = signal('object-add', num_args=1)
-    # object_remove = signal('object-remove', num_args=1)
-    # gravity_change = signal('gravity-change', num_args=2)
-    # damping_change = signal('damping-change', num_args=2)
-    # adamping_change = signal('adamping-change', num_args=2)
-    # restitution_change = signal('restitution-change', num_args=2)
-    # friction_change = signal('friction-change', num_args=2)
-
-    # Physical properties and global forces
-    @property
-    def gravity(self):
-        return self._gravity
-
-    @gravity.setter
-    def gravity(self, value):
-        owns_prop = flags.owns_gravity
-        old = self._gravity
-        try:
-            gravity = self._gravity = Vec2(*value)
-        except TypeError:
-            gravity = self._gravity = Vec2(0, -value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._gravity = gravity
-                # self.trigger('gravity-change', old, self._gravity)
-
-    @property
-    def damping(self):
-        return self._damping
-
-    @damping.setter
-    def damping(self, value):
-        owns_prop = flags.owns_damping
-        old = self._damping
-        value = self._damping = float(value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._damping = value
-                # self.trigger('damping-change', old, self._damping)
-
-    @property
-    def adamping(self):
-        return self._adamping
-
-    @adamping.setter
-    def adamping(self, value):
-        owns_prop = flags.owns_adamping
-        old = self._adamping
-        value = self._adamping = float(value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._adamping = value
-                # self.trigger('adamping-change', old, self._damping)
-
-    @property
-    def restitution(self):
-        return self._restitution
-
-    @restitution.setter
-    def restitution(self, value):
-        owns_prop = flags.owns_restitution
-        old = self._restitution
-        value = self._restitution = float(value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._restitution = value
-                # self.trigger('restitution-change', old, self._restitution)
-
-    @property
-    def friction(self):
-        return self._friction
-
-    @friction.setter
-    def friction(self, value):
-        owns_prop = flags.owns_friction
-        old = self._friction
-        value = self._friction = float(value)
-
-        for obj in self._objects:
-            if not obj.flags & owns_prop:
-                obj._friction = value
-                # self.trigger('friction-change', old, self._friction)
-
     # Objects and collisions
     def add(self, obj):
         """
@@ -178,7 +226,8 @@ class Simulation:
                 obj._restitution = self.restitution
             if not oflags & flags.owns_friction:
                 obj._friction = self.friction
-            # self.trigger('object-add', obj)
+
+            object_added_signal.trigger(self, obj)
 
     def remove(self, obj):
         """
@@ -198,7 +247,8 @@ class Simulation:
                     L.remove(obj)
                 except ValueError:
                     pass
-            self.trigger('object-remove', obj)
+            object_removed_signal.trigger(self, obj)
+
         obj._simulation = None
 
     def discard(self, obj):
@@ -338,27 +388,6 @@ class Simulation:
             gA.append(C)
         return list(groups.values())
 
-    def can_collide(self, A, B):
-        """
-        Return True if A and B can collide.
-        """
-
-        # Testa se os dois objetos são estáticos
-        if ((not A._invmass or A.flags & flags.is_sleeping) and
-                (not B._invmass or B.flags & flags.is_sleeping)):
-            return False
-
-        # Testa se estão na mesma camada de colisão
-        elif ((A._col_layer_mask != B._col_layer_mask)
-              and not (A._col_layer_mask & B._col_layer_mask)):
-            return False
-
-        # Testa se estão no mesmo grupo de colisão mesma camada de colisão
-        elif A._col_group_mask & B._col_group_mask:
-            return False
-
-        return True
-
     # Physical parameters
     def energyK(self):
         """
@@ -481,16 +510,38 @@ class Simulation:
                 col.adjust_overlap()
 
 
-def normalize_broad_phase(broad_phase, world):
+def normalize_broad_phase(broad_phase, simulation):
     if broad_phase is None:
-        broad_phase = BroadPhaseCBB(world=world)
+        broad_phase = BroadPhaseCBB(simulation=simulation)
     elif isinstance(broad_phase, BroadPhase):
-        if broad_phase.world not in [None, world]:
+        if broad_phase.simulation not in [None, simulation]:
             raise ValueError('BroadPhase object has a world attatched')
         else:
-            broad_phase.world = world
+            broad_phase.simulation = simulation
     elif isinstance(broad_phase, type) and issubclass(broad_phase, BroadPhase):
-        broad_phase = broad_phase(world=world)
+        broad_phase = broad_phase(simulation=simulation)
     else:
         raise TypeError('invalid broad phase object')
     return broad_phase
+
+
+def can_collide(A, B):
+    """
+    Return True if A and B can collide.
+    """
+
+    # Check if A and B are kinematic
+    if ((not A._invmass or A.flags & flags.is_sleeping) and
+            (not B._invmass or B.flags & flags.is_sleeping)):
+        return False
+
+    # Check if both are in the same collision layer
+    elif ((A._col_layer_mask != B._col_layer_mask)
+          and not (A._col_layer_mask & B._col_layer_mask)):
+        return False
+
+    # Check if both are in the same collision group
+    elif A._col_group_mask & B._col_group_mask:
+        return False
+
+    return True

@@ -1,18 +1,14 @@
-/build
-/doc/build
+# Cached builds
+__pycache__/
 *.pyc
+*.pyo
+*.pyd
 *.so
-*.c
-*.profile
-*.prof
-/dist/
-.anjuta
-.idea/
-.settings/
-.project
-.pydevproject
-FGAme.anjuta
-fgame.nja
-MANIFEST
-.anjuta_sym_db.db
-/py2src/
+*.dll
+*.egg
+*.egg-info/
+
+# Build directories
+doc/_build/
+build/
+dist/
