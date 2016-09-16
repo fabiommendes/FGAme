@@ -146,7 +146,9 @@ class Body(physics.Body):
 
     def destroy(self):
         super().destroy()
-        self.world.remove(self)
+        if self.world is not None:
+            self.world.remove(self)
+            self.world = None
 
     def _init_drawshape(self, color=None, linecolor=None, linewidth=1):
         bbox = self.bb

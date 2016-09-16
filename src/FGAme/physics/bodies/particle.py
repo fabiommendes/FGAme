@@ -15,6 +15,18 @@ class ParticleMeta(type(smallshapes.core.mLocatable)):
     def __init__(self, name, bases, ns):
         super().__init__(name, bases, ns)
 
+        self._create_property_setters(ns)
+
+    def _create_property_setters(self, ns):
+        if 'xmin' in ns:
+            self.xmin = ns['xmin'].setter(self.left.fset)
+        if 'xmax' in ns:
+            self.xmax = ns['xmax'].setter(self.right.fset)
+        if 'ymin' in ns:
+            self.ymin = ns['ymin'].setter(self.bottom.fset)
+        if 'ymax' in ns:
+            self.ymax = ns['ymax'].setter(self.top.fset)
+
 
 class Particle(smallshapes.core.locatable.mLocatable,
                Listener,
@@ -88,9 +100,17 @@ class Particle(smallshapes.core.locatable.mLocatable,
     def invmass(self):
         return self._invmass
 
+    @invmass.setter
+    def invmass(self, value):
+        self._invmass = float(value)
+
     @property
     def invinertia(self):
         return self._invinertia
+
+    @invinertia.setter
+    def invinertia(self, value):
+        self._invinertia = float(value)
 
     @property
     def mass(self):
@@ -101,7 +121,7 @@ class Particle(smallshapes.core.locatable.mLocatable,
 
     @mass.setter
     def mass(self, value):
-        self._invmass = 1.0 / value
+        self.invmass = 1 / float(value)
 
     # External forces
     force = ForceProperty()
@@ -281,6 +301,7 @@ class Particle(smallshapes.core.locatable.mLocatable,
 
         if self._simulation is not None:
             self.simulation.remove(self)
+            self._simulation = None
 
     def copy(self):
         """

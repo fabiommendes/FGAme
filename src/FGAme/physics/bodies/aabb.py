@@ -48,45 +48,17 @@ class AABB(LinearRigidBody):
     def xmin(self):
         return self._pos.x - self._delta_x
 
-    @xmin.setter
-    def xmin(self, value):
-        xmin = float(value)
-        xmax = self.xmax
-        self._pos = self._pos.setx((xmax + xmin) / 2)
-        self._delta_x = (xmax - xmin) / 2
-
     @property
     def xmax(self):
         return self._pos.x + self._delta_x
-
-    @xmax.setter
-    def xmax(self, value):
-        xmin = self.xmin
-        xmax = float(value)
-        self._pos = self._pos.setx((xmax + xmin) / 2)
-        self._delta_x = (xmax - xmin) / 2
 
     @property
     def ymin(self):
         return self._pos.y - self._delta_y
 
-    @ymin.setter
-    def ymin(self, value):
-        ymin = float(value)
-        ymax = self.ymax
-        self._pos = self._pos.sety((ymax + ymin) / 2)
-        self._delta_y = (ymax - ymin) / 2
-
     @property
     def ymax(self):
         return self._pos.y + self._delta_y
-
-    @ymax.setter
-    def ymax(self, value):
-        ymin = self.ymin
-        ymax = float(value)
-        self.pos = self.pos.copy(y=(ymax + ymin) / 2)
-        self._delta_y = (ymax - ymin) / 2
 
     @property
     def vertices(self):
@@ -99,7 +71,7 @@ class AABB(LinearRigidBody):
             rect=rect, shape=shape, pos=pos
         )
 
-        pos = ((xmin + xmax) / 2., (ymin + ymax) / 2.)
+        pos = (xmin + xmax) / 2., (ymin + ymax) / 2.
         self._delta_x = dx = (xmax - xmin) / 2
         self._delta_y = dy = (ymax - ymin) / 2
         aabb = shapes.AABB(-dx, dx, -dy, dy)

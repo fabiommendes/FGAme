@@ -12,3 +12,4 @@ __pycache__/
 doc/_build/
 build/
 dist/
+py2src/

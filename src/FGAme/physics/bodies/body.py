@@ -1,5 +1,3 @@
-from lazyutils import delegate_to
-
 from FGAme.mathtools import Vec2, asvector, null2D, shapes
 from FGAme.physics import flags
 from FGAme.physics.bodies import Particle
@@ -156,10 +154,56 @@ class Body(Solid, Particle):
             shape = shape.rotate(self._theta)
         return shape
 
-    xmin = delegate_to('bb')
-    xmax = delegate_to('bb')
-    ymin = delegate_to('bb')
-    ymax = delegate_to('bb')
+    xmin = property(lambda self: self.bb.xmin)
+    xmax = property(lambda self: self.bb.xmax)
+    ymin = property(lambda self: self.bb.ymin)
+    ymax = property(lambda self: self.bb.ymax)
+
+    @property
+    def left(self):
+        return self.xmin
+
+    @left.setter
+    def left(self, value):
+        self.move(value - self.xmin, 0)
+
+    @property
+    def right(self):
+        return self.xmax
+
+    @right.setter
+    def right(self, value):
+        self.move(value - self.xmax, 0)
+
+    @property
+    def top(self):
+        return self.ymax
+
+    @top.setter
+    def top(self, value):
+        self.move(0, value - self.ymax)
+
+    @property
+    def bottom(self):
+        return self.ymin
+
+    @bottom.setter
+    def bottom(self, value):
+        self.move(0, value - self.ymin)
+
+    @property
+    def heading(self):
+        try:
+            return self.vel.normalize()
+        except ZeroDivisionError:
+            return self.orientation()
+
+    @heading.setter
+    def heading(self, value):
+        vel = self.vel
+        speed = vel.norm()
+        heading = asvector(value).normalize()
+        self.vel = heading * speed
 
     DEFAULT_FLAGS = 0 | flags.can_rotate | flags.dirty_shape | flags.dirty_aabb
 

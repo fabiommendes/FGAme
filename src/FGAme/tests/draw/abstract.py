@@ -1,3 +1,5 @@
+import pytest
+
 from smallshapes.tests import abstract as base
 from FGAme import draw
 
@@ -6,12 +8,10 @@ class TestDrawable:
     pass
 
 
-class TestShape(TestDrawable, base.TestShape):
-    def test_classes_define_mutability(self):
-        pass
-
-    def test_is_immutable(self):
-        pass
+class TestShape(base.DisableMutabilityTests, TestDrawable, base.TestShape):
+    @pytest.fixture
+    def mutable(self, obj):
+        return obj
 
     def test_default_line_color_is_black(self, obj):
         assert isinstance(obj.linecolor, draw.Color)

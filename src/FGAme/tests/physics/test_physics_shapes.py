@@ -26,7 +26,7 @@ class TestAABB(test_body.TestBody, test_aabb.TestAABB):
     def test_aabb_collision(self, cls):
         a = cls(0, 10, 0, 10)
         b = cls(5, 15, 5, 15)
-        c = cls(10, 15, 11, 16)
+        c = cls(11, 15, 11, 16)
         assert get_collision(a, b) is not None
         assert get_collision(b, c) is not None
         assert get_collision(a, c) is None

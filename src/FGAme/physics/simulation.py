@@ -291,17 +291,22 @@ class Simulation:
         broad_cols = self.broad_phase(self._objects)
         narrow_cols = self.narrow_phase(broad_cols)
 
+        # Resolve collisions
         for col in narrow_cols:
             col.pre_collision(self)
             if col.active:
                 col.resolve()
-                col.post_collision(self)
 
         # Baumgarte stabilization
         beta = self.beta
         for col in narrow_cols:
             if col.active:
                 col.baumgarte(beta)
+
+        # Post-collision signal
+        for col in narrow_cols:
+            if col.active:
+                col.post_collision(self)
 
     def get_islands(self, contacts):
         """

@@ -81,6 +81,8 @@ class PosObject(StateObject):
     # Relative displacements
     from_middle, from_north, from_south, from_east, from_west = \
         map(_factory_from_func, [middle, north, south, east, west])
+    from_top, from_bottom, from_left, from_right = \
+        map(_factory_from_func, [north, south, west, east])
 
     # Diagonals
     sw, se, ne, nw = \
@@ -93,13 +95,42 @@ class PosObject(StateObject):
     from_south_west, from_south_east, from_north_east, from_north_west = \
         from_sw, from_se, from_ne, from_nw
 
-    def random(self):
+    def random(self, *args):
         """
         Return random position in the visible screen.
+
+        Signature:
+            ``pos.random(size)``: create objects within screen and inside a
+                margin with the given number of pixels.
+            ``pos.random(margin_x, margin_y)``: specify margin in x and y
+                directions.
+            ``pos.random(margin_left, margin_bottom, margin_right, margin_top)``:
+                specify each margin separately
         """
 
-        w, h = self._shape
-        return Vec2(random.uniform(0, w), random.uniform(0, h)) + self._origin
+        x0 = y0 = 0
+        x1, y1 = self._shape
+        if len(args) == 1:
+            margin = args[0]
+            x0 += margin
+            x1 -= margin
+            y0 += margin
+            y1 -= margin
+        elif len(args) == 2:
+            dx, dy = args
+            x0 += dx
+            x1 -= dx
+            y0 += dy
+            y1 -= dy
+        elif len(args) == 4:
+            x0 += args[0]
+            y0 += args[1]
+            x1 -= args[2]
+            y1 -= args[3]
+        elif len(args) != 0:
+            raise TypeError('must be called with 0, 1, 2, or 4 arguments')
+
+        return Vec2(random.uniform(x0, x1), random.uniform(y0, y1)) + self._origin
 
 
 class VelObject(StateObject):

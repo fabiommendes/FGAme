@@ -1,11 +1,14 @@
 import inspect
-from functools import partial
-from types import FunctionType
-
 import sys
+from functools import partial
+from types import FunctionType, MethodType
+from weakref import WeakKeyDictionary
+
 from lazyutils import lazy
 
 REGISTERED_SIGNALS = {}
+METHOD_LISTENERS = WeakKeyDictionary()
+FUNCTION_LISTENERS = WeakKeyDictionary()
 
 
 def _ignoring_function_factory(function, required_args, ignores):
@@ -330,8 +333,8 @@ class Listener:
                 signal_name = attr[:-6].replace('_', '-')
                 self.listen(signal_name, function=value)
 
-            if hasattr(value, '__method_signals__'):
-                L = value.__method_signals__
+            if cls_value in METHOD_LISTENERS:
+                L = METHOD_LISTENERS[cls_value]
                 for (signal, filters, args, kwargs, extra_args) in L:
                     self.listen(signal, *filters, args=args, kwargs=kwargs,
                                 function=value, **extra_args)
@@ -380,7 +383,7 @@ class Listener:
                 decorator = listen(signal, *filters, args=args, kwargs=kwargs,
                                    **extra_args)
                 decorated = decorator(func)
-                self._connected_handlers.append(decorated.handlers[-1])
+                self._connected_handlers.append(decorated._signal_handlers[-1])
                 return decorated
 
             return decorator
@@ -426,8 +429,13 @@ def is_method(func):
     Return True if function is a method and receives an implicit self argument.
     """
 
-    args = inspect.getargspec(func).args
-    return args and args[0] == 'self'
+    if isinstance(func, MethodType):
+        return False
+    try:
+        args = inspect.getargspec(func).args
+        return args and args[0] == 'self'
+    except TypeError:
+        return False
 
 
 def listen(signal, *filters,
@@ -449,11 +457,9 @@ def listen(signal, *filters,
 
     def decorator(func):
         if is_method(func):
-            try:
-                args_list = func.__method_signals__
-            except AttributeError:
-                args_list = func.__method_signals__ = []
-            args_list.append((signal_input, filters, args, kwargs, extra_kwargs))
+            item = signal_input, filters, args, kwargs, extra_kwargs
+            args_list = METHOD_LISTENERS.get(func, [])
+            args_list.append(item)
             return func
 
         # Connect function
@@ -462,17 +468,17 @@ def listen(signal, *filters,
 
         # We register a few attributes to make the func.disconnect(),
         # func.pause(), etc functions work.
-        signals = getattr(func, '_connected_signals', set())
+        signal_data = FUNCTION_LISTENERS.get(func, {})
+        signals = signal_data.get('signals', set())
         signals.add(signal)
-        func._connected_signals = signals
-        handlers = getattr(func, '_signal_handlers', [])
+        handlers = signal_data.get('handlers', [])
         handlers.append(handler)
-        func._signal_handlers = handlers
 
         def make_action(signal, action, *args, **kwargs):
             # Helper function
             affected = []
-            for idx, handler in enumerate(list(func._signal_handlers)):
+            handlers = FUNCTION_LISTENERS.get(func, {}).get('handlers', [])
+            for idx, handler in enumerate(list(handlers)):
                 if handler.signal is signal:
                     affected.append(idx)
                     getattr(handler, action)(*args, **kwargs)
@@ -494,8 +500,10 @@ def listen(signal, *filters,
 
             Can target a specific signal, if provided.
             """
+
             if signal is None:
-                for signal in list(func._connected_signals):
+                signals = FUNCTION_LISTENERS.get(func, {}).get('signals', set())
+                for signal in signals:
                     disconnect(signal)
                 return
 
@@ -551,7 +559,7 @@ def listen(signal, *filters,
             """
 
             # Filter handlers, if necessary
-            handlers = func._signal_handlers
+            handlers = FUNCTION_LISTENERS.get(func, {}).get('handlers', [])
             if signal:
                 handlers = [x for x in handlers if x.signal is signal]
 
@@ -570,19 +578,23 @@ def listen(signal, *filters,
             """
 
             data = {}
-            for handler in func._signal_handlers:
+            handlers = FUNCTION_LISTENERS.get(func, {}).get('handlers', [])
+            for handler in handlers:
                 handlers = data.setdefault(handler.signal, [])
                 handlers.append(handler)
             return data
 
         # Now we save these functions as attributes for the decorated function
-        func.disconnect = disconnect
-        func.reconnect_before = reconnect_before
-        func.reconnect_after = reconnect_after
-        func.pause = pause
-        func.resume = resume
-        func.handler = handler
-        func.handlers = handlers
+        try:
+            func.disconnect = disconnect
+            func.reconnect_before = reconnect_before
+            func.reconnect_after = reconnect_after
+            func.pause = pause
+            func.resume = resume
+            func.handler = handler
+            func.handlers = handlers
+        except AttributeError:
+            pass
         return func
 
     return decorator
@@ -637,7 +649,8 @@ def normalize_filters(signal, values, named_filters):
         if value is empty:
             result[idx] = values.pop()
         elif idx == len(values) - 1:
-            raise ValueError('too many filter arguments!')
+            raise ValueError('too many filter arguments in %r signal!' %
+                             signal.name)
         else:
             idx += 1
 

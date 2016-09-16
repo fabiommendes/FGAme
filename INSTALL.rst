@@ -4,15 +4,14 @@ Installation instructions
 
 FGAme can be installed using pip::
 
-    $ python -m pip install FGAme
+    $ python3 -m pip install FGAme
 
 This command will fetch the archive and its dependencies from the internet and
-install them. You may need to pick either ``python2``` or ``python3`` in
-order to select the correct python version.
+install them.
 
 If you've downloaded the tarball, unpack it, and execute::
 
-    $ python setup.py install
+    $ python3 setup.py install
 
 In either case, it is possible to perform local user installs by appending the
 ``--user`` option.
