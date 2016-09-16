@@ -10,7 +10,7 @@ python:
 install:
     - pip install pip -U
     - pip install .[dev] -r requirements.txt
-    - pip install coveralls pytest-cov
+    - pip install coveralls pytest-cov -m 'not pygame'
 
 # run tests
 script:

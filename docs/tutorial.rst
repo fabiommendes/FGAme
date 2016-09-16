@@ -125,16 +125,16 @@ every frame that this event is triggered, we want to call the ``player1.move``
 with the arguments (0, 4) to move it 4px up. This is done with this command:
 
 >>> listen('long-press', 'w', function=player1.move, args=(0, 4))     #doctest: +ELLIPSIS
-<function ...>
+move(...)
 
 We now adjust the same command for the other keys:
 
 >>> listen('long-press', 's', function=player1.move, args=(0, -4))    #doctest: +ELLIPSIS
-<function ...>
+move(...)
 >>> listen('long-press', 'up', function=player2.move, args=(0, 4))    #doctest: +ELLIPSIS
-<function ...>
+move(...)
 >>> listen('long-press', 'down', function=player2.move, args=(0, -4)) #doctest: +ELLIPSIS
-<function ...>
+move(...)
 
 Now we have a functional Pong game! Let us give a nice hit to the red ball
 and start playing.
