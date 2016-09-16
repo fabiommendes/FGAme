@@ -10,11 +10,11 @@ python:
 install:
     - pip install pip -U
     - pip install .[dev] -r requirements.txt
-    - pip install coveralls pytest-cov -m 'not pygame'
+    - pip install coveralls pytest-cov
 
 # run tests
 script:
-    - py.test src/FGAme/tests/ --cov
+    - py.test src/FGAme/tests/ --cov -m "not pygame"
 
 after_success:
     - coveralls
