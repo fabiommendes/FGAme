@@ -19,11 +19,12 @@ dirname = os.path.dirname(__file__)
 
 # Save version and author to __meta__.py
 path = os.path.join(dirname, 'src', 'FGAme', '__meta__.py')
-with open(path, 'wb') as F:
-    F.write(('''# Automatically created. Please do not edit.
+data = '''# Automatically created. Please do not edit.
 __version__ = u'%s'
 __author__ = u'F\\xe1bio Mac\\xeado Mendes'
-''' % version).encode())
+''' % version
+with open(path, 'wb') as F:
+    F.write(data.encode())
 
 setup(
     # Basic info
