@@ -50,9 +50,11 @@ setup(
         'smallshapes>=0.6',
         'smallvectors>=0.6',
         'colortools>=0.1.1',
-        'pygame',
     ],
     extras_require={
+        'pygame': [
+            'pygame',
+        ],
         'dev': [
             'cython',
             'pytest',

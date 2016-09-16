@@ -14,7 +14,7 @@ install:
 
 # run tests
 script:
-    - py.test src/colortools/tests/ --cov
+    - py.test src/FGAme/tests/ --cov
 
 after_success:
     - coveralls
