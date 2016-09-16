@@ -18,10 +18,12 @@ version = open('VERSION').read().strip()
 dirname = os.path.dirname(__file__)
 
 # Save version and author to __meta__.py
-file_name = os.path.join(dirname, 'src', project, '__meta__.py')
-with open(file_name, 'w', encoding='utf-8') as F:
-    F.write('__version__ = %r\n'
-            '__author__ = %r\n' % (version, author))
+path = os.path.join(dirname, 'src', 'FGAme', '__meta__.py')
+with open(path, 'wb') as F:
+    F.write(('''# Automatically created. Please do not edit.
+__version__ = u'%s'
+__author__ = u'F\\xe1bio Mac\\xeado Mendes'
+''' % version).encode())
 
 setup(
     # Basic info
