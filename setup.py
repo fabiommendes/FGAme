@@ -61,6 +61,7 @@ setup(
         'dev': [
             'cython',
             'pytest',
+            'manuel',
             'python-boilerplate>=0.4.5',
         ],
     },
