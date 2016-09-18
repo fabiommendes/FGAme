@@ -50,8 +50,8 @@ setup(
     package_dir={'': 'src'},
     packages=find_packages('src'),
     install_requires=[
-        'smallshapes>=0.6',
-        'smallvectors>=0.6',
+        'smallshapes>=0.6.1',
+        'smallvectors>=0.6.3',
         'colortools>=0.1.1',
     ],
     extras_require={
