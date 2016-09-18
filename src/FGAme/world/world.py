@@ -1,6 +1,8 @@
 import threading
 import weakref
 
+import collections
+
 from FGAme import conf
 from FGAme.draw import RenderTree, colorproperty
 from FGAme.objects import Body
@@ -12,7 +14,7 @@ from FGAme.world.factory import ObjectFactory
 from FGAme.world.tracker import Tracker
 
 
-class World(Listener):
+class World(Listener, collections.MutableSequence):
     """
     Combines physical simulation with display.
     """
@@ -51,6 +53,7 @@ class World(Listener):
 
         self.background = background
         self._render_tree = RenderTree()
+        self._objects = []
 
         if simulation:
             self._simulation = simulation
@@ -75,8 +78,20 @@ class World(Listener):
         # Connect signals
         self.autoconnect()
 
-    def __contains__(self, obj):
-        return obj in self._render_tree or obj in self._simulation
+    def __len__(self):
+        return len(self._objects)
+
+    def __iter__(self):
+        return iter(self._objects)
+
+    def __getitem__(self, i):
+        return self._objects[i]
+
+    def __delitem__(self, i):
+        self.remove(self._objects[i])
+
+    def __setitem__(self, key, value):
+        raise IndexError('cannot replace objects in world')
 
     def _add(self, obj, layer=0):
         """
@@ -91,6 +106,18 @@ class World(Listener):
             if isinstance(obj, Body):
                 self._simulation.add(obj)
                 obj.world = self
+            self._objects.append(obj)
+
+    def insert(self, idx, obj):
+        raise IndexError('cannot insert objects at specific positions. '
+                         'Please user world.add()')
+
+    def append(self, obj, layer=0):
+        """
+        Alias to World.add()
+        """
+
+        self.add(obj, layer)
 
     def remove(self, obj):
         """
@@ -104,6 +131,7 @@ class World(Listener):
             obj.world = None
         else:
             self._render_tree.remove(obj)
+        self._objects.remove(obj)
 
     def init(self):
         """

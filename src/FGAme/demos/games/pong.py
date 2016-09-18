@@ -14,3 +14,4 @@ def set_speed(player, direction):
     player.vy = direction * vel.speed_fair
 
 run()
+

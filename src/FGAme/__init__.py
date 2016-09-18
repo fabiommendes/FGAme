@@ -1,5 +1,5 @@
 from .__meta__ import __version__, __author__
-from .signals import Signal, listen, trigger
+from .signals import Signal, listen, trigger, on
 from .input import *
 from .configuration import conf, init
 from .world import World, world, pos, vel

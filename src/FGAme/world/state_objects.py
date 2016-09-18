@@ -139,8 +139,8 @@ class VelObject(StateObject):
     """
 
     def __init__(self):
-        self._fair = 300
         self._fast = 600
+        self._fair = 300
         self._slow = 150
 
     def set_speeds(self, slow, fair, fast):
@@ -201,7 +201,7 @@ class VelObject(StateObject):
         A random fast velocity.
         """
 
-        return self._random(self._slow, angle)
+        return self._random(self._fast, angle)
 
     def random_slow(self, angle=None):
         """

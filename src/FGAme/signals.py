@@ -662,3 +662,38 @@ def normalize_filters(signal, values, named_filters):
         name = signal.filters[idx]
         raise TypeError('missing %s argument!' % name)
     return result
+
+
+class OnObject:
+    """
+    Implements the on(signal, args).do(function, *args, **kwargs) syntax.
+    """
+
+    def __init__(self, signal, *filters):
+        self.__signal = signal
+        self.__filters = filters
+
+    def __getattr__(self, attr):
+        if self.__bound is None:
+            raise AttributeError(attr)
+        else:
+            return getattr(self.__bound, attr)
+
+    def do(self, function, *args, **kwargs):
+        listener = listen(self.__signal, *self.__filters,
+                          function=function, args=args, kwargs=kwargs)
+        listener.do = self.do
+        return listener
+
+
+def on(signal, *filters):
+    """
+    Implements the on().do() syntax to register signal handlers.
+
+    Example:
+        This will print (an annoying) "hello frame!" message every frame.
+
+        >>> on('frame-enter').do(print, "hello frame!")
+    """
+
+    return OnObject(signal, *filters)
