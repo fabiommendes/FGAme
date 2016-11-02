@@ -460,6 +460,7 @@ def listen(signal, *filters,
             item = signal_input, filters, args, kwargs, extra_kwargs
             args_list = METHOD_LISTENERS.get(func, [])
             args_list.append(item)
+            METHOD_LISTENERS[func] = args_list
             return func
 
         # Connect function

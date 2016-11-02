@@ -9,7 +9,15 @@ __pycache__/
 *.egg-info/
 
 # Build directories
-doc/_build/
+docs/_build/
 build/
 dist/
-py2src/
+
+# Python-boilerplate auto generated files
+src/FGAme/__meta__.py
+
+# IDEs
+.idea/
+
+# Testing and temporary files
+.tox/

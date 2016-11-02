@@ -99,7 +99,9 @@ class ObjectFactory:
 
         W, H = conf.get_resolution()
         N = len(args)
-        if N == 1:
+        if N == 0:
+            dx = dy = dx_ = dy_ = 0
+        elif N == 1:
             dx = dy = dx_ = dy_ = args[0]
         elif N == 2:
             dx, dy = args

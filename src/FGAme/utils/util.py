@@ -1,4 +1,3 @@
-import types
 import functools
 import types
 
@@ -8,10 +7,12 @@ __all__ = [
 
 
 class CachingProxy:
-    """A proxy object that caches all attribute access for faster
+    """
+    A proxy object that caches all attribute access for faster
     re-evaluation.
 
-    Delegate can be intialized by an object or by a factory."""
+    Delegate can be intialized by an object or by a factory.
+    """
 
     def __init__(self, obj=None, factory=None):
         self.__data = obj
@@ -28,17 +29,20 @@ class CachingProxy:
 
 
 def caching_proxy_factory(func):
-    """Decorator that initializes a CachingProxy object by setting its factory
-    function."""
+    """
+    Decorator that initializes a CachingProxy object by setting its factory
+    function.
+    """
 
     return CachingProxy(factory=func)
 
 
-
 def autodoc(cls):
-    '''Decorador de classe que insere automaticamente as strings de
+    """
+    Decorador de classe que insere automaticamente as strings de
     documentação nos métodos não-documentados de uma classe utilizando a
-    string da classe mãe'''
+    string da classe mãe
+    """
 
     func_t = types.FunctionType
 
@@ -59,8 +63,8 @@ def autodoc(cls):
 
 
 def popattr(obj, attr, value=None):
-    '''Returns attribute `attr` from `obj` and delete it afterwards.
-    If attribute does not exist, return `value`'''
+    """Returns attribute `attr` from `obj` and delete it afterwards.
+    If attribute does not exist, return `value`"""
 
     try:
         result = getattr(obj, attr)
@@ -76,14 +80,13 @@ def popattr(obj, attr, value=None):
 #
 try:
     from functools import lru_cache as _lru_cache
-    def lru_cache(func):
-        '''A least recently used cache: keeps the 512 most recent results of
-        function in cache'''
-        return _lru_cache(maxsize=512)(func)
+
+
+    def lru_cache(func, maxsize=512):
+        return _lru_cache(maxsize=maxsize)(func)
+
 except ImportError:
-    def lru_cache(func):
-        '''A least recently used cache: keeps the 512 most recent results of
-        function in cache'''
+    def lru_cache(func, maxsize=512):
         D = {}
 
         @functools.wraps(func)
@@ -92,9 +95,10 @@ except ImportError:
                 return D[args]
             except KeyError:
                 result = func(*args)
-                while len(D) > 512:
+                while len(D) > maxsize:
                     D.popitem()
                 return result
+
         return decorated
 
 
@@ -102,28 +106,33 @@ except ImportError:
 # Easy interactive console for debugging
 #
 def console_here():
-    '''Cria um console local para debug'''
-    
+    """
+    Start debug console.
+    """
+
     import code
     import inspect
-    
+
     frame = inspect.currentframe().f_back
     ns = dict(frame.f_globals)
     ns.update(frame.f_locals)
     console = code.InteractiveConsole(ns)
     console.interact()
 
+
 def ipython_here():
-    '''Cria um console local para debug usando IPython'''
-    
+    """
+    Starts an ipython debug console.
+    """
+
     import IPython.terminal.embed
     import inspect
-    
+
     frame = inspect.currentframe().f_back
-    
+
     shell = IPython.terminal.embed.InteractiveShellEmbed(
         argv=["-colors", "NoColor"],
-        locals_ns=frame.f_locals, 
+        locals_ns=frame.f_locals,
         globals_ns=frame.f_globals,
     )
     shell()

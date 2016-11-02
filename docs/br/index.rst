@@ -12,7 +12,6 @@ Bem vindo à documentação da FGAme
 
    install.rst
    tutorial.rst
-   tutorial2.rst
    documentation.rst
    game_engines.rst
    

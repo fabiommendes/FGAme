@@ -73,6 +73,9 @@ class PongDefend(World):
             self.new_hit_mark(i, self.hits_bg)
         self.level = 0
 
+        # Connect signals
+        self.autoconnect()
+
     def new_ball(self):
         """
         Creates a new red ball
@@ -202,7 +205,9 @@ class PongDefend(World):
 
 
 def game_over():
-    """Executed when the game finishes"""
+    """
+    Executed when the game finishes.
+    """
 
     from FGAme.extra.letters import add_word
 

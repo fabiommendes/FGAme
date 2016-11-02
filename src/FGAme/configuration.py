@@ -67,6 +67,16 @@ class Configuration:
     _set_mainloop = _setter_factory('_mainloop_object')
     _set_fps = _setter_factory('_physics_fps', force=True)
 
+    @property
+    def sfx_class(self):
+        from FGAme.sound import SFX
+        return SFX
+
+    @property
+    def music_class(self):
+        from FGAme.sound import Music
+        return Music
+
     def set_resolution(self, *args):
         """
         Set screen resolution.

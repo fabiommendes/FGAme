@@ -5,12 +5,12 @@ from FGAme.mathtools import asvector
 from FGAme.resources import resources
 from FGAme.utils import lru_cache
 
-try:
-    import PIL.Image
-except ImportError:
-    from warnings import warn
-
-    warn('PIL not found. FGAme will not be able to render images and textures')
+# try:
+#     import PIL.Image
+# except ImportError:
+#     from warnings import warn
+#
+#     warn('PIL not found. FGAme will not be able to render images and textures')
 
 #
 # Reference aliases for special points in an AABB

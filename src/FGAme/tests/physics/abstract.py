@@ -1,5 +1,5 @@
 from FGAme.physics import get_collision
-from FGAme.physics.bodies import Circle, AABB, Body,  # Poly, Rectangle, RegularPoly,
+from FGAme.physics.bodies import Circle, AABB, Body,  Poly, Rectangle, RegularPoly
 
 CLASSES = [Circle, AABB,
            # Poly, Rectangle, RegularPoly

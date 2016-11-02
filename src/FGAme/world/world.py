@@ -4,10 +4,10 @@ import weakref
 import collections
 
 from FGAme import conf
+from FGAme.signals import Listener
 from FGAme.draw import RenderTree, colorproperty
 from FGAme.objects import Body
 from FGAme.physics import Simulation
-from FGAme.signals import Listener
 from FGAme.utils import delegate_to
 from FGAme.utils import lazy
 from FGAme.world.factory import ObjectFactory

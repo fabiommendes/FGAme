@@ -1,11 +1,13 @@
 from .__meta__ import __version__, __author__
-from .signals import Signal, listen, trigger, on
+from .signals import Signal, Listener, listen, trigger, on
+from .asset import Asset
 from .input import *
 from .configuration import conf, init
 from .world import World, world, pos, vel
 from .objects import *
 from . import mathtools as math
 from . import draw
+from .sound import play, music, stop_music, stop_sfx, mute, Sound, Music, SFX
 from .draw import Color
 from . import physics
 from .zero import run, start

@@ -55,3 +55,4 @@ wake_up_signal = global_signal(
     'wake-up', ['simulation', 'object'],
     help_text='Triggered when object leaves sleeping state.'
 )
+import pgzero

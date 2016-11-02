@@ -1,4 +1,4 @@
-from FGAme.mathtools import Vec2, asvector, null2D, shapes
+from FGAme.mathtools import Vec2, asvector, null2D, shapes, Vec
 from FGAme.physics import flags
 from FGAme.physics.bodies import Particle
 from FGAme.physics.utils import safe_div, INF
@@ -37,6 +37,8 @@ class Body(Solid, Particle):
         'cbb_radius', '_shape', 'base_shape',
         '_theta', '_omega', '_alpha',
     )
+    _e_vel = Vec(0, 0)
+    _e_omega = 0
 
     # Angular state
     @property
