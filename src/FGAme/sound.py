@@ -7,6 +7,16 @@ music_ended_signal = _signal('music-ended', ['sound'])
 sfx_ended_signal = _signal('music-ended', ['sound'])
 
 
+@lru_cache
+def get_pygame_sound(path):
+    """
+    Cached sound loader
+    """
+
+    import pygame
+    return pygame.mixer.Sound(path)
+
+
 class Sound(Asset):
     """
     Common functionality for SFX and Music.
@@ -64,7 +74,7 @@ class Sound(Asset):
         Play sound
         """
 
-        if not self.is_playing:
+        if not self.is_playing or True:
             self.init()
             self._play()
             self.is_playing = True
@@ -116,7 +126,7 @@ class Sound(Asset):
     def _get_sound(self):
         self.init()
         if not hasattr(self, '_sound'):
-            self._sound = self._pygame().mixer.Sound(self.path)
+            self._sound = get_pygame_sound(self.path)
         return self._sound
 
     def _play(self):
@@ -240,7 +250,6 @@ class Music(Sound):
         self._volume = value
 
 
-@lru_cache
 def get_sfx(name):
     """
     Return the SFX instance with the given name.
@@ -251,7 +260,6 @@ def get_sfx(name):
     return conf.sfx_class(name)
 
 
-@lru_cache
 def get_music(name):
     """
     Return Music instance with the given name.

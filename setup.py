@@ -66,6 +66,16 @@ setup(
         ],
     },
 
+    # Data
+    package_data={
+        'FGAme': [
+            'assets/*.*',
+            'assets/sfx/*.*',
+            'assets/music/*.*',
+            'assets/images/*.*',
+        ],
+    },
+
     # Other configurations
     zip_safe=False,
     platforms='any',

@@ -1,5 +1,5 @@
 import os
-
+import sys
 from lazyutils import lazy
 
 import FGAme
@@ -38,9 +38,10 @@ class Asset:
 
         name = os.path.join(*self.name.split('/'))
         for directory in self.directories():
-            for ext in self.extensions:
-                path = os.path.join(directory, name + ext)
-                yield path
+            if os.path.exists(directory):
+                for ext in self.extensions:
+                    path = os.path.join(directory, name + ext)
+                    yield path
 
     def directories(self):
         """
@@ -53,10 +54,22 @@ class Asset:
         glob = os.path.dirname(FGAme.__file__)
         yield os.path.join(glob, 'assets', self.file_type)
 
+        # Inspect frame globals and use asset directory from calling module
+        frame = sys._getframe()
+        modname = frame.f_globals.get('__name__', 'FGAme').partition('.')[0]
+        while modname == 'FGAme':
+            frame = frame.f_back
+            if frame is None:
+                return
+            modname = frame.f_globals.get('__name__', 'FGAme').partition('.')[0]
+        mod = sys.modules[modname]
+        base = os.path.dirname(mod.__file__)
+        yield os.path.join(base, 'assets')
+
     def best_path(self):
         """
         Return the full path to filename with the highest priority.
-        If no suitable files were found, raises a ValueError.
+        If no suitable files are found, raise a ValueError.
         """
 
         for path in self.paths():

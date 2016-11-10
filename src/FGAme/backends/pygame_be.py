@@ -86,13 +86,14 @@ class PyGameCanvas(Canvas):
         x, y = self._map_point(*pos)
         self._screen.set_at(x, y, rgb(color))
 
-    def clear_background(self, color=None):
-        if color is None:
-            if self.background is None:
-                raise RuntimeError('background was not defined')
-            self._screen.fill(self.background)
-        else:
-            self._screen.fill(Color(color))
+    def prepare_image(self, asset):
+        path = asset.path
+        return pygame.image.load(path)
+
+    def draw_background(self):
+        self._screen.fill(self.background_color)
+        if self.background_image is not None:
+            self._screen.blit(self.background_image, (0, 0))
 
 
 class PyGameInput(Input):

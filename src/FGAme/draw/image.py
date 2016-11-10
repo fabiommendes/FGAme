@@ -219,7 +219,9 @@ class TileSheet(object):
 # Utility functions
 #
 def get_texture(texture_or_path, theta=0, scale=1):
-    """Return texture from path or object holding image data."""
+    """
+    Return texture from path or object holding image data.
+    """
 
     if isinstance(texture_or_path, str):
         return __get_texture_from_path(texture_or_path)
@@ -233,8 +235,3 @@ def get_texture(texture_or_path, theta=0, scale=1):
 def __get_texture_from_path(path):
     return Texture(path)
 
-
-if __name__ == '__main__':
-    import doctest
-
-    doctest.testmod()

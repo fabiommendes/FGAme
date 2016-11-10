@@ -44,6 +44,8 @@ class Screen(object):
         self.background = background
         self.camera = Camera(self)
         self.visible = False
+        self.background_image = None
+        self.background_color = white
 
     def init(self):
         """
@@ -56,6 +58,27 @@ class Screen(object):
         """
 
         self.visible = True
+
+    def set_background_image(self, image):
+        """
+        Configures a background image from its asset name.
+        """
+
+        if image is None:
+            self.background_image = None
+        else:
+            from FGAme import asset
+
+            if isinstance(image, str):
+                image = asset.Asset(image, 'images', ['.png', '.jpeg', '.jpg'])
+            self.background_image = self.prepare_image(image)
+
+    def prepare_image(self, asset):
+        """
+        Prepares a useful image object from asset.
+        """
+
+        raise NotImplementedError
 
     def draw(self, obj):
         obj.draw(self.camera)
@@ -244,7 +267,7 @@ class Canvas(Screen):
 
     def show(self):
         super(Canvas, self).show()
-        self.clear_background('white')
+        self.draw_background()
         self.flip()
 
     def flip(self):
@@ -313,7 +336,7 @@ class Canvas(Screen):
     def raw_image(self, image):
         self.raw_texture(image.texture, image.pos_sw)
 
-    def clear_background(self, color):
+    def draw_background(self):
         raise NotImplementedError
 
 

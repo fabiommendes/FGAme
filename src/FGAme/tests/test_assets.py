@@ -30,3 +30,10 @@ def test_asset_repr(asset):
 def test_can_open_asset(asset):
     with asset as F:
         F.read()
+
+
+def test_assets_search_path(asset):
+    dirs = list(asset.directories())
+    join = os.path.join
+    assert dirs[0].endswith(join('assets', 'sfx'))
+    assert dirs[1].endswith(join('FGAme', 'assets', 'sfx'))

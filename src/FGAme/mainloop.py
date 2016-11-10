@@ -128,8 +128,7 @@ class MainLoop:
         screen = self.screen
         bg_color = getattr(state, 'background', 'white')
         pre_draw_signal.trigger(screen)
-        if bg_color is not None:
-            screen.clear_background(bg_color)
+        screen.draw_background()
         state.render_tree().draw(screen.camera)
         post_draw_signal.trigger(screen)
         screen.flip()

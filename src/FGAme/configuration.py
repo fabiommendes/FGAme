@@ -2,6 +2,7 @@ import os
 
 from FGAme import backends as fgame_backends
 from FGAme.logger import log
+from colortools import Color
 
 
 def _setter_factory(attr, force=False):
@@ -76,6 +77,16 @@ class Configuration:
     def music_class(self):
         from FGAme.sound import Music
         return Music
+
+    def set_background(self, color=None, image=None):
+        """
+        Sets the background color or image.
+        """
+
+        screen = self.get_screen()
+        if color is not None:
+            screen.background_color = Color(color)
+        screen.set_background_image(image)
 
     def set_resolution(self, *args):
         """
