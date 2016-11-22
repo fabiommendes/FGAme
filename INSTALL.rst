@@ -41,6 +41,40 @@ To start using FGAme, just type::
 
 	$ python3 test.py
 
+Debian
+------
+
+If you use Debian or Debian-based distributions like Ubuntu or Linux Mint, we show you how to install all the prerequisites to start using FGAme.
+
+First, download and install all libraries needed by Pygame::
+
+	$ sudo apt-get update
+	$ sudo apt-get install -y python3-dev python3-numpy \ 
+	libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev \
+	libsmpeg-dev libsdl1.2-dev libportmidi-dev libswscale-dev \
+	libavformat-dev libavcodec-dev libfreetype6-dev
+
+Then install Mercurial, and clone Pygame repository::
+
+	$ sudo apt-get -y install mercurial
+	$ hg clone https://bitbucket.org/pygame/pygame
+
+Build and Install Pygame::
+	
+	$ python3 pygame/setup.py build
+	$ sudo python3 pygame/setup.py install
+
+If you don't have pip3 or pil, install them::
+
+	$ sudo apt-get -y install python3-pip
+	$ sudo apt-get -y install python3-pil
+
+Finally, install pgzero and FGAme::
+
+	$ sudo pip3 install pgzero
+	$ sudo python3 -m pip install FGAme
+
+
 Troubleshoot
 ------------
 
