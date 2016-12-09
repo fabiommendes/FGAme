@@ -1,4 +1,4 @@
-import os
+import os, PIL.Image
 
 from FGAme.draw import AABB
 from FGAme.mathtools import asvector

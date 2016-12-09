@@ -5,16 +5,30 @@ python:
     - "3.5"
     - "nightly"
 
+sudo: required
+
+env:
+  - AUDIODEV=null
 # install dependencies
 # we have to upgrade pip to accept the .[dev] option
 install:
+    - sudo apt-get install python3-dev mercurial
+    - sudo apt-get update
+    - sudo apt-get -y install mercurial
+    - hg clone https://bitbucket.org/pygame/pygame
+    - sudo apt-get update
+    - sudo apt-get install -y python3-dev python3-numpy libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsmpeg-dev libsdl1.2-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev libfreetype6-dev
+    - pip3 install hg+http://bitbucket.org/pygame/pygame
+    - pip install pgzero
     - pip install pip -U
     - pip install .[dev] -r requirements.txt
     - pip install coveralls pytest-cov
+    - pip install Pillow
+    - pip install FGAme
 
 # run tests
 script:
-    - py.test src/FGAme/tests/ --cov -m "not pygame"
+    - py.test src/FGAme/tests/ --cov
 
 after_success:
     - coveralls

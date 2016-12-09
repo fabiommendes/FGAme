@@ -1,6 +1,8 @@
 [run]
 include =
     src/*
+omit =
+    src/FGAme/tests/*
 
 
 [report]

@@ -3,6 +3,7 @@ Re-define os objetos do módulo FGAme.physics e adiciona propriades extras de
 renderização
 """
 
+from PIL import ImageChops
 from FGAme import conf
 from FGAme import draw
 from FGAme import physics
@@ -68,7 +69,7 @@ class Body(physics.Body):
             elif image_reference not in ['middle', None]:
                 raise ValueError(
                     'invalid image reference: %r' % image_reference)
-            image.offset = offset
+            ImageChops.offset(image.texture._pil, int(offset[0]), int(offset[1]))
         else:
             self._drawshape = self._init_drawshape(color=self.color or black,
                                                    linecolor=self.linecolor,
